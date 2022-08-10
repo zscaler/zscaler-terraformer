@@ -69,7 +69,3 @@ terraform.tfvars.json
 .idea/
 vendor/
 local_test
-<<<<<<< HEAD
-=======
-zscaler-terraforming
->>>>>>> master
