@@ -1,0 +1,37 @@
+# Visit https://goreleaser.com for documentation on how to customize this
+# behavior.
+before:
+  hooks:
+    # this is just an example and not a requirement for provider building/publishing
+    - go mod tidy && go mod vendor
+builds:
+  - main: ./cmd/zscaler-terraforming/main.go
+    binary: zscaler-terraforming
+    ldflags:
+      - -s -w -X "github.com/zscaler/zscaler-terraforming/internal/app/zscaler-terraforming/cmd.versionString={{.Env.VERSION}}"
+    goos:
+      - windows
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - '386'
+      - arm
+      - arm64
+    ignore:
+      - goos: darwin
+        goarch: '386'
+archives:
+  - format: zip
+    name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Tag }}-next"
+
+release:
+  # Explicit set the repo to release from. Default is origin.
+  # Visit your project's GitHub Releases page to publish this release.
+  draft: true
+changelog:
+  skip: true

@@ -1,0 +1,75 @@
+# This is a minimal list, OK to add things per repo
+# mac specific
+.DS_Store
+.ansible
+.azure/
+.bash_history
+
+# don't check storage creds into GH
+.boto
+.cache
+*.code-workspace
+
+#  may contain gcloud files
+.config
+.gitconfig
+.local
+
+# .netrc contains secrets for service tokens
+.netrc
+*.plan
+.sentinel
+
+# .ssh dir may contain private keys
+.ssh
+.terrascan
+
+# Terraform dot files
+.terraform
+.terraform.lock.hcl
+.terraformrc
+**/.terraform/*
+.terraform.d
+*.tfstate
+*.tfstate.*
+.terragrunt-cache
+.vscode
+.idea
+.idea
+
+# Crash log files
+crash.log
+credentials.json
+
+# Zscaler specific
+temp
+terraform.rc
+tmp
+
+# Auto variables
+terraform.tfvars
+terraform.tfvars.json
+*.auto.tfvars
+*.auto.tfvars.json
+
+.terraform.lock.hcl
+
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, build with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+.idea/
+vendor/
+local_test
+<<<<<<< HEAD
+=======
+zscaler-terraforming
+>>>>>>> master
