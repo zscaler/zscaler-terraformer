@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/zscaler/zscaler-sdk-go/zia"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/activation"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/adminuserrolemgmt"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/devicegroups"
@@ -28,6 +29,7 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/zia/services/urlfilteringpolicies"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/user_authentication_settings"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/usermanagement"
+	"github.com/zscaler/zscaler-sdk-go/zpa"
 	"github.com/zscaler/zscaler-sdk-go/zpa/services/appconnectorcontroller"
 	"github.com/zscaler/zscaler-sdk-go/zpa/services/appconnectorgroup"
 	"github.com/zscaler/zscaler-sdk-go/zpa/services/applicationsegment"
@@ -120,6 +122,8 @@ type ZIAClient struct {
 }
 
 type Client struct {
-	zpa *ZPAClient
-	zia *ZIAClient
+	zpa       *ZPAClient
+	zia       *ZIAClient
+	ZiaClient *zia.Client
+	ZpaClient *zpa.Client
 }

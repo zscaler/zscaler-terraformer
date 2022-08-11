@@ -1,0 +1,49 @@
+---
+version: 1
+interactions:
+- request:
+    body: ""
+    form: {}
+    headers:
+      Content-Type:
+      - application/x-www-form-urlencoded
+      User-Agent:
+      - zscaler-terraforming
+    url: https://config.private.zscaler.com/signin
+    method: POST
+  response:
+    body: |-
+      {
+        "token_type" : "Bearer",
+        "access_token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+        "expires_in" : "3600"
+      }
+    headers:
+      Content-Type:
+      - application/json
+    status: 200 OK
+    code: 200
+- request:
+    body: ""
+    form: {}
+    headers:
+      Content-Type:
+      - application/json
+      User-Agent:
+      - zscaler-terraforming
+    url: https://config.private.zscaler.com/mgmtconfig/v1/admin/customers/216196257331281920/appConnectorGroup?pagesize=500
+    method: GET
+  response:
+    body: '{"totalPages":"1","list":[{"id":"216196257331301305","modifiedTime":"1646874488","creationTime":"1646791910","modifiedBy":"216196257331281958","name":"Zscaler
+      Deception","enabled":true,"description":"Automatically created by Zscaler Deception
+      API for whiskeygolf","versionProfileId":"2","overrideVersionProfile":false,"versionProfileName":"New
+      Release","versionProfileVisibilityScope":"ALL","upgradeTimeInSecs":"66600","upgradeDay":"SUNDAY","location":"Mumbai,
+      Maharashtra, India","latitude":"19.0728","longitude":"72.8826","dnsQueryType":"IPV4_IPV6","cityCountry":"Mumbai,
+      IN","countryCode":"IN","connectors":[{"id":"216196257331307409","modifiedTime":"1656100806","creationTime":"1656100806","modifiedBy":"-2","name":"Zscaler
+      Deception-1656100806020","fingerprint":"TRdagD4/vmR47xjEJaGXWHTbS2nQx9EaGqdf3XozSoM=","issuedCertId":"1176378","enabled":true,"assistantVersion":{"id":"216196257331307409","modifiedTime":"1660158018","creationTime":"1656100811","modifiedBy":"72057594037928156","expectedVersion":"22.137.1","currentVersion":"22.137.1","systemStartTime":"1656100751","applicationStartTime":"1656101538","lastBrokerConnectTime":"1660158018600815","lastBrokerDisconnectTime":"1657047942664384","brokerId":"72057594037929075","restartTimeInSec":"1656101471","platform":"el7","upgradeStatus":"COMPLETE","ctrlChannelStatus":"ZPN_STATUS_AUTHENTICATED","latitude":"19.0728","longitude":"72.8826","privateIp":"198.18.224.20","publicIp":"3.108.225.232","loneWarrior":true,"mtunnelId":"Vl35Wp9dm3aPfmyB9XqA","previousVersion":"21.352.1","lastUpgradedTime":"1656101538","upgradeAttempt":"0","sargeVersion":"22.137.1","appConnectorGroupId":"216196257331301305"},"upgradeAttempt":"0","provisioningKeyId":"11110"}],"lssAppConnectorGroup":true}]}'
+    headers:
+      Content-Type:
+      - application/json;charset=utf-8
+    status: 200 OK
+    code: 200
+    duration: ""

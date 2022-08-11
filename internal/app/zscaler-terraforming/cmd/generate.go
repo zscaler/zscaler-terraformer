@@ -13,6 +13,7 @@ import (
 	"github.com/hashicorp/hc-install/product"
 	"github.com/hashicorp/hc-install/releases"
 	"github.com/hashicorp/terraform-exec/tfexec"
+	tfjson "github.com/hashicorp/terraform-json"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zclconf/go-cty/cty"
@@ -82,20 +83,24 @@ func generateResources() func(cmd *cobra.Command, args []string) {
 		if err != nil {
 			log.Fatal("failed to read provider schema", err)
 		}
-		// log.Info("providers:%v", ps.Schemas)
-		s := ps.Schemas[fmt.Sprintf("zscaler.com/%s/%s", cloudType, cloudType)]
-		if s == nil {
-			// try zscaler/XXX
-			s = ps.Schemas[fmt.Sprintf("zscaler/%s", cloudType)]
-			if s == nil {
-				log.Fatal("failed to detect " + cloudType + " provider installation")
+		providerNames := []string{
+			fmt.Sprintf("zscaler.com/%s/%s", cloudType, cloudType),
+			fmt.Sprintf("zscaler/%s", cloudType),
+			fmt.Sprintf("registry.terraform.io/zscaler/%s", cloudType),
+		}
+		var s *tfjson.ProviderSchema
+		log.Debug("ps.Schemas:", ps.Schemas)
+		for _, p := range providerNames {
+			if ps, ok := ps.Schemas[p]; ok {
+				s = ps
+				break
 			}
+		}
+		if s == nil {
+			log.Fatal("failed to detect " + cloudType + " provider installation")
 		}
 
 		r := s.ResourceSchemas[resourceType]
-		if r == nil {
-			log.Fatal("resource not found:", resourceType, " in %v", s.ResourceSchemas)
-		}
 		log.Debugf("beginning to read and build %s resources", resourceType)
 
 		// Initialise `resourceCount` outside of the switch for supported resources

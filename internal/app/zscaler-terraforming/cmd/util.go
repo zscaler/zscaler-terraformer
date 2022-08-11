@@ -161,7 +161,7 @@ func sharedPreRun(cmd *cobra.Command, args []string) {
 			"ziaCloud":    "ziaCloud",
 		}).Debug("initializing zscaler-sdk-go[ZIA]")
 	} else {
-		log.Fatal("failed to initialize zscaler-sdk-go (zpa): Uknwon resource type prefix, expecting zpa_ or zia_")
+		log.Fatal("failed to initialize zscaler-sdk-go (zpa): Uknwon resource type prefix, expecting zpa_ or zia_: " + resourceType)
 	}
 
 	// Don't initialise a client in CI as this messes with VCR and the ability to
