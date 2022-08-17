@@ -15,7 +15,7 @@ interactions:
     body: |-
       {
         "token_type" : "Bearer",
-        "access_token" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+        "access_token" : "jwt",
         "expires_in" : "3600"
       }
     headers:
@@ -34,8 +34,7 @@ interactions:
     url: https://config.private.zscaler.com/mgmtconfig/v1/admin/customers/216196257331281920/appConnectorGroup?pagesize=500
     method: GET
   response:
-    body: '{
-    "totalPages":"1","list":[{"id":"216196257331301305","modifiedTime":"1646874488","creationTime":"1646791910","modifiedBy":"216196257331281958","name":"Zscaler
+    body: '{"totalPages":"1","list":[{"id":"216196257331301305","modifiedTime":"1646874488","creationTime":"1646791910","modifiedBy":"216196257331281958","name":"Zscaler
       Deception","enabled":true,"description":"Automatically created by Zscaler Deception
       API for whiskeygolf","versionProfileId":"2","overrideVersionProfile":false,"versionProfileName":"New
       Release","versionProfileVisibilityScope":"ALL","upgradeTimeInSecs":"66600","upgradeDay":"SUNDAY","location":"Mumbai,

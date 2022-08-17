@@ -119,6 +119,7 @@ func TestGenerate_writeAttrLine(t *testing.T) {
 func TestGenerate_ResourceNotSupported(t *testing.T) {
 	viper.Set("zpa-terraform-install-path", "")
 	viper.Set("zia-terraform-install-path", "")
+	viper.Set("terraform-install-path", "../../../../testdata/testnotsupported/.")
 	_, output, err := executeCommandC(rootCmd, "generate", "--resource-type", "zpa_notreal", "--verbose")
 
 	if assert.Nil(t, err) {
@@ -133,26 +134,26 @@ func TestResourceGeneration(t *testing.T) {
 		testdataFilename string
 	}{
 		// ZPA Resource
-		"zpa app connector group": {identiferType: "group", resourceType: "zpa_app_connector_group", testdataFilename: "zpa_app_connector_group"},
-		//"zpa application server":             {identiferType: "server", resourceType: "zpa_application_server", testdataFilename: "zpa_application_server"},
-		//"zpa application segment":            {identiferType: "appsegment", resourceType: "zpa_application_segment", testdataFilename: "zpa_application_segment"},
-		//"zpa application segment pra":        {identiferType: "appsegment", resourceType: "zpa_application_segment_pra", testdataFilename: "zpa_application_segment_pra"},
-		//"zpa application segment inspection": {identiferType: "appsegment", resourceType: "zpa_application_segment_inspection", testdataFilename: "zpa_application_segment"},
-		//"zpa segment group":                  {identiferType: "group", resourceType: "zpa_segment_group", testdataFilename: "zpa_segment_group"},
-		//"zpa server group":                   {identiferType: "group", resourceType: "zpa_server_group", testdataFilename: "zpa_server_group"},
-		//"zpa browser access":                 {identiferType: "appsegment", resourceType: "zpa_browser_access", testdataFilename: "zpa_browser_access"},
-		//"zpa policy access rule":             {identiferType: "policy", resourceType: "zpa_policy_access_rule", testdataFilename: "zpa_policy_access_rule"},
-		//"zpa policy inspection rule":         {identiferType: "policy", resourceType: "zpa_policy_inspection_rule", testdataFilename: "zpa_policy_inspection_rule"},
-		//"zpa policy timeout rule":            {identiferType: "policy", resourceType: "zpa_policy_timeout_rule", testdataFilename: "zpa_policy_timeout_rule"},
-		//"zpa policy forwarding rule":         {identiferType: "policy", resourceType: "zpa_policy_forwarding_rule", testdataFilename: "zpa_policy_forwarding_rule"},
-		//"zpa provisioning key":               {identiferType: "key", resourceType: "zpa_provisioning_key", testdataFilename: "zpa_provisioning_key"},
-		//"zpa service edge group":             {identiferType: "group", resourceType: "zpa_service_edge_group", testdataFilename: "zpa_service_edge_group"},
-		//"zpa lss config controller":          {identiferType: "lss", resourceType: "zpa_lss_config_controller", testdataFilename: "zpa_lss_config_controller"},
-		//"zpa inspection custom controls":     {identiferType: "inspection", resourceType: "zpa_inspection_custom_controls", testdataFilename: "zpa_inspection_custom_controls"},
-		//"zpa inspection profile":             {identiferType: "inspection", resourceType: "zpa_inspection_profile", testdataFilename: "zpa_inspection_profile"},
+		"zpa app connector group":            {identiferType: "group", resourceType: "zpa_app_connector_group", testdataFilename: "zpa_app_connector_group"},
+		"zpa application server":             {identiferType: "server", resourceType: "zpa_application_server", testdataFilename: "zpa_application_server"},
+		"zpa application segment":            {identiferType: "appsegment", resourceType: "zpa_application_segment", testdataFilename: "zpa_application_segment"},
+		"zpa application segment pra":        {identiferType: "appsegment", resourceType: "zpa_application_segment_pra", testdataFilename: "zpa_application_segment_pra"},
+		"zpa application segment inspection": {identiferType: "appsegment", resourceType: "zpa_application_segment_inspection", testdataFilename: "zpa_application_segment_inspection"},
+		"zpa segment group":                  {identiferType: "group", resourceType: "zpa_segment_group", testdataFilename: "zpa_segment_group"},
+		"zpa server group":                   {identiferType: "group", resourceType: "zpa_server_group", testdataFilename: "zpa_server_group"},
+		"zpa browser access":                 {identiferType: "appsegment", resourceType: "zpa_browser_access", testdataFilename: "zpa_browser_access"},
+		"zpa policy access rule":             {identiferType: "policy", resourceType: "zpa_policy_access_rule", testdataFilename: "zpa_policy_access_rule"},
+		"zpa policy inspection rule":         {identiferType: "policy", resourceType: "zpa_policy_inspection_rule", testdataFilename: "zpa_policy_inspection_rule"},
+		"zpa policy timeout rule":            {identiferType: "policy", resourceType: "zpa_policy_timeout_rule", testdataFilename: "zpa_policy_timeout_rule"},
+		"zpa policy forwarding rule":         {identiferType: "policy", resourceType: "zpa_policy_forwarding_rule", testdataFilename: "zpa_policy_forwarding_rule"},
+		"zpa provisioning key":               {identiferType: "key", resourceType: "zpa_provisioning_key", testdataFilename: "zpa_provisioning_key"},
+		"zpa service edge group":             {identiferType: "group", resourceType: "zpa_service_edge_group", testdataFilename: "zpa_service_edge_group"},
+		"zpa lss config controller":          {identiferType: "lss", resourceType: "zpa_lss_config_controller", testdataFilename: "zpa_lss_config_controller"},
+		"zpa inspection custom controls":     {identiferType: "inspection", resourceType: "zpa_inspection_custom_controls", testdataFilename: "zpa_inspection_custom_controls"},
+		"zpa inspection profile":             {identiferType: "inspection", resourceType: "zpa_inspection_profile", testdataFilename: "zpa_inspection_profile"},
 
 		// ZIA Resource
-		//"zia admin users":                                   {identiferType: "users", resourceType: "zia_admin_users", testdataFilename: "zia_admin_users"},
+		"zia admin users": {identiferType: "users", resourceType: "zia_admin_users", testdataFilename: "zia_admin_users"},
 		//"zia dlp dictionaries":                              {identiferType: "dlp", resourceType: "zia_dlp_dictionaries", testdataFilename: "zia_dlp_dictionaries"},
 		//"zia dlp notification templates":                    {identiferType: "dlp", resourceType: "zia_dlp_notification_templates", testdataFilename: "zia_dlp_notification_templates"},
 		//"zia dlp web rules":                                 {identiferType: "dlp", resourceType: "zia_dlp_web_rules", testdataFilename: "zia_dlp_web_rules"},
@@ -176,21 +177,24 @@ func TestResourceGeneration(t *testing.T) {
 	}
 
 	for name, tc := range tests {
-
 		t.Run(name, func(t *testing.T) {
+			cloudType := "zpa"
+			if strings.HasPrefix(tc.resourceType, "zia_") {
+				cloudType = "zia"
+			}
 			viper.Set("zpa-terraform-install-path", "")
 			viper.Set("zia-terraform-install-path", "")
-			viper.Set("terraform-install-path", "../../../../testdata/terraform/"+tc.resourceType+"/")
-			r, err := recorder.New("../../../../testdata/zpa/" + tc.testdataFilename)
+			viper.Set("terraform-install-path", "../../../../testdata/terraform/"+cloudType+"/"+tc.resourceType+"/")
+			r, err := recorder.New("../../../../testdata/" + cloudType + "/" + tc.testdataFilename)
 			if err != nil {
 				log.Fatal(err)
 			}
 			defer r.Stop()
 
 			r.AddFilter(func(i *cassette.Interaction) error {
-				delete(i.Request.Headers, "X-Auth-Email")
-				delete(i.Request.Headers, "X-Auth-Key")
 				delete(i.Request.Headers, "Authorization")
+				i.Request.Form.Del("client_id")
+				i.Request.Form.Del("client_secret")
 				return nil
 			})
 
@@ -199,7 +203,7 @@ func TestResourceGeneration(t *testing.T) {
 			api = createClientMock(r, tc.resourceType, viper.GetString("zpaClientID"), viper.GetString("zpaClientSecret"), viper.GetString("zpaCustomerID"), viper.GetString("zpaCloud"), viper.GetString("ziaUsername"), viper.GetString("ziaPassword"), viper.GetString("ziaApiKey"), viper.GetString("ziaCloud"))
 			_, output, _ = executeCommandC(rootCmd, "generate", "--resource-type", tc.resourceType, "--verbose")
 
-			expected := testDataFile(tc.testdataFilename)
+			expected := testDataFile(tc.testdataFilename, cloudType)
 			assert.Equal(t, strings.TrimRight(expected, "\n"), strings.TrimRight(output, "\n"))
 		})
 	}
