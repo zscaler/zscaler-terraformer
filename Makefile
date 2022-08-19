@@ -31,4 +31,22 @@ fmt:
 validate-tf:
 	@bash scripts/validate-tf.sh
 
+
+install: GOOS=$(shell go env GOOS)
+install: GOARCH=$(shell go env GOARCH)
+ifeq ($(OS),Windows_NT)  # is Windows_NT on XP, 2000, 7, Vista, 10...
+install: DESTINATION=C:\Windows\System32
+else
+install: DESTINATION=/usr/local/bin
+endif
+install:
+	@echo "==> Installing zscaler-terraforming cli in: $(DESTINATION)/zscaler-terraforming"
+	@mkdir -p $(DESTINATION)
+	@rm -f $(DESTINATION)/zscaler-terraforming
+	@go build \
+	-gcflags=all=-trimpath=$(GOPATH) \
+	-asmflags=all=-trimpath=$(GOPATH) \
+	-ldflags="-X github.com/zscaler/zscaler-terraforming/internal/app/zscaler-terraforming/cmd.versionString=$(VERSION)" \
+	-o $(DESTINATION)/zscaler-terraforming ./cmd/zscaler-terraforming/main.go
+
 .PHONY: build test fmt validate-tf
