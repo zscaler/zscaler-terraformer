@@ -1,0 +1,106 @@
+---
+version: 1
+interactions:
+- request:
+    body: client_id=1222clientid&client_secret=1222clientsec
+    form: {}
+    headers:
+      Content-Type:
+      - application/x-www-form-urlencoded
+      User-Agent:
+      - zscaler-terraforming
+    url: https://config.private.zscaler.com/signin
+    method: POST
+  response:
+    body: |-
+      {
+        "token_type" : "Bearer",
+        "access_token" : "jwt",
+        "expires_in" : "3600"
+      }
+    headers:
+      Cache-Control:
+      - no-store
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 15 Aug 2022 21:23:36 GMT
+      Pragma:
+      - no-cache
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Set-Cookie:
+      - AWSALB=fCDF9sZswF/B99B3GRQVctV5sWVKd17dO5DYryDQoq2Eqb3pLYFiUPMp8CRaiHxHl5CQY4PGiuiFh2V0D8w3EsLz8awSaruZNX1eX0qvnFsgqh3x0Efj8Rw2w0Xd;
+        Expires=Mon, 22 Aug 2022 21:23:36 GMT; Path=/
+      - AWSALBCORS=fCDF9sZswF/B99B3GRQVctV5sWVKd17dO5DYryDQoq2Eqb3pLYFiUPMp8CRaiHxHl5CQY4PGiuiFh2V0D8w3EsLz8awSaruZNX1eX0qvnFsgqh3x0Efj8Rw2w0Xd;
+        Expires=Mon, 22 Aug 2022 21:23:36 GMT; Path=/; SameSite=None; Secure
+      Strict-Transport-Security:
+      - max-age=63072000 ; includeSubDomains ; preload
+      Vary:
+      - Origin
+      - Access-Control-Request-Method
+      - Access-Control-Request-Headers
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+      X-Xss-Protection:
+      - 1; mode=block
+    status: 200 OK
+    code: 200
+    duration: ""
+- request:
+    body: ""
+    form: {}
+    headers:
+      Content-Type:
+      - application/json
+      User-Agent:
+      - zscaler-terraforming
+    url: https://config.private.zscaler.com/mgmtconfig/v1/admin/customers/216196257331281920/serverGroup?pagesize=500
+    method: GET
+  response:
+    body: '{"totalPages":"1","list":[{"creationTime":"1646791911","modifiedBy":"216196257331301304","id":"216196257331301306","enabled":true,"name":"Zscaler
+      Deception","description":"Automatically created by Zscaler Deception API for
+      whiskeygolf","applications":[{"id":"216196257331301317","name":"Zscaler Deception"}],"ipAnchored":false,"configSpace":"DEFAULT","dynamicDiscovery":true,"appConnectorGroups":[{"id":"216196257331301305","modifiedTime":"1646874488","creationTime":"1646791910","modifiedBy":"216196257331281958","name":"Zscaler
+      Deception","enabled":true,"description":"Automatically created by Zscaler Deception
+      API for whiskeygolf","versionProfileId":"2","overrideVersionProfile":false,"location":"Mumbai,
+      Maharashtra, India","dnsQueryType":"IPV4_IPV6","cityCountry":"Mumbai, IN","countryCode":"IN","lssAppConnectorGroup":false}]}]}'
+    headers:
+      Cache-Control:
+      - no-store
+      Content-Security-Policy:
+      - default-src 'none'; upgrade-insecure-requests
+      Content-Type:
+      - application/json;charset=utf-8
+      Date:
+      - Mon, 15 Aug 2022 21:23:37 GMT
+      Expires:
+      - "0"
+      Pragma:
+      - no-cache
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Set-Cookie:
+      - AWSALB=vBW7OmhtRzmoNUuwHyGa5BsRkij+YCz2aayB11mKVl4lDX/Y4jg5MEwiuYoCa+gFUwSbTRDTQDl59j5ibN4vBRQKnhocJSs3s9aQzb9N5UjtcwXxUyHyrEC75QPj;
+        Expires=Mon, 22 Aug 2022 21:23:37 GMT; Path=/
+      - AWSALBCORS=vBW7OmhtRzmoNUuwHyGa5BsRkij+YCz2aayB11mKVl4lDX/Y4jg5MEwiuYoCa+gFUwSbTRDTQDl59j5ibN4vBRQKnhocJSs3s9aQzb9N5UjtcwXxUyHyrEC75QPj;
+        Expires=Mon, 22 Aug 2022 21:23:37 GMT; Path=/; SameSite=None; Secure
+      - AWSALB=CAT7VT8AQ2ynMSUIEXMtvA0FcgPoq0i4S3OAl8di0wqyL4exZakcQXEScNcY++CCiU6XuB+O73WrLAtGTDYTZCOck8srY9GipV2MwuXmuJqdDvQzLAqDwtVoW6sv;
+        Expires=Mon, 22 Aug 2022 21:23:37 GMT; Path=/, AWSALBCORS=CAT7VT8AQ2ynMSUIEXMtvA0FcgPoq0i4S3OAl8di0wqyL4exZakcQXEScNcY++CCiU6XuB+O73WrLAtGTDYTZCOck8srY9GipV2MwuXmuJqdDvQzLAqDwtVoW6sv;
+        Expires=Mon, 22 Aug 2022 21:23:37 GMT; Path=/; SameSite=None; Secure
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      Vary:
+      - Origin
+      - Access-Control-Request-Method
+      - Access-Control-Request-Headers
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+      X-Xss-Protection:
+      - "0"
+    status: 200 OK
+    code: 200
+    duration: ""

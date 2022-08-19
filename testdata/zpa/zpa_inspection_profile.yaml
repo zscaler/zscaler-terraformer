@@ -1,0 +1,102 @@
+---
+version: 1
+interactions:
+- request:
+    body: client_id=1222clientid&client_secret=1222clientsec
+    form: {}
+    headers:
+      Content-Type:
+      - application/x-www-form-urlencoded
+      User-Agent:
+      - zscaler-terraforming
+    url: https://config.private.zscaler.com/signin
+    method: POST
+  response:
+    body: |-
+      {
+        "token_type" : "Bearer",
+        "access_token" : "jwt",
+        "expires_in" : "3600"
+      }
+    headers:
+      Cache-Control:
+      - no-store
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 16 Aug 2022 21:16:47 GMT
+      Pragma:
+      - no-cache
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Set-Cookie:
+      - AWSALB=HRgS4OujngkoULCgcCNrZZdGAsSBWVCQrMfckjrWteEsgH5bt2glKkmCnD3LSR5HYu2CUHA8bEzC9Av1pbh5XK2QbHB/kW8v28t887dPxWM1eLC0qKr9o0hRS05p;
+        Expires=Tue, 23 Aug 2022 21:16:46 GMT; Path=/
+      - AWSALBCORS=HRgS4OujngkoULCgcCNrZZdGAsSBWVCQrMfckjrWteEsgH5bt2glKkmCnD3LSR5HYu2CUHA8bEzC9Av1pbh5XK2QbHB/kW8v28t887dPxWM1eLC0qKr9o0hRS05p;
+        Expires=Tue, 23 Aug 2022 21:16:46 GMT; Path=/; SameSite=None; Secure
+      Strict-Transport-Security:
+      - max-age=63072000 ; includeSubDomains ; preload
+      Vary:
+      - Origin
+      - Access-Control-Request-Method
+      - Access-Control-Request-Headers
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+      X-Xss-Protection:
+      - 1; mode=block
+    status: 200 OK
+    code: 200
+    duration: ""
+- request:
+    body: ""
+    form: {}
+    headers:
+      Content-Type:
+      - application/json
+      User-Agent:
+      - zscaler-terraforming
+    url: https://config.private.zscaler.com/mgmtconfig/v1/admin/customers/216196257331281920/inspectionProfile?pagesize=500
+    method: GET
+  response:
+    body: '{"totalPages":"1","list":[{"id":"216196257331307780","modifiedTime":"1660684553","creationTime":"1660684553","modifiedBy":"216196257331282070","name":"Example","description":"Example","paranoiaLevel":"2","globalControlActions":["CUSTOM:NONE","PREDEFINED:PASS","OVERRIDE_ACTION:COMMON"],"controlsInfo":[{"controlType":"PREDEFINED","count":"7"}],"incarnationNumber":"1","commonGlobalOverrideActionsConfig":{"PREDEF_CNTRL_GLOBAL_ACTION":"PASS","IS_OVERRIDE_ACTION_COMMON":"TRUE"}}]}'
+    headers:
+      Cache-Control:
+      - no-store
+      Content-Security-Policy:
+      - default-src 'none'; upgrade-insecure-requests
+      Content-Type:
+      - application/json;charset=utf-8
+      Date:
+      - Tue, 16 Aug 2022 21:16:47 GMT
+      Expires:
+      - Thu, 01 Jan 1970 00:00:00 GMT
+      Pragma:
+      - no-cache
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Set-Cookie:
+      - AWSALB=3fH6yUZlsAoczdSR6YnxpqoLFBKbvkvwVP+mXbKwXEAbvpFuFxOsfcXdon3X7w1zNTnN6rvdOZPhFkrDObwLHGQQ5oQcRqfRFwEUv3BcMceCr/KMxlxayjysREUQ;
+        Expires=Tue, 23 Aug 2022 21:16:47 GMT; Path=/
+      - AWSALBCORS=3fH6yUZlsAoczdSR6YnxpqoLFBKbvkvwVP+mXbKwXEAbvpFuFxOsfcXdon3X7w1zNTnN6rvdOZPhFkrDObwLHGQQ5oQcRqfRFwEUv3BcMceCr/KMxlxayjysREUQ;
+        Expires=Tue, 23 Aug 2022 21:16:47 GMT; Path=/; SameSite=None; Secure
+      - AWSALB=CWGNck5SU3q3JbiffUKOJMAcPcTqEi87bUBtNzUXTwH3jer++CVGspSfNgm68qI1lRTElw/8nBoCCMYRuXYrn1PHZ9/psexObB/3eYle29CtrGaFA5voiCXhr7w5;
+        Expires=Tue, 23 Aug 2022 21:16:47 GMT; Path=/, AWSALBCORS=CWGNck5SU3q3JbiffUKOJMAcPcTqEi87bUBtNzUXTwH3jer++CVGspSfNgm68qI1lRTElw/8nBoCCMYRuXYrn1PHZ9/psexObB/3eYle29CtrGaFA5voiCXhr7w5;
+        Expires=Tue, 23 Aug 2022 21:16:47 GMT; Path=/; SameSite=None; Secure, JSESSIONIDCORS=node083z16ygshjjxymmf7sl942qi168806.node0;
+        Path=/; Secure; HttpOnly; SameSite=Lax
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      Vary:
+      - Origin
+      - Access-Control-Request-Method
+      - Access-Control-Request-Headers
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+      X-Xss-Protection:
+      - "0"
+    status: 200 OK
+    code: 200
+    duration: ""

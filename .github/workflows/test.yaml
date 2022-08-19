@@ -37,8 +37,7 @@ jobs:
       #     go get -v -u golang.org/x/lint/golint
       #     $(go env GOPATH)/bin/golint -set_exit_status .
       - name: Download Go Dependencies
-        run: |
-          go mod vendor && go mod tidy
+        run: go mod tidy && go mod vendor
       - name: Vet
         run: go vet ./...
       - name: setup Terraform
@@ -59,31 +58,15 @@ jobs:
         run: terraform init
       - name: zpa go test
         env:
-            ZPA_CLIENT_ID: ${{ secrets.ZPA_CLIENT_ID }}
-            ZPA_CLIENT_SECRET: ${{ secrets.ZPA_CLIENT_SECRET }}
-            ZPA_CUSTOMER_ID: ${{ secrets.ZPA_CUSTOMER_ID }}
+            # ZPA_CLIENT_ID: ${{ secrets.ZPA_CLIENT_ID }}
+            # ZPA_CLIENT_SECRET: ${{ secrets.ZPA_CLIENT_SECRET }}
+            # ZPA_CUSTOMER_ID: ${{ secrets.ZPA_CUSTOMER_ID }}
+            ZPA_CLIENT_ID: "noone@zscaler.com"
+            ZPA_CLIENT_SECRET: "ZPA_CLIENT_SECRET"
+            ZPA_CUSTOMER_ID: "216196257331281920"
+            ZIA_USERNAME: "username"
+            ZIA_PASSWORD: "password"
+            ZIA_API_KEY: "ziaapikeyhere"
+            ZIA_CLOUD: "zscalerthree"
             ZSCALER_TERRAFORM_INSTALL_PATH: ${{ github.workspace }}
-        run: make test
-
-      - name: write ZIA Terraform configuration
-        run: |
-            cat > main.tf <<EOF
-            terraform {
-              required_providers {
-                zia = {
-                  source = "zscaler/zia"
-                  version = "~> 2"
-                }
-              }
-            }
-            EOF
-      - name: terraform init
-        run: terraform init
-      - name: zia go test
-        env:
-            ZIA_USERNAME: ${{ secrets.ZIA_USERNAME }}
-            ZIA_PASSWORD: ${{ secrets.ZIA_PASSWORD }}
-            ZIA_API_KEY: ${{ secrets.ZIA_API_KEY }}
-            ZIA_CLOUD: ${{ secrets.ZIA_CLOUD }}
-            ZSCALER_ZIA_TERRAFORM_INSTALL_PATH: ${{ github.workspace }}
         run: make test

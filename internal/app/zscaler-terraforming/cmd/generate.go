@@ -56,6 +56,7 @@ func generateResources() func(cmd *cobra.Command, args []string) {
 			log.Fatalf("error installing Terraform: %s", err)
 		}
 		log.Debugf("Terraform installed")
+
 		cloudType := ""
 		if strings.HasPrefix(resourceType, "zpa_") {
 			cloudType = "zpa"
@@ -449,10 +450,9 @@ func generateResources() func(cmd *cobra.Command, args []string) {
 				sortedBlockAttributes = append(sortedBlockAttributes, k)
 			}
 			sort.Strings(sortedBlockAttributes)
-
 			// Block attributes are for any attributes where assignment is involved.
 			for _, attrName := range sortedBlockAttributes {
-				apiAttrName := mapApiFieldNameToTf(resourceType, attrName)
+				apiAttrName := mapTfFieldNameToApi(resourceType, attrName)
 				// Don't bother outputting the ID for the resource as that is only for
 				// internal use (such as importing state).
 				if attrName == "id" {

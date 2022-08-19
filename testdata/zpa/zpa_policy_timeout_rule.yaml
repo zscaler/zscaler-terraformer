@@ -1,0 +1,104 @@
+---
+version: 1
+interactions:
+- request:
+    body: client_id=1222clientid&client_secret=1222clientsec
+    form: {}
+    headers:
+      Content-Type:
+      - application/x-www-form-urlencoded
+      User-Agent:
+      - zscaler-terraforming
+    url: https://config.private.zscaler.com/signin
+    method: POST
+  response:
+    body: |-
+      {
+        "token_type" : "Bearer",
+        "access_token" : "jwt",
+        "expires_in" : "3600"
+      }
+    headers:
+      Cache-Control:
+      - no-store
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 16 Aug 2022 17:45:37 GMT
+      Pragma:
+      - no-cache
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Set-Cookie:
+      - AWSALB=B+ACrKEqJV5NvyRVpzNIVdO4B+/pujjNBiKRzFIG6R4Uoo2EJtJHpKQc9sK11Z5xtbzo5i8xuh6Nw3RfmBsG/6c9SqTs5PCa6t/DiW0kyxxh4Q5CFfWuFeLxqywV;
+        Expires=Tue, 23 Aug 2022 17:45:36 GMT; Path=/
+      - AWSALBCORS=B+ACrKEqJV5NvyRVpzNIVdO4B+/pujjNBiKRzFIG6R4Uoo2EJtJHpKQc9sK11Z5xtbzo5i8xuh6Nw3RfmBsG/6c9SqTs5PCa6t/DiW0kyxxh4Q5CFfWuFeLxqywV;
+        Expires=Tue, 23 Aug 2022 17:45:36 GMT; Path=/; SameSite=None; Secure
+      Strict-Transport-Security:
+      - max-age=63072000 ; includeSubDomains ; preload
+      Vary:
+      - Origin
+      - Access-Control-Request-Method
+      - Access-Control-Request-Headers
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+      X-Xss-Protection:
+      - 1; mode=block
+    status: 200 OK
+    code: 200
+    duration: ""
+- request:
+    body: ""
+    form: {}
+    headers:
+      Content-Type:
+      - application/json
+      User-Agent:
+      - zscaler-terraforming
+    url: https://config.private.zscaler.com/mgmtconfig/v1/admin/customers/216196257331281920/policySet/rules/policyType/TIMEOUT_POLICY?pagesize=500
+    method: GET
+  response:
+    body: '{"totalPages":"1","list":[{"id":"216196257331281927","modifiedTime":"1659634963","modifiedBy":"216196257331282070","name":"Default_Rule","description":"This
+      is the default Timeout Policy rule","ruleOrder":"1","priority":"1","policyType":"2","operator":"AND","action":"RE_AUTH","reauthTimeout":"-1","reauthIdleTimeout":"-1","customMsg":"Your
+      access to internal Applications has expired","defaultRuleName":"Default_Rule","defaultRule":true}]}'
+    headers:
+      Cache-Control:
+      - no-store
+      Content-Security-Policy:
+      - default-src 'none'; upgrade-insecure-requests
+      Content-Type:
+      - application/json;charset=utf-8
+      Date:
+      - Tue, 16 Aug 2022 17:45:37 GMT
+      Expires:
+      - Thu, 01 Jan 1970 00:00:00 GMT
+      Pragma:
+      - no-cache
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Set-Cookie:
+      - AWSALB=a3ho4+R2ZHDrktQ7AN0W3X5E7SJsbYU/HRrAZyrgSAoj88jFA6P+N+eni2c5EQ6C/Qh0b+tb9nz0VshuqP8fUQQqnQ6fbzHuLMDwnKyehf6q24Kyr9rm4XAgkfep;
+        Expires=Tue, 23 Aug 2022 17:45:37 GMT; Path=/
+      - AWSALBCORS=a3ho4+R2ZHDrktQ7AN0W3X5E7SJsbYU/HRrAZyrgSAoj88jFA6P+N+eni2c5EQ6C/Qh0b+tb9nz0VshuqP8fUQQqnQ6fbzHuLMDwnKyehf6q24Kyr9rm4XAgkfep;
+        Expires=Tue, 23 Aug 2022 17:45:37 GMT; Path=/; SameSite=None; Secure
+      - AWSALB=hTDLUgDDg6TcgTFbelMm6gmjBDhAh+RnPQh23idHMyrcIUDRNG29w8xgtp23D7eVU6oJ6R8Wj3fU9YMwRox+19S7IrtJnWAnv7fGapTiszeV3ic5KZn4k6IWYDN3;
+        Expires=Tue, 23 Aug 2022 17:45:37 GMT; Path=/, AWSALBCORS=hTDLUgDDg6TcgTFbelMm6gmjBDhAh+RnPQh23idHMyrcIUDRNG29w8xgtp23D7eVU6oJ6R8Wj3fU9YMwRox+19S7IrtJnWAnv7fGapTiszeV3ic5KZn4k6IWYDN3;
+        Expires=Tue, 23 Aug 2022 17:45:37 GMT; Path=/; SameSite=None; Secure, JSESSIONIDCORS=node01ahx58z4ll1igcjcun1cj6heo134248.node0;
+        Path=/; Secure; HttpOnly; SameSite=Lax
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      Vary:
+      - Origin
+      - Access-Control-Request-Method
+      - Access-Control-Request-Headers
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+      X-Xss-Protection:
+      - "0"
+    status: 200 OK
+    code: 200
+    duration: ""

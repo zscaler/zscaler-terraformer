@@ -101,7 +101,7 @@ func executeCommandC(root *cobra.Command, args ...string) (c *cobra.Command, out
 
 // testDataFile slurps a local test case into memory and returns it while
 // encapsulating the logic for finding it.
-func testDataFile(filename string) string {
+func testDataFile(filename, cloudType string) string {
 	filename = strings.TrimSuffix(filename, "/")
 
 	dirname, err := os.Getwd()
@@ -109,7 +109,7 @@ func testDataFile(filename string) string {
 		panic(err)
 	}
 
-	dir, err := os.Open(filepath.Join(dirname, "../../../../testdata/terraform"))
+	dir, err := os.Open(filepath.Join(dirname, "../../../../testdata/terraform/"+cloudType))
 	if err != nil {
 		panic(err)
 	}
@@ -289,6 +289,39 @@ func flattenAttrMap(l []interface{}) map[string]interface{} {
 	return result
 }
 
+func isInList(item string, list []string) bool {
+	for _, i := range list {
+		if i == item {
+			return true
+		}
+	}
+	return false
+}
+
+func listIdsStringBlock(fieldName string, obj interface{}) string {
+	output := fieldName + " {\n"
+	output += "id=["
+	if obj != nil && len(obj.([]interface{})) >= 0 {
+		for i, v := range obj.([]interface{}) {
+			m, ok := v.(map[string]interface{})
+			if !ok || m == nil || m["id"] == "" {
+				continue
+			}
+			id, ok := m["id"].(string)
+			if !ok || id == "" {
+				continue
+			}
+			if i > 0 {
+				output += ","
+			}
+			output += "\"" + id + "\""
+		}
+	}
+	output += "]\n"
+	output += "}\n"
+	return output
+}
+
 // nestBlocks takes a schema and generates all of the appropriate nesting of any
 // top-level blocks as well as nested lists or sets.
 func nestBlocks(schemaBlock *tfjson.SchemaBlock, structData map[string]interface{}, parentID string, indexedNestedBlocks map[string][]string) string {
@@ -303,7 +336,7 @@ func nestBlocks(schemaBlock *tfjson.SchemaBlock, structData map[string]interface
 	sort.Strings(sortedNestedBlocks)
 
 	for _, block := range sortedNestedBlocks {
-		apiBlock := mapApiFieldNameToTf(resourceType, block)
+		apiBlock := mapTfFieldNameToApi(resourceType, block)
 		// special cases mapping
 		if resourceType == "zia_admin_users" && block == "admin_scope" {
 			output += "admin_scope {\n"
@@ -311,7 +344,8 @@ func nestBlocks(schemaBlock *tfjson.SchemaBlock, structData map[string]interface
 				output += "type=\"" + structData["adminScopeType"].(string) + "\"\n"
 			}
 			if structData["adminScopeScopeEntities"] != nil && len(structData["adminScopeScopeEntities"].([]interface{})) >= 0 {
-				output += "scope_entities=["
+				output += "scope_entities {\n"
+				output += "id = ["
 				for i, v := range structData["adminScopeScopeEntities"].([]interface{}) {
 
 					m, ok := v.(map[string]interface{})
@@ -328,9 +362,11 @@ func nestBlocks(schemaBlock *tfjson.SchemaBlock, structData map[string]interface
 					output += fmt.Sprintf("%d", int64(id))
 				}
 				output += "]\n"
+				output += "}\n"
 			}
 			if structData["adminScopescopeGroupMemberEntities"] != nil && len(structData["adminScopescopeGroupMemberEntities"].([]interface{})) >= 0 {
-				output += "scope_group_member_entities=["
+				output += "scope_group_member_entities={\n"
+				output += "id = ["
 				for i, v := range structData["adminScopescopeGroupMemberEntities"].([]interface{}) {
 
 					m, ok := v.(map[string]interface{})
@@ -347,8 +383,31 @@ func nestBlocks(schemaBlock *tfjson.SchemaBlock, structData map[string]interface
 					output += fmt.Sprintf("%d", int64(id))
 				}
 				output += "]\n"
+				output += "}\n"
 			}
 			output += "}\n"
+			continue
+		} else if isInList(resourceType, []string{"zpa_application_segment",
+			"zpa_application_segment_inspection",
+			"zpa_application_segment_pra",
+			"zpa_browser_access",
+		}) && block == "server_groups" {
+			output += listIdsStringBlock(block, structData["serverGroups"])
+			continue
+		} else if isInList(resourceType, []string{"zpa_server_group", "zpa_policy_access_rule"}) && block == "app_connector_groups" {
+			output += listIdsStringBlock(block, structData["appConnectorGroups"])
+			continue
+		} else if isInList(resourceType, []string{"zpa_server_group"}) && block == "applications" {
+			output += listIdsStringBlock(block, structData["applications"])
+			continue
+		} else if isInList(resourceType, []string{"zpa_policy_access_rule"}) && block == "app_server_groups" {
+			output += listIdsStringBlock(block, structData["appServerGroups"])
+			continue
+		} else if isInList(resourceType, []string{"zpa_inspection_custom_controls"}) && block == "associated_inspection_profile_names" {
+			output += listIdsStringBlock(block, structData["associatedInspectionProfileNames"])
+			continue
+		} else if isInList(resourceType, []string{"zpa_lss_config_controller"}) && block == "connector_groups" {
+			output += listIdsStringBlock(block, structData["connectorGroups"])
 			continue
 		}
 		if schemaBlock.NestedBlocks[block].NestingMode == "list" || schemaBlock.NestedBlocks[block].NestingMode == "set" {
@@ -503,18 +562,19 @@ func writeNestedBlock(attributes []string, schemaBlock *tfjson.SchemaBlock, attr
 	nestedBlockOutput := ""
 
 	for _, attrName := range attributes {
+		apiFieldName := mapTfFieldNameToApi(resourceType, attrName)
 		ty := schemaBlock.Attributes[attrName].AttributeType
 
 		switch {
 		case ty.IsPrimitiveType():
 			switch ty {
 			case cty.String, cty.Bool, cty.Number:
-				nestedBlockOutput += writeAttrLine(attrName, attrStruct[attrName], false)
+				nestedBlockOutput += writeAttrLine(attrName, attrStruct[apiFieldName], false)
 			default:
 				log.Debugf("unexpected primitive type %q", ty.FriendlyName())
 			}
 		case ty.IsListType(), ty.IsSetType(), ty.IsMapType():
-			nestedBlockOutput += writeAttrLine(attrName, attrStruct[attrName], true)
+			nestedBlockOutput += writeAttrLine(attrName, attrStruct[apiFieldName], true)
 		default:
 			log.Debugf("unexpected nested type %T for %s", ty, attrName)
 		}
@@ -624,19 +684,20 @@ func writeAttrLine(key string, value interface{}, usedInBlock bool) string {
 var matchFirstCap = regexp.MustCompile("(.)([A-Z][a-z]+)")
 var matchAllCap = regexp.MustCompile("([a-z0-9])([A-Z])")
 
-func ToSnakeCase(str string) string {
-	snake := matchFirstCap.ReplaceAllString(str, "${1}_${2}")
+func mapApiFieldNameToTf(resourceType, fieldName string) string {
+	snake := matchFirstCap.ReplaceAllString(fieldName, "${1}_${2}")
 	snake = matchAllCap.ReplaceAllString(snake, "${1}_${2}")
 	return strings.ToLower(snake)
 }
 
-func mapApiFieldNameToTf(resourceType, apiFieldName string) string {
+func mapTfFieldNameToApi(resourceType, apiFieldName string) string {
 	switch resourceType {
 	case "zia_admin_users":
 		switch apiFieldName {
-		case "userName":
-			return "username"
+		case "username":
+			return "userName"
 		}
 	}
-	return strcase.ToLowerCamel(apiFieldName)
+	result := strcase.ToLowerCamel(apiFieldName)
+	return result
 }
