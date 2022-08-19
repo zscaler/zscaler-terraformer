@@ -2,7 +2,7 @@
 version: 1
 interactions:
 - request:
-    body: '{"username":"zia@securitygeek.io","password":"12334333322","apiKey":"apiKeyHere","timestamp":"1660686140893"}'
+    body: '{"username":"zia@securitygeek.io","password":"passwordzia","apiKey":"apiKeyHere","timestamp":"1660773772125"}'
     form: {}
     headers:
       Content-Type:
@@ -21,11 +21,11 @@ interactions:
       Content-Type:
       - application/json
       Date:
-      - Tue, 16 Aug 2022 21:42:26 GMT
+      - Wed, 17 Aug 2022 22:02:57 GMT
       Server:
       - Zscaler
       Set-Cookie:
-      - JSESSIONID=1AB1339F057410D5943E94AC64385E53; Path=/; Secure; HttpOnly
+      - JSESSIONID=3671FEE47C93E84A0E8BF5BC9895E948; Path=/; Secure; HttpOnly
       Strict-Transport-Security:
       - max-age=31622400;includeSubDomains;preload
       X-Content-Type-Options:
@@ -44,24 +44,22 @@ interactions:
       Content-Type:
       - application/json
       Cookie:
-      - JSESSIONID=1AB1339F057410D5943E94AC64385E53
+      - JSESSIONID=3671FEE47C93E84A0E8BF5BC9895E948
       User-Agent:
       - zscaler-terraforming
-    url: https://zsapi.zscalerthree.net/api/v1/adminUsers
+    url: https://zsapi.zscalerthree.net/api/v1/urlFilteringRules
     method: GET
   response:
-    body: '[{"id":33938803,"loginName":"john.smith@securitygeek.io","userName":"John
-      Smith","email":"john.smith@securitygeek.io","role":{"id":11521,"name":"Super
-      Admin","isNameL10nTag":true,"extensions":{"adminRank":"0","roleType":"EXEC_INSIGHT_AND_ORG_ADMIN"}},"comments":"Administrator
-      Group","adminScopescopeGroupMemberEntities":[],"adminScopeType":"DEPARTMENT","adminScopeScopeEntities":[{"id":25684245,"name":"Engineering"}],"isPasswordLoginAllowed":true,"isSecurityReportCommEnabled":true,"isServiceUpdateCommEnabled":true,"isProductUpdateCommEnabled":true,"pwdLastModifiedTime":1649517249,"name":"John
-      Smith"}]'
+    body: '[{"id":413550,"accessControl":"READ_WRITE","name":"Block Inappropriate
+      Content","order":2,"protocols":["ANY_RULE"],"urlCategories":["OTHER_ADULT_MATERIAL","ADULT_THEMES","LINGERIE_BIKINI","NUDITY","PORNOGRAPHY","SEXUALITY","ADULT_SEX_EDUCATION","K_12_SEX_EDUCATION","OTHER_DRUGS","GAMBLING","OTHER_ILLEGAL_OR_QUESTIONABLE","COPYRIGHT_INFRINGEMENT","COMPUTER_HACKING","QUESTIONABLE","PROFANITY","MATURE_HUMOR","ANONYMIZER","SOCIAL_ADULT"],"state":"ENABLED","rank":7,"requestMethods":["OPTIONS","GET","HEAD","POST","PUT","DELETE","TRACE","CONNECT","OTHER"],"blockOverride":false,"description":"Block
+      all inappropriate content for all users.","labels":[{"id":87085,"name":"Example"}],"enforceTimeValidity":false,"cbiProfileId":0,"action":"BLOCK"}]'
     headers:
       Cache-Control:
       - no-store
       Content-Type:
       - application/json
       Date:
-      - Tue, 16 Aug 2022 21:42:27 GMT
+      - Wed, 17 Aug 2022 22:02:57 GMT
       Server:
       - Zscaler
       Strict-Transport-Security:

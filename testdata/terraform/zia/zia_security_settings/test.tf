@@ -1,0 +1,4 @@
+resource "zia_security_settings" "terraform_managed_resource" {
+  blacklist_urls = [".vodahelp.sytes.net", ".riverwalktrader.co.za", ".hectorcalle.com/listbul.exe", ".gandhitoday.org/video/6JvA8", ".glareestradad.com", ".johnsonsmedia.it/img/ZBNk0xpRL8YEVl", ".genccagdas.com.tr/assets/doWHIxLe7e", ".movekochd.com", ".sanyai-love.rmu.ac.th", ".grafischer.ch/fit-well/wDPTwKtZPoWL12", ".fpd.cl/cgi-bin/N/", ".djunreal.co.uk/site/ApOKpFad", ".steptransport2017b.com", ".sloanavocadog.com", ".caseytackleg.com", ".hortonheavyg.com", ".hectorcalle.com/093789.hta", ".testmahoneyd.com", ".hectorcalle.com/May-16_2022.zip", ".nephewboring2013b.com", ".fordlogisticss.com"]
+  whitelist_urls = [".acme.com"]
+}

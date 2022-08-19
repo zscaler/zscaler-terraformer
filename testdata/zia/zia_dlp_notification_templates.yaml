@@ -1,0 +1,91 @@
+---
+version: 1
+interactions:
+- request:
+    body: '{"username":"zia@securitygeek.io","password":"passwordzia","apiKey":"apiKeyHere","timestamp":"1660772741809"}'
+    form: {}
+    headers:
+      Content-Type:
+      - application/json
+      User-Agent:
+      - zscaler-terraforming
+    url: https://zsapi.zscalerthree.net/api/v1/authenticatedSession
+    method: POST
+  response:
+    body: '{"authType":"ADMIN_LOGIN","obfuscateApiKey":true,"passwordExpiryTime":-1,"passwordExpiryDays":-1,"source":"https://zsapi.zscalerthree.net"}'
+    headers:
+      Cache-Control:
+      - no-store
+      Content-Length:
+      - "139"
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 17 Aug 2022 21:45:47 GMT
+      Server:
+      - Zscaler
+      Set-Cookie:
+      - JSESSIONID=9241CB4BD25644FD5224AC998592F7E1; Path=/; Secure; HttpOnly
+      Strict-Transport-Security:
+      - max-age=31622400;includeSubDomains;preload
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+    status: '200 '
+    code: 200
+    duration: ""
+- request:
+    body: ""
+    form: {}
+    headers:
+      Content-Type:
+      - application/json
+      Cookie:
+      - JSESSIONID=9241CB4BD25644FD5224AC998592F7E1
+      User-Agent:
+      - zscaler-terraforming
+    url: https://zsapi.zscalerthree.net/api/v1/dlpNotificationTemplates
+    method: GET
+  response:
+    body: '[{"id":787,"name":"DLP Auditor Template","subject":"DLP Violation: $${TRANSACTION_ID}
+      $${ENGINES}","tlsEnabled":true,"attachContent":true,"plainTextMessage":"The attached
+      content triggered a Web DLP rule for your organization.\n\nTransaction ID: $${TRANSACTION_ID}\nUser
+      Accessing the URL: $${USER}\nURL Accessed: $${URL}\nPosting Type: $${TYPE}\nDLP
+      MD5: $${DLPMD5}\nDLP Violation Engines: $${ENGINES}\nDLP Violation Dictionaries:
+      $${DICTIONARIES}\n\nNo action is required on your part.","htmlMessage":"<!DOCTYPE
+      html>\n<html>\n\t<head>\n\t\t<style>\n\t\t\t.user {color: rgb(1, 81, 152);}\n\t\t\t.url
+      {color: rgb(1, 81, 152);}\n\t\t\t.postingtype {color: rgb(1, 81, 152);}\n\t\t\t.engines
+      {color: rgb(1, 81, 152);}\n\t\t\t.dictionaries {color: rgb(1, 81, 152);}\n\t\t</style>\n\t</head>\n\t<body>\n\t\tThe
+      attached content triggered a Web DLP rule for your organization.\n\t\t<br/><br/>\n\t\tTransaction
+      ID: <span class=\"transaction_id\">$${TRANSACTION_ID}</span>\n\t\t<br/>\n\t\tUser
+      Accessing the URL: <span class=\"user\">$${USER}</span>\n\t\t<br/>\n\t\tURL Accessed:
+      <span class=\"url\">$${URL}</span>\n\t\t<br/>\n\t\tPosting Type: <span class=\"postingtype\">$${TYPE}</span>\n\t\t<br/>\n\t\tDLP
+      MD5: <span class=\"dlpmd5\">$${DLPMD5}</span>\n\t\t<br/>\n\t\tDLP Violation Engines:
+      <span class=\"engines\">$${ENGINES}</span>\n\t\t<br/>\n\t\tDLP Violation Dictionaries:
+      <span class=\"dictionaries\">$${DICTIONARIES}</span>\n\t\t<br/><br/>\n\t\tNo
+      action is required on your part.\n\t\t<br/><br/>\n\t</body>\n</html>"}]'
+    headers:
+      Cache-Control:
+      - no-store
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 17 Aug 2022 21:45:47 GMT
+      Server:
+      - Zscaler
+      Strict-Transport-Security:
+      - max-age=31622400;includeSubDomains;preload
+      Vary:
+      - accept-encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+    status: '200 '
+    code: 200
+    duration: ""

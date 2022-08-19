@@ -12,6 +12,7 @@ resource "zpa_application_segment" "terraform_managed_resource" {
   name                          = "Example"
   passive_health_enabled        = true
   segment_group_id              = "216196257331307750"
+  segment_group_name            = "Example"
   select_connector_close_to_app = false
   tcp_port_range = [
     {

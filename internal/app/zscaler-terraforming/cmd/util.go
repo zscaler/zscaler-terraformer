@@ -298,6 +298,30 @@ func isInList(item string, list []string) bool {
 	return false
 }
 
+func listIdsIntBlock(fieldName string, obj interface{}) string {
+	output := ""
+	if obj != nil && len(obj.([]interface{})) >= 0 {
+		output = fieldName + " {\n"
+		output += "id=["
+		for i, v := range obj.([]interface{}) {
+			m, ok := v.(map[string]interface{})
+			if !ok || m == nil || m["id"] == 0 {
+				continue
+			}
+			id, ok := m["id"].(float64)
+			if !ok || id == 0 {
+				continue
+			}
+			if i > 0 {
+				output += ","
+			}
+			output += fmt.Sprintf("%d", int64(id))
+		}
+		output += "]\n"
+		output += "}\n"
+	}
+	return output
+}
 func listIdsStringBlock(fieldName string, obj interface{}) string {
 	output := fieldName + " {\n"
 	output += "id=["
@@ -386,6 +410,17 @@ func nestBlocks(schemaBlock *tfjson.SchemaBlock, structData map[string]interface
 				output += "}\n"
 			}
 			output += "}\n"
+			continue
+		} else if isInList(resourceType, []string{"zia_firewall_filtering_network_service_groups", "zia_url_filtering_rules", "zia_dlp_web_rules"}) && isInList(block, []string{"departments",
+			"groups",
+			"locations",
+			"dlp_engines",
+			"location_groups",
+			"url_categories",
+			"users",
+			"labels",
+			"services"}) {
+			output += listIdsIntBlock(block, structData[mapTfFieldNameToApi(resourceType, block)])
 			continue
 		} else if isInList(resourceType, []string{"zpa_application_segment",
 			"zpa_application_segment_inspection",
