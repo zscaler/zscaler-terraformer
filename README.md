@@ -1,4 +1,12 @@
-# Zscaler Terraforming
+<a href="https://terraform.io">
+    <img src="https://raw.githubusercontent.com/hashicorp/terraform-website/master/public/img/logo-text.svg" alt="Terraform logo" title="Terraform" height="50" />
+</a>
+
+<a href="https://www.zscaler.com/">
+    <img src="https://www.zscaler.com/themes/custom/zscaler/logo.svg" alt="Zscaler logo" title="Zscaler" height="50" />
+</a>
+
+# Zscaler Terraforming Tool
 
 ## Overview
 
@@ -12,8 +20,6 @@ This tool is ideal if you already have ZPA and/or ZIA resources defined but want
 start managing them via Terraform, and don't want to spend the time to manually
 write the Terraform configuration to describe them.
 
-Read the [announcement blog](https://blog.cloudflare.com/cloudflares-partnership-with-hashicorp-and-bootstrapping-terraform-with-cf-terraforming/) for further details on using `cf-terraforming` in your workflow.
-
 > NOTE: This tool has been developed and tested with Terraform v1.x.x only.
 
 ## Usage
@@ -24,7 +30,7 @@ Usage:
 
 Available Commands:
   completion  Generate the autocompletion script for the specified shell
-  generate    Fetch resources from the Cloudflare API and generate the respective Terraform stanzas
+  generate    Fetch resources from the Zscaler ZPA and/or ZIA API and generate the respective Terraform stanzas
   help        Help about any command
   import      Output `terraform import` compatible commands in order to import resources into state
   version     Print the version number of zscaler-terraforming
@@ -97,8 +103,6 @@ export ZIA_PASSWORD = "xxxxxxxxxxxxxxxx"
 export ZIA_API_KEY  = "xxxxxxxxxxxxxxxx"
 export ZIA_CLOUD    = "xxxxxxxxxxxxxxxx" (i.e zscalerthree)
 
-# now call zscaler-terraforming, e.g.
-
 ```
 
 Alternatively, if using a config file, then specify the inputs using the same
@@ -114,49 +118,129 @@ zpaCloud: "BETA"
 
 ## ZPA Example usage
 
+To get started with the zscaler-terraforming CLI to export your ZPA configuration follow you must create a terraform configuration file in a specific directory, and then manually initialize the provider via ``terraform init`` in order to download the provider binary.
+
+```bash
+$ mkdir -p $HOME/Desktop/zpa_configuration
+$ cd $HOME/Desktop/zpa_configuration
+$ touch main.tf
+```
+
+```hcl
+terraform {
+  required_providers {
+    zpa = {
+      version = "2.3.0"
+      source  = "zscaler/zpa"
+    }
+  }
+}
+
+provider "zpa" {}
+```
+
+Once the directory is initialized via `terraform init`, you can then follow one of the below options by either exporting the directory path as an environment variable or utilize one of the command line options available.
+
+**Option 1**
+
+```bash
+$ export ZSCALER_ZPA_TERRAFORM_INSTALL_PATH="$HOME/Desktop/zpa_configuration"
+$ zscaler-terraforming generate \
+  --resource-type "zpa_app_connector_group"
+```
+
+**Option 2**
+
 ```bash
 $ zscaler-terraforming generate \
-  --zone $CLOUDFLARE_ZONE_ID \
-  --resource-type "cloudflare_record"
+  --zpa-terraform-install-path $HOME/Desktop/zpa_configuration \
+  --resource-type "zpa_app_connector_group"
+```
+
+```hcl
+"zpa_app_connector_group" "terraform_managed_resource" {
+  name                     = "Example"
+  description              = "Example"
+  enabled                  = true
+  city_country             = "San Jose, US"
+  location                 = "San Jose, CA, USA"
+  country_code             = "US"
+  dns_query_type           = "IPV4"
+  latitude                 = "37.3382082"
+  longitude                = "-121.8863286"
+  lss_app_connector_group  = false
+  override_version_profile = true
+  upgrade_day              = "SUNDAY"
+  upgrade_time_in_secs     = "66600"
+  version_profile_id       = "2"
+}
 ```
 
 ## ZIA Example usage
 
+To get started with the zscaler-terraforming CLI to export your ZPA configuration follow you must create a terraform configuration file in a specific directory, and then manually initialize the provider via ``terraform init`` in order to download the provider binary.
+
 ```bash
-$ zscaler-terraforming generate \
-  --zone $CLOUDFLARE_ZONE_ID \
-  --resource-type "cloudflare_record"
+$ mkdir -p $HOME/Desktop/zia_configuration
+$ cd $HOME/Desktop/zia_configuration
+$ touch main.tf
 ```
 
-will contact the Cloudflare API on your behalf and result in a valid Terraform
-configuration representing the **resource** you requested:
+```hcl
+terraform {
+  required_providers {
+    zia = {
+      version = "2.2.0"
+      source  = "zscaler/zia"
+    }
+  }
+}
+
+provider "zia" {}
+```
+
+Once the directory is initialized via `terraform init`, you can then follow one of the below options by either exporting the directory path as an environment variable or utilize one of the command line options available.
+
+**Option 1**
+
+```bash
+$ export ZSCALER_ZIA_TERRAFORM_INSTALL_PATH="$HOME/Desktop/zia_configuration"
+$ zscaler-terraforming generate \
+  --resource-type "zia_traffic_forwarding_static_ip"
+```
+
+**Option 2**
+
+```bash
+$ zscaler-terraforming generate \
+  --zia-terraform-install-path $HOME/Desktop/zia_configuration \
+  --resource-type "zia_traffic_forwarding_static_ip"
+```
 
 ```hcl
-resource "cloudflare_record" "terraform_managed_resource" {
-  name = "example.com"
-  proxied = false
-  ttl = 120
-  type = "A"
-  value = "198.51.100.4"
-  zone_id = "0da42c8d2132a9ddaf714f9e7c920711"
+resource "zia_traffic_forwarding_static_ip" "terraform_managed_resource" {
+  comment      = "GRE Tunnel Created with Terraform"
+  geo_override = false
+  ip_address   = "187.22.113.134"
+  latitude     = -24
+  longitude    = -46
 }
 ```
 
 ## Prerequisites
 
-* A Cloudflare account with resources defined (e.g. a few zones, some load
-  balancers, spectrum applications, etc)
-* A valid Cloudflare API key and sufficient permissions to access the resources
+* A ZIA and/or ZPA tenant with resources defined.
+* Valid ZIA and or/ZPA API credentials with sufficient permissions to access the resources
   you are requesting via the API
-* An initialised Terraform directory (`terraform init` has run and providers installed). See the [provider documentation](https://registry.terraform.io/providers/cloudflare/cloudflare/latest/docs) if you have not yet setup the Terraform directory.
+* An initialised Terraform directory (`terraform init` has run and providers installed). See the [provider documentation](https://registry.terraform.io/namespaces/zscaler) if you have not yet setup the Terraform directory.
 
 ## Installation
 
 If you use Homebrew on MacOS, you can run the following:
 
 ```bash
-$ brew tap zscaler/zscaler
-$ brew install --cask zscaler/zscaler/zscaler-terraforming
+brew tap zscaler/zscaler
+brew install --cask zscaler/zscaler/zscaler-terraforming
 ```
 
 If you use another OS, you will need to download the release directly from
@@ -168,15 +252,12 @@ If you use another OS, you will need to download the release directly from
 when you invoke the `import` command. This command assumes you have already ran
 `zscaler-terraforming generate ...` to output your resources.
 
-In the future we aim to automate this however for now, it is a manual step to
+In the future this process will be further automated; however for now, it is a manual step to
 allow flexibility in directory structure.
 
-```
+```bash
 $ zscaler-terraforming import \
-  --resource-type "cloudflare_record" \
-  --email $CLOUDFLARE_EMAIL \
-  --key $CLOUDFLARE_API_KEY \
-  --zone $CLOUDFLARE_ZONE_ID
+  --resource-type "zpa_app_connector_group"
 ```
 
 ## ZPA Supported Resources
@@ -269,4 +350,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-

@@ -31,7 +31,7 @@ func init() {
 
 var generateCmd = &cobra.Command{
 	Use:    "generate",
-	Short:  "Fetch resources from the Cloudflare API and generate the respective Terraform stanzas",
+	Short:  "Fetch resources from the Zscaler ZPA and/or ZIA API and generate the respective Terraform stanzas",
 	Run:    generateResources(),
 	PreRun: sharedPreRun,
 }
