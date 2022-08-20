@@ -31,11 +31,6 @@ jobs:
         with:
           path: ~/go/pkg/mod
           key: ${{ runner.os }}-go${{ matrix.go-version }}-${{ hashFiles('**/go.sum') }}
-      - name: golint
-        if: matrix.os != 'windows-latest'
-        run: |
-          go get -v -u golang.org/x/lint/golint
-          $(go env GOPATH)/bin/golint -set_exit_status .
       - name: Download Go Dependencies
         run: go mod tidy && go mod vendor
       - name: Vet
@@ -49,7 +44,7 @@ jobs:
               required_providers {
                 zpa = {
                   source = "zscaler/zpa"
-                  version = "~> 2"
+                  version = ">= 2"
                 }
               }
             }
@@ -63,7 +58,7 @@ jobs:
               required_providers {
                 zia = {
                   source = "zscaler/zia"
-                  version = "~> 2"
+                  version = ">= 2"
                 }
               }
             }
@@ -81,4 +76,3 @@ jobs:
             ZIA_CLOUD: ${{ secrets.ZIA_CLOUD }}
             ZSCALER_TERRAFORM_INSTALL_PATH: ${{ github.workspace }}
         run: make test
-

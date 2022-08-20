@@ -1,8 +1,5 @@
 TEST                  ?= $$(go list ./...)
 GO_FILES              ?= $$(find . -name '*.go')
-ZPA_CLIENT_ID	      ?= aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-ZPA_CLIENT_SECRET     ?= 00deadb33f000000000000000000000000000
-ZPA_CUSTOMER_ID		  ?= 00deadb33f000000000000000000000000000
 
 VERSION               ?= $$(git describe --tags --abbrev=0)-dev+$$(git rev-parse --short=12 HEAD)
 ROOT_DIR               = $$PWD
@@ -16,7 +13,7 @@ build:
 		-ldflags="-X github.com/zscaler/zscaler-terraforming/internal/app/zscaler-terraforming/cmd.versionString=$(VERSION)" \
 		-o zscaler-terraforming cmd/zscaler-terraforming/main.go
 
-test:
+test_zpa:
 	@CI=true \
 		USE_STATIC_RESOURCE_IDS=true \
 		CHECKPOINT_TIMEOUT=$(HASHICORP_CHECKPOINT_TIMEMOUT) \
@@ -25,6 +22,15 @@ test:
 		ZPA_CUSTOMER_ID="$(ZPA_CUSTOMER_ID)" \
 		go test $(TEST) -timeout 120m -v $(TESTARGS)
 
+test_zia:
+	@CI=true \
+		USE_STATIC_RESOURCE_IDS=true \
+		CHECKPOINT_TIMEOUT=$(HASHICORP_CHECKPOINT_TIMEMOUT) \
+		ZIA_USERNAME="$(ZIA_USERNAME)" \
+		ZIA_PASSWORD="$(ZIA_PASSWORD)" \
+		ZIA_API_KEY="$(ZIA_API_KEY)" \
+		ZIA_CLOUD="$(ZIA_CLOUD)" \
+		go test $(TEST) -timeout 120m -v $(TESTARGS)
 fmt:
 	gofmt -w $(GO_FILES)
 
