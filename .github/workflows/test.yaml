@@ -13,6 +13,9 @@ on:
       - 'README.md'
       - 'docs/**'
 
+  schedule:
+    - cron: '0 13 * * *'
+
 jobs:
   test:
     strategy:
