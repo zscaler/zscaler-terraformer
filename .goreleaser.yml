@@ -13,22 +13,10 @@ builds:
       - windows
       - linux
       - darwin
-    goarch:
-      - amd64
-      - '386'
-      - arm
-      - arm64
-    ignore:
-      - goos: darwin
-        goarch: '386'
-archives:
-  - format: zip
-    name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
 checksum:
   name_template: 'checksums.txt'
 snapshot:
   name_template: "{{ .Tag }}-next"
-
 release:
   # Explicit set the repo to release from. Default is origin.
   # Visit your project's GitHub Releases page to publish this release.
