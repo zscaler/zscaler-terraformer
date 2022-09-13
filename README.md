@@ -6,7 +6,7 @@
     <img src="https://www.zscaler.com/themes/custom/zscaler/logo.svg" alt="Zscaler logo" title="Zscaler" height="50" />
 </a>
 
-# Zscaler Terraforming Tool
+# Zscaler Terraformer Tool
 
 ## Overview
 
