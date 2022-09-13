@@ -13,8 +13,8 @@ body:
         required: true
 - type: input
   attributes:
-    label: zscaler-terraforming version
-    description: Output from `zscaler-terraforming version`.
+    label: zscaler-terraformer version
+    description: Output from `zscaler-terraformer version`.
   validations:
     required: true
 - type: textarea
@@ -43,7 +43,7 @@ body:
   attributes:
     label: References
     description: |
-      Are there any other GitHub issues (open or closed) or Pull Requests that 
-      should be linked here? 
+      Are there any other GitHub issues (open or closed) or Pull Requests that
+      should be linked here?
   validations:
     required: false

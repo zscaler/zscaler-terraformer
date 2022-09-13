@@ -10,8 +10,8 @@ build:
 	@go build \
 		-gcflags=all=-trimpath=$(GOPATH) \
 		-asmflags=all=-trimpath=$(GOPATH) \
-		-ldflags="-X github.com/zscaler/zscaler-terraforming/internal/app/zscaler-terraforming/cmd.versionString=$(VERSION)" \
-		-o zscaler-terraforming cmd/zscaler-terraforming/main.go
+		-ldflags="-X github.com/zscaler/zscaler-terraformer/internal/app/zscaler-terraformer/cmd.versionString=$(VERSION)" \
+		-o zscaler-terraformer cmd/zscaler-terraformer/main.go
 
 test_zpa:
 	@CI=true \
@@ -46,13 +46,13 @@ else
 install: DESTINATION=/usr/local/bin
 endif
 install:
-	@echo "==> Installing zscaler-terraforming cli in: $(DESTINATION)/zscaler-terraforming"
+	@echo "==> Installing zscaler-terraformer cli in: $(DESTINATION)/zscaler-terraformer"
 	@mkdir -p $(DESTINATION)
-	@rm -f $(DESTINATION)/zscaler-terraforming
+	@rm -f $(DESTINATION)/zscaler-terraformer
 	@go build \
 	-gcflags=all=-trimpath=$(GOPATH) \
 	-asmflags=all=-trimpath=$(GOPATH) \
-	-ldflags="-X github.com/zscaler/zscaler-terraforming/internal/app/zscaler-terraforming/cmd.versionString=$(VERSION)" \
-	-o $(DESTINATION)/zscaler-terraforming ./cmd/zscaler-terraforming/main.go
+	-ldflags="-X github.com/zscaler/zscaler-terraformer/internal/app/zscaler-terraformer/cmd.versionString=$(VERSION)" \
+	-o $(DESTINATION)/zscaler-terraformer ./cmd/zscaler-terraformer/main.go
 
 .PHONY: build test fmt validate-tf

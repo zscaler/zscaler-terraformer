@@ -168,7 +168,7 @@ func sharedPreRun(cmd *cobra.Command, args []string) {
 	// mock out the HTTP interactions.
 	if os.Getenv("CI") != "true" {
 		if strings.HasPrefix(resourceType, "zpa_") {
-			zpaConfig, err := zpa.NewConfig(zpaClientID, zpaClientSecret, zpaCustomerID, zpaCloud, "zscaler-terraforming")
+			zpaConfig, err := zpa.NewConfig(zpaClientID, zpaClientSecret, zpaCustomerID, zpaCloud, "zscaler-terraformer")
 			if err != nil {
 				log.Fatal("failed to initialize zscaler-sdk-go (zpa)", err)
 			}
@@ -207,7 +207,7 @@ func sharedPreRun(cmd *cobra.Command, args []string) {
 			}
 		} else if strings.HasPrefix(resourceType, "zia_") {
 			// init zia
-			ziaClient, err := zia.NewClient(ziaUsername, ziaPassword, ziaApiKey, ziaCloud, "zscaler-terraforming")
+			ziaClient, err := zia.NewClient(ziaUsername, ziaPassword, ziaApiKey, ziaCloud, "zscaler-terraformer")
 			if err != nil {
 				log.Fatal("failed to initialize zscaler-sdk-go (zia)", err)
 			}

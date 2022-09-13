@@ -5,10 +5,10 @@ before:
     # this is just an example and not a requirement for provider building/publishing
     - go mod tidy && go mod vendor
 builds:
-  - main: ./cmd/zscaler-terraforming/main.go
-    binary: zscaler-terraforming
+  - main: ./cmd/zscaler-terraformer/main.go
+    binary: zscaler-terraformer
     ldflags:
-      - -s -w -X "github.com/zscaler/zscaler-terraforming/internal/app/zscaler-terraforming/cmd.versionString={{.Env.VERSION}}"
+      - -s -w -X "github.com/zscaler/zscaler-terraformer/internal/app/zscaler-terraformer/cmd.versionString={{.Env.VERSION}}"
     goos:
       - windows
       - linux

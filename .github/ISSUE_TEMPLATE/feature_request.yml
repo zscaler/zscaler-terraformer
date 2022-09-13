@@ -4,7 +4,7 @@ labels: ["kind/enhancement", "needs-triage"]
 body:
 - type: input
   attributes:
-    label: Current `zscaler-terraforming` version
+    label: Current `zscaler-terraformer` version
     description: |
       If you're not using the latest version, please check to see if something related
       to your request has already been implemented in a later version.
@@ -21,7 +21,7 @@ body:
     label: Use cases
     description: |
       In order to properly evaluate a feature request, it is necessary to understand
-      the use-cases for it. Please describe below the _end goal_ you are trying 
+      the use-cases for it. Please describe below the _end goal_ you are trying
       to achieve that has led you to request this feature.
 
       Please keep this section focused on the problem and not on the suggested
@@ -30,18 +30,18 @@ body:
     required: true
 - type: textarea
   attributes:
-    label: Potential `zscaler-terraforming` usage
+    label: Potential `zscaler-terraformer` usage
     description: |
-      Show how you think this should work and interact. 
+      Show how you think this should work and interact.
   validations:
     required: true
-  
+
 - type: textarea
   attributes:
     label: References
     description: |
       Are there any other GitHub issues, whether open or closed, that are related to
       the problem you've described above or to the suggested solution? If so, please
-      create a list below that mentions each of them. 
+      create a list below that mentions each of them.
   validations:
     required: false

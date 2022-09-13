@@ -10,7 +10,7 @@
 
 ## Overview
 
-`zscaler-terraforming` is a command line utility to facilitate terraforming your
+`zscaler-terraformer` is a command line utility to facilitate terraforming your
 existing ZPA and ZIA resources. It does this by using your respective API credentials in each platform
 to retrieve your configurations from the [ZPA API](https://help.zscaler.com/zpa/getting-started-zpa-api) and/or [ZIA API](https://help.zscaler.com/zia/getting-started-zia-api)
 and converting them to Terraform configurations so that it can be used with the
@@ -26,18 +26,18 @@ write the Terraform configuration to describe them.
 
 ```
 Usage:
-  zscaler-terraforming [command]
+  zscaler-terraformer [command]
 
 Available Commands:
   completion  Generate the autocompletion script for the specified shell
   generate    Fetch resources from the Zscaler ZPA and/or ZIA API and generate the respective Terraform stanzas
   help        Help about any command
   import      Output `terraform import` compatible commands in order to import resources into state
-  version     Print the version number of zscaler-terraforming
+  version     Print the version number of zscaler-terraformer
 
 Flags:
-  -c, --config string                       Path to config file (default "/Users/username/.zscaler-terraforming.yaml")
-  -h, --help                                help for zscaler-terraforming
+  -c, --config string                       Path to config file (default "/Users/username/.zscaler-terraformer.yaml")
+  -h, --help                                help for zscaler-terraformer
       --resource-type string                Which resource you wish to generate
       --terraform-install-path string       Path to the default Terraform installation (default ".")
   -v, --verbose                             Specify verbose output (same as setting log level to debug)
@@ -52,7 +52,7 @@ Flags:
       --zpaCloud string                     ZPA Cloud (BETA or PRODUCTION)
       --zpaCustomerID string                ZPA Customer ID
 
-Use "zscaler-terraforming [command] --help" for more information about a command.
+Use "zscaler-terraformer [command] --help" for more information about a command.
 ```
 
 ## Authentication
@@ -82,20 +82,20 @@ demonstrated below.
 
 ### ZPA Environment Variables
 
-zscaler-terraforming for ZPA supports the following environment variables:
+zscaler-terraformer for ZPA supports the following environment variables:
 
 ```bash
 export ZPA_CLIENT_ID      = "xxxxxxxxxxxxxxxx"
 export ZPA_CLIENT_SECRET  = "xxxxxxxxxxxxxxxx"
 export ZPA_CUSTOMER_ID    = "xxxxxxxxxxxxxxxx"
 export ZPA_CLOUD          = "BETA" // Use "GOV" for ZPA Gov Cloud
-# now call zscaler-terraforming, e.g.
+# now call zscaler-terraformer, e.g.
 
 ```
 
 ### ZIA Environment Variables
 
-zscaler-terraforming for ZIA supports the following environment variables:
+zscaler-terraformer for ZIA supports the following environment variables:
 
 ```bash
 export ZIA_USERNAME = "xxxxxxxxxxxxxxxx"
@@ -109,7 +109,7 @@ Alternatively, if using a config file, then specify the inputs using the same
 names the `flag` names. Example:
 
 ```
-$ cat ~/.zscaler-terraforming.yaml
+$ cat ~/.zscaler-terraformer.yaml
 zpaClientID: "Mrwefhoijhviihew"
 zpaClientSecret: "{HBRjowhdowqj"
 zpaCustomerID: "123456789"
@@ -118,7 +118,7 @@ zpaCloud: "BETA"
 
 ## ZPA Example usage
 
-To get started with the zscaler-terraforming CLI to export your ZPA configuration follow you must create a terraform configuration file in a specific directory, and then manually initialize the provider via ``terraform init`` in order to download the provider binary.
+To get started with the zscaler-terraformer CLI to export your ZPA configuration follow you must create a terraform configuration file in a specific directory, and then manually initialize the provider via ``terraform init`` in order to download the provider binary.
 
 ```bash
 $ mkdir -p $HOME/Desktop/zpa_configuration
@@ -145,14 +145,14 @@ Once the directory is initialized via `terraform init`, you can then follow one 
 
 ```bash
 $ export ZSCALER_ZPA_TERRAFORM_INSTALL_PATH="$HOME/Desktop/zpa_configuration"
-$ zscaler-terraforming generate \
+$ zscaler-terraformer generate \
   --resource-type "zpa_app_connector_group"
 ```
 
 **Option 2**
 
 ```bash
-$ zscaler-terraforming generate \
+$ zscaler-terraformer generate \
   --zpa-terraform-install-path $HOME/Desktop/zpa_configuration \
   --resource-type "zpa_app_connector_group"
 ```
@@ -178,7 +178,7 @@ $ zscaler-terraforming generate \
 
 ## ZIA Example usage
 
-To get started with the zscaler-terraforming CLI to export your ZPA configuration follow you must create a terraform configuration file in a specific directory, and then manually initialize the provider via ``terraform init`` in order to download the provider binary.
+To get started with the zscaler-terraformer CLI to export your ZPA configuration follow you must create a terraform configuration file in a specific directory, and then manually initialize the provider via ``terraform init`` in order to download the provider binary.
 
 ```bash
 $ mkdir -p $HOME/Desktop/zia_configuration
@@ -205,14 +205,14 @@ Once the directory is initialized via `terraform init`, you can then follow one 
 
 ```bash
 $ export ZSCALER_ZIA_TERRAFORM_INSTALL_PATH="$HOME/Desktop/zia_configuration"
-$ zscaler-terraforming generate \
+$ zscaler-terraformer generate \
   --resource-type "zia_traffic_forwarding_static_ip"
 ```
 
 **Option 2**
 
 ```bash
-$ zscaler-terraforming generate \
+$ zscaler-terraformer generate \
   --zia-terraform-install-path $HOME/Desktop/zia_configuration \
   --resource-type "zia_traffic_forwarding_static_ip"
 ```
@@ -240,23 +240,23 @@ If you use Homebrew on MacOS, you can run the following:
 
 ```bash
 brew tap zscaler/zscaler
-brew install --cask zscaler/zscaler/zscaler-terraforming
+brew install --cask zscaler/zscaler/zscaler-terraformer
 ```
 
 If you use another OS, you will need to download the release directly from
-[GitHub Releases](https://github.com/zscaler/zscaler-terraforming/releases).
+[GitHub Releases](https://github.com/zscaler/zscaler-terraformer/releases).
 
 ## Importing with Terraform state
 
-`zscaler-terraforming` will output the `terraform import` compatible commands for you
+`zscaler-terraformer` will output the `terraform import` compatible commands for you
 when you invoke the `import` command. This command assumes you have already ran
-`zscaler-terraforming generate ...` to output your resources.
+`zscaler-terraformer generate ...` to output your resources.
 
 In the future this process will be further automated; however for now, it is a manual step to
 allow flexibility in directory structure.
 
 ```bash
-$ zscaler-terraforming import \
+$ zscaler-terraformer import \
   --resource-type "zpa_app_connector_group"
 ```
 
