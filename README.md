@@ -24,6 +24,8 @@ write the Terraform configuration to describe them.
 
 > NOTE: This tool has been developed and tested with Terraform v1.x.x only.
 
+## Demo ZPA
+[![asciicast](https://asciinema.org/a/243961.svg)](https://asciinema.org/a/243961)
 ## Usage
 
 ```
