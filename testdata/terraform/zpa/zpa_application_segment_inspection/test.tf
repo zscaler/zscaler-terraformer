@@ -1,5 +1,6 @@
 resource "zpa_application_segment_inspection" "terraform_managed_resource" {
   bypass_type            = "NEVER"
+  config_space           = "DEFAULT"
   domain_names           = ["test.acme.com"]
   double_encrypt         = false
   enabled                = true

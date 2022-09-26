@@ -125,122 +125,118 @@ func testDataFile(filename, cloudType string) string {
 }
 
 func sharedPreRun(cmd *cobra.Command, args []string) {
-	if strings.HasPrefix(resourceType, "zpa_") {
-		// init zpa
-		zpaCloud = viper.GetString("zpaCloud")
-		if zpaClientID = viper.GetString("zpaClientID"); zpaClientID == "" {
-			log.Fatal("'zpaClientID' must be set.")
-		}
-		if zpaClientSecret = viper.GetString("zpaClientSecret"); zpaClientSecret == "" {
-			log.Fatal("'zpaClientSecret' must be set.")
-		}
-		if zpaCustomerID = viper.GetString("zpaCustomerID"); zpaCustomerID == "" {
-			log.Fatal("'zpaCustomerID' must be set.")
-		}
-
-		log.WithFields(logrus.Fields{
-			"zpaClientID":   zpaClientID,
-			"zpaCustomerID": "zpaCustomerID",
-			"zpaCloud":      "zpaCloud",
-		}).Debug("initializing zscaler-sdk-go[ZPA]")
-	} else if strings.HasPrefix(resourceType, "zia_") {
-		// init zia
-		ziaCloud = viper.GetString("ziaCloud")
-		if ziaUsername = viper.GetString("ziaUsername"); ziaUsername == "" {
-			log.Fatal("'ziaUsername' must be set.")
-		}
-		if ziaPassword = viper.GetString("ziaPassword"); ziaPassword == "" {
-			log.Fatal("'ziaPassword' must be set.")
-		}
-		if ziaApiKey = viper.GetString("ziaApiKey"); ziaApiKey == "" {
-			log.Fatal("'ziaApiKey' must be set.")
-		}
-
-		log.WithFields(logrus.Fields{
-			"ziaUsername": ziaUsername,
-			"ziaCloud":    "ziaCloud",
-		}).Debug("initializing zscaler-sdk-go[ZIA]")
-	} else {
-		log.Fatal("failed to initialize zscaler-sdk-go (zpa): Uknwon resource type prefix, expecting zpa_ or zia_: " + resourceType)
-	}
-
 	// Don't initialise a client in CI as this messes with VCR and the ability to
 	// mock out the HTTP interactions.
 	if os.Getenv("CI") != "true" {
-		if strings.HasPrefix(resourceType, "zpa_") {
+		if strings.HasPrefix(resourceType_, "zpa_") || strings.Contains(resources, "zpa_") || resources == "*" || resources == "zpa" {
+			// init zpa
+			zpaCloud = viper.GetString("zpaCloud")
+			if zpaClientID = viper.GetString("zpaClientID"); zpaClientID == "" {
+				log.Fatal("'zpaClientID' must be set.")
+			}
+			if zpaClientSecret = viper.GetString("zpaClientSecret"); zpaClientSecret == "" {
+				log.Fatal("'zpaClientSecret' must be set.")
+			}
+			if zpaCustomerID = viper.GetString("zpaCustomerID"); zpaCustomerID == "" {
+				log.Fatal("'zpaCustomerID' must be set.")
+			}
+
+			log.WithFields(logrus.Fields{
+				"zpaClientID":   zpaClientID,
+				"zpaCustomerID": "zpaCustomerID",
+				"zpaCloud":      "zpaCloud",
+			}).Debug("initializing zscaler-sdk-go[ZPA]")
+		}
+		if strings.HasPrefix(resourceType_, "zia_") || strings.Contains(resources, "zia_") || resources == "*" || resources == "zia" {
+			// init zia
+			ziaCloud = viper.GetString("ziaCloud")
+			if ziaUsername = viper.GetString("ziaUsername"); ziaUsername == "" {
+				log.Fatal("'ziaUsername' must be set.")
+			}
+			if ziaPassword = viper.GetString("ziaPassword"); ziaPassword == "" {
+				log.Fatal("'ziaPassword' must be set.")
+			}
+			if ziaApiKey = viper.GetString("ziaApiKey"); ziaApiKey == "" {
+				log.Fatal("'ziaApiKey' must be set.")
+			}
+
+			log.WithFields(logrus.Fields{
+				"ziaUsername": ziaUsername,
+				"ziaCloud":    "ziaCloud",
+			}).Debug("initializing zscaler-sdk-go[ZIA]")
+		}
+		api = &Client{}
+		if strings.HasPrefix(resourceType_, "zpa_") || strings.Contains(resources, "zpa_") || resources == "*" || resources == "zpa" {
 			zpaConfig, err := zpa.NewConfig(zpaClientID, zpaClientSecret, zpaCustomerID, zpaCloud, "zscaler-terraformer")
 			if err != nil {
 				log.Fatal("failed to initialize zscaler-sdk-go (zpa)", err)
 			}
 			zpaClient := zpa.NewClient(zpaConfig)
-			api = &Client{
-				zpa: &ZPAClient{
-					appconnectorgroup:              appconnectorgroup.New(zpaClient),
-					appconnectorcontroller:         appconnectorcontroller.New(zpaClient),
-					applicationsegment:             applicationsegment.New(zpaClient),
-					applicationsegmentpra:          applicationsegmentpra.New(zpaClient),
-					applicationsegmentinspection:   applicationsegmentinspection.New(zpaClient),
-					appservercontroller:            appservercontroller.New(zpaClient),
-					bacertificate:                  bacertificate.New(zpaClient),
-					cloudconnectorgroup:            cloudconnectorgroup.New(zpaClient),
-					customerversionprofile:         customerversionprofile.New(zpaClient),
-					enrollmentcert:                 enrollmentcert.New(zpaClient),
-					idpcontroller:                  idpcontroller.New(zpaClient),
-					lssconfigcontroller:            lssconfigcontroller.New(zpaClient),
-					machinegroup:                   machinegroup.New(zpaClient),
-					postureprofile:                 postureprofile.New(zpaClient),
-					policysetcontroller:            policysetcontroller.New(zpaClient),
-					provisioningkey:                provisioningkey.New(zpaClient),
-					samlattribute:                  samlattribute.New(zpaClient),
-					scimgroup:                      scimgroup.New(zpaClient),
-					scimattributeheader:            scimattributeheader.New(zpaClient),
-					segmentgroup:                   segmentgroup.New(zpaClient),
-					servergroup:                    servergroup.New(zpaClient),
-					serviceedgegroup:               serviceedgegroup.New(zpaClient),
-					serviceedgecontroller:          serviceedgecontroller.New(zpaClient),
-					trustednetwork:                 trustednetwork.New(zpaClient),
-					browseraccess:                  browseraccess.New(zpaClient),
-					inspection_custom_controls:     inspection_custom_controls.New(zpaClient),
-					inspection_predefined_controls: inspection_predefined_controls.New(zpaClient),
-					inspection_profile:             inspection_profile.New(zpaClient),
-				},
+			api.zpa = &ZPAClient{
+				appconnectorgroup:              appconnectorgroup.New(zpaClient),
+				appconnectorcontroller:         appconnectorcontroller.New(zpaClient),
+				applicationsegment:             applicationsegment.New(zpaClient),
+				applicationsegmentpra:          applicationsegmentpra.New(zpaClient),
+				applicationsegmentinspection:   applicationsegmentinspection.New(zpaClient),
+				appservercontroller:            appservercontroller.New(zpaClient),
+				bacertificate:                  bacertificate.New(zpaClient),
+				cloudconnectorgroup:            cloudconnectorgroup.New(zpaClient),
+				customerversionprofile:         customerversionprofile.New(zpaClient),
+				enrollmentcert:                 enrollmentcert.New(zpaClient),
+				idpcontroller:                  idpcontroller.New(zpaClient),
+				lssconfigcontroller:            lssconfigcontroller.New(zpaClient),
+				machinegroup:                   machinegroup.New(zpaClient),
+				postureprofile:                 postureprofile.New(zpaClient),
+				policysetcontroller:            policysetcontroller.New(zpaClient),
+				provisioningkey:                provisioningkey.New(zpaClient),
+				samlattribute:                  samlattribute.New(zpaClient),
+				scimgroup:                      scimgroup.New(zpaClient),
+				scimattributeheader:            scimattributeheader.New(zpaClient),
+				segmentgroup:                   segmentgroup.New(zpaClient),
+				servergroup:                    servergroup.New(zpaClient),
+				serviceedgegroup:               serviceedgegroup.New(zpaClient),
+				serviceedgecontroller:          serviceedgecontroller.New(zpaClient),
+				trustednetwork:                 trustednetwork.New(zpaClient),
+				browseraccess:                  browseraccess.New(zpaClient),
+				inspection_custom_controls:     inspection_custom_controls.New(zpaClient),
+				inspection_predefined_controls: inspection_predefined_controls.New(zpaClient),
+				inspection_profile:             inspection_profile.New(zpaClient),
 			}
-		} else if strings.HasPrefix(resourceType, "zia_") {
+		}
+		if strings.HasPrefix(resourceType_, "zia_") || strings.Contains(resources, "zia_") || resources == "*" || resources == "zia" {
 			// init zia
 			ziaClient, err := zia.NewClient(ziaUsername, ziaPassword, ziaApiKey, ziaCloud, "zscaler-terraformer")
 			if err != nil {
 				log.Fatal("failed to initialize zscaler-sdk-go (zia)", err)
 			}
-			api = &Client{
-				zia: &ZIAClient{
-					adminuserrolemgmt:            adminuserrolemgmt.New(ziaClient),
-					filteringrules:               filteringrules.New(ziaClient),
-					ipdestinationgroups:          ipdestinationgroups.New(ziaClient),
-					ipsourcegroups:               ipsourcegroups.New(ziaClient),
-					networkapplications:          networkapplications.New(ziaClient),
-					networkservices:              networkservices.New(ziaClient),
-					timewindow:                   timewindow.New(ziaClient),
-					urlcategories:                urlcategories.New(ziaClient),
-					urlfilteringpolicies:         urlfilteringpolicies.New(ziaClient),
-					usermanagement:               usermanagement.New(ziaClient),
-					virtualipaddresslist:         virtualipaddresslist.New(ziaClient),
-					vpncredentials:               vpncredentials.New(ziaClient),
-					gretunnels:                   gretunnels.New(ziaClient),
-					gretunnelinfo:                gretunnelinfo.New(ziaClient),
-					greinternalipranges:          greinternalipranges.New(ziaClient),
-					staticips:                    staticips.New(ziaClient),
-					locationmanagement:           locationmanagement.New(ziaClient),
-					locationgroups:               locationgroups.New(ziaClient),
-					activation:                   activation.New(ziaClient),
-					devicegroups:                 devicegroups.New(ziaClient),
-					dlpdictionaries:              dlpdictionaries.New(ziaClient),
-					dlp_engines:                  dlp_engines.New(ziaClient),
-					dlp_notification_templates:   dlp_notification_templates.New(ziaClient),
-					dlp_web_rules:                dlp_web_rules.New(ziaClient),
-					rule_labels:                  rule_labels.New(ziaClient),
-					security_policy_settings:     security_policy_settings.New(ziaClient),
-					user_authentication_settings: user_authentication_settings.New(ziaClient),
-				},
+			api.zia = &ZIAClient{
+				adminuserrolemgmt:            adminuserrolemgmt.New(ziaClient),
+				filteringrules:               filteringrules.New(ziaClient),
+				ipdestinationgroups:          ipdestinationgroups.New(ziaClient),
+				ipsourcegroups:               ipsourcegroups.New(ziaClient),
+				networkapplications:          networkapplications.New(ziaClient),
+				networkservices:              networkservices.New(ziaClient),
+				timewindow:                   timewindow.New(ziaClient),
+				urlcategories:                urlcategories.New(ziaClient),
+				urlfilteringpolicies:         urlfilteringpolicies.New(ziaClient),
+				usermanagement:               usermanagement.New(ziaClient),
+				virtualipaddresslist:         virtualipaddresslist.New(ziaClient),
+				vpncredentials:               vpncredentials.New(ziaClient),
+				gretunnels:                   gretunnels.New(ziaClient),
+				gretunnelinfo:                gretunnelinfo.New(ziaClient),
+				greinternalipranges:          greinternalipranges.New(ziaClient),
+				staticips:                    staticips.New(ziaClient),
+				locationmanagement:           locationmanagement.New(ziaClient),
+				locationgroups:               locationgroups.New(ziaClient),
+				activation:                   activation.New(ziaClient),
+				devicegroups:                 devicegroups.New(ziaClient),
+				dlpdictionaries:              dlpdictionaries.New(ziaClient),
+				dlp_engines:                  dlp_engines.New(ziaClient),
+				dlp_notification_templates:   dlp_notification_templates.New(ziaClient),
+				dlp_web_rules:                dlp_web_rules.New(ziaClient),
+				rule_labels:                  rule_labels.New(ziaClient),
+				security_policy_settings:     security_policy_settings.New(ziaClient),
+				user_authentication_settings: user_authentication_settings.New(ziaClient),
 			}
 		}
 	}
@@ -298,6 +294,26 @@ func isInList(item string, list []string) bool {
 	return false
 }
 
+func listIdsIntBlockIDExtentionsSingle(fieldName string, obj interface{}) string {
+	output := ""
+	if obj == nil {
+		return output
+	}
+	if m, ok := obj.(map[string]interface{}); ok {
+		output = fieldName + " {\n"
+		output += "id=["
+		if idInterface, ok := m["id"]; ok {
+			id, ok := idInterface.(float64)
+			if ok && id > 0 {
+				output += fmt.Sprintf("%d", int64(id))
+			}
+		}
+		output += "]\n"
+		output += "}\n"
+	}
+	return output
+}
+
 func listIdsIntBlock(fieldName string, obj interface{}) string {
 	output := ""
 	if obj != nil && len(obj.([]interface{})) >= 0 {
@@ -348,7 +364,7 @@ func listIdsStringBlock(fieldName string, obj interface{}) string {
 
 // nestBlocks takes a schema and generates all of the appropriate nesting of any
 // top-level blocks as well as nested lists or sets.
-func nestBlocks(schemaBlock *tfjson.SchemaBlock, structData map[string]interface{}, parentID string, indexedNestedBlocks map[string][]string) string {
+func nestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData map[string]interface{}, parentID string, indexedNestedBlocks map[string][]string) string {
 	output := ""
 
 	// Nested blocks are used for configuration options where assignment
@@ -411,7 +427,7 @@ func nestBlocks(schemaBlock *tfjson.SchemaBlock, structData map[string]interface
 			}
 			output += "}\n"
 			continue
-		} else if isInList(resourceType, []string{"zia_firewall_filtering_network_service_groups", "zia_url_filtering_rules", "zia_dlp_web_rules"}) && isInList(block, []string{"departments",
+		} else if isInList(resourceType, []string{"zia_firewall_filtering_network_service_groups", "zia_url_filtering_rules", "zia_dlp_web_rules", "zia_user_management"}) && isInList(block, []string{"departments",
 			"groups",
 			"locations",
 			"dlp_engines",
@@ -419,7 +435,19 @@ func nestBlocks(schemaBlock *tfjson.SchemaBlock, structData map[string]interface
 			"url_categories",
 			"users",
 			"labels",
-			"services"}) {
+			"services",
+		}) {
+			output += listIdsIntBlock(block, structData[mapTfFieldNameToApi(resourceType, block)])
+			continue
+		} else if isInList(resourceType, []string{"zia_dlp_web_rules"}) && isInList(block, []string{
+			"notification_template",
+		}) {
+			output += listIdsIntBlockIDExtentionsSingle(block, structData[mapTfFieldNameToApi(resourceType, block)])
+			continue
+		} else if isInList(resourceType, []string{"zia_firewall_filtering_rule"}) && isInList(block, []string{"dest_ip_groups", "nw_services",
+			"departments",
+			"groups",
+			"time_windows"}) {
 			output += listIdsIntBlock(block, structData[mapTfFieldNameToApi(resourceType, block)])
 			continue
 		} else if isInList(resourceType, []string{"zpa_application_segment",
@@ -468,7 +496,7 @@ func nestBlocks(schemaBlock *tfjson.SchemaBlock, structData map[string]interface
 				if s, ok := structData[apiBlock]; ok {
 					switch s.(type) {
 					case map[string]interface{}:
-						nestedBlockOutput += nestBlocks(schemaBlock.NestedBlocks[block].Block, s.(map[string]interface{}), parentID, indexedNestedBlocks)
+						nestedBlockOutput += nestBlocks(resourceType, schemaBlock.NestedBlocks[block].Block, s.(map[string]interface{}), parentID, indexedNestedBlocks)
 						indexedNestedBlocks[parentID] = append(indexedNestedBlocks[parentID], nestedBlockOutput)
 
 					case []interface{}:
@@ -481,7 +509,7 @@ func nestBlocks(schemaBlock *tfjson.SchemaBlock, structData map[string]interface
 								nestedItem.(map[string]interface{})["terraform_internal_id"] = parentID
 							}
 
-							nestedBlockOutput += nestBlocks(schemaBlock.NestedBlocks[block].Block, nestedItem.(map[string]interface{}), parentID.(string), indexedNestedBlocks)
+							nestedBlockOutput += nestBlocks(resourceType, schemaBlock.NestedBlocks[block].Block, nestedItem.(map[string]interface{}), parentID.(string), indexedNestedBlocks)
 							// The indexedNestedBlocks maps helps us know which parent we're rendering the nested block for
 							// So we append the current child's output to it, for when we render it out later
 							indexedNestedBlocks[parentID.(string)] = append(indexedNestedBlocks[parentID.(string)], nestedBlockOutput)
@@ -500,7 +528,7 @@ func nestBlocks(schemaBlock *tfjson.SchemaBlock, structData map[string]interface
 			// which case we can directly add them to the config.
 			case map[string]interface{}:
 				if attrStruct != nil {
-					nestedBlockOutput += writeNestedBlock(sortedInnerAttributes, schemaBlock.NestedBlocks[block].Block, attrStruct, parentID)
+					nestedBlockOutput += writeNestedBlock(resourceType, sortedInnerAttributes, schemaBlock.NestedBlocks[block].Block, attrStruct, parentID)
 				}
 
 				if nestedBlockOutput != "" || schemaBlock.NestedBlocks[block].MinItems > 0 {
@@ -516,7 +544,7 @@ func nestBlocks(schemaBlock *tfjson.SchemaBlock, structData map[string]interface
 					repeatedBlockOutput := ""
 
 					if attrStruct != nil {
-						repeatedBlockOutput = writeNestedBlock(sortedInnerAttributes, schemaBlock.NestedBlocks[block].Block, v, parentID)
+						repeatedBlockOutput = writeNestedBlock(resourceType, sortedInnerAttributes, schemaBlock.NestedBlocks[block].Block, v, parentID)
 					}
 
 					// Write the block if we had data for it, or if it is a required block.
@@ -538,7 +566,7 @@ func nestBlocks(schemaBlock *tfjson.SchemaBlock, structData map[string]interface
 				for _, v := range attrStruct {
 					repeatedBlockOutput := ""
 					if attrStruct != nil {
-						repeatedBlockOutput = writeNestedBlock(sortedInnerAttributes, schemaBlock.NestedBlocks[block].Block, v.(map[string]interface{}), parentID)
+						repeatedBlockOutput = writeNestedBlock(resourceType, sortedInnerAttributes, schemaBlock.NestedBlocks[block].Block, v.(map[string]interface{}), parentID)
 					}
 
 					// Write the block if we had data for it, or if it is a required block.
@@ -593,7 +621,7 @@ func nestBlocks(schemaBlock *tfjson.SchemaBlock, structData map[string]interface
 	return output
 }
 
-func writeNestedBlock(attributes []string, schemaBlock *tfjson.SchemaBlock, attrStruct map[string]interface{}, parentID string) string {
+func writeNestedBlock(resourceType string, attributes []string, schemaBlock *tfjson.SchemaBlock, attrStruct map[string]interface{}, parentID string) string {
 	nestedBlockOutput := ""
 
 	for _, attrName := range attributes {
@@ -716,23 +744,29 @@ func writeAttrLine(key string, value interface{}, usedInBlock bool) string {
 	return ""
 }
 
-var matchFirstCap = regexp.MustCompile("(.)([A-Z][a-z]+)")
-var matchAllCap = regexp.MustCompile("([a-z0-9])([A-Z])")
-
-func mapApiFieldNameToTf(resourceType, fieldName string) string {
-	snake := matchFirstCap.ReplaceAllString(fieldName, "${1}_${2}")
-	snake = matchAllCap.ReplaceAllString(snake, "${1}_${2}")
-	return strings.ToLower(snake)
-}
-
-func mapTfFieldNameToApi(resourceType, apiFieldName string) string {
+func mapTfFieldNameToApi(resourceType, fieldName string) string {
 	switch resourceType {
 	case "zia_admin_users":
-		switch apiFieldName {
+		switch fieldName {
 		case "username":
 			return "userName"
 		}
 	}
-	result := strcase.ToLowerCamel(apiFieldName)
+	result := strcase.ToLowerCamel(fieldName)
 	return result
+}
+
+func strip(s string) string {
+	var result strings.Builder
+	for i := 0; i < len(s); i++ {
+		b := s[i]
+		if ('a' <= b && b <= 'z') ||
+			('A' <= b && b <= 'Z') ||
+			('0' <= b && b <= '9') ||
+			b == ' ' ||
+			b == '_' {
+			result.WriteByte(b)
+		}
+	}
+	return result.String()
 }

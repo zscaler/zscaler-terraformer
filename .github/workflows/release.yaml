@@ -1,29 +1,40 @@
-name: Release
-
+name: "tagged-release"
 on:
-  push:
-    tags:
-      - 'v*'
-
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Bump Version
+        required: true
 jobs:
-  release:
-    runs-on: ubuntu-latest
+  tagged-release:
+    name: "Tagged Release"
+    runs-on: "ubuntu-latest"
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Set up Go
+      - uses: actions/checkout@v3
+      - name: Install Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18
-      - name: Set release VERSION
-        run: echo "VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-      - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v3
+          go-version: 1.19
+      - name: Test
+        run: go build -v && go test ./...
+      - name: Build for linux/amd64
+        run: go build -o terraformer-all-linux-amd64
+      - name: Build for linux/arm64
+        run: GOOS=linux GOARCH=arm64 go build -o terraformer-all-linux-arm64
+      - name: Build for mac
+        run: GOOS=darwin go build -o terraformer-all-darwin-amd64
+      - name: Build for mac Apple Silicon
+        run: GOOS=darwin GOARCH=arm64 go build -o terraformer-all-darwin-arm64
+      - name: Build for windows
+        run: GOOS=windows go build -o terraformer-all-windows-amd64
+      - name: Build for all providers
+        run: go run build/multi-build/main.go
+
+      - uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          version: latest
-          args: release --rm-dist
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ env.VERSION }}
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: ${{ github.event.inputs.version }}
+          prerelease: false
+          files: |
+            terraformer-*
