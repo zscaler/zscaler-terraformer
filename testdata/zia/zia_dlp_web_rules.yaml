@@ -8,7 +8,7 @@ interactions:
       Content-Type:
       - application/json
       User-Agent:
-      - zscaler-terraformer
+      - zscaler-terraforming
     url: https://zsapi.zscalerthree.net/api/v1/authenticatedSession
     method: POST
   response:
@@ -46,7 +46,7 @@ interactions:
       Cookie:
       - JSESSIONID=ECEF254017359D3AD80193C1806B6251
       User-Agent:
-      - zscaler-terraformer
+      - zscaler-terraforming
     url: https://zsapi.zscalerthree.net/api/v1/webDlpRules
     method: GET
   response:

@@ -211,7 +211,7 @@ func TestResourceGeneration(t *testing.T) {
 func createClientMock(r http.RoundTripper, resourceType, zpaClientID, zpaClientSecret, zpaCustomerID, zpaCloud, ziaUsername, ziaPassword, ziaApiKey, ziaCloud string) *Client {
 	var cli *Client
 	if strings.HasPrefix(resourceType, "zpa_") {
-		zpaConfig, err := zpa.NewConfig(zpaClientID, zpaClientSecret, zpaCustomerID, zpaCloud, "zscaler-terraformer")
+		zpaConfig, err := zpa.NewConfig(zpaClientID, zpaClientSecret, zpaCustomerID, zpaCloud, "zscaler-terraforming")
 		if err != nil {
 			log.Fatal("failed to initialize mock zscaler-sdk-go (zpa)", err)
 		}
@@ -252,7 +252,7 @@ func createClientMock(r http.RoundTripper, resourceType, zpaClientID, zpaClientS
 		}
 	} else if strings.HasPrefix(resourceType, "zia_") {
 		// init zia
-		ziaClient, err := zia.NewClient(ziaUsername, ziaPassword, ziaApiKey, ziaCloud, "zscaler-terraformer")
+		ziaClient, err := zia.NewClient(ziaUsername, ziaPassword, ziaApiKey, ziaCloud, "zscaler-terraforming")
 		if err != nil {
 			log.Fatal("failed to initialize mock zscaler-sdk-go (zia)", err)
 		}
