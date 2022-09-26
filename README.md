@@ -8,6 +8,8 @@
 
 # Zscaler Terraformer Tool
 
+[![tests](https://github.com/zscaler/zscaler-terraformer/actions/workflows/test.yaml/badge.svg)](https://github.com/zscaler/zscaler-terraformer/actions/workflows/test.yaml)
+[![linter](https://github.com/zscaler/zscaler-terraformer/actions/workflows/linter.yml/badge.svg)](https://github.com/zscaler/zscaler-terraformer/actions/workflows/linter.yml)
 ## Overview
 
 `zscaler-terraformer` is a command line utility to facilitate terraforming your
