@@ -167,7 +167,7 @@ func sharedPreRun(cmd *cobra.Command, args []string) {
 		}
 		api = &Client{}
 		if strings.HasPrefix(resourceType_, "zpa_") || strings.Contains(resources, "zpa_") || resources == "*" || resources == "zpa" {
-			zpaConfig, err := zpa.NewConfig(zpaClientID, zpaClientSecret, zpaCustomerID, zpaCloud, "zscaler-terraforming")
+			zpaConfig, err := zpa.NewConfig(zpaClientID, zpaClientSecret, zpaCustomerID, zpaCloud, "zscaler-terraformer")
 			if err != nil {
 				log.Fatal("failed to initialize zscaler-sdk-go (zpa)", err)
 			}
@@ -205,7 +205,7 @@ func sharedPreRun(cmd *cobra.Command, args []string) {
 		}
 		if strings.HasPrefix(resourceType_, "zia_") || strings.Contains(resources, "zia_") || resources == "*" || resources == "zia" {
 			// init zia
-			ziaClient, err := zia.NewClient(ziaUsername, ziaPassword, ziaApiKey, ziaCloud, "zscaler-terraforming")
+			ziaClient, err := zia.NewClient(ziaUsername, ziaPassword, ziaApiKey, ziaCloud, "zscaler-terraformer")
 			if err != nil {
 				log.Fatal("failed to initialize zscaler-sdk-go (zia)", err)
 			}
