@@ -11,7 +11,12 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/security_policy_settings"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/urlcategories"
+	"github.com/zscaler/zscaler-sdk-go/zia/services/urlfilteringpolicies"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/user_authentication_settings"
+	"github.com/zscaler/zscaler-sdk-go/zpa/services/appconnectorgroup"
+	"github.com/zscaler/zscaler-sdk-go/zpa/services/policysetcontroller"
+	"github.com/zscaler/zscaler-sdk-go/zpa/services/segmentgroup"
+	"github.com/zscaler/zscaler-sdk-go/zpa/services/servergroup"
 
 	"fmt"
 )
@@ -100,9 +105,16 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 
 	switch resourceType {
 	case "zpa_app_connector_group":
-		jsonPayload, _, err := api.zpa.appconnectorgroup.GetAll()
+		list, _, err := api.zpa.appconnectorgroup.GetAll()
 		if err != nil {
 			log.Fatal(err)
+		}
+		jsonPayload := []appconnectorgroup.AppConnectorGroup{}
+		for _, i := range list {
+			if i.Name == "Zscaler Deception" {
+				continue
+			}
+			jsonPayload = append(jsonPayload, i)
 		}
 		m, _ := json.Marshal(jsonPayload)
 		json.Unmarshal(m, &jsonStructData)
@@ -135,16 +147,30 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		m, _ := json.Marshal(jsonPayload)
 		json.Unmarshal(m, &jsonStructData)
 	case "zpa_segment_group":
-		jsonPayload, _, err := api.zpa.segmentgroup.GetAll()
+		list, _, err := api.zpa.segmentgroup.GetAll()
 		if err != nil {
 			log.Fatal(err)
+		}
+		jsonPayload := []segmentgroup.SegmentGroup{}
+		for _, i := range list {
+			if i.Name == "Zscaler Deception" {
+				continue
+			}
+			jsonPayload = append(jsonPayload, i)
 		}
 		m, _ := json.Marshal(jsonPayload)
 		json.Unmarshal(m, &jsonStructData)
 	case "zpa_server_group":
-		jsonPayload, _, err := api.zpa.servergroup.GetAll()
+		list, _, err := api.zpa.servergroup.GetAll()
 		if err != nil {
 			log.Fatal(err)
+		}
+		jsonPayload := []servergroup.ServerGroup{}
+		for _, i := range list {
+			if i.Name == "Zscaler Deception" {
+				continue
+			}
+			jsonPayload = append(jsonPayload, i)
 		}
 		m, _ := json.Marshal(jsonPayload)
 		json.Unmarshal(m, &jsonStructData)
@@ -156,30 +182,58 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		m, _ := json.Marshal(jsonPayload)
 		json.Unmarshal(m, &jsonStructData)
 	case "zpa_policy_access_rule":
-		jsonPayload, _, err := api.zpa.policysetcontroller.GetAllByType("ACCESS_POLICY")
+		list, _, err := api.zpa.policysetcontroller.GetAllByType("ACCESS_POLICY")
 		if err != nil {
 			log.Fatal(err)
+		}
+		jsonPayload := []policysetcontroller.PolicyRule{}
+		for _, i := range list {
+			if i.Name == "Zscaler Deception" {
+				continue
+			}
+			jsonPayload = append(jsonPayload, i)
 		}
 		m, _ := json.Marshal(jsonPayload)
 		json.Unmarshal(m, &jsonStructData)
 	case "zpa_policy_inspection_rule":
-		jsonPayload, _, err := api.zpa.policysetcontroller.GetAllByType("INSPECTION_POLICY")
+		list, _, err := api.zpa.policysetcontroller.GetAllByType("INSPECTION_POLICY")
 		if err != nil {
 			log.Fatal(err)
+		}
+		jsonPayload := []policysetcontroller.PolicyRule{}
+		for _, i := range list {
+			if i.Name == "Zscaler Deception" {
+				continue
+			}
+			jsonPayload = append(jsonPayload, i)
 		}
 		m, _ := json.Marshal(jsonPayload)
 		json.Unmarshal(m, &jsonStructData)
 	case "zpa_policy_timeout_rule":
-		jsonPayload, _, err := api.zpa.policysetcontroller.GetAllByType("TIMEOUT_POLICY")
+		list, _, err := api.zpa.policysetcontroller.GetAllByType("TIMEOUT_POLICY")
 		if err != nil {
 			log.Fatal(err)
+		}
+		jsonPayload := []policysetcontroller.PolicyRule{}
+		for _, i := range list {
+			if i.Name == "Zscaler Deception" {
+				continue
+			}
+			jsonPayload = append(jsonPayload, i)
 		}
 		m, _ := json.Marshal(jsonPayload)
 		json.Unmarshal(m, &jsonStructData)
 	case "zpa_policy_forwarding_rule":
-		jsonPayload, _, err := api.zpa.policysetcontroller.GetAllByType("CLIENT_FORWARDING_POLICY")
+		list, _, err := api.zpa.policysetcontroller.GetAllByType("CLIENT_FORWARDING_POLICY")
 		if err != nil {
 			log.Fatal(err)
+		}
+		jsonPayload := []policysetcontroller.PolicyRule{}
+		for _, i := range list {
+			if i.Name == "Zscaler Deception" {
+				continue
+			}
+			jsonPayload = append(jsonPayload, i)
 		}
 		m, _ := json.Marshal(jsonPayload)
 		json.Unmarshal(m, &jsonStructData)
@@ -334,11 +388,18 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		m, _ := json.Marshal(items)
 		json.Unmarshal(m, &jsonStructData)
 	case "zia_url_filtering_rules":
-		jsonPayload, err := api.zia.urlfilteringpolicies.GetAll()
+		rules, err := api.zia.urlfilteringpolicies.GetAll()
 		if err != nil {
 			log.Fatal(err)
 		}
-		m, _ := json.Marshal(jsonPayload)
+		rulesFiltered := []urlfilteringpolicies.URLFilteringRule{}
+		for _, rule := range rules {
+			if isInList(rule.Name, []string{"Office 365 One Click Rule", "UCaaS One Click Rule", "Default Firewall Filtering Rule"}) {
+				continue
+			}
+			rulesFiltered = append(rulesFiltered, rule)
+		}
+		m, _ := json.Marshal(rulesFiltered)
 		json.Unmarshal(m, &jsonStructData)
 	case "zia_user_management":
 		jsonPayload, err := api.zia.usermanagement.GetAllUsers()
