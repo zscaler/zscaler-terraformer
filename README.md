@@ -96,7 +96,7 @@ export ZPA_CLOUD          = "BETA" // Use "GOV" for ZPA Gov Cloud
 
 ## Demo ZPA
 
-[![asciicast](https://asciinema.org/a/523881.svg)](https://asciinema.org/a/523881)
+[![asciicast](https://asciinema.org/a/525956.svg)](https://asciinema.org/a/525956)
 
 ### ZIA Environment Variables
 
