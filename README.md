@@ -60,19 +60,10 @@ Use "zscaler-terraformer [command] --help" for more information about a command.
 
 ## Authentication
 
-Both ZPA and ZIA have different authentication methods to their respective APIs:
+Both ZPA and ZIA follow its respective authentication methods as described in the Terraform registry documentation:
 
-* ZPA
-  * zpaClientID
-  * zpaClientSecret
-  * zpaCustomerID
-  * zpaCloud (Optional) - Only required if importing resources from another ZPA cloud other than production i.e BETA or GOV.
-
-* ZIA
-  * ziaUsername
-  * ziaPassword
-  * ziaApiKey
-  * ziaCloud (i.e zscalerthree)
+* [ZPA Terraform Provider](https://registry.terraform.io/providers/zscaler/zpa/latest/docs)
+* [ZIA Terraform Provider](https://registry.terraform.io/providers/zscaler/zia/latest/docs)
 
 For details on how to generate API credentials visit:
 
@@ -93,10 +84,6 @@ export ZPA_CLIENT_SECRET  = "xxxxxxxxxxxxxxxx"
 export ZPA_CUSTOMER_ID    = "xxxxxxxxxxxxxxxx"
 export ZPA_CLOUD          = "BETA" // Use "GOV" for ZPA Gov Cloud
 ```
-
-## Demo ZPA
-
-[![asciicast](https://asciinema.org/a/525956.svg)](https://asciinema.org/a/525956)
 
 ### ZIA Environment Variables
 
@@ -123,113 +110,66 @@ zpaCloud: "BETA"
 
 ## ZPA Example usage
 
-To get started with the zscaler-terraformer CLI to export your ZPA configuration follow you must create a terraform configuration file in a specific directory, and then manually initialize the provider via ``terraform init`` in order to download the provider binary.
+To get started with the zscaler-terraformer CLI to export your ZPA configuration, create a directory where you want the configuration to stored. See ZPA Demo:
 
-```bash
-mkdir -p $HOME/Desktop/zpa_configuration
-cd $HOME/Desktop/zpa_configuration
-touch main.tf
-```
-
-```hcl
-terraform {
-  required_providers {
-    zpa = {
-      version = "=>2.3.2"
-      source  = "zscaler/zpa"
-    }
-  }
-}
-
-provider "zpa" {}
-```
-
-Once the directory is initialized via `terraform init`, you can then follow one of the below options by either exporting the directory path as an environment variable or utilize one of the command line options available.
+[![asciicast](https://asciinema.org/a/525956.svg)](https://asciinema.org/a/525956)
 
 **Option 1**
+
+### Import All ZPA Configuration
+
+```bash
+zscaler-terraformer import --resources="zpa"
+```
+
+### Import Specific ZPA Resource
+
+```bash
+zscaler-terraformer import --resources="zpa_application_segment"
+```
+
+You can also indicate the path where the imported configuration should be stored by using the folowing environment variable ``ZSCALER_ZPA_TERRAFORM_INSTALL_PATH``.
 
 ```bash
 $ export ZSCALER_ZPA_TERRAFORM_INSTALL_PATH="$HOME/Desktop/zpa_configuration"
 $ zscaler-terraformer generate \
-  --resource-type "zpa_app_connector_group"
-```
-
-**Option 2**
-
-```bash
-$ zscaler-terraformer generate \
-  --zpa-terraform-install-path $HOME/Desktop/zpa_configuration \
-  --resource-type "zpa_app_connector_group"
-```
-
-```hcl
-"zpa_app_connector_group" "terraform_managed_resource" {
-  name                     = "Example"
-  description              = "Example"
-  enabled                  = true
-  city_country             = "San Jose, US"
-  location                 = "San Jose, CA, USA"
-  country_code             = "US"
-  dns_query_type           = "IPV4"
-  latitude                 = "37.3382082"
-  longitude                = "-121.8863286"
-  lss_app_connector_group  = false
-  override_version_profile = true
-  upgrade_day              = "SUNDAY"
-  upgrade_time_in_secs     = "66600"
-  version_profile_id       = "2"
-}
+  --resource-type "zpa_application_segment"
 ```
 
 ## ZIA Example usage
 
-To get started with the zscaler-terraformer CLI to export your ZPA configuration follow you must create a terraform configuration file in a specific directory, and then manually initialize the provider via ``terraform init`` in order to download the provider binary.
-
-```bash
-mkdir -p $HOME/Desktop/zia_configuration
-cd $HOME/Desktop/zia_configuration
-touch main.tf
-```
-
-```hcl
-terraform {
-  required_providers {
-    zia = {
-      version = "2.2.0"
-      source  = "zscaler/zia"
-    }
-  }
-}
-
-provider "zia" {}
-```
-
-Once the directory is initialized via `terraform init`, you can then follow one of the below options by either exporting the directory path as an environment variable or utilize one of the command line options available.
+To get started with the zscaler-terraformer CLI to export your ZIA configuration, create a directory where you want the configuration to stored.
 
 **Option 1**
+
+### Import All ZIA Configuration
+
+```bash
+zscaler-terraformer import --resources="zia"
+```
+
+### Import Specific ZIA Resource
+
+```bash
+zscaler-terraformer import --resources="zia_firewall_filtering_rule"
+```
+
+You can also indicate the path where the imported configuration should be stored by using the folowing environment variable ``ZSCALER_ZIA_TERRAFORM_INSTALL_PATH``.
 
 ```bash
 $ export ZSCALER_ZIA_TERRAFORM_INSTALL_PATH="$HOME/Desktop/zia_configuration"
 $ zscaler-terraformer generate \
-  --resource-type "zia_traffic_forwarding_static_ip"
+  --resource-type "zia_firewall_filtering_rule"
 ```
 
-**Option 2**
+**Generate HCL Configuration**
+
+To simply generate the HCL configuration output without importing and creating the state file, use the command ``zscaler-terraformer generate``
 
 ```bash
 $ zscaler-terraformer generate \
   --zia-terraform-install-path $HOME/Desktop/zia_configuration \
-  --resource-type "zia_traffic_forwarding_static_ip"
-```
-
-```hcl
-resource "zia_traffic_forwarding_static_ip" "terraform_managed_resource" {
-  comment      = "GRE Tunnel Created with Terraform"
-  geo_override = false
-  ip_address   = "187.22.113.134"
-  latitude     = -24
-  longitude    = -46
-}
+  --resource-type "zia_firewall_filtering_rule"
 ```
 
 ## Prerequisites
@@ -237,7 +177,7 @@ resource "zia_traffic_forwarding_static_ip" "terraform_managed_resource" {
 * A ZIA and/or ZPA tenant with resources defined.
 * Valid ZIA and or/ZPA API credentials with sufficient permissions to access the resources
   you are requesting via the API
-* An initialised Terraform directory (`terraform init` has run and providers installed). See the [provider documentation](https://registry.terraform.io/namespaces/zscaler) if you have not yet setup the Terraform directory.
+* zscaler-terraformer utility installed on the local machine.
 
 ## Installation
 
