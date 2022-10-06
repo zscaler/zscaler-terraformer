@@ -10,12 +10,11 @@
 
 [![tests](https://github.com/zscaler/zscaler-terraformer/actions/workflows/test.yaml/badge.svg)](https://github.com/zscaler/zscaler-terraformer/actions/workflows/test.yaml)
 [![linter](https://github.com/zscaler/zscaler-terraformer/actions/workflows/linter.yml/badge.svg)](https://github.com/zscaler/zscaler-terraformer/actions/workflows/linter.yml)
+
 ## Overview
 
 `zscaler-terraformer` is a command line utility to facilitate terraforming your
-existing ZPA and ZIA resources. It does this by using your respective API credentials in each platform
-to retrieve your configurations from the [ZPA API](https://help.zscaler.com/zpa/getting-started-zpa-api) and/or [ZIA API](https://help.zscaler.com/zia/getting-started-zia-api)
-and converting them to Terraform configurations so that it can be used with the
+existing ZPA and/or ZIA resources. It does this by using your respective API credentials in each platform to retrieve your configurations from the [ZPA API](https://help.zscaler.com/zpa/getting-started-zpa-api) and/or [ZIA API](https://help.zscaler.com/zia/getting-started-zia-api) and converting them to Terraform configurations so that it can be used with the
 [ZPA Terraform Provider](https://registry.terraform.io/providers/zscaler/zpa/latest) and/or [ZIA Terraform Provider](https://registry.terraform.io/providers/zscaler/zia/latest)
 
 This tool is ideal if you already have ZPA and/or ZIA resources defined but want to
@@ -24,17 +23,15 @@ write the Terraform configuration to describe them.
 
 > NOTE: This tool has been developed and tested with Terraform v1.x.x only.
 
-## Demo ZPA
-[![asciicast](https://asciinema.org/a/243961.svg)](https://asciinema.org/a/243961)
 ## Usage
 
-```
+```bash
 Usage:
   zscaler-terraformer [command]
 
 Available Commands:
   completion  Generate the autocompletion script for the specified shell
-  generate    Fetch resources from the Zscaler ZPA and/or ZIA API and generate the respective Terraform stanzas
+  generate    Fetch resources from the Cloudflare API and generate the respective Terraform stanzas
   help        Help about any command
   import      Output `terraform import` compatible commands in order to import resources into state
   version     Print the version number of zscaler-terraformer
@@ -43,6 +40,7 @@ Flags:
   -c, --config string                       Path to config file (default "/Users/username/.zscaler-terraformer.yaml")
   -h, --help                                help for zscaler-terraformer
       --resource-type string                Which resource you wish to generate
+      --resources string                    Which resources you wish to import
       --terraform-install-path string       Path to the default Terraform installation (default ".")
   -v, --verbose                             Specify verbose output (same as setting log level to debug)
       --zia-terraform-install-path string   Path to the ZIA Terraform installation (default ".")
@@ -57,6 +55,7 @@ Flags:
       --zpaCustomerID string                ZPA Customer ID
 
 Use "zscaler-terraformer [command] --help" for more information about a command.
+
 ```
 
 ## Authentication
@@ -93,9 +92,11 @@ export ZPA_CLIENT_ID      = "xxxxxxxxxxxxxxxx"
 export ZPA_CLIENT_SECRET  = "xxxxxxxxxxxxxxxx"
 export ZPA_CUSTOMER_ID    = "xxxxxxxxxxxxxxxx"
 export ZPA_CLOUD          = "BETA" // Use "GOV" for ZPA Gov Cloud
-# now call zscaler-terraformer, e.g.
-
 ```
+
+## Demo ZPA
+
+[![asciicast](https://asciinema.org/a/523881.svg)](https://asciinema.org/a/523881)
 
 ### ZIA Environment Variables
 
@@ -112,7 +113,7 @@ export ZIA_CLOUD    = "xxxxxxxxxxxxxxxx" (i.e zscalerthree)
 Alternatively, if using a config file, then specify the inputs using the same
 names the `flag` names. Example:
 
-```
+```bash
 $ cat ~/.zscaler-terraformer.yaml
 zpaClientID: "Mrwefhoijhviihew"
 zpaClientSecret: "{HBRjowhdowqj"
@@ -125,16 +126,16 @@ zpaCloud: "BETA"
 To get started with the zscaler-terraformer CLI to export your ZPA configuration follow you must create a terraform configuration file in a specific directory, and then manually initialize the provider via ``terraform init`` in order to download the provider binary.
 
 ```bash
-$ mkdir -p $HOME/Desktop/zpa_configuration
-$ cd $HOME/Desktop/zpa_configuration
-$ touch main.tf
+mkdir -p $HOME/Desktop/zpa_configuration
+cd $HOME/Desktop/zpa_configuration
+touch main.tf
 ```
 
 ```hcl
 terraform {
   required_providers {
     zpa = {
-      version = "2.3.0"
+      version = "=>2.3.2"
       source  = "zscaler/zpa"
     }
   }
@@ -185,9 +186,9 @@ $ zscaler-terraformer generate \
 To get started with the zscaler-terraformer CLI to export your ZPA configuration follow you must create a terraform configuration file in a specific directory, and then manually initialize the provider via ``terraform init`` in order to download the provider binary.
 
 ```bash
-$ mkdir -p $HOME/Desktop/zia_configuration
-$ cd $HOME/Desktop/zia_configuration
-$ touch main.tf
+mkdir -p $HOME/Desktop/zia_configuration
+cd $HOME/Desktop/zia_configuration
+touch main.tf
 ```
 
 ```hcl
