@@ -20,6 +20,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zclconf/go-cty/cty"
+	"github.com/zscaler/zscaler-sdk-go/zia/services/firewallpolicies/networkservices"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/security_policy_settings"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/urlcategories"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/urlfilteringpolicies"
@@ -489,12 +490,19 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		m, _ := json.Marshal(jsonPayload)
 		json.Unmarshal(m, &jsonStructData)
 	case "zia_firewall_filtering_network_service":
-		jsonPayload, err := api.zia.networkservices.GetAllNetworkServices()
+		services, err := api.zia.networkservices.GetAllNetworkServices()
 		if err != nil {
 			log.Fatal(err)
 		}
-		resourceCount = len(jsonPayload)
-		m, _ := json.Marshal(jsonPayload)
+		servicesFiltered := []networkservices.NetworkServices{}
+		for _, service := range services {
+			if isInList(service.Type, []string{"STANDARD", "PREDEFINED"}) {
+				continue
+			}
+			servicesFiltered = append(servicesFiltered, service)
+		}
+		resourceCount = len(servicesFiltered)
+		m, _ := json.Marshal(servicesFiltered)
 		json.Unmarshal(m, &jsonStructData)
 	case "zia_firewall_filtering_network_service_groups":
 		jsonPayload, err := api.zia.networkservices.GetAllNetworkServiceGroups()
