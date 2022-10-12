@@ -20,10 +20,10 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zclconf/go-cty/cty"
+	"github.com/zscaler/zscaler-sdk-go/zia/services/firewallpolicies/filteringrules"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/firewallpolicies/networkservices"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/security_policy_settings"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/urlcategories"
-	"github.com/zscaler/zscaler-sdk-go/zia/services/urlfilteringpolicies"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/user_authentication_settings"
 	"github.com/zscaler/zscaler-sdk-go/zpa/services/appconnectorgroup"
 	"github.com/zscaler/zscaler-sdk-go/zpa/services/policysetcontroller"
@@ -466,12 +466,19 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		m, _ := json.Marshal(jsonPayload)
 		json.Unmarshal(m, &jsonStructData)
 	case "zia_firewall_filtering_rule":
-		jsonPayload, err := api.zia.filteringrules.GetAll()
+		rules, err := api.zia.filteringrules.GetAll()
 		if err != nil {
 			log.Fatal(err)
 		}
-		resourceCount = len(jsonPayload)
-		m, _ := json.Marshal(jsonPayload)
+		rulesFiltered := []filteringrules.FirewallFilteringRules{}
+		for _, rule := range rules {
+			if isInList(rule.Name, []string{"Office 365 One Click Rule", "UCaaS One Click Rule", "Default Firewall Filtering Rule"}) {
+				continue
+			}
+			rulesFiltered = append(rulesFiltered, rule)
+		}
+		resourceCount = len(rulesFiltered)
+		m, _ := json.Marshal(rulesFiltered)
 		json.Unmarshal(m, &jsonStructData)
 	case "zia_firewall_filtering_destination_groups":
 		jsonPayload, err := api.zia.ipdestinationgroups.GetAll()
@@ -571,19 +578,12 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		m, _ := json.Marshal(items)
 		json.Unmarshal(m, &jsonStructData)
 	case "zia_url_filtering_rules":
-		rules, err := api.zia.urlfilteringpolicies.GetAll()
+		jsonPayload, err := api.zia.urlfilteringpolicies.GetAll()
 		if err != nil {
 			log.Fatal(err)
 		}
-		rulesFiltered := []urlfilteringpolicies.URLFilteringRule{}
-		for _, rule := range rules {
-			if isInList(rule.Name, []string{"Office 365 One Click Rule", "UCaaS One Click Rule", "Default Firewall Filtering Rule"}) {
-				continue
-			}
-			rulesFiltered = append(rulesFiltered, rule)
-		}
-		resourceCount = len(rulesFiltered)
-		m, _ := json.Marshal(rulesFiltered)
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
 		json.Unmarshal(m, &jsonStructData)
 	case "zia_user_management":
 		jsonPayload, err := api.zia.usermanagement.GetAllUsers()
