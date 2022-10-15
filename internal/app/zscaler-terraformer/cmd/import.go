@@ -227,7 +227,7 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		}
 		jsonPayload := []policysetcontroller.PolicyRule{}
 		for _, i := range list {
-			if i.Name == "Zscaler Deception" {
+			if i.Name == "Zscaler Deception" || i.Name == "Default_Rule" || i.DefaultRule {
 				continue
 			}
 			jsonPayload = append(jsonPayload, i)
@@ -242,7 +242,7 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		}
 		jsonPayload := []policysetcontroller.PolicyRule{}
 		for _, i := range list {
-			if i.Name == "Zscaler Deception" {
+			if i.Name == "Zscaler Deception" || i.Name == "Default_Rule" || i.DefaultRule {
 				continue
 			}
 			jsonPayload = append(jsonPayload, i)
