@@ -288,7 +288,7 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		m, _ := json.Marshal(jsonPayload)
 		json.Unmarshal(m, &jsonStructData)
 	case "zpa_application_segment_inspection":
-		jsonPayload, _, err := api.zpa.applicationsegment.GetAll()
+		jsonPayload, _, err := api.zpa.applicationsegmentinspection.GetAll()
 		if err != nil {
 			log.Fatal(err)
 		}
