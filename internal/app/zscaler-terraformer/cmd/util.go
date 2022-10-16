@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"regexp"
 	"sort"
 	"strings"
 
@@ -77,16 +76,6 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/zia"
 	"github.com/zscaler/zscaler-sdk-go/zpa"
 )
-
-func contains(slice []string, item string) bool {
-	set := make(map[string]struct{}, len(slice))
-	for _, s := range slice {
-		set[s] = struct{}{}
-	}
-
-	_, ok := set[item]
-	return ok
-}
 
 func executeCommandC(root *cobra.Command, args ...string) (c *cobra.Command, output string, err error) {
 	buf := new(bytes.Buffer)
@@ -240,49 +229,6 @@ func sharedPreRun(cmd *cobra.Command, args []string) {
 			}
 		}
 	}
-}
-
-// sanitiseTerraformResourceName ensures that a Terraform resource name matches
-// the restrictions imposed by core.
-func sanitiseTerraformResourceName(s string) string {
-	re := regexp.MustCompile(`[^a-zA-Z0-9_]+`)
-	return re.ReplaceAllString(s, "_")
-}
-
-// flattenAttrMap takes a list of attributes defined as a list of maps comprising of {"id": "attrId", "value": "attrValue"}
-// and flattens it to a single map of {"attrId": "attrValue"}
-func flattenAttrMap(l []interface{}) map[string]interface{} {
-	result := make(map[string]interface{})
-	attrID := ""
-	var attrVal interface{}
-
-	for _, elem := range l {
-		switch t := elem.(type) {
-		case map[string]interface{}:
-			if id, ok := t["id"]; ok {
-				attrID = id.(string)
-			} else {
-				log.Debug("no 'id' in map when attempting to flattenAttrMap")
-			}
-
-			if val, ok := t["value"]; ok {
-				if val == nil {
-					log.Debugf("Found nil 'value' for %s attempting to flattenAttrMap, coercing to true", attrID)
-					attrVal = true
-				} else {
-					attrVal = val
-				}
-			} else {
-				log.Debug("no 'value' in map when attempting to flattenAttrMap")
-			}
-
-			result[attrID] = attrVal
-		default:
-			log.Debugf("got unknown element type %T when attempting to flattenAttrMap", elem)
-		}
-	}
-
-	return result
 }
 
 func isInList(item string, list []string) bool {
@@ -494,13 +440,14 @@ func nestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 			// recursively call nestBlocks.
 			if len(schemaBlock.NestedBlocks[block].Block.NestedBlocks) > 0 {
 				if s, ok := structData[apiBlock]; ok {
-					switch s.(type) {
+
+					switch s := s.(type) {
 					case map[string]interface{}:
-						nestedBlockOutput += nestBlocks(resourceType, schemaBlock.NestedBlocks[block].Block, s.(map[string]interface{}), parentID, indexedNestedBlocks)
+						nestedBlockOutput += nestBlocks(resourceType, schemaBlock.NestedBlocks[block].Block, s, parentID, indexedNestedBlocks)
 						indexedNestedBlocks[parentID] = append(indexedNestedBlocks[parentID], nestedBlockOutput)
 
 					case []interface{}:
-						for _, nestedItem := range s.([]interface{}) {
+						for _, nestedItem := range s {
 							parentID, exists := nestedItem.(map[string]interface{})["id"]
 							if !exists {
 								// if we fail to find an ID, we tag the current element with a uuid
@@ -677,13 +624,13 @@ func writeAttrLine(key string, value interface{}, usedInBlock bool) string {
 		var interfaceItems []map[string]interface{}
 
 		for _, item := range value.([]interface{}) {
-			switch item.(type) {
+			switch item := item.(type) {
 			case string:
-				stringItems = append(stringItems, item.(string))
+				stringItems = append(stringItems, item)
 			case map[string]interface{}:
-				interfaceItems = append(interfaceItems, item.(map[string]interface{}))
+				interfaceItems = append(interfaceItems, item)
 			case float64:
-				intItems = append(intItems, int(item.(float64)))
+				intItems = append(intItems, int(item))
 			}
 		}
 		if len(stringItems) > 0 {
