@@ -34,6 +34,7 @@ var resourceImportStringFormats = map[string]string{
 	"zpa_segment_group":                                 ":id",
 	"zpa_server_group":                                  ":id",
 	"zpa_browser_access":                                ":id",
+	"zpa_application_segment_browser_access":            ":id",
 	"zpa_policy_access_rule":                            ":id",
 	"zpa_policy_inspection_rule":                        ":id",
 	"zpa_policy_timeout_rule":                           ":id",
@@ -184,6 +185,14 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zpa_browser_access":
+		jsonPayload, _, err := api.zpa.browseraccess.GetAll()
+		if err != nil {
+			log.Fatal(err)
+		}
+		m, _ := json.Marshal(jsonPayload)
+		resourceCount = len(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zpa_application_segment_browser_access":
 		jsonPayload, _, err := api.zpa.browseraccess.GetAll()
 		if err != nil {
 			log.Fatal(err)

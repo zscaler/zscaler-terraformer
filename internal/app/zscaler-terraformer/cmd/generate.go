@@ -46,6 +46,7 @@ var allGeneratableResources = []string{
 	"zpa_segment_group",
 	"zpa_server_group",
 	"zpa_browser_access",
+	"zpa_application_segment_browser_access",
 	"zpa_policy_access_rule",
 	"zpa_policy_inspection_rule",
 	"zpa_policy_timeout_rule",
@@ -327,6 +328,14 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zpa_browser_access":
+		jsonPayload, _, err := api.zpa.browseraccess.GetAll()
+		if err != nil {
+			log.Fatal(err)
+		}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zpa_application_segment_browser_access":
 		jsonPayload, _, err := api.zpa.browseraccess.GetAll()
 		if err != nil {
 			log.Fatal(err)
