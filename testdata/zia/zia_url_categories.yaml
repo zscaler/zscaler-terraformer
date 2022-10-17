@@ -50,7 +50,7 @@ interactions:
     url: https://zsapi.zscalerthree.net/api/v1/urlCategories
     method: GET
   response:
-    body: '[{"id":"OTHER_ADULT_MATERIAL","urls":[],"dbCategorizedUrls":[],"customCategory":false,"editable":true,"description":"OTHER_ADULT_MATERIAL_DESC","type":"URL_CATEGORY","val":1,"customUrlsCount":0,"urlsRetainingParentCategoryCount":0,"customIpRangesCount":0,"ipRangesRetainingParentCategoryCount":0}]'
+    body: '[{"id":"CUSTOM_02","urls":[".Logz.io",".aa.com",".accuweather.com",".agoda.com"],"dbCategorizedUrls":[".creditkarma.com",".youku.com"],"customCategory":true,"editable":true,"description":"MCAS Unsanctioned Apps","type":"URL_CATEGORY","val":1,"customUrlsCount":4,"urlsRetainingParentCategoryCount":2,"customIpRangesCount":0,"ipRangesRetainingParentCategoryCount":0, "keywords": [], "super_category": "USER_DEFINED"}]'
     headers:
       Cache-Control:
       - no-store
