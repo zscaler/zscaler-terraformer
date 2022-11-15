@@ -70,13 +70,13 @@ For details on how to generate API credentials visit:
 * ZPA [Getting Started](https://help.zscaler.com/zpa/getting-started-zpa-api)
 * ZIA [Getting Started](https://help.zscaler.com/zia/getting-started-zia-api)
 
-**A note on storing your credentials securely:** We recommend that you store
+!> **A note on storing your credentials securely**: We recommend that you store
 your ZPA and/or ZIA credentials as environment variables as
 demonstrated below.
 
 ### ZPA Environment Variables
 
-zscaler-terraformer for ZPA supports the following environment variables:
+``zscaler-terraformer`` for ZPA supports the following environment variables:
 
 ```bash
 export ZPA_CLIENT_ID      = "xxxxxxxxxxxxxxxx"
@@ -87,7 +87,7 @@ export ZPA_CLOUD          = "BETA" // Use "GOV" for ZPA Gov Cloud
 
 ### ZIA Environment Variables
 
-zscaler-terraformer for ZIA supports the following environment variables:
+``zscaler-terraformer`` for ZIA supports the following environment variables:
 
 ```bash
 export ZIA_USERNAME = "xxxxxxxxxxxxxxxx"
@@ -97,8 +97,7 @@ export ZIA_CLOUD    = "xxxxxxxxxxxxxxxx" (i.e zscalerthree)
 
 ```
 
-Alternatively, if using a config file, then specify the inputs using the same
-names the `flag` names. Example:
+Alternatively, if using a config file, then specify the inputs using the following `flag` names. Example:
 
 ```bash
 $ cat ~/.zscaler-terraformer.yaml
@@ -128,7 +127,7 @@ zscaler-terraformer import --resources="zpa"
 zscaler-terraformer import --resources="zpa_application_segment"
 ```
 
-You can also indicate the path where the imported configuration should be stored by using the folowing environment variable ``ZSCALER_ZPA_TERRAFORM_INSTALL_PATH``.
+By default, ``zscaler-terraformer`` will create a local configuration directory where it is being executed. You can also indicate the path where the imported configuration should be stored by using the folowing environment variable ``ZSCALER_ZPA_TERRAFORM_INSTALL_PATH``.
 
 ```bash
 $ export ZSCALER_ZPA_TERRAFORM_INSTALL_PATH="$HOME/Desktop/zpa_configuration"
@@ -154,7 +153,7 @@ zscaler-terraformer import --resources="zia"
 zscaler-terraformer import --resources="zia_firewall_filtering_rule"
 ```
 
-You can also indicate the path where the imported configuration should be stored by using the folowing environment variable ``ZSCALER_ZIA_TERRAFORM_INSTALL_PATH``.
+By default, ``zscaler-terraformer`` will create a local configuration directory where it is being executed. You can also indicate the path where the imported configuration should be stored by using the folowing environment variable ``ZSCALER_ZIA_TERRAFORM_INSTALL_PATH``.
 
 ```bash
 $ export ZSCALER_ZIA_TERRAFORM_INSTALL_PATH="$HOME/Desktop/zia_configuration"
@@ -177,7 +176,7 @@ $ zscaler-terraformer generate \
 * A ZIA and/or ZPA tenant with resources defined.
 * Valid ZIA and or/ZPA API credentials with sufficient permissions to access the resources
   you are requesting via the API
-* zscaler-terraformer utility installed on the local machine.
+* ``zscaler-terraformer`` utility installed on the local machine.
 
 ## Installation
 
