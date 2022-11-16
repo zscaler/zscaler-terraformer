@@ -11,7 +11,6 @@ import (
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/zscaler/zscaler-sdk-go/zia"
-	"github.com/zscaler/zscaler-sdk-go/zia/services/activation"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/adminuserrolemgmt"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/devicegroups"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/dlp_engines"
@@ -134,23 +133,23 @@ func TestResourceGeneration(t *testing.T) {
 		testdataFilename string
 	}{
 		// ZPA Resource
-		"zpa app connector group":            {identiferType: "group", resourceType: "zpa_app_connector_group", testdataFilename: "zpa_app_connector_group"},
-		"zpa application server":             {identiferType: "server", resourceType: "zpa_application_server", testdataFilename: "zpa_application_server"},
-		"zpa application segment":            {identiferType: "appsegment", resourceType: "zpa_application_segment", testdataFilename: "zpa_application_segment"},
-		"zpa application segment pra":        {identiferType: "appsegment", resourceType: "zpa_application_segment_pra", testdataFilename: "zpa_application_segment_pra"},
-		"zpa application segment inspection": {identiferType: "appsegment", resourceType: "zpa_application_segment_inspection", testdataFilename: "zpa_application_segment_inspection"},
-		"zpa segment group":                  {identiferType: "group", resourceType: "zpa_segment_group", testdataFilename: "zpa_segment_group"},
-		"zpa server group":                   {identiferType: "group", resourceType: "zpa_server_group", testdataFilename: "zpa_server_group"},
-		"zpa browser access":                 {identiferType: "appsegment", resourceType: "zpa_browser_access", testdataFilename: "zpa_browser_access"},
-		"zpa policy access rule":             {identiferType: "policy", resourceType: "zpa_policy_access_rule", testdataFilename: "zpa_policy_access_rule"},
-		"zpa policy inspection rule":         {identiferType: "policy", resourceType: "zpa_policy_inspection_rule", testdataFilename: "zpa_policy_inspection_rule"},
-		"zpa policy timeout rule":            {identiferType: "policy", resourceType: "zpa_policy_timeout_rule", testdataFilename: "zpa_policy_timeout_rule"},
-		"zpa policy forwarding rule":         {identiferType: "policy", resourceType: "zpa_policy_forwarding_rule", testdataFilename: "zpa_policy_forwarding_rule"},
-		"zpa provisioning key":               {identiferType: "key", resourceType: "zpa_provisioning_key", testdataFilename: "zpa_provisioning_key"},
-		"zpa service edge group":             {identiferType: "group", resourceType: "zpa_service_edge_group", testdataFilename: "zpa_service_edge_group"},
-		"zpa lss config controller":          {identiferType: "lss", resourceType: "zpa_lss_config_controller", testdataFilename: "zpa_lss_config_controller"},
-		"zpa inspection custom controls":     {identiferType: "inspection", resourceType: "zpa_inspection_custom_controls", testdataFilename: "zpa_inspection_custom_controls"},
-		"zpa inspection profile":             {identiferType: "inspection", resourceType: "zpa_inspection_profile", testdataFilename: "zpa_inspection_profile"},
+		"zpa app connector group":                {identiferType: "group", resourceType: "zpa_app_connector_group", testdataFilename: "zpa_app_connector_group"},
+		"zpa application server":                 {identiferType: "server", resourceType: "zpa_application_server", testdataFilename: "zpa_application_server"},
+		"zpa application segment":                {identiferType: "appsegment", resourceType: "zpa_application_segment", testdataFilename: "zpa_application_segment"},
+		"zpa application segment pra":            {identiferType: "appsegment", resourceType: "zpa_application_segment_pra", testdataFilename: "zpa_application_segment_pra"},
+		"zpa application segment inspection":     {identiferType: "appsegment", resourceType: "zpa_application_segment_inspection", testdataFilename: "zpa_application_segment_inspection"},
+		"zpa application segment browser access": {identiferType: "appsegment", resourceType: "zpa_application_segment_browser_access", testdataFilename: "zpa_application_segment_browser_access"},
+		"zpa segment group":                      {identiferType: "group", resourceType: "zpa_segment_group", testdataFilename: "zpa_segment_group"},
+		"zpa server group":                       {identiferType: "group", resourceType: "zpa_server_group", testdataFilename: "zpa_server_group"},
+		"zpa policy access rule":                 {identiferType: "policy", resourceType: "zpa_policy_access_rule", testdataFilename: "zpa_policy_access_rule"},
+		"zpa policy inspection rule":             {identiferType: "policy", resourceType: "zpa_policy_inspection_rule", testdataFilename: "zpa_policy_inspection_rule"},
+		"zpa policy timeout rule":                {identiferType: "policy", resourceType: "zpa_policy_timeout_rule", testdataFilename: "zpa_policy_timeout_rule"},
+		"zpa policy forwarding rule":             {identiferType: "policy", resourceType: "zpa_policy_forwarding_rule", testdataFilename: "zpa_policy_forwarding_rule"},
+		"zpa provisioning key":                   {identiferType: "key", resourceType: "zpa_provisioning_key", testdataFilename: "zpa_provisioning_key"},
+		"zpa service edge group":                 {identiferType: "group", resourceType: "zpa_service_edge_group", testdataFilename: "zpa_service_edge_group"},
+		"zpa lss config controller":              {identiferType: "lss", resourceType: "zpa_lss_config_controller", testdataFilename: "zpa_lss_config_controller"},
+		"zpa inspection custom controls":         {identiferType: "inspection", resourceType: "zpa_inspection_custom_controls", testdataFilename: "zpa_inspection_custom_controls"},
+		"zpa inspection profile":                 {identiferType: "inspection", resourceType: "zpa_inspection_profile", testdataFilename: "zpa_inspection_profile"},
 
 		// ZIA Resource
 		"zia admin users":                                   {identiferType: "users", resourceType: "zia_admin_users", testdataFilename: "zia_admin_users"},
@@ -278,7 +277,6 @@ func createClientMock(r http.RoundTripper, resourceType, zpaClientID, zpaClientS
 				staticips:                    staticips.New(ziaClient),
 				locationmanagement:           locationmanagement.New(ziaClient),
 				locationgroups:               locationgroups.New(ziaClient),
-				activation:                   activation.New(ziaClient),
 				devicegroups:                 devicegroups.New(ziaClient),
 				dlpdictionaries:              dlpdictionaries.New(ziaClient),
 				dlp_engines:                  dlp_engines.New(ziaClient),

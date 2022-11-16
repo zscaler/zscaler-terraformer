@@ -31,10 +31,9 @@ var resourceImportStringFormats = map[string]string{
 	"zpa_application_segment":                           ":id",
 	"zpa_application_segment_pra":                       ":id",
 	"zpa_application_segment_inspection":                ":id",
+	"zpa_application_segment_browser_access":            ":id",
 	"zpa_segment_group":                                 ":id",
 	"zpa_server_group":                                  ":id",
-	"zpa_browser_access":                                ":id",
-	"zpa_application_segment_browser_access":            ":id",
 	"zpa_policy_access_rule":                            ":id",
 	"zpa_policy_inspection_rule":                        ":id",
 	"zpa_policy_timeout_rule":                           ":id",
@@ -60,7 +59,6 @@ var resourceImportStringFormats = map[string]string{
 	"zia_url_categories":                                ":id",
 	"zia_url_filtering_rules":                           ":id",
 	"zia_user_management":                               ":id",
-	"zia_activation_status":                             ":id",
 	"zia_rule_labels":                                   ":id",
 	"zia_auth_settings_urls":                            ":id",
 	"zia_security_settings":                             ":id",
@@ -180,14 +178,6 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 				continue
 			}
 			jsonPayload = append(jsonPayload, i)
-		}
-		m, _ := json.Marshal(jsonPayload)
-		resourceCount = len(jsonPayload)
-		_ = json.Unmarshal(m, &jsonStructData)
-	case "zpa_browser_access":
-		jsonPayload, _, err := api.zpa.browseraccess.GetAll()
-		if err != nil {
-			log.Fatal(err)
 		}
 		m, _ := json.Marshal(jsonPayload)
 		resourceCount = len(jsonPayload)
