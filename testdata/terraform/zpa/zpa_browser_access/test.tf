@@ -1,4 +1,4 @@
-resource "zpa_browser_access" "terraform_managed_resource" {
+resource "zpa_application_segment_browser_access" "terraform_managed_resource" {
   bypass_type            = "NEVER"
   config_space           = "DEFAULT"
   description            = "Created by Zscaler Deception. Do not edit"

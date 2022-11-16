@@ -397,7 +397,7 @@ func nestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 		} else if isInList(resourceType, []string{"zpa_application_segment",
 			"zpa_application_segment_inspection",
 			"zpa_application_segment_pra",
-			"zpa_browser_access",
+			"zpa_application_segment_browser_access",
 		}) && block == "server_groups" {
 			output += listIdsStringBlock(block, structData["serverGroups"])
 			continue
