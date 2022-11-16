@@ -13,8 +13,8 @@
 
 ## Overview
 
-`zscaler-terraformer` is a command line utility to facilitate terraforming your
-existing ZPA and/or ZIA resources. It does this by using your respective API credentials in each platform to retrieve your configurations from the [ZPA API](https://help.zscaler.com/zpa/getting-started-zpa-api) and/or [ZIA API](https://help.zscaler.com/zia/getting-started-zia-api) and converting them to Terraform configurations so that it can be used with the
+`zscaler-terraformer` is A CLI tool that generates ``tf`` and ``tfstate`` files based on existing ZPA and/or ZIA resources.
+It does this by using your respective API credentials in each platform to retrieve your configurations from the [ZPA API](https://help.zscaler.com/zpa/getting-started-zpa-api) and/or [ZIA API](https://help.zscaler.com/zia/getting-started-zia-api) and converting them to Terraform configurations so that it can be used with the
 [ZPA Terraform Provider](https://registry.terraform.io/providers/zscaler/zpa/latest) and/or [ZIA Terraform Provider](https://registry.terraform.io/providers/zscaler/zia/latest)
 
 This tool is ideal if you already have ZPA and/or ZIA resources defined but want to
@@ -51,7 +51,7 @@ Flags:
       --zpa-terraform-install-path string   Path to the ZPA Terraform installation (default ".")
       --zpaClientID string                  ZPA client ID
       --zpaClientSecret string              ZPA client secret
-      --zpaCloud string                     ZPA Cloud (BETA or PRODUCTION)
+      --zpaCloud string                     ZPA Cloud (BETA, GOV, PREVIEW or PRODUCTION)
       --zpaCustomerID string                ZPA Customer ID
 
 Use "zscaler-terraformer [command] --help" for more information about a command.
@@ -111,7 +111,7 @@ zpaCloud: "BETA"
 
 To get started with the zscaler-terraformer CLI to export your ZPA configuration, create a directory where you want the configuration to stored. See ZPA Demo:
 
-[![asciicast](https://asciinema.org/a/525956.svg)](https://asciinema.org/a/525956)
+[![asciicast](https://asciinema.org/a/537966.svg)](https://asciinema.org/a/537966)
 
 **Option 1**
 
@@ -138,6 +138,8 @@ $ zscaler-terraformer generate \
 ## ZIA Example usage
 
 To get started with the zscaler-terraformer CLI to export your ZIA configuration, create a directory where you want the configuration to stored.
+
+[![asciicast](https://asciinema.org/a/537966.svg)](https://asciinema.org/a/537966)
 
 **Option 1**
 

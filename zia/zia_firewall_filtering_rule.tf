@@ -38,7 +38,7 @@ resource "zia_firewall_filtering_rule" "resource_recommended_firewall_rule_18422
   }
 }
 
-resource "zia_firewall_filtering_rule" "resource_allow_connection_to_pcoip__aws_413554" {
+resource "zia_firewall_filtering_rule" "resource_allow_connection_to_pcoip_aws_413554" {
   access_control      = "READ_WRITE"
   action              = "ALLOW"
   default_rule        = false

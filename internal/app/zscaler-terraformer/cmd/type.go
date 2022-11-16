@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"github.com/zscaler/zscaler-sdk-go/zia"
-	"github.com/zscaler/zscaler-sdk-go/zia/services/activation"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/adminuserrolemgmt"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/devicegroups"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/dlp_engines"
@@ -110,7 +109,6 @@ type ZIAClient struct {
 	vpncredentials               *vpncredentials.Service
 	locationmanagement           *locationmanagement.Service
 	locationgroups               *locationgroups.Service
-	activation                   *activation.Service
 	devicegroups                 *devicegroups.Service
 	dlpdictionaries              *dlpdictionaries.Service
 	dlp_engines                  *dlp_engines.Service

@@ -60,7 +60,6 @@ var resourceImportStringFormats = map[string]string{
 	"zia_url_categories":                                ":id",
 	"zia_url_filtering_rules":                           ":id",
 	"zia_user_management":                               ":id",
-	"zia_activation_status":                             ":id",
 	"zia_rule_labels":                                   ":id",
 	"zia_auth_settings_urls":                            ":id",
 	"zia_security_settings":                             ":id",

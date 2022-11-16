@@ -12,7 +12,6 @@ import (
 	"github.com/iancoleman/strcase"
 
 	"github.com/sirupsen/logrus"
-	"github.com/zscaler/zscaler-sdk-go/zia/services/activation"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/adminuserrolemgmt"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/devicegroups"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/dlp_engines"
@@ -217,7 +216,6 @@ func sharedPreRun(cmd *cobra.Command, args []string) {
 				staticips:                    staticips.New(ziaClient),
 				locationmanagement:           locationmanagement.New(ziaClient),
 				locationgroups:               locationgroups.New(ziaClient),
-				activation:                   activation.New(ziaClient),
 				devicegroups:                 devicegroups.New(ziaClient),
 				dlpdictionaries:              dlpdictionaries.New(ziaClient),
 				dlp_engines:                  dlp_engines.New(ziaClient),

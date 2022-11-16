@@ -11,7 +11,6 @@ import (
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/zscaler/zscaler-sdk-go/zia"
-	"github.com/zscaler/zscaler-sdk-go/zia/services/activation"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/adminuserrolemgmt"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/devicegroups"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/dlp_engines"
@@ -278,7 +277,6 @@ func createClientMock(r http.RoundTripper, resourceType, zpaClientID, zpaClientS
 				staticips:                    staticips.New(ziaClient),
 				locationmanagement:           locationmanagement.New(ziaClient),
 				locationgroups:               locationgroups.New(ziaClient),
-				activation:                   activation.New(ziaClient),
 				devicegroups:                 devicegroups.New(ziaClient),
 				dlpdictionaries:              dlpdictionaries.New(ziaClient),
 				dlp_engines:                  dlp_engines.New(ziaClient),
