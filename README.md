@@ -13,8 +13,8 @@
 
 ## Overview
 
-`zscaler-terraformer` is a command line utility to facilitate terraforming your
-existing ZPA and/or ZIA resources. It does this by using your respective API credentials in each platform to retrieve your configurations from the [ZPA API](https://help.zscaler.com/zpa/getting-started-zpa-api) and/or [ZIA API](https://help.zscaler.com/zia/getting-started-zia-api) and converting them to Terraform configurations so that it can be used with the
+`zscaler-terraformer` is A CLI tool that generates ``tf`` and ``tfstate`` files based on existing ZPA and/or ZIA resources.
+It does this by using your respective API credentials in each platform to retrieve your configurations from the [ZPA API](https://help.zscaler.com/zpa/getting-started-zpa-api) and/or [ZIA API](https://help.zscaler.com/zia/getting-started-zia-api) and converting them to Terraform configurations so that it can be used with the
 [ZPA Terraform Provider](https://registry.terraform.io/providers/zscaler/zpa/latest) and/or [ZIA Terraform Provider](https://registry.terraform.io/providers/zscaler/zia/latest)
 
 This tool is ideal if you already have ZPA and/or ZIA resources defined but want to
