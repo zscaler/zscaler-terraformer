@@ -10,14 +10,6 @@ builds:
     binary: zscaler-terraformer
     ldflags:
       - -s -w -X "github.com/zscaler/zscaler-terraformer/internal/app/zscaler-terraformer/cmd.versionString={{.Env.VERSION}}"
-- env:
-    # goreleaser does not work with CGO, it could also complicate
-    # usage by users in CI/CD systems like Terraform Cloud where
-    # they are unable to install libraries.
-    - CGO_ENABLED=0
-  mod_timestamp: '{{ .CommitTimestamp }}'
-  flags:
-    - -trimpath
     goos:
       - windows
       - linux
