@@ -8,13 +8,13 @@ import (
 	"io/ioutil"
 	"os"
 	"sort"
+	"strconv"
 	"strings"
-
-	"github.com/hashicorp/hc-install/product"
-	"github.com/hashicorp/hc-install/releases"
 
 	"github.com/google/uuid"
 	"github.com/hashicorp/go-version"
+	"github.com/hashicorp/hc-install/product"
+	"github.com/hashicorp/hc-install/releases"
 	"github.com/hashicorp/terraform-exec/tfexec"
 	tfjson "github.com/hashicorp/terraform-json"
 	"github.com/spf13/cobra"
@@ -43,10 +43,9 @@ var allGeneratableResources = []string{
 	"zpa_application_segment",
 	"zpa_application_segment_pra",
 	"zpa_application_segment_inspection",
+	"zpa_application_segment_browser_access",
 	"zpa_segment_group",
 	"zpa_server_group",
-	"zpa_browser_access",
-	"zpa_application_segment_browser_access",
 	"zpa_policy_access_rule",
 	"zpa_policy_inspection_rule",
 	"zpa_policy_timeout_rule",
@@ -130,8 +129,11 @@ func buildResourceName(resourceType string, structData map[string]interface{}) s
 			id = strings.ReplaceAll(strings.ToLower(strip(name)), " ", "_") + "_" + id
 		}
 	}
-
-	return fmt.Sprintf("resource_%s", id)
+	resID := fmt.Sprintf("resource_%s", id)
+	resID = strings.ReplaceAll(resID, `"`, "")
+	resID = strings.ReplaceAll(resID, `'`, "")
+	resID = strings.ReplaceAll(resID, "`", "")
+	return resID
 }
 
 func initTf(resourceType string) (tf *tfexec.Terraform, r *tfjson.Schema, workingDir string) {
@@ -323,14 +325,6 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 				continue
 			}
 			jsonPayload = append(jsonPayload, i)
-		}
-		resourceCount = len(jsonPayload)
-		m, _ := json.Marshal(jsonPayload)
-		_ = json.Unmarshal(m, &jsonStructData)
-	case "zpa_browser_access":
-		jsonPayload, _, err := api.zpa.browseraccess.GetAll()
-		if err != nil {
-			log.Fatal(err)
 		}
 		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
@@ -687,6 +681,14 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 					value := structData[apiAttrName]
 					if resourceType == "zia_dlp_notification_templates" && isInList(attrName, []string{"subject", "plain_text_message", "html_message"}) {
 						value = strings.ReplaceAll(value.(string), "${", "$${")
+					}
+					if resourceType == "zpa_service_edge_group" && attrName == "is_public" {
+						if value == nil {
+							value = false
+						} else {
+							isPublic, _ := strconv.ParseBool(value.(string))
+							value = isPublic
+						}
 					}
 					output += writeAttrLine(attrName, value, false)
 				default:
