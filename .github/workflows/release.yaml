@@ -1,21 +1,22 @@
-name: "tagged-release"
-on:
-  workflow_dispatch:
-    inputs:
-      version:
-        description: Bump Version
-        required: true
-jobs:
-  tagged-release:
-    name: "Tagged Release"
-    runs-on: "ubuntu-latest"
+name: Release
 
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Install Go
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.19
+          go-version: ^1.19
       - name: Build for linux/amd64
         run: go build -o zscaler-terraformer-all-linux-amd64
       - name: Build for linux/arm64
