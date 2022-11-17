@@ -24,10 +24,9 @@ builds:
     binary: 'zscaler-terraformer'
 archives:
 - format: zip
-  name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
+  name_template: "{{ .Tag }}-next"
 checksum:
-  name_template: '{{ .ProjectName }}_{{ .Version }}_SHA256SUMS'
-  algorithm: sha256
+  name_template: 'checksums.txt'
 
 signs:
   - artifacts: checksum
