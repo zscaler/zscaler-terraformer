@@ -8,7 +8,7 @@ before:
 builds:
   - main: ./cmd/zscaler-terraformer/main.go
     ldflags:
-      - -s -w -X "github.com/zscaler/zscaler-terraformer/internal/app/zscaler-terraformer/cmd.versionString={{.Env.VERSION}}"
+      - '-s -w -X "github.com/zscaler/zscaler-terraformer/internal/app/zscaler-terraformer/cmd.versionString={{.Env.VERSION}}" -X main.commit={{.Commit}}'
     goos:
       - windows
       - linux
