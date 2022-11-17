@@ -7,7 +7,6 @@ before:
     - go mod tidy && go mod vendor
 builds:
   - main: ./cmd/zscaler-terraformer/main.go
-    binary: zscaler-terraformer
     ldflags:
       - -s -w -X "github.com/zscaler/zscaler-terraformer/internal/app/zscaler-terraformer/cmd.versionString={{.Env.VERSION}}"
     goos:
