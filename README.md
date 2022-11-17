@@ -182,15 +182,24 @@ $ zscaler-terraformer generate \
 
 ## Installation
 
-If you use Homebrew on MacOS, you can run the following:
+If you use Homebrew on MacOS, you can run one of the following commands:
 
 ```bash
-brew tap zscaler/zscaler
-brew install --cask zscaler/zscaler/zscaler-terraformer
+brew tap zscaler/tap
+brew install zscaler/tap/zscaler-terraformer
+```
+
+or
+
+```bash
+brew tap zscaler/tap
+brew install --cask zscaler/tap/zscaler-terraformer
 ```
 
 If you use another OS, you will need to download the release directly from
 [GitHub Releases](https://github.com/zscaler/zscaler-terraformer/releases).
+
+In the future we plan on releasing versions for installation via MacPorts and Chocolatey for Windows systems.
 
 ## Importing with Terraform state
 
