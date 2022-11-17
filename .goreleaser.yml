@@ -1,3 +1,4 @@
+
 # Visit https://goreleaser.com for documentation on how to customize this
 # behavior.
 before:
@@ -6,20 +7,47 @@ before:
     - go mod tidy && go mod vendor
 builds:
   - main: ./cmd/zscaler-terraformer/main.go
-    binary: zscaler-terraformer
     ldflags:
       - -s -w -X "github.com/zscaler/zscaler-terraformer/internal/app/zscaler-terraformer/cmd.versionString={{.Env.VERSION}}"
     goos:
       - windows
       - linux
       - darwin
+    goarch:
+      - amd64
+      - '386'
+      - arm
+      - arm64
+    ignore:
+      - goos: darwin
+        goarch: '386'
+    binary: 'zscaler-terraformer'
+archives:
+- format: zip
+  name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
 checksum:
-  name_template: 'checksums.txt'
+  name_template: '{{ .ProjectName }}_{{ .Version }}_SHA256SUMS'
+  algorithm: sha256
+
+signs:
+  - artifacts: checksum
+    args:
+      # if you are using this in a GitHub action or some other automated pipeline, you
+      # need to pass the batch flag to indicate its not interactive.
+      - "--batch"
+      - "--local-user"
+      - "{{ .Env.GPG_FINGERPRINT }}" # set this environment variable for your signing key
+      - "--output"
+      - "${signature}"
+      - "--detach-sign"
+      - "${artifact}"
 snapshot:
   name_template: "{{ .Tag }}-next"
 release:
-  # Explicit set the repo to release from. Default is origin.
   # Visit your project's GitHub Releases page to publish this release.
+  github:
+    owner: Zscaler
+    name: zscaler-terraformer
   draft: true
 changelog:
   skip: true
