@@ -9,12 +9,22 @@ resource "zpa_application_segment_browser_access" "terraform_managed_resource" {
   health_reporting       = "NONE"
   ip_anchored            = false
   is_cname_enabled       = true
-  name                   = "Zscaler Deception"
+  name                   = "test name"
   passive_health_enabled = true
   segment_group_id       = "216196257331301307"
   segment_group_name     = "Zscaler Deception"
   tcp_port_ranges        = ["1", "52", "54", "65535"]
   udp_port_ranges        = ["1", "52", "54", "65535"]
+  clientless_apps {
+    allow_options        = false
+    application_port     = "80"
+    application_protocol = "HTTP"
+    certificate_id       = "1"
+    enabled              = false
+    hidden               = false
+    name                 = "test"
+    trust_untrusted_cert = false
+  }
   server_groups {
     id = ["216196257331301306"]
   }
