@@ -9,4 +9,5 @@ resource "zpa_service_edge_group" "terraform_managed_resource" {
   upgrade_day              = "SUNDAY"
   upgrade_time_in_secs     = "66600"
   version_profile_id       = "0"
+  is_public                = false
 }
