@@ -10,6 +10,14 @@ builds:
     binary: zscaler-terraformer
     ldflags:
       - -s -w -X "github.com/zscaler/zscaler-terraformer/internal/app/zscaler-terraformer/cmd.versionString={{.Env.VERSION}}"
+- env:
+    # goreleaser does not work with CGO, it could also complicate
+    # usage by users in CI/CD systems like Terraform Cloud where
+    # they are unable to install libraries.
+    - CGO_ENABLED=0
+  mod_timestamp: '{{ .CommitTimestamp }}'
+  flags:
+    - -trimpath
     goos:
       - windows
       - linux
@@ -22,13 +30,12 @@ builds:
     ignore:
       - goos: darwin
         goarch: '386'
-
+    binary: '{{ .ProjectName }}_v{{ .Version }}'
 archives:
 - format: zip
   name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
-
 checksum:
-  name_template: 'checksums.txt'
+  name_template: '{{ .ProjectName }}_{{ .Version }}_SHA256SUMS'
   algorithm: sha256
 
 signs:
@@ -43,11 +50,11 @@ signs:
       - "${signature}"
       - "--detach-sign"
       - "${artifact}"
-snapshot:
-  name_template: "{{ .Tag }}-next"
 release:
-  # Explicit set the repo to release from. Default is origin.
   # Visit your project's GitHub Releases page to publish this release.
+  github:
+    owner: Zscaler
+    name: zscaler-terraformer
   draft: true
 changelog:
   skip: true
