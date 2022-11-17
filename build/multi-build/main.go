@@ -35,15 +35,15 @@ func main() {
 			switch OS {
 			case "linux":
 				GOOS = "linux"
-				binaryName = "terraformer-" + provider + "-linux-amd64"
+				binaryName = "zscaler-terraformer-" + provider + "-linux-amd64"
 			case "windows":
 				GOOS = "windows"
-				binaryName = "terraformer-" + provider + "-windows-amd64.exe"
+				binaryName = "zscaler-terraformer-" + provider + "-windows-amd64.exe"
 			case "mac":
 				GOOS = "darwin"
-				binaryName = "terraformer-" + provider + "-darwin-amd64"
+				binaryName = "zscaler-terraformer-" + provider + "-darwin-amd64"
 			}
-			log.Println("Build terraformer with "+provider+" provider...", "GOOS=", GOOS)
+			log.Println("Build zscaler-terraformer with "+provider+" provider...", "GOOS=", GOOS)
 			deletedProvider := []string{}
 			for _, f := range files {
 				if strings.HasPrefix(f.Name(), filePrefix) {

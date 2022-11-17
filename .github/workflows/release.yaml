@@ -16,8 +16,6 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: 1.19
-      - name: Test
-        run: go build -v && go test ./...
       - name: Build for linux/amd64
         run: go build -o zscaler-terraformer-all-linux-amd64
       - name: Build for linux/arm64
@@ -37,4 +35,4 @@ jobs:
           automatic_release_tag: ${{ github.event.inputs.version }}
           prerelease: false
           files: |
-            terraformer-*
+            zscaler-terraformer-*
