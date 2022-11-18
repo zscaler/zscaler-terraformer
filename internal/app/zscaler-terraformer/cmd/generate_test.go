@@ -138,9 +138,9 @@ func TestResourceGeneration(t *testing.T) {
 		"zpa application segment":                {identiferType: "appsegment", resourceType: "zpa_application_segment", testdataFilename: "zpa_application_segment"},
 		"zpa application segment pra":            {identiferType: "appsegment", resourceType: "zpa_application_segment_pra", testdataFilename: "zpa_application_segment_pra"},
 		"zpa application segment inspection":     {identiferType: "appsegment", resourceType: "zpa_application_segment_inspection", testdataFilename: "zpa_application_segment_inspection"},
-		"zpa application segment browser access": {identiferType: "appsegment", resourceType: "zpa_application_segment_browser_access", testdataFilename: "zpa_application_segment_browser_access"},
 		"zpa segment group":                      {identiferType: "group", resourceType: "zpa_segment_group", testdataFilename: "zpa_segment_group"},
 		"zpa server group":                       {identiferType: "group", resourceType: "zpa_server_group", testdataFilename: "zpa_server_group"},
+		"zpa application segment browser access": {identiferType: "appsegment", resourceType: "zpa_application_segment_browser_access", testdataFilename: "zpa_application_segment_browser_access"},
 		"zpa policy access rule":                 {identiferType: "policy", resourceType: "zpa_policy_access_rule", testdataFilename: "zpa_policy_access_rule"},
 		"zpa policy inspection rule":             {identiferType: "policy", resourceType: "zpa_policy_inspection_rule", testdataFilename: "zpa_policy_inspection_rule"},
 		"zpa policy timeout rule":                {identiferType: "policy", resourceType: "zpa_policy_timeout_rule", testdataFilename: "zpa_policy_timeout_rule"},
@@ -187,8 +187,9 @@ func TestResourceGeneration(t *testing.T) {
 			if err != nil {
 				log.Fatal(err)
 			}
-			defer r.Stop()
-
+			defer func() {
+				_ = r.Stop()
+			}()
 			r.AddFilter(func(i *cassette.Interaction) error {
 				delete(i.Request.Headers, "Authorization")
 				i.Request.Form.Del("client_id")
@@ -210,7 +211,7 @@ func TestResourceGeneration(t *testing.T) {
 func createClientMock(r http.RoundTripper, resourceType, zpaClientID, zpaClientSecret, zpaCustomerID, zpaCloud, ziaUsername, ziaPassword, ziaApiKey, ziaCloud string) *Client {
 	var cli *Client
 	if strings.HasPrefix(resourceType, "zpa_") {
-		zpaConfig, err := zpa.NewConfig(zpaClientID, zpaClientSecret, zpaCustomerID, zpaCloud, "zscaler-terraformer")
+		zpaConfig, err := zpa.NewConfig(zpaClientID, zpaClientSecret, zpaCustomerID, zpaCloud, "zscaler-terraforming")
 		if err != nil {
 			log.Fatal("failed to initialize mock zscaler-sdk-go (zpa)", err)
 		}
@@ -251,7 +252,7 @@ func createClientMock(r http.RoundTripper, resourceType, zpaClientID, zpaClientS
 		}
 	} else if strings.HasPrefix(resourceType, "zia_") {
 		// init zia
-		ziaClient, err := zia.NewClient(ziaUsername, ziaPassword, ziaApiKey, ziaCloud, "zscaler-terraformer")
+		ziaClient, err := zia.NewClient(ziaUsername, ziaPassword, ziaApiKey, ziaCloud, "zscaler-terraforming")
 		if err != nil {
 			log.Fatal("failed to initialize mock zscaler-sdk-go (zia)", err)
 		}

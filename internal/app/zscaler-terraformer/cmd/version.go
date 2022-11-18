@@ -16,7 +16,7 @@ func init() {
 
 var versionCmd = &cobra.Command{
 	Use:   "version",
-	Short: "Print the version number of zscaler-terraformer",
+	Short: "Print the version number of zscaler-terraforming",
 	Run: func(cmd *cobra.Command, args []string) {
 		if versionString == "dev" {
 			gitDescribe := exec.Command("git", "describe", "--tags", "--abbrev=0")
@@ -33,6 +33,6 @@ var versionCmd = &cobra.Command{
 			versionString = strings.TrimSpace(string(gitDescribeStdout)) + "-" + versionString + "+" + strings.TrimSpace(string(gitShaStdout))
 		}
 
-		fmt.Printf("zscaler-terraformer %s\n", versionString)
+		fmt.Printf("zscaler-terraforming %s\n", versionString)
 	},
 }
