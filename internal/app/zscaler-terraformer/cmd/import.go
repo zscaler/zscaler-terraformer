@@ -445,6 +445,7 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 			log.Fatal(err)
 		}
 		m, _ := json.Marshal(jsonPayload)
+		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_user_management":
 		jsonPayload, err := api.zia.usermanagement.GetAllUsers()
