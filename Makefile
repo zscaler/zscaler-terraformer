@@ -1,7 +1,7 @@
 TEST                  ?= $$(go list ./...)
 GO_FILES              ?= $$(find . -name '*.go')
 
-VERSION               ?= $$(git describe --tags --abbrev=0)-dev+$$(git rev-parse --short=12 HEAD)
+VERSION               ?= $$(git describe --tags --abbrev=0)-pre-release+$$(git rev-parse --short=12 HEAD)
 ROOT_DIR               = $$PWD
 
 HASHICORP_CHECKPOINT_TIMEMOUT ?= 30000
