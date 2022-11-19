@@ -12,6 +12,7 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/zia/services/dlpdictionaries"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/firewallpolicies/filteringrules"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/firewallpolicies/networkservices"
+	"github.com/zscaler/zscaler-sdk-go/zia/services/locationmanagement"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/security_policy_settings"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/urlcategories"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/user_authentication_settings"
@@ -414,12 +415,18 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_location_management":
-		jsonPayload, err := api.zia.locationmanagement.GetAll()
+		locations, err := api.zia.locationmanagement.GetAll()
 		if err != nil {
 			log.Fatal(err)
 		}
-		m, _ := json.Marshal(jsonPayload)
-		resourceCount = len(jsonPayload)
+		locationsFiltered := []locationmanagement.Locations{}
+		for _, location := range locations {
+			if isInList(location.Profile, []string{"WORKLOAD"}) {
+				continue
+			}
+			locationsFiltered = append(locationsFiltered, location)
+		}
+		m, _ := json.Marshal(locationsFiltered)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_url_categories":
 		list, err := api.zia.urlcategories.GetAll()
