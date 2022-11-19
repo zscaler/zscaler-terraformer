@@ -7,6 +7,7 @@ resource "zpa_application_segment_browser_access" "terraform_managed_resource" {
   enabled                = true
   health_check_type      = "NONE"
   health_reporting       = "NONE"
+  ip_anchored            = false
   is_cname_enabled       = true
   name                   = "test name"
   passive_health_enabled = true

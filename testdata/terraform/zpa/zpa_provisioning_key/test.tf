@@ -1,5 +1,5 @@
 resource "zpa_provisioning_key" "terraform_managed_resource" {
-  association_type = "CONNECTOR_GRP"
+  association_type   = "CONNECTOR_GRP"
   enabled            = true
   enrollment_cert_id = "6573"
   max_usage          = "10"

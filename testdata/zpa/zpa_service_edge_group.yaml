@@ -8,7 +8,7 @@ interactions:
       Content-Type:
       - application/x-www-form-urlencoded
       User-Agent:
-      - zscaler-terraformer
+      - zscaler-terraforming
     url: https://config.private.zscaler.com/signin
     method: POST
   response:
@@ -56,11 +56,11 @@ interactions:
       Content-Type:
       - application/json
       User-Agent:
-      - zscaler-terraformer
+      - zscaler-terraforming
     url: https://config.private.zscaler.com/mgmtconfig/v1/admin/customers/216196257331281920/serviceEdgeGroup?pagesize=500
     method: GET
   response:
-    body: '{"totalPages":"0", "list":[{"name": "Service Edge Group New York","isPublic": "TRUE","description": "Service Edge Group New York","upgradeDay": "SUNDAY","upgradeTimeInSecs": "66600","latitude": "40.7128","longitude": "-73.935242","location": "New York, NY, USA","versionProfileId": "0"}]}'
+    body: '{"totalPages":"0", "list":[{"name": "Service Edge Group New York","description": "Service Edge Group New York","upgradeDay": "SUNDAY","upgradeTimeInSecs": "66600","latitude": "40.7128","longitude": "-73.935242","location": "New York, NY, USA","versionProfileId": "0"}]}'
     headers:
       Cache-Control:
       - no-store

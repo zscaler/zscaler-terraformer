@@ -4,7 +4,7 @@ resource "zpa_server_group" "terraform_managed_resource" {
   dynamic_discovery = true
   enabled           = true
   ip_anchored       = false
-  name              = "Zscaler Deception"
+  name              = "test name"
   app_connector_groups {
     id = ["216196257331301305"]
   }

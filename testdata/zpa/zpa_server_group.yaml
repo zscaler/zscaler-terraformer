@@ -8,7 +8,7 @@ interactions:
       Content-Type:
       - application/x-www-form-urlencoded
       User-Agent:
-      - zscaler-terraformer
+      - zscaler-terraforming
     url: https://config.private.zscaler.com/signin
     method: POST
   response:
@@ -56,14 +56,12 @@ interactions:
       Content-Type:
       - application/json
       User-Agent:
-      - zscaler-terraformer
+      - zscaler-terraforming
     url: https://config.private.zscaler.com/mgmtconfig/v1/admin/customers/216196257331281920/serverGroup?pagesize=500
     method: GET
   response:
-    body: '{"totalPages":"1","list":[{"creationTime":"1646791911","modifiedBy":"216196257331301304","id":"216196257331301306","enabled":true,"name":"Zscaler
-      Deception","description":"Automatically created by Zscaler Deception API for
-      whiskeygolf","applications":[{"id":"216196257331301317","name":"Zscaler Deception"}],"ipAnchored":false,"configSpace":"DEFAULT","dynamicDiscovery":true,"appConnectorGroups":[{"id":"216196257331301305","modifiedTime":"1646874488","creationTime":"1646791910","modifiedBy":"216196257331281958","name":"Zscaler
-      Deception","enabled":true,"description":"Automatically created by Zscaler Deception
+    body: '{"totalPages":"1","list":[{"creationTime":"1646791911","modifiedBy":"216196257331301304","id":"216196257331301306","enabled":true,"name":"test name","description":"Automatically created by Zscaler Deception API for
+      whiskeygolf","applications":[{"id":"216196257331301317","name":"test name"}],"ipAnchored":false,"configSpace":"DEFAULT","dynamicDiscovery":true,"appConnectorGroups":[{"id":"216196257331301305","modifiedTime":"1646874488","creationTime":"1646791910","modifiedBy":"216196257331281958","name":"test name","enabled":true,"description":"Automatically created by Zscaler Deception
       API for whiskeygolf","versionProfileId":"2","overrideVersionProfile":false,"location":"Mumbai,
       Maharashtra, India","dnsQueryType":"IPV4_IPV6","cityCountry":"Mumbai, IN","countryCode":"IN","lssAppConnectorGroup":false}]}]}'
     headers:

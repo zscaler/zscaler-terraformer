@@ -8,7 +8,7 @@ interactions:
       Content-Type:
       - application/x-www-form-urlencoded
       User-Agent:
-      - zscaler-terraformer
+      - zscaler-terraforming
     url: https://config.private.zscaler.com/signin
     method: POST
   response:
@@ -56,13 +56,11 @@ interactions:
       Content-Type:
       - application/json
       User-Agent:
-      - zscaler-terraformer
+      - zscaler-terraforming
     url: https://config.private.zscaler.com/mgmtconfig/v1/admin/customers/216196257331281920/application?pagesize=500
     method: GET
   response:
-    body: '{"totalPages":"1","list":[{"creationTime":"1646798682","modifiedBy":"216196257331301304","id":"216196257331301317","domainNames":["swift-35.securitygeek.io","10.10.10.100"],"name":"Zscaler
-      Deception","description":"Created by Zscaler Deception. Do not edit","serverGroups":[{"id":"216196257331301306","creationTime":"1646791911","modifiedBy":"216196257331301304","name":"Zscaler
-      Deception","enabled":true,"description":"Automatically created by Zscaler Deception
+    body: '{"totalPages":"1","list":[{"clientlessApps":[{"id":"1","name":"test","certificateId":"1","applicationProtocol":"HTTP","applicationPort":"80"}],"creationTime":"1646798682","modifiedBy":"216196257331301304","id":"216196257331301317","domainNames":["swift-35.securitygeek.io","10.10.10.100"],"name":"test name","description":"Created by Zscaler Deception. Do not edit","serverGroups":[{"id":"216196257331301306","creationTime":"1646791911","modifiedBy":"216196257331301304","name":"test name","enabled":true,"description":"Automatically created by Zscaler Deception
       API for whiskeygolf","configSpace":"DEFAULT","dynamicDiscovery":true}],"enabled":true,"passiveHealthEnabled":true,"tcpPortRanges":["1","52","54","65535"],"udpPortRanges":["1","52","54","65535"],"tcpPortRange":[{"from":"1","to":"52"},{"from":"54","to":"65535"}],"udpPortRange":[{"from":"1","to":"52"},{"from":"54","to":"65535"}],"doubleEncrypt":false,"configSpace":"DEFAULT","bypassType":"NEVER","healthCheckType":"NONE","icmpAccessType":"NONE","isCnameEnabled":true,"ipAnchored":false,"healthReporting":"NONE","tcpKeepAlive":"0","segmentGroupId":"216196257331301307","segmentGroupName":"Zscaler
       Deception"}]}'
     headers:

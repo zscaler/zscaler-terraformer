@@ -8,7 +8,7 @@ interactions:
       Content-Type:
       - application/json
       User-Agent:
-      - zscaler-terraformer
+      - zscaler-terraforming
     url: https://zsapi.zscalerthree.net/api/v1/authenticatedSession
     method: POST
   response:
@@ -46,11 +46,11 @@ interactions:
       Cookie:
       - JSESSIONID=485ED07C9EB68A18021A1A3DAF941A39
       User-Agent:
-      - zscaler-terraformer
+      - zscaler-terraforming
     url: https://zsapi.zscalerthree.net/api/v1/networkServices
     method: GET
   response:
-    body: '[{"id":773995,"name":"ICMP_ANY","tag":"ICMP_ANY","type":"STANDARD","description":"ICMP_ANY_DESC","creatorContext":"ZIA","isNameL10nTag":true}]'
+    body: '[{"id":773995,"name":"ICMP_ANY","tag":"ICMP_ANY","type":"CUSTOM","description":"ICMP_ANY_DESC","creatorContext":"ZIA","isNameL10nTag":true}]'
     headers:
       Cache-Control:
       - no-store

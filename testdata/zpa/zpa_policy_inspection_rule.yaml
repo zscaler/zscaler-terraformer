@@ -8,7 +8,7 @@ interactions:
       Content-Type:
       - application/x-www-form-urlencoded
       User-Agent:
-      - zscaler-terraformer
+      - zscaler-terraforming
     url: https://config.private.zscaler.com/signin
     method: POST
   response:
@@ -56,17 +56,13 @@ interactions:
       Content-Type:
       - application/json
       User-Agent:
-      - zscaler-terraformer
+      - zscaler-terraforming
     url: https://config.private.zscaler.com/mgmtconfig/v1/admin/customers/216196257331281920/policySet/rules/policyType/INSPECTION_POLICY?pagesize=500
     method: GET
   response:
-    body: '{"totalPages":"1","list":[{"id":"216196257331301308","modifiedTime":"1646791911","creationTime":"1646791911","modifiedBy":"216196257331301304","name":"Zscaler
-      Deception","description":"Automatically created by Zscaler Deception API for
-      whiskeygolf","ruleOrder":"1","priority":"1","policyType":"1","operator":"AND","conditions":[{"id":"1440536","modifiedTime":"1646791911","creationTime":"1646791911","modifiedBy":"216196257331301304","operator":"OR","negated":false,"operands":[{"id":"1440537","creationTime":"1646791911","modifiedBy":"216196257331301304","objectType":"APP_GROUP","lhs":"id","rhs":"216196257331301307","name":"Zscaler
-      Deception"}]}],"action":"INSPECT","appServerGroups":[{"id":"216196257331301306","creationTime":"1646791911","modifiedBy":"216196257331301304","name":"Zscaler
-      Deception","enabled":true,"description":"Automatically created by Zscaler Deception
-      API for whiskeygolf","configSpace":"DEFAULT","dynamicDiscovery":true}],"defaultRule":false,"appConnectorGroups":[{"id":"216196257331301305","modifiedTime":"1646874488","creationTime":"1646791910","modifiedBy":"216196257331281958","name":"Zscaler
-      Deception","enabled":true,"description":"Automatically created by Zscaler Deception
+    body: '{"totalPages":"1","list":[{"id":"216196257331301308","modifiedTime":"1646791911","creationTime":"1646791911","modifiedBy":"216196257331301304","name":"test name","description":"Automatically created by Zscaler Deception API for
+      whiskeygolf","ruleOrder":"1","priority":"1","policyType":"1","operator":"AND","conditions":[{"id":"1440536","modifiedTime":"1646791911","creationTime":"1646791911","modifiedBy":"216196257331301304","operator":"OR","negated":false,"operands":[{"id":"1440537","creationTime":"1646791911","modifiedBy":"216196257331301304","objectType":"APP_GROUP","lhs":"id","rhs":"216196257331301307","name":"test name"}]}],"action":"INSPECT","appServerGroups":[{"id":"216196257331301306","creationTime":"1646791911","modifiedBy":"216196257331301304","name":"test name","enabled":true,"description":"Automatically created by Zscaler Deception
+      API for whiskeygolf","configSpace":"DEFAULT","dynamicDiscovery":true}],"defaultRule":false,"appConnectorGroups":[{"id":"216196257331301305","modifiedTime":"1646874488","creationTime":"1646791910","modifiedBy":"216196257331281958","name":"test name","enabled":true,"description":"Automatically created by Zscaler Deception
       API for whiskeygolf","versionProfileId":"2","overrideVersionProfile":false,"location":"Mumbai,
       Maharashtra, India","dnsQueryType":"IPV4_IPV6","cityCountry":"Mumbai, IN","countryCode":"IN","lssAppConnectorGroup":false}]}]}'
     headers:

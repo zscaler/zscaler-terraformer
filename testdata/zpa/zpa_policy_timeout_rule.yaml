@@ -8,7 +8,7 @@ interactions:
       Content-Type:
       - application/x-www-form-urlencoded
       User-Agent:
-      - zscaler-terraformer
+      - zscaler-terraforming
     url: https://config.private.zscaler.com/signin
     method: POST
   response:
@@ -56,13 +56,13 @@ interactions:
       Content-Type:
       - application/json
       User-Agent:
-      - zscaler-terraformer
+      - zscaler-terraforming
     url: https://config.private.zscaler.com/mgmtconfig/v1/admin/customers/216196257331281920/policySet/rules/policyType/TIMEOUT_POLICY?pagesize=500
     method: GET
   response:
-    body: '{"totalPages":"1","list":[{"id":"216196257331281927","modifiedTime":"1659634963","modifiedBy":"216196257331282070","name":"Default_Rule","description":"This
+    body: '{"totalPages":"1","list":[{"id":"216196257331281927","modifiedTime":"1659634963","modifiedBy":"216196257331282070","name":"Default_Rule2","description":"This
       is the default Timeout Policy rule","ruleOrder":"1","priority":"1","policyType":"2","operator":"AND","action":"RE_AUTH","reauthTimeout":"-1","reauthIdleTimeout":"-1","customMsg":"Your
-      access to internal Applications has expired","defaultRuleName":"Default_Rule","defaultRule":true}]}'
+      access to internal Applications has expired","defaultRuleName":"Default_Rule2","defaultRule":false}]}'
     headers:
       Cache-Control:
       - no-store

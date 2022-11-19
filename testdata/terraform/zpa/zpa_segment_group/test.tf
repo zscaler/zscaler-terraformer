@@ -2,7 +2,7 @@ resource "zpa_segment_group" "terraform_managed_resource" {
   config_space           = "DEFAULT"
   description            = "Automatically created by Zscaler Deception API for whiskeygolf"
   enabled                = true
-  name                   = "Zscaler Deception"
+  name                   = "test name"
   policy_migrated        = true
   tcp_keep_alive_enabled = "0"
   applications {

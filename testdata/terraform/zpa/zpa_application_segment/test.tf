@@ -19,6 +19,7 @@ resource "zpa_application_segment" "terraform_managed_resource" {
       to   = "80"
     }
   ]
+  tcp_port_ranges = ["80", "80"]
   server_groups {
     id = ["216196257331307753"]
   }

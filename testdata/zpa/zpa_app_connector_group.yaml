@@ -8,7 +8,7 @@ interactions:
       Content-Type:
       - application/x-www-form-urlencoded
       User-Agent:
-      - zscaler-terraformer
+      - zscaler-terraforming
     url: https://config.private.zscaler.com/signin
     method: POST
   response:
@@ -30,12 +30,11 @@ interactions:
       Content-Type:
       - application/json
       User-Agent:
-      - zscaler-terraformer
+      - zscaler-terraforming
     url: https://config.private.zscaler.com/mgmtconfig/v1/admin/customers/216196257331281920/appConnectorGroup?pagesize=500
     method: GET
   response:
-    body: '{"totalPages":"1","list":[{"id":"216196257331301305","modifiedTime":"1646874488","creationTime":"1646791910","modifiedBy":"216196257331281958","name":"Zscaler
-      Deception","enabled":true,"description":"Automatically created by Zscaler Deception
+    body: '{"totalPages":"1","list":[{"id":"216196257331301305","modifiedTime":"1646874488","creationTime":"1646791910","modifiedBy":"216196257331281958","name":"test name","enabled":true,"description":"Automatically created by Zscaler Deception
       API for whiskeygolf","versionProfileId":"2","overrideVersionProfile":false,"versionProfileName":"New
       Release","versionProfileVisibilityScope":"ALL","upgradeTimeInSecs":"66600","upgradeDay":"SUNDAY","location":"Mumbai,
       Maharashtra, India","latitude":"19.0728","longitude":"72.8826","dnsQueryType":"IPV4_IPV6","cityCountry":"Mumbai,

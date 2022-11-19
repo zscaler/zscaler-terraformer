@@ -19,6 +19,17 @@ resource "zpa_application_segment_inspection" "terraform_managed_resource" {
       to   = "80"
     }
   ]
+  tcp_port_ranges = ["80", "80"]
+  common_apps_dto {
+    apps_config {
+      allow_options = false
+      app_types     = ["INSPECT"]
+      enabled       = false
+      hidden        = false
+      id            = "11"
+      portal        = false
+    }
+  }
   server_groups {
     id = ["216196257331307753"]
   }

@@ -8,7 +8,7 @@ interactions:
       Content-Type:
       - application/json
       User-Agent:
-      - zscaler-terraformer
+      - zscaler-terraforming
     url: https://zsapi.zscalerthree.net/api/v1/authenticatedSession
     method: POST
   response:
@@ -46,11 +46,11 @@ interactions:
       Cookie:
       - JSESSIONID=5D9547951D824D31BF03EF37F7150819
       User-Agent:
-      - zscaler-terraformer
+      - zscaler-terraforming
     url: https://zsapi.zscalerthree.net/api/v1/urlCategories
     method: GET
   response:
-    body: '[{"id":"CUSTOM_02","urls":[".Logz.io",".aa.com",".accuweather.com",".agoda.com"],"dbCategorizedUrls":[".creditkarma.com",".youku.com"],"customCategory":true,"editable":true,"description":"MCAS Unsanctioned Apps","type":"URL_CATEGORY","val":1,"customUrlsCount":4,"urlsRetainingParentCategoryCount":2,"customIpRangesCount":0,"ipRangesRetainingParentCategoryCount":0, "keywords": [], "super_category": "USER_DEFINED"}]'
+    body: '[{"superCategory":"USER_DEFINED", "id":"OTHER_ADULT_MATERIAL","urls":[],"dbCategorizedUrls":[],"customCategory":false,"editable":true,"description":"OTHER_ADULT_MATERIAL_DESC","type":"URL_CATEGORY","val":1,"customUrlsCount":0,"urlsRetainingParentCategoryCount":0,"customIpRangesCount":0,"ipRangesRetainingParentCategoryCount":0}]'
     headers:
       Cache-Control:
       - no-store

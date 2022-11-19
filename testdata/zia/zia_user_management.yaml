@@ -8,7 +8,7 @@ interactions:
       Content-Type:
       - application/json
       User-Agent:
-      - zscaler-terraformer
+      - zscaler-terraforming
     url: https://zsapi.zscalerthree.net/api/v1/authenticatedSession
     method: POST
   response:
@@ -46,16 +46,14 @@ interactions:
       Cookie:
       - JSESSIONID=F67DD0268EC8C99B10C8E084FBDDE98F
       User-Agent:
-      - zscaler-terraformer
-    url: https://zsapi.zscalerthree.net/api/v1/departments
+      - zscaler-terraforming
+    url: https://zsapi.zscalerthree.net/api/v1/users
     method: GET
   response:
-    body: '[{"id":25684245,"name":"Engineering"}]'
+    body: '[{"id":29309077,"name":"test","email":"test@securitygeek.io","groups":[{"id":26231231,"name":"Normal_Internet"},{"id":24392492,"name":"Marketing"}],"department":{"id":25658545,"name":"Finance"},"adminUser":false,"isNonEditable":false,"deleted":false}]'
     headers:
       Cache-Control:
       - no-store
-      Content-Length:
-      - "446"
       Content-Type:
       - application/json
       Date:

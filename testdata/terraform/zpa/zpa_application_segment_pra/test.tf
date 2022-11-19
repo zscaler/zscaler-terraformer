@@ -20,6 +20,13 @@ resource "zpa_application_segment_pra" "terraform_managed_resource" {
     }
   ]
   tcp_port_ranges = ["80", "80"]
+  common_apps_dto {
+    apps_config {
+      allow_options = false
+      app_types     = ["SECURE_REMOTE_ACCESS"]
+      id            = "11"
+    }
+  }
   server_groups {
     id = ["216196257331307753"]
   }

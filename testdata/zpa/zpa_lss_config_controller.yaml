@@ -8,7 +8,7 @@ interactions:
       Content-Type:
       - application/x-www-form-urlencoded
       User-Agent:
-      - zscaler-terraformer
+      - zscaler-terraforming
     url: https://config.private.zscaler.com/signin
     method: POST
   response:
@@ -56,7 +56,7 @@ interactions:
       Content-Type:
       - application/json
       User-Agent:
-      - zscaler-terraformer
+      - zscaler-terraforming
     url: https://config.private.zscaler.com/mgmtconfig/v2/admin/customers/216196257331281920/lssConfig?pagesize=500
     method: GET
   response:
@@ -116,15 +116,13 @@ interactions:
       Deception Log Forwarder\",\"description\":\"Automatically created by Zscaler
       Deception API for whiskeygolf\",\"sessionStatuses\":null,\"enabled\":true,\"useTls\":false,\"policy\":{\"policyType\":\"Log
       Receiver Policy\",\"name\":\"SIEM selection rule for Zscaler Deception Log Forwarder\",\"conditions\":[{\"criteria\":[{\"id\":\"216196257331301307\",\"type\":\"Segment
-      Group\"}],\"operator\":\"OR\"}]}}","lssHost":"198.18.224.10","lssPort":"9514"},"connectorGroups":[{"id":"216196257331301305","modifiedTime":"1646874488","creationTime":"1646791910","modifiedBy":"216196257331281958","name":"Zscaler
-      Deception","enabled":true,"description":"Automatically created by Zscaler Deception
+      Group\"}],\"operator\":\"OR\"}]}}","lssHost":"198.18.224.10","lssPort":"9514"},"connectorGroups":[{"id":"216196257331301305","modifiedTime":"1646874488","creationTime":"1646791910","modifiedBy":"216196257331281958","name":"test name","enabled":true,"description":"Automatically created by Zscaler Deception
       API for whiskeygolf","versionProfileId":"2","overrideVersionProfile":false,"versionProfileName":"New
       Release","versionProfileVisibilityScope":"ALL","upgradeTimeInSecs":"66600","upgradeDay":"SUNDAY","location":"Mumbai,
       Maharashtra, India","latitude":"19.0728","longitude":"72.8826","dnsQueryType":"IPV4_IPV6","cityCountry":"Mumbai,
       IN","countryCode":"IN","connectors":[{"id":"216196257331307409","modifiedTime":"1656100806","creationTime":"1656100806","modifiedBy":"-2","name":"Zscaler
       Deception-1656100806020","fingerprint":"TRdagD4/vmR47xjEJaGXWHTbS2nQx9EaGqdf3XozSoM=","issuedCertId":"1176378","enabled":true,"assistantVersion":{"id":"216196257331307409","modifiedTime":"1660654375","creationTime":"1656100811","modifiedBy":"72057594037928156","expectedVersion":"22.137.1","currentVersion":"22.184.4","systemStartTime":"1656100751","applicationStartTime":"1660335536","lastBrokerConnectTime":"1660504135692592","lastBrokerDisconnectTime":"1660653475685000","brokerId":"72057594037930604","restartTimeInSec":"1660674600","platform":"el7","upgradeStatus":"IN_PROGRESS","ctrlChannelStatus":"ZPN_STATUS_AUTHENTICATED","latitude":"19.0728","longitude":"72.8826","privateIp":"198.18.224.20","publicIp":"3.108.225.232","loneWarrior":true,"mtunnelId":"4RKEE72N5aAwtkE6H/Ig","previousVersion":"22.137.1","lastUpgradedTime":"1660335536","upgradeAttempt":"1","sargeVersion":"22.137.1","appConnectorGroupId":"216196257331301305"},"upgradeAttempt":"0","provisioningKeyId":"11110"}],"lssAppConnectorGroup":false}],"policyRule":{"id":"216196257331301315","modifiedTime":"1646791912","creationTime":"1646791912","modifiedBy":"216196257331301304","name":"SIEM
-      selection rule for Zscaler Deception Log Forwarder","ruleOrder":"1","priority":"1","policyType":"3","operator":"AND","actionId":"216196257331301309","conditions":[{"id":"1440538","modifiedTime":"1646791912","creationTime":"1646791912","modifiedBy":"216196257331301304","operator":"OR","negated":false,"operands":[{"id":"1440539","creationTime":"1646791912","modifiedBy":"216196257331301304","objectType":"APP_GROUP","lhs":"id","rhs":"216196257331301307","name":"Zscaler
-      Deception"}]}],"action":"LOG","policySetId":"216196257331281966","defaultRule":false}}]}'
+      selection rule for Zscaler Deception Log Forwarder","ruleOrder":"1","priority":"1","policyType":"3","operator":"AND","actionId":"216196257331301309","conditions":[{"id":"1440538","modifiedTime":"1646791912","creationTime":"1646791912","modifiedBy":"216196257331301304","operator":"OR","negated":false,"operands":[{"id":"1440539","creationTime":"1646791912","modifiedBy":"216196257331301304","objectType":"APP_GROUP","lhs":"id","rhs":"216196257331301307","name":"test name"}]}],"action":"LOG","policySetId":"216196257331281966","defaultRule":false}}]}'
     headers:
       Cache-Control:
       - no-store

@@ -8,7 +8,7 @@ resource "zpa_app_connector_group" "terraform_managed_resource" {
   location                 = "Mumbai, Maharashtra, India"
   longitude                = "72.8826"
   lss_app_connector_group  = true
-  name                     = "Zscaler Deception"
+  name                     = "test name"
   override_version_profile = false
   upgrade_day              = "SUNDAY"
   upgrade_time_in_secs     = "66600"
