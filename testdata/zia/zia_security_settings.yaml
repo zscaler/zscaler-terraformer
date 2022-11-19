@@ -1,0 +1,111 @@
+---
+version: 1
+interactions:
+- request:
+    body: '{"username":"zia@securitygeek.io","password":"passwordzia","apiKey":"apiKeyHere","timestamp":"1660773756223"}'
+    form: {}
+    headers:
+      Content-Type:
+      - application/json
+      User-Agent:
+      - zscaler-terraformer
+    url: https://zsapi.zscalerthree.net/api/v1/authenticatedSession
+    method: POST
+  response:
+    body: '{"authType":"ADMIN_LOGIN","obfuscateApiKey":true,"passwordExpiryTime":-1,"passwordExpiryDays":-1,"source":"https://zsapi.zscalerthree.net"}'
+    headers:
+      Cache-Control:
+      - no-store
+      Content-Length:
+      - "139"
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 17 Aug 2022 22:02:41 GMT
+      Server:
+      - Zscaler
+      Set-Cookie:
+      - JSESSIONID=E6593541B1B9566DA43B4D260F117476; Path=/; Secure; HttpOnly
+      Strict-Transport-Security:
+      - max-age=31622400;includeSubDomains;preload
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+    status: '200 '
+    code: 200
+    duration: ""
+- request:
+    body: ""
+    form: {}
+    headers:
+      Content-Type:
+      - application/json
+      Cookie:
+      - JSESSIONID=E6593541B1B9566DA43B4D260F117476
+      User-Agent:
+      - zscaler-terraformer
+    url: https://zsapi.zscalerthree.net/api/v1/security
+    method: GET
+  response:
+    body: '{"whitelistUrls":[".acme.com"]}'
+    headers:
+      Cache-Control:
+      - no-store
+      Content-Length:
+      - "31"
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 17 Aug 2022 22:02:41 GMT
+      Server:
+      - Zscaler
+      Strict-Transport-Security:
+      - max-age=31622400;includeSubDomains;preload
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+    status: '200 '
+    code: 200
+    duration: ""
+- request:
+    body: ""
+    form: {}
+    headers:
+      Content-Type:
+      - application/json
+      Cookie:
+      - JSESSIONID=E6593541B1B9566DA43B4D260F117476
+      User-Agent:
+      - zscaler-terraformer
+    url: https://zsapi.zscalerthree.net/api/v1/security/advanced
+    method: GET
+  response:
+    body: '{"blacklistUrls":[".vodahelp.sytes.net",".riverwalktrader.co.za",".hectorcalle.com/listbul.exe",".gandhitoday.org/video/6JvA8",".glareestradad.com",".johnsonsmedia.it/img/ZBNk0xpRL8YEVl",".genccagdas.com.tr/assets/doWHIxLe7e",".movekochd.com",".sanyai-love.rmu.ac.th",".grafischer.ch/fit-well/wDPTwKtZPoWL12",".fpd.cl/cgi-bin/N/",".djunreal.co.uk/site/ApOKpFad",".steptransport2017b.com",".sloanavocadog.com",".caseytackleg.com",".hortonheavyg.com",".hectorcalle.com/093789.hta",".testmahoneyd.com",".hectorcalle.com/May-16_2022.zip",".nephewboring2013b.com",".fordlogisticss.com"]}'
+    headers:
+      Cache-Control:
+      - no-store
+      Content-Length:
+      - "582"
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 17 Aug 2022 22:02:41 GMT
+      Server:
+      - Zscaler
+      Strict-Transport-Security:
+      - max-age=31622400;includeSubDomains;preload
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+    status: '200 '
+    code: 200
+    duration: ""

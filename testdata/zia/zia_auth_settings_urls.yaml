@@ -1,0 +1,75 @@
+---
+version: 1
+interactions:
+- request:
+    body: '{"username":"zia@securitygeek.io","password":"passwordzia","apiKey":"apiKeyHere","timestamp":"1660773750816"}'
+    form: {}
+    headers:
+      Content-Type:
+      - application/json
+      User-Agent:
+      - zscaler-terraformer
+    url: https://zsapi.zscalerthree.net/api/v1/authenticatedSession
+    method: POST
+  response:
+    body: '{"authType":"ADMIN_LOGIN","obfuscateApiKey":true,"passwordExpiryTime":-1,"passwordExpiryDays":-1,"source":"https://zsapi.zscalerthree.net"}'
+    headers:
+      Cache-Control:
+      - no-store
+      Content-Length:
+      - "139"
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 17 Aug 2022 22:02:35 GMT
+      Server:
+      - Zscaler
+      Set-Cookie:
+      - JSESSIONID=25C784AE6717052DF9EF26F51ACEE09B; Path=/; Secure; HttpOnly
+      Strict-Transport-Security:
+      - max-age=31622400;includeSubDomains;preload
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+    status: '200 '
+    code: 200
+    duration: ""
+- request:
+    body: ""
+    form: {}
+    headers:
+      Content-Type:
+      - application/json
+      Cookie:
+      - JSESSIONID=25C784AE6717052DF9EF26F51ACEE09B
+      User-Agent:
+      - zscaler-terraformer
+    url: https://zsapi.zscalerthree.net/api/v1/authSettings/exemptedUrls
+    method: GET
+  response:
+    body: '{"urls":[".okta.com",".oktacdn.com",".mtls.oktapreview.com",".mtls.okta.com","d3l44rcogcb7iv.cloudfront.net","pac.zdxcloud.net",".windowsazure.com",".fedoraproject.org","login.windows.net","d32a6ru7mhaq0c.cloudfront.net",".kerberos.oktapreview.com",".oktapreview.com","login.zdxcloud.net","login.microsoftonline.com","smres.zdxcloud.net",".kerberos.okta.com"]}'
+    headers:
+      Cache-Control:
+      - no-store
+      Content-Length:
+      - "360"
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 17 Aug 2022 22:02:35 GMT
+      Server:
+      - Zscaler
+      Strict-Transport-Security:
+      - max-age=31622400;includeSubDomains;preload
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+    status: '200 '
+    code: 200
+    duration: ""

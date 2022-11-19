@@ -1,0 +1,77 @@
+---
+version: 1
+interactions:
+- request:
+    body: '{"username":"zia@securitygeek.io","password":"passwordzia","apiKey":"apiKeyHere","timestamp":"1660773738053"}'
+    form: {}
+    headers:
+      Content-Type:
+      - application/json
+      User-Agent:
+      - zscaler-terraformer
+    url: https://zsapi.zscalerthree.net/api/v1/authenticatedSession
+    method: POST
+  response:
+    body: '{"authType":"ADMIN_LOGIN","obfuscateApiKey":true,"passwordExpiryTime":-1,"passwordExpiryDays":-1,"source":"https://zsapi.zscalerthree.net"}'
+    headers:
+      Cache-Control:
+      - no-store
+      Content-Length:
+      - "139"
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 17 Aug 2022 22:02:24 GMT
+      Server:
+      - Zscaler
+      Set-Cookie:
+      - JSESSIONID=AA5F0807E0DAEF87CF3AB19AF5C82BC8; Path=/; Secure; HttpOnly
+      Strict-Transport-Security:
+      - max-age=31622400;includeSubDomains;preload
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+    status: '200 '
+    code: 200
+    duration: ""
+- request:
+    body: ""
+    form: {}
+    headers:
+      Content-Type:
+      - application/json
+      Cookie:
+      - JSESSIONID=AA5F0807E0DAEF87CF3AB19AF5C82BC8
+      User-Agent:
+      - zscaler-terraformer
+    url: https://zsapi.zscalerthree.net/api/v1/locations?page=1&pageSize=1000
+    method: GET
+  response:
+    body: '[{"id":32960775,"name":"AU - Sydney - Branch01","nonEditable":false,"parentId":0,"upBandwidth":0,"dnBandwidth":0,"overrideUpBandwidth":0,"overrideDnBandwidth":0,"sharedUpBandwidth":0,"sharedDownBandwidth":0,"unusedUpBandwidth":0,"unusedDnBandwidth":0,"country":"AUSTRALIA","language":"NONE","tz":"AUSTRALIA_SYDNEY","ipAddresses":["61.68.118.237"],"authRequired":true,"sslScanEnabled":false,"zappSslScanEnabled":false,"xffForwardEnabled":true,"otherSubLocation":false,"ecLocation":false,"surrogateIP":true,"idleTimeInMinutes":720,"displayTimeUnit":"HOUR","surrogateIPEnforcedForKnownBrowsers":false,"surrogateRefreshTimeInMinutes":0,"kerberosAuth":false,"digestAuthEnabled":false,"ofwEnabled":true,"ipsControl":true,"aupEnabled":false,"cautionEnabled":false,"aupBlockInternetUntilAccepted":false,"aupForceSslInspection":false,"aupTimeoutInDays":0,"childCount":2,"matchInChild":false,"staticLocationGroups":[],"dynamiclocationGroups":[{"id":43803051,"name":"SGIO-Dynamic-Group"},{"id":24326827,"name":"Unassigned
+      Locations"}],"excludeFromDynamicGroups":false,"excludeFromManualGroups":false,"profile":"CORPORATE","description":"Created
+      with Terraform"}]'
+    headers:
+      Cache-Control:
+      - no-store
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 17 Aug 2022 22:02:26 GMT
+      Server:
+      - Zscaler
+      Strict-Transport-Security:
+      - max-age=31622400;includeSubDomains;preload
+      Vary:
+      - accept-encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+    status: '200 '
+    code: 200
+    duration: ""

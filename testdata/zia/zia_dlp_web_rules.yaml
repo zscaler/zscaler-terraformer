@@ -1,0 +1,80 @@
+---
+version: 1
+interactions:
+- request:
+    body: '{"username":"zia@securitygeek.io","password":"passwordzia","apiKey":"apiKeyHere","timestamp":"1660773215833"}'
+    form: {}
+    headers:
+      Content-Type:
+      - application/json
+      User-Agent:
+      - zscaler-terraformer
+    url: https://zsapi.zscalerthree.net/api/v1/authenticatedSession
+    method: POST
+  response:
+    body: '{"authType":"ADMIN_LOGIN","obfuscateApiKey":true,"passwordExpiryTime":-1,"passwordExpiryDays":-1,"source":"https://zsapi.zscalerthree.net"}'
+    headers:
+      Cache-Control:
+      - no-store
+      Content-Length:
+      - "139"
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 17 Aug 2022 21:53:41 GMT
+      Server:
+      - Zscaler
+      Set-Cookie:
+      - JSESSIONID=ECEF254017359D3AD80193C1806B6251; Path=/; Secure; HttpOnly
+      Strict-Transport-Security:
+      - max-age=31622400;includeSubDomains;preload
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+    status: '200 '
+    code: 200
+    duration: ""
+- request:
+    body: ""
+    form: {}
+    headers:
+      Content-Type:
+      - application/json
+      Cookie:
+      - JSESSIONID=ECEF254017359D3AD80193C1806B6251
+      User-Agent:
+      - zscaler-terraformer
+    url: https://zsapi.zscalerthree.net/api/v1/webDlpRules
+    method: GET
+  response:
+    body: '[{"accessControl":"READ_WRITE","id":184221,"order":3,"protocols":["HTTPS_RULE","HTTP_RULE"],"rank":7,"description":"Test","locations":[{"id":43966027,"name":"AU
+      - Sydney - Branch01 (other)"},{"id":36788696,"name":"AWS-CAN-ca-central-1-vpc-05c7f364cf47c2b93","deleted":true}],"locationGroups":[{"id":24326828,"name":"Corporate
+      User Traffic Group"}],"groups":[{"id":24392492,"name":"Marketing"},{"id":26231231,"name":"Normal_Internet"},{"id":25684251,"name":"Sales"}],"departments":[{"id":25684245,"name":"Engineering"},{"id":29485508,"name":"Executive"},{"id":25658545,"name":"Finance"}],"users":[{"id":29309057,"name":"Adam
+      Ashcroft(adam.ashcroft@securitygeek.io)"},{"id":29306493,"name":"Ajith Almond(ajith.almond@securitygeek.io)"},{"id":29309058,"name":"Albert
+      Amin(albert.amin@securitygeek.io)"}],"urlCategories":[{"id":10,"name":"CORPORATE_MARKETING","isNameL10nTag":true},{"id":11,"name":"FINANCE","isNameL10nTag":true}],"dlpEngines":[{"id":61,"name":"PCI","isNameL10nTag":true}],"fileTypes":["PYTHON","BASH_SCRIPTS","SQL"],"cloudApplications":["BOXNET","AMAZONDRIVE","BITPORT_IO"],"minSize":0,"action":"ALLOW","state":"DISABLED","matchOnly":false,"icapServer":{},"withoutContentInspection":false,"name":"DLP
+      PCI Rule-1","ocrEnabled":false,"zscalerIncidentReciever":true}]'
+    headers:
+      Cache-Control:
+      - no-store
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 17 Aug 2022 21:53:43 GMT
+      Server:
+      - Zscaler
+      Strict-Transport-Security:
+      - max-age=31622400;includeSubDomains;preload
+      Vary:
+      - accept-encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+    status: '200 '
+    code: 200
+    duration: ""

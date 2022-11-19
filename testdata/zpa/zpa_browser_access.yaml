@@ -1,0 +1,104 @@
+---
+version: 1
+interactions:
+- request:
+    body: client_id=1222clientid&client_secret=1222clientsec
+    form: {}
+    headers:
+      Content-Type:
+      - application/x-www-form-urlencoded
+      User-Agent:
+      - zscaler-terraformer
+    url: https://config.private.zscaler.com/signin
+    method: POST
+  response:
+    body: |-
+      {
+        "token_type" : "Bearer",
+        "access_token" : "jwt",
+        "expires_in" : "3600"
+      }
+    headers:
+      Cache-Control:
+      - no-store
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 15 Aug 2022 21:34:08 GMT
+      Pragma:
+      - no-cache
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Set-Cookie:
+      - AWSALB=07u7Oz3mt4b50uDG5tcTNfDaDGPBwJtkxB06oQIfElr09RlPPD6WHC9pPd53WkhOXmgAOZx5Eu8F0HlhG/mbDC1zqbmldKIuOAKV/9yPKCv1EARyRSigxxE9tOM/;
+        Expires=Mon, 22 Aug 2022 21:34:08 GMT; Path=/
+      - AWSALBCORS=07u7Oz3mt4b50uDG5tcTNfDaDGPBwJtkxB06oQIfElr09RlPPD6WHC9pPd53WkhOXmgAOZx5Eu8F0HlhG/mbDC1zqbmldKIuOAKV/9yPKCv1EARyRSigxxE9tOM/;
+        Expires=Mon, 22 Aug 2022 21:34:08 GMT; Path=/; SameSite=None; Secure
+      Strict-Transport-Security:
+      - max-age=63072000 ; includeSubDomains ; preload
+      Vary:
+      - Origin
+      - Access-Control-Request-Method
+      - Access-Control-Request-Headers
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+      X-Xss-Protection:
+      - 1; mode=block
+    status: 200 OK
+    code: 200
+    duration: ""
+- request:
+    body: ""
+    form: {}
+    headers:
+      Content-Type:
+      - application/json
+      User-Agent:
+      - zscaler-terraformer
+    url: https://config.private.zscaler.com/mgmtconfig/v1/admin/customers/216196257331281920/application?pagesize=500
+    method: GET
+  response:
+    body: '{"totalPages":"1","list":[{"clientlessApps":[{"id":"1","name":"test","certificateId":"1","applicationProtocol":"HTTP","applicationPort":"80"}],"creationTime":"1646798682","modifiedBy":"216196257331301304","id":"216196257331301317","domainNames":["swift-35.securitygeek.io","10.10.10.100"],"name":"test name","description":"Created by Zscaler Deception. Do not edit","serverGroups":[{"id":"216196257331301306","creationTime":"1646791911","modifiedBy":"216196257331301304","name":"test name","enabled":true,"description":"Automatically created by Zscaler Deception
+      API for whiskeygolf","configSpace":"DEFAULT","dynamicDiscovery":true}],"enabled":true,"passiveHealthEnabled":true,"tcpPortRanges":["1","52","54","65535"],"udpPortRanges":["1","52","54","65535"],"tcpPortRange":[{"from":"1","to":"52"},{"from":"54","to":"65535"}],"udpPortRange":[{"from":"1","to":"52"},{"from":"54","to":"65535"}],"doubleEncrypt":false,"configSpace":"DEFAULT","bypassType":"NEVER","healthCheckType":"NONE","icmpAccessType":"NONE","isCnameEnabled":true,"ipAnchored":false,"healthReporting":"NONE","tcpKeepAlive":"0","segmentGroupId":"216196257331301307","segmentGroupName":"Zscaler
+      Deception"}]}'
+    headers:
+      Cache-Control:
+      - no-store
+      Content-Security-Policy:
+      - default-src 'none'; upgrade-insecure-requests
+      Content-Type:
+      - application/json;charset=utf-8
+      Date:
+      - Mon, 15 Aug 2022 21:34:08 GMT
+      Expires:
+      - Thu, 01 Jan 1970 00:00:00 GMT
+      Pragma:
+      - no-cache
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Set-Cookie:
+      - AWSALB=GJZqPIfQVbnN1uSUPkfC0fjpUm9O0xOVu0RgAfQn40z0UWgnJdvrBXqquhFYYYfGOkAmZuPX3qkKTE9oRL/D2WM/w/fZfn1MWY/YXMCwMe2+lAjwVt238X+qxu7g;
+        Expires=Mon, 22 Aug 2022 21:34:08 GMT; Path=/
+      - AWSALBCORS=GJZqPIfQVbnN1uSUPkfC0fjpUm9O0xOVu0RgAfQn40z0UWgnJdvrBXqquhFYYYfGOkAmZuPX3qkKTE9oRL/D2WM/w/fZfn1MWY/YXMCwMe2+lAjwVt238X+qxu7g;
+        Expires=Mon, 22 Aug 2022 21:34:08 GMT; Path=/; SameSite=None; Secure
+      - AWSALB=t7UFNWBK/0BdfWAY7PDGHIB1vqIe+FwmL7YmEBusnEnxVd0gF+3tIUkLff0ey/oKHLAillBwzsZZPhzqkSGCXMKEc10Igy3knAdx79cVMxzC4KSb23jrUskp4N/v;
+        Expires=Mon, 22 Aug 2022 21:34:08 GMT; Path=/, AWSALBCORS=t7UFNWBK/0BdfWAY7PDGHIB1vqIe+FwmL7YmEBusnEnxVd0gF+3tIUkLff0ey/oKHLAillBwzsZZPhzqkSGCXMKEc10Igy3knAdx79cVMxzC4KSb23jrUskp4N/v;
+        Expires=Mon, 22 Aug 2022 21:34:08 GMT; Path=/; SameSite=None; Secure, JSESSIONIDCORS=node01gu10nr6cva1l1wr7r2b635ewu2449036.node0;
+        Path=/; Secure; HttpOnly; SameSite=Lax
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      Vary:
+      - Origin
+      - Access-Control-Request-Method
+      - Access-Control-Request-Headers
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+      X-Xss-Protection:
+      - "0"
+    status: 200 OK
+    code: 200
+    duration: ""

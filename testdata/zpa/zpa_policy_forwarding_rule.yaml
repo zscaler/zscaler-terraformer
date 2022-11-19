@@ -1,0 +1,103 @@
+---
+version: 1
+interactions:
+- request:
+    body: client_id=1222clientid&client_secret=1222clientsec
+    form: {}
+    headers:
+      Content-Type:
+      - application/x-www-form-urlencoded
+      User-Agent:
+      - zscaler-terraformer
+    url: https://config.private.zscaler.com/signin
+    method: POST
+  response:
+    body: |-
+      {
+        "token_type" : "Bearer",
+        "access_token" : "jwt",
+        "expires_in" : "3600"
+      }
+    headers:
+      Cache-Control:
+      - no-store
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 16 Aug 2022 17:51:05 GMT
+      Pragma:
+      - no-cache
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Set-Cookie:
+      - AWSALB=CEjKgIG3bM7Kj8gmE9xcuTMaf1DlHWBchM+6ICcbNYl+NXJtIItPP1arEDtNFLr8suuydx6NwhPnqC62EApIrYJ8dCvVEoXamj61SUZuK0PoMJhA1SzGyO6/57gH;
+        Expires=Tue, 23 Aug 2022 17:51:05 GMT; Path=/
+      - AWSALBCORS=CEjKgIG3bM7Kj8gmE9xcuTMaf1DlHWBchM+6ICcbNYl+NXJtIItPP1arEDtNFLr8suuydx6NwhPnqC62EApIrYJ8dCvVEoXamj61SUZuK0PoMJhA1SzGyO6/57gH;
+        Expires=Tue, 23 Aug 2022 17:51:05 GMT; Path=/; SameSite=None; Secure
+      Strict-Transport-Security:
+      - max-age=63072000 ; includeSubDomains ; preload
+      Vary:
+      - Origin
+      - Access-Control-Request-Method
+      - Access-Control-Request-Headers
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+      X-Xss-Protection:
+      - 1; mode=block
+    status: 200 OK
+    code: 200
+    duration: ""
+- request:
+    body: ""
+    form: {}
+    headers:
+      Content-Type:
+      - application/json
+      User-Agent:
+      - zscaler-terraformer
+    url: https://config.private.zscaler.com/mgmtconfig/v1/admin/customers/216196257331281920/policySet/rules/policyType/CLIENT_FORWARDING_POLICY?pagesize=500
+    method: GET
+  response:
+    body: '{"totalPages":"1","list":[{"id":"216196257331281930","modifiedTime":"1659635023","creationTime":"1619672239","modifiedBy":"216196257331282070","name":"Default_Rule2","description":"This
+      is the default Client Forwarding Policy rule","ruleOrder":"1","priority":"1","policyType":"4","operator":"AND","action":"INTERCEPT","defaultRuleName":"Default_Rule2","defaultRule":false}]}'
+    headers:
+      Cache-Control:
+      - no-store
+      Content-Security-Policy:
+      - default-src 'none'; upgrade-insecure-requests
+      Content-Type:
+      - application/json;charset=utf-8
+      Date:
+      - Tue, 16 Aug 2022 17:51:06 GMT
+      Expires:
+      - Thu, 01 Jan 1970 00:00:00 GMT
+      Pragma:
+      - no-cache
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Set-Cookie:
+      - AWSALB=lJHJGCES+wRYsTmwBrpKiLNWL/boZ16ur6FcpeZIhrdLvyjkDCFV0BZ7PzXyWzGCKMtsXXNA6PphZbuKTJFqa6N0TUBqdZSbEWh+SrjaAZkuxPEHFLJC6J7zWUUh;
+        Expires=Tue, 23 Aug 2022 17:51:05 GMT; Path=/
+      - AWSALBCORS=lJHJGCES+wRYsTmwBrpKiLNWL/boZ16ur6FcpeZIhrdLvyjkDCFV0BZ7PzXyWzGCKMtsXXNA6PphZbuKTJFqa6N0TUBqdZSbEWh+SrjaAZkuxPEHFLJC6J7zWUUh;
+        Expires=Tue, 23 Aug 2022 17:51:05 GMT; Path=/; SameSite=None; Secure
+      - AWSALB=RCwyUl6Yed4EJvIE00OqkDN0pe0rYx73L5OQu/2t7CqSWcc9jwt/qC1ytNb1Y4v/Yp6TrfZFA2rxAJX32WY+NAhPr1ZVBadvEYx+Uu/H4mrnlyvHsp6iuHay5kFy;
+        Expires=Tue, 23 Aug 2022 17:51:06 GMT; Path=/, AWSALBCORS=RCwyUl6Yed4EJvIE00OqkDN0pe0rYx73L5OQu/2t7CqSWcc9jwt/qC1ytNb1Y4v/Yp6TrfZFA2rxAJX32WY+NAhPr1ZVBadvEYx+Uu/H4mrnlyvHsp6iuHay5kFy;
+        Expires=Tue, 23 Aug 2022 17:51:06 GMT; Path=/; SameSite=None; Secure, JSESSIONIDCORS=node01qssdl2d6votd6uf2ipogjzcc136505.node0;
+        Path=/; Secure; HttpOnly; SameSite=Lax
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      Vary:
+      - Origin
+      - Access-Control-Request-Method
+      - Access-Control-Request-Headers
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+      X-Xss-Protection:
+      - "0"
+    status: 200 OK
+    code: 200
+    duration: ""

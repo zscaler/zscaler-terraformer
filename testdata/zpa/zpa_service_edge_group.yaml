@@ -1,0 +1,102 @@
+---
+version: 1
+interactions:
+- request:
+    body: client_id=1222clientid&client_secret=1222clientsec
+    form: {}
+    headers:
+      Content-Type:
+      - application/x-www-form-urlencoded
+      User-Agent:
+      - zscaler-terraformer
+    url: https://config.private.zscaler.com/signin
+    method: POST
+  response:
+    body: |-
+      {
+        "token_type" : "Bearer",
+        "access_token" : "jwt",
+        "expires_in" : "3600"
+      }
+    headers:
+      Cache-Control:
+      - no-store
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 16 Aug 2022 17:51:30 GMT
+      Pragma:
+      - no-cache
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Set-Cookie:
+      - AWSALB=KS21OiJX4+zayDRi0aHf5xMWIaHxmA0K8OE51YPI1bMyMhnVhOKiPBOYaDSTqWXAnOZ8M3eI3h4rOU+I7m7wtzqSf4aOrhqo733RR7sKEDPYY3o8bVmFw6vix4Ue;
+        Expires=Tue, 23 Aug 2022 17:51:29 GMT; Path=/
+      - AWSALBCORS=KS21OiJX4+zayDRi0aHf5xMWIaHxmA0K8OE51YPI1bMyMhnVhOKiPBOYaDSTqWXAnOZ8M3eI3h4rOU+I7m7wtzqSf4aOrhqo733RR7sKEDPYY3o8bVmFw6vix4Ue;
+        Expires=Tue, 23 Aug 2022 17:51:29 GMT; Path=/; SameSite=None; Secure
+      Strict-Transport-Security:
+      - max-age=63072000 ; includeSubDomains ; preload
+      Vary:
+      - Origin
+      - Access-Control-Request-Method
+      - Access-Control-Request-Headers
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+      X-Xss-Protection:
+      - 1; mode=block
+    status: 200 OK
+    code: 200
+    duration: ""
+- request:
+    body: ""
+    form: {}
+    headers:
+      Content-Type:
+      - application/json
+      User-Agent:
+      - zscaler-terraformer
+    url: https://config.private.zscaler.com/mgmtconfig/v1/admin/customers/216196257331281920/serviceEdgeGroup?pagesize=500
+    method: GET
+  response:
+    body: '{"totalPages":"0", "list":[{"name": "Service Edge Group New York","description": "Service Edge Group New York","upgradeDay": "SUNDAY","upgradeTimeInSecs": "66600","latitude": "40.7128","longitude": "-73.935242","location": "New York, NY, USA","versionProfileId": "0"}]}'
+    headers:
+      Cache-Control:
+      - no-store
+      Content-Security-Policy:
+      - default-src 'none'; upgrade-insecure-requests
+      Content-Type:
+      - application/json;charset=utf-8
+      Date:
+      - Tue, 16 Aug 2022 17:51:30 GMT
+      Expires:
+      - Thu, 01 Jan 1970 00:00:00 GMT
+      Pragma:
+      - no-cache
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+      Set-Cookie:
+      - AWSALB=gFYf3Yxll8TdrtRGhClN5RCqXN1Vcd5SNX4+DCzbRvsfr+bxZN5RmejvIBbH05jiTggaSku0FBogzEVyXgVRWKgO9mFp8fPHsv7G4TdlLx/T/4x6PwMDptBOgifz;
+        Expires=Tue, 23 Aug 2022 17:51:30 GMT; Path=/
+      - AWSALBCORS=gFYf3Yxll8TdrtRGhClN5RCqXN1Vcd5SNX4+DCzbRvsfr+bxZN5RmejvIBbH05jiTggaSku0FBogzEVyXgVRWKgO9mFp8fPHsv7G4TdlLx/T/4x6PwMDptBOgifz;
+        Expires=Tue, 23 Aug 2022 17:51:30 GMT; Path=/; SameSite=None; Secure
+      - AWSALB=gbQNylNxPMfkRgYA96Ze9yIO0TNTehjujlwsgwP1ra+ptsUT0Do1GstWfuKy/NeSA8GeQk8GWGfv8M3XFmrrdWEebLEnZyEN5+8ZfU2Az6WSGa+vUnEb+gAj6++m;
+        Expires=Tue, 23 Aug 2022 17:51:30 GMT; Path=/, AWSALBCORS=gbQNylNxPMfkRgYA96Ze9yIO0TNTehjujlwsgwP1ra+ptsUT0Do1GstWfuKy/NeSA8GeQk8GWGfv8M3XFmrrdWEebLEnZyEN5+8ZfU2Az6WSGa+vUnEb+gAj6++m;
+        Expires=Tue, 23 Aug 2022 17:51:30 GMT; Path=/; SameSite=None; Secure, JSESSIONIDCORS=node01v702l7sa5uf81t29j6stk79us136553.node0;
+        Path=/; Secure; HttpOnly; SameSite=Lax
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      Vary:
+      - Origin
+      - Access-Control-Request-Method
+      - Access-Control-Request-Headers
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+      X-Xss-Protection:
+      - "0"
+    status: 200 OK
+    code: 200
+    duration: ""

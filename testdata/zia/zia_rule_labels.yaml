@@ -1,0 +1,75 @@
+---
+version: 1
+interactions:
+- request:
+    body: '{"username":"zia@securitygeek.io","password":"passwordzia","apiKey":"apiKeyHere","timestamp":"1660773745871"}'
+    form: {}
+    headers:
+      Content-Type:
+      - application/json
+      User-Agent:
+      - zscaler-terraformer
+    url: https://zsapi.zscalerthree.net/api/v1/authenticatedSession
+    method: POST
+  response:
+    body: '{"authType":"ADMIN_LOGIN","obfuscateApiKey":true,"passwordExpiryTime":-1,"passwordExpiryDays":-1,"source":"https://zsapi.zscalerthree.net"}'
+    headers:
+      Cache-Control:
+      - no-store
+      Content-Length:
+      - "139"
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 17 Aug 2022 22:02:30 GMT
+      Server:
+      - Zscaler
+      Set-Cookie:
+      - JSESSIONID=3B5BB839294E1134BAF064160165E19D; Path=/; Secure; HttpOnly
+      Strict-Transport-Security:
+      - max-age=31622400;includeSubDomains;preload
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+    status: '200 '
+    code: 200
+    duration: ""
+- request:
+    body: ""
+    form: {}
+    headers:
+      Content-Type:
+      - application/json
+      Cookie:
+      - JSESSIONID=3B5BB839294E1134BAF064160165E19D
+      User-Agent:
+      - zscaler-terraformer
+    url: https://zsapi.zscalerthree.net/api/v1/ruleLabels
+    method: GET
+  response:
+    body: '[{"id":87085,"name":"Example","description":"Example","lastModifiedTime":1643823134,"lastModifiedBy":{"id":24328827,"name":"wguilherme@securitygeek.io"},"createdBy":{"id":24328827,"name":"wguilherme@securitygeek.io"},"referencedRuleCount":1}]'
+    headers:
+      Cache-Control:
+      - no-store
+      Content-Length:
+      - "484"
+      Content-Type:
+      - application/json
+      Date:
+      - Wed, 17 Aug 2022 22:02:30 GMT
+      Server:
+      - Zscaler
+      Strict-Transport-Security:
+      - max-age=31622400;includeSubDomains;preload
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+    status: '200 '
+    code: 200
+    duration: ""
