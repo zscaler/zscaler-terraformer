@@ -342,6 +342,7 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 			rulesFiltered = append(rulesFiltered, rule)
 		}
 		m, _ := json.Marshal(rulesFiltered)
+		resourceCount = len(rulesFiltered)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_firewall_filtering_destination_groups":
 		jsonPayload, err := api.zia.ipdestinationgroups.GetAll()
@@ -372,6 +373,7 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 			servicesFiltered = append(servicesFiltered, service)
 		}
 		m, _ := json.Marshal(servicesFiltered)
+		resourceCount = len(servicesFiltered)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_firewall_filtering_network_service_groups":
 		jsonPayload, err := api.zia.networkservices.GetAllNetworkServiceGroups()
