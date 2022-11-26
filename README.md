@@ -139,7 +139,7 @@ $ zscaler-terraformer generate \
 
 To get started with the zscaler-terraformer CLI to export your ZIA configuration, create a directory where you want the configuration to stored.
 
-[![asciicast](https://asciinema.org/a/537966.svg)](https://asciinema.org/a/537966)
+[![asciicast](https://github.com/zscaler/zscaler-terraformer/blob/master/assets/zscaler-terraformer-zia-demo.png)](https://github.com/zscaler/zscaler-terraformer/blob/master/assets/zscaler-terraformer-zia-demo.mp4)
 
 **Option 1**
 
