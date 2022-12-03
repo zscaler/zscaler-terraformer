@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/dlpdictionaries"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/firewallpolicies/filteringrules"
+	"github.com/zscaler/zscaler-sdk-go/zia/services/firewallpolicies/networkapplications"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/firewallpolicies/networkservices"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/security_policy_settings"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/urlcategories"
@@ -384,12 +385,19 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_firewall_filtering_network_application_groups":
-		jsonPayload, err := api.zia.networkapplications.GetAllNetworkApplicationGroups()
+		groups, err := api.zia.networkapplications.GetAllNetworkApplicationGroups()
 		if err != nil {
 			log.Fatal(err)
 		}
-		m, _ := json.Marshal(jsonPayload)
-		resourceCount = len(jsonPayload)
+		groupsFiltered := []networkapplications.NetworkApplicationGroups{}
+		for _, rule := range groups {
+			if isInList(rule.Name, []string{"Microsoft Office365"}) {
+				continue
+			}
+			groupsFiltered = append(groupsFiltered, rule)
+		}
+		m, _ := json.Marshal(groupsFiltered)
+		resourceCount = len(groupsFiltered)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_traffic_forwarding_gre_tunnel":
 		jsonPayload, err := api.zia.gretunnels.GetAll()

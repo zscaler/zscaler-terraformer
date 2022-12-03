@@ -61,7 +61,7 @@ func init() {
 	_ = viper.BindPFlag("zpaCustomerID", rootCmd.PersistentFlags().Lookup("zpaCustomerID"))
 	_ = viper.BindEnv("zpaCustomerID", "ZPA_CUSTOMER_ID")
 
-	rootCmd.PersistentFlags().StringVarP(&zpaCloud, "zpaCloud", "", "", "ZPA Cloud (BETA or PRODUCTION)")
+	rootCmd.PersistentFlags().StringVarP(&zpaCloud, "zpaCloud", "", "", "ZPA Cloud (BETA, GOV, PREVIEW or PRODUCTION)")
 	_ = viper.BindPFlag("zpaCloud", rootCmd.PersistentFlags().Lookup("zpaCloud"))
 	_ = viper.BindEnv("zpaCloud", "ZPA_CLOUD")
 
