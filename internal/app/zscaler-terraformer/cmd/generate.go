@@ -531,15 +531,6 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
-	// case "zia_firewall_filtering_network_application_groups":
-	// 	jsonPayload, err := api.zia.networkapplications.GetAllNetworkApplicationGroups()
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
-	// 	resourceCount = len(jsonPayload)
-	// 	m, _ := json.Marshal(jsonPayload)
-	// 	_ = json.Unmarshal(m, &jsonStructData)
-
 	case "zia_firewall_filtering_network_application_groups":
 		groups, err := api.zia.networkapplications.GetAllNetworkApplicationGroups()
 		if err != nil {
