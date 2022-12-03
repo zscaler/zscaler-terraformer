@@ -22,6 +22,7 @@ import (
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/dlpdictionaries"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/firewallpolicies/filteringrules"
+	"github.com/zscaler/zscaler-sdk-go/zia/services/firewallpolicies/networkapplications"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/firewallpolicies/networkservices"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/security_policy_settings"
 	"github.com/zscaler/zscaler-sdk-go/zia/services/urlcategories"
@@ -530,13 +531,29 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
+	// case "zia_firewall_filtering_network_application_groups":
+	// 	jsonPayload, err := api.zia.networkapplications.GetAllNetworkApplicationGroups()
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// 	resourceCount = len(jsonPayload)
+	// 	m, _ := json.Marshal(jsonPayload)
+	// 	_ = json.Unmarshal(m, &jsonStructData)
+
 	case "zia_firewall_filtering_network_application_groups":
-		jsonPayload, err := api.zia.networkapplications.GetAllNetworkApplicationGroups()
+		groups, err := api.zia.networkapplications.GetAllNetworkApplicationGroups()
 		if err != nil {
 			log.Fatal(err)
 		}
-		resourceCount = len(jsonPayload)
-		m, _ := json.Marshal(jsonPayload)
+		groupsFiltered := []networkapplications.NetworkApplicationGroups{}
+		for _, group := range groups {
+			if isInList(group.Name, []string{"Microsoft Office365"}) {
+				continue
+			}
+			groupsFiltered = append(groupsFiltered, group)
+		}
+		resourceCount = len(groupsFiltered)
+		m, _ := json.Marshal(groupsFiltered)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_traffic_forwarding_gre_tunnel":
 		jsonPayload, err := api.zia.gretunnels.GetAll()
