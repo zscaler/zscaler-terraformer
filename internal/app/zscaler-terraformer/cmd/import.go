@@ -446,6 +446,13 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 				items = append(items, i)
 			}
 		}
+		for i := range items {
+			details, err := api.zia.urlcategories.Get(items[i].ID)
+			if err != nil {
+				continue
+			}
+			items[i] = *details
+		}
 		m, _ := json.Marshal(items)
 		resourceCount = len(items)
 		_ = json.Unmarshal(m, &jsonStructData)
