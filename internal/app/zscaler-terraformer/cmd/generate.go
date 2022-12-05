@@ -37,6 +37,7 @@ import (
 
 var resourceType_ string
 var resources string
+var excludedResources string
 
 var allGeneratableResources = []string{
 	"zpa_app_connector_group",
@@ -105,7 +106,19 @@ func generateResources() func(cmd *cobra.Command, args []string) {
 				resourceTypes = strings.Split(resources, ",")
 			}
 			for _, rt := range resourceTypes {
-				generate(cmd, cmd.OutOrStdout(), strings.Trim(rt, " "))
+				excluded := false
+				resourceTyp := strings.Trim(rt, " ")
+				excludedResourcesTypes := strings.Split(excludedResources, ",")
+				for _, execludedRType := range excludedResourcesTypes {
+					if execludedRType == resourceTyp {
+						excluded = true
+						break
+					}
+				}
+				if excluded {
+					continue
+				}
+				generate(cmd, cmd.OutOrStdout(), resourceTyp)
 			}
 			return
 		}
@@ -592,13 +605,6 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 				len(i.Urls) > 0 {
 				items = append(items, i)
 			}
-		}
-		for i := range items {
-			details, err := api.zia.urlcategories.Get(items[i].ID)
-			if err != nil {
-				continue
-			}
-			items[i] = *details
 		}
 		resourceCount = len(items)
 		m, _ := json.Marshal(items)
