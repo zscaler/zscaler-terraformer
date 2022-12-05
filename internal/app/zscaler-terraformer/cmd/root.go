@@ -13,6 +13,8 @@ var zpaCloud, zpaClientID, zpaClientSecret, zpaCustomerID string
 var ziaCloud, ziaUsername, ziaPassword, ziaApiKey string
 
 var verbose bool
+var displayReleaseVersion bool
+
 var api *Client
 var terraformImportCmdPrefix = "terraform import"
 
@@ -82,6 +84,8 @@ func init() {
 	_ = viper.BindEnv("ziaCloud", "ZIA_CLOUD")
 	// Debug logging mode
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Specify verbose output (same as setting log level to debug)")
+
+	rootCmd.PersistentFlags().BoolVarP(&displayReleaseVersion, "version", "", false, "Display the release version")
 
 	rootCmd.PersistentFlags().StringVar(&resourceType_, "resource-type", "", "Which resource you wish to generate")
 
