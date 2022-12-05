@@ -593,6 +593,13 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 				items = append(items, i)
 			}
 		}
+		for i := range items {
+			details, err := api.zia.urlcategories.Get(items[i].ID)
+			if err != nil {
+				continue
+			}
+			items[i] = *details
+		}
 		resourceCount = len(items)
 		m, _ := json.Marshal(items)
 		_ = json.Unmarshal(m, &jsonStructData)
