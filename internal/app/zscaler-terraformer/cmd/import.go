@@ -94,7 +94,19 @@ func runImport() func(cmd *cobra.Command, args []string) {
 				resourceTypes = strings.Split(resources, ",")
 			}
 			for _, rt := range resourceTypes {
-				importResource(cmd, cmd.OutOrStdout(), strings.Trim(rt, " "))
+				excluded := false
+				resourceTyp := strings.Trim(rt, " ")
+				excludedResourcesTypes := strings.Split(excludedResources, ",")
+				for _, execludedRType := range excludedResourcesTypes {
+					if execludedRType == resourceTyp {
+						excluded = true
+						break
+					}
+				}
+				if excluded {
+					continue
+				}
+				importResource(cmd, cmd.OutOrStdout(), resourceTyp)
 			}
 			return
 		}
@@ -445,13 +457,6 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 				len(i.Urls) > 0 {
 				items = append(items, i)
 			}
-		}
-		for i := range items {
-			details, err := api.zia.urlcategories.Get(items[i].ID)
-			if err != nil {
-				continue
-			}
-			items[i] = *details
 		}
 		m, _ := json.Marshal(items)
 		resourceCount = len(items)
