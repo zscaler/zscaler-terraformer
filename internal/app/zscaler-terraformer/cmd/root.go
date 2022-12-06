@@ -13,14 +13,16 @@ var zpaCloud, zpaClientID, zpaClientSecret, zpaCustomerID string
 var ziaCloud, ziaUsername, ziaPassword, ziaApiKey string
 
 var verbose bool
+var displayReleaseVersion bool
+
 var api *Client
 var terraformImportCmdPrefix = "terraform import"
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "zscaler-terraforming",
+	Use:   "zscaler-terraformer",
 	Short: "Bootstrapping Terraform from existing ZPA/ZIA account",
-	Long: `zscaler-terraforming is an application that allows ZPA/ZIA users
+	Long: `zscaler-terraformer is an application that allows ZPA/ZIA users
 to be able to adopt Terraform by giving them a feasible way to get
 all of their existing ZPA/ZIA configuration into Terraform.`,
 }
@@ -46,7 +48,7 @@ func init() {
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
-	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", home+"/.zscaler-terraforming.yaml", "Path to config file")
+	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", home+"/.zscaler-terraformer.yaml", "Path to config file")
 
 	// API credentials
 	rootCmd.PersistentFlags().StringVarP(&zpaClientID, "zpaClientID", "", "", "ZPA client ID")
@@ -83,6 +85,8 @@ func init() {
 	// Debug logging mode
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Specify verbose output (same as setting log level to debug)")
 
+	rootCmd.PersistentFlags().BoolVarP(&displayReleaseVersion, "version", "", false, "Display the release version")
+
 	rootCmd.PersistentFlags().StringVar(&resourceType_, "resource-type", "", "Which resource you wish to generate")
 
 	rootCmd.PersistentFlags().StringVar(&resources, "resources", "", "Which resources you wish to import")
@@ -113,9 +117,9 @@ func initConfig() {
 			return
 		}
 
-		// Search config in home directory with name ".zscaler-terraforming" (without extension).
+		// Search config in home directory with name ".zscaler-terraformer" (without extension).
 		viper.AddConfigPath(home)
-		viper.SetConfigName(".zscaler-terraforming")
+		viper.SetConfigName(".zscaler-terraformer")
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match

@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var versionString = "pre-release"
+var versionString = "dev"
 
 func init() {
 	rootCmd.AddCommand(versionCmd)
@@ -18,7 +18,7 @@ var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Print the version number of zscaler-terraformer",
 	Run: func(cmd *cobra.Command, args []string) {
-		if versionString == "pre-release" {
+		if versionString == "dev" {
 			gitDescribe := exec.Command("git", "describe", "--tags", "--abbrev=0")
 			gitDescribeStdout, err := gitDescribe.Output()
 			if err != nil {

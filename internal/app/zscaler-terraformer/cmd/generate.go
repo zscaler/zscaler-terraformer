@@ -246,6 +246,18 @@ func initTf(resourceType string) (tf *tfexec.Terraform, r *tfjson.Schema, workin
 		}
 	}
 	r = s.ResourceSchemas[resourceType]
+	if displayReleaseVersion {
+		tfVrsion, providerVersions, err := tf.Version(context.Background(), false)
+		if err == nil {
+			if tfVrsion != nil {
+				log.Infof("Terrafrom Version: %s", tfVrsion.String())
+			}
+			for provider, version := range providerVersions {
+				log.Infof("Provider %s:%s", provider, version.String())
+			}
+
+		}
+	}
 	return
 }
 
@@ -605,6 +617,13 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 				len(i.Urls) > 0 {
 				items = append(items, i)
 			}
+		}
+		for i := range items {
+			details, err := api.zia.urlcategories.Get(items[i].ID)
+			if err != nil {
+				continue
+			}
+			items[i] = *details
 		}
 		resourceCount = len(items)
 		m, _ := json.Marshal(items)
