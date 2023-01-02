@@ -16,7 +16,7 @@ require (
 	github.com/spf13/viper v1.14.0
 	github.com/stretchr/testify v1.8.1
 	github.com/zclconf/go-cty v1.12.1
-	github.com/zscaler/zscaler-sdk-go v0.5.2
+	github.com/zscaler/zscaler-sdk-go v0.5.5
 )
 
 require (
