@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.2.0 (January 31, 2023)
+
+### Notes
+
+- Release date: **(January 31, 2023)**
+- Supported Terraform version: **v1.x.x**
+
+### Bug Fixes
+
+- [PR #60](https://github.com/zscaler/zscaler-terraformer/pull/60) Fixed ``zia_traffic_forwarding_static_ip`` attributes ``latitude`` and ``longitude`` to return float instead of a rounded value
+
+### Enhancements
+
+- [PR #61](https://github.com/zscaler/zscaler-terraformer/pull/61) The tool now will format the internal resource name according to the name of the resource upstream without appending the resource ID.
+
 ## 0.1.0 (December 5, 2022)
 
 ### Notes
