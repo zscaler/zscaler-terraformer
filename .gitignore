@@ -69,3 +69,4 @@ terraform.tfvars.json
 .idea/
 vendor/
 local_test
+zscaler-terraformer
