@@ -679,7 +679,7 @@ func writeAttrLine(key string, value interface{}, usedInBlock bool) string {
 	case int:
 		return fmt.Sprintf("%s = %d\n", key, value)
 	case float64:
-		return fmt.Sprintf("%s = %0.f\n", key, value)
+		return fmt.Sprintf("%s = %v\n", key, value)
 	case bool:
 		return fmt.Sprintf("%s = %t\n", key, value)
 	default:
