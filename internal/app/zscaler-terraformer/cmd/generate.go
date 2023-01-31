@@ -140,7 +140,7 @@ func buildResourceName(resourceType string, structData map[string]interface{}) s
 	if structData["name"] != nil {
 		name := structData["name"].(string)
 		if name != "" {
-			id = strings.ReplaceAll(strings.ToLower(strip(name)), " ", "_") + "_" + id
+			id = strings.ReplaceAll(strings.ToLower(strip(name)), " ", "_")
 		}
 	}
 	resID := fmt.Sprintf("resource_%s", id)
