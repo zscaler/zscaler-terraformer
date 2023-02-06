@@ -1,5 +1,4 @@
 resource "zia_dlp_web_rules" "terraform_managed_resource" {
-  access_control            = "READ_WRITE"
   action                    = "ALLOW"
   cloud_applications        = ["BOXNET", "AMAZONDRIVE", "BITPORT_IO"]
   description               = "Test"
