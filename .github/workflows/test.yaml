@@ -5,13 +5,15 @@ on:
     branches: [ master ]
     paths-ignore:
       - 'README.md'
-      - 'docs/**'
+      - 'CHANGELOG.md'
+      - 'LICENSE'
 
   pull_request:
     branches: [ master ]
     paths-ignore:
       - 'README.md'
-      - 'docs/**'
+      - 'CHANGELOG.md'
+      - 'LICENSE'
 
   schedule:
     - cron: '0 13 * * *'
