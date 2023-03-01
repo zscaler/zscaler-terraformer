@@ -713,6 +713,10 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 				continue
 			}
 
+			if r.Block.Attributes[attrName].Computed && !r.Block.Attributes[attrName].Optional && attrName != "tunnel_id" {
+				continue
+			}
+
 			ty := r.Block.Attributes[attrName].AttributeType
 			switch {
 			case ty.IsPrimitiveType():
