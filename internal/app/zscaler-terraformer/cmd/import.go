@@ -56,6 +56,7 @@ var resourceImportStringFormats = map[string]string{
 	"zia_firewall_filtering_network_application_groups": ":id",
 	"zia_traffic_forwarding_static_ip":                  ":id",
 	"zia_traffic_forwarding_vpn_credentials":            ":id",
+	"zia_traffic_forwarding_gre_tunnel":                 ":id",
 	"zia_location_management":                           ":id",
 	"zia_url_categories":                                ":id",
 	"zia_url_filtering_rules":                           ":id",

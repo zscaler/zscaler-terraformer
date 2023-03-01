@@ -2,14 +2,14 @@
 version: 1
 interactions:
 - request:
-    body: '{"username":"zia@securitygeek.io","password":"passwordzia","apiKey":"apiKeyHere","timestamp":"1660772262460"}'
+    body: '{"username":"zia-api@bd-hashicorp.com","password":"passwordzia","apiKey":"apiKeyHere","timestamp":"1660772262460"}'
     form: {}
     headers:
       Content-Type:
       - application/json
       User-Agent:
       - zscaler-terraformer
-    url: https://zsapi.zscalerthree.net/api/v1/authenticatedSession
+    url: https://zsapi.zscalertwo.net/api/v1/authenticatedSession
     method: POST
   response:
     body: '{"authType":"ADMIN_LOGIN","obfuscateApiKey":true,"passwordExpiryTime":-1,"passwordExpiryDays":-1,"source":"https://zsapi.zscalerthree.net"}'
