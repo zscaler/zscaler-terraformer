@@ -38,11 +38,13 @@ Available Commands:
 
 Flags:
   -c, --config string                       Path to config file (default "/Users/username/.zscaler-terraformer.yaml")
+      --exclude string                      Which resources you wish to exclude
   -h, --help                                help for zscaler-terraformer
       --resource-type string                Which resource you wish to generate
       --resources string                    Which resources you wish to import
       --terraform-install-path string       Path to the default Terraform installation (default ".")
   -v, --verbose                             Specify verbose output (same as setting log level to debug)
+      --version                             Display the release version
       --zia-terraform-install-path string   Path to the ZIA Terraform installation (default ".")
       --ziaApiKey string                    ZIA API Key
       --ziaCloud string                     ZIA Cloud (i.e zscalerthree)
@@ -51,7 +53,7 @@ Flags:
       --zpa-terraform-install-path string   Path to the ZPA Terraform installation (default ".")
       --zpaClientID string                  ZPA client ID
       --zpaClientSecret string              ZPA client secret
-      --zpaCloud string                     ZPA Cloud (BETA, GOV, PREVIEW or PRODUCTION)
+      --zpaCloud string                     ZPA Cloud (BETA or PRODUCTION)
       --zpaCustomerID string                ZPA Customer ID
 
 Use "zscaler-terraformer [command] --help" for more information about a command.
