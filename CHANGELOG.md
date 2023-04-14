@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.3.0 (April xx, 2023)
+
+### Notes
+
+- Release date: **(April xx, 2023)**
+- Supported Terraform version: **v1.x.x**
+
+### Bug Fixes
+
+- [PR #96](https://github.com/zscaler/zscaler-terraformer/pull/96) Omitted import of unnecessary attributes in the following ZPA resource ``zpa_segment_group``
+- [PR #96](https://github.com/zscaler/zscaler-terraformer/pull/96) Updated to Zscaler-SDK-GO v1.4.0
+- [PR #97](https://github.com/zscaler/zscaler-terraformer/pull/97) Going forward all imported resources will contain the internal ID of either ZPA and/or ZIA in order to avoid name duplication during Terraform execution.
+
 ## 0.2.2 (March 01, 2023)
 
 ### Notes
