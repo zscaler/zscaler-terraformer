@@ -246,8 +246,8 @@ github.com/yuin/goldmark v1.1.32/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9de
 github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/zclconf/go-cty v1.13.1 h1:0a6bRwuiSHtAmqCqNOE+c2oHgepv0ctoxU4FUe43kwc=
 github.com/zclconf/go-cty v1.13.1/go.mod h1:YKQzy/7pZ7iq2jNFzy5go57xdxdWoLLpaEp4u238AE0=
-github.com/zscaler/zscaler-sdk-go v1.4.7 h1:M1RGFORSZeFmnMrcgvsW40ShleX1HzTp9KXKsXRSAZo=
-github.com/zscaler/zscaler-sdk-go v1.4.7/go.mod h1:H5+dlWRN7zfG/blwaiB1hEbzELHt8V1zkZpqHy1bbJY=
+github.com/zscaler/zscaler-sdk-go v1.5.3 h1:U53imKB2cKdfrHZ5ICx/r4IMROoYzkzs6s80f5y5yTU=
+github.com/zscaler/zscaler-sdk-go v1.5.3/go.mod h1:ge86KdkHgje3U+rHCURwPwvKgHhFi4R+v+cRJ7Q25ak=
 go.opencensus.io v0.21.0/go.mod h1:mSImk1erAIZhrmZN+AvHh14ztQfjbGwt4TtuofqLduU=
 go.opencensus.io v0.22.0/go.mod h1:+kGneAE2xo2IficOXnaByMWTGM9T73dGwxeWcUqIpI8=
 go.opencensus.io v0.22.2/go.mod h1:yxeiOL68Rb0Xd1ddK5vPZ/oVn4vY4Ynel7k9FzqtOIw=
