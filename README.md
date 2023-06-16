@@ -24,7 +24,7 @@ write the Terraform configuration to describe them.
 
 > NOTE: This tool has been developed and tested with Terraform v1.x.x only.
 
-[![Zscaler Terraformer Migration Tool](https://raw.githubusercontent.com/zscaler/zscaler-terraformer/master/images/zscaler_terraformer.svg)](https://community.zscaler.com/t/video-zscaler-terraformer-migration-tool-launch/19684)
+[![Zscaler Terraformer Migration Tool](https://raw.githubusercontent.com/zscaler/zscaler-terraformer/master/images/zscaler_terraformer.svg)](https://community.zscaler.com/zenith/s/question/0D54u00009evlDrCAI/video-zscaler-terraformer-migration-tool-launch)
 ## Usage
 
 ```bash
