@@ -7,12 +7,12 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"sort"
 	"strconv"
 	"strings"
 
 	"github.com/google/uuid"
-	"github.com/hashicorp/go-version"
 	"github.com/hashicorp/hc-install/product"
 	"github.com/hashicorp/hc-install/releases"
 	"github.com/hashicorp/terraform-exec/tfexec"
@@ -156,16 +156,22 @@ func initTf(resourceType string) (tf *tfexec.Terraform, r *tfjson.Schema, workin
 		log.Fatal(err)
 	}
 	defer os.RemoveAll(tmpDir)
-	installer := &releases.ExactVersion{
-		Product: product.Terraform,
-		Version: version.Must(version.NewVersion("1.2.6")),
-	}
-	log.Debugf("installing Terraform")
-	execPath, err := installer.Install(context.Background())
+	// Check if Terraform is already installed
+	execPath, err := exec.LookPath("terraform")
 	if err != nil {
-		log.Fatalf("error installing Terraform: %s", err)
+		// Terraform is not found, install it
+		log.Debugf("Terraform not found, installing...")
+		installer := &releases.LatestVersion{
+			Product: product.Terraform,
+		}
+		execPath, err = installer.Install(context.Background())
+		if err != nil {
+			log.Fatalf("error installing Terraform: %s", err)
+		}
+		log.Debugf("Terraform installed")
+	} else {
+		log.Debugf("Terraform already installed")
 	}
-	log.Debugf("Terraform installed")
 
 	cloudType := ""
 	if strings.HasPrefix(resourceType, "zpa_") {
