@@ -164,9 +164,9 @@ func initTf(resourceType string) (tf *tfexec.Terraform, r *tfjson.Schema, workin
 		if err != nil {
 			log.Fatalf("error installing Terraform: %s", err)
 		}
-		log.Debugf("Terraform installed")
+		log.Debugf("Terraform installed at:%s", execPath)
 	} else {
-		log.Debugf("Terraform already installed")
+		log.Debugf("Terraform already installed at:%s", execPath)
 	}
 
 	cloudType := ""
