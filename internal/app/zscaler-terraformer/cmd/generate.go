@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"sort"
@@ -151,18 +150,15 @@ func buildResourceName(resourceType string, structData map[string]interface{}) s
 }
 
 func initTf(resourceType string) (tf *tfexec.Terraform, r *tfjson.Schema, workingDir string) {
-	tmpDir, err := ioutil.TempDir("", "tfinstall")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer os.RemoveAll(tmpDir)
 	// Check if Terraform is already installed
 	execPath, err := exec.LookPath("terraform")
 	if err != nil {
 		// Terraform is not found, install it
 		log.Debugf("Terraform not found, installing...")
+		installDir := "/usr/local/bin"
 		installer := &releases.LatestVersion{
-			Product: product.Terraform,
+			Product:    product.Terraform,
+			InstallDir: installDir,
 		}
 		execPath, err = installer.Install(context.Background())
 		if err != nil {
