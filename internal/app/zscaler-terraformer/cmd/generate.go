@@ -128,12 +128,13 @@ func generateResources() func(cmd *cobra.Command, args []string) {
 
 func buildResourceName(resourceType string, structData map[string]interface{}) string {
 	id := ""
+	resourceID := ""
 	if structData["id"] != nil {
 		switch structData["id"].(type) {
 		case float64:
-			id = fmt.Sprintf("%d", int64(structData["id"].(float64)))
+			resourceID = fmt.Sprintf("%d", int64(structData["id"].(float64)))
 		default:
-			id = structData["id"].(string)
+			resourceID = structData["id"].(string)
 		}
 	}
 	id = strings.ToLower(strip(id))
@@ -143,7 +144,7 @@ func buildResourceName(resourceType string, structData map[string]interface{}) s
 			id = strings.ReplaceAll(strings.ToLower(strip(name)), " ", "_")
 		}
 	}
-	resID := fmt.Sprintf("resource_%s", id)
+	resID := fmt.Sprintf("resource_%s_%s", id, resourceID)
 	resID = strings.ReplaceAll(resID, `"`, "")
 	resID = strings.ReplaceAll(resID, `'`, "")
 	resID = strings.ReplaceAll(resID, "`", "")
