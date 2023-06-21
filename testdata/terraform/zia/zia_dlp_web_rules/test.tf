@@ -8,7 +8,6 @@ resource "zia_dlp_web_rules" "terraform_managed_resource" {
   protocols                 = ["HTTPS_RULE", "HTTP_RULE"]
   rank                      = 7
   state                     = "DISABLED"
-  zscaler_incident_reciever = true
   departments {
     id = [25684245, 29485508, 25658545]
   }
