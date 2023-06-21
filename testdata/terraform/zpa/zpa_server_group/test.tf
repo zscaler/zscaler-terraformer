@@ -1,5 +1,4 @@
 resource "zpa_server_group" "terraform_managed_resource" {
-  config_space      = "DEFAULT"
   description       = "Automatically created by Zscaler Deception API for whiskeygolf"
   dynamic_discovery = true
   enabled           = true

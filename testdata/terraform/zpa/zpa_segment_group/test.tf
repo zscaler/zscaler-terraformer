@@ -1,5 +1,4 @@
 resource "zpa_segment_group" "terraform_managed_resource" {
-  config_space           = "DEFAULT"
   description            = "Automatically created by Zscaler Deception API for whiskeygolf"
   enabled                = true
   name                   = "test name"

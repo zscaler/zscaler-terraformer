@@ -1,6 +1,5 @@
 resource "zpa_application_segment_inspection" "terraform_managed_resource" {
   bypass_type            = "NEVER"
-  config_space           = "DEFAULT"
   domain_names           = ["test.acme.com"]
   double_encrypt         = false
   enabled                = true
@@ -22,11 +21,9 @@ resource "zpa_application_segment_inspection" "terraform_managed_resource" {
   tcp_port_ranges = ["80", "80"]
   common_apps_dto {
     apps_config {
-      allow_options = false
       app_types     = ["INSPECT"]
       enabled       = false
       hidden        = false
-      id            = "11"
       portal        = false
     }
   }

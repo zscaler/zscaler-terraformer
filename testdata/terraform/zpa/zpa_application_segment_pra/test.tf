@@ -1,6 +1,5 @@
 resource "zpa_application_segment_pra" "terraform_managed_resource" {
   bypass_type            = "NEVER"
-  config_space           = "DEFAULT"
   domain_names           = ["test.acme.com"]
   double_encrypt         = false
   enabled                = true
@@ -22,9 +21,7 @@ resource "zpa_application_segment_pra" "terraform_managed_resource" {
   tcp_port_ranges = ["80", "80"]
   common_apps_dto {
     apps_config {
-      allow_options = false
       app_types     = ["SECURE_REMOTE_ACCESS"]
-      id            = "11"
     }
   }
   server_groups {
