@@ -694,7 +694,15 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		} else {
 			resourceID = buildResourceName(resourceType, structData)
 		}
-
+		resourceName := ""
+		if structData["name"] != nil {
+			resourceName = structData["name"].(string)
+		} else if structData["description"] != nil {
+			resourceName = structData["description"].(string)
+		} else {
+			resourceName = fmt.Sprintf("ID %v", structData["id"])
+		}
+		output += fmt.Sprintf("# __generated__ by Terraform from %s\n", resourceName)
 		output += fmt.Sprintf(`resource "%s" "%s" {`+"\n", resourceType, resourceID)
 		sortedBlockAttributes := make([]string, 0, len(r.Block.Attributes))
 		for k := range r.Block.Attributes {
