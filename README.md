@@ -13,9 +13,9 @@
 [![Zscaler Community](https://img.shields.io/badge/zscaler-community-blue)](https://community.zscaler.com/)
 [![Slack](https://img.shields.io/badge/Join%20Our%20Community-Slack-blue)](https://forms.gle/3iMJvVmJDvmUy36q9)
 
-Support Disclaimer
--------
-!> **Disclaimer:** This Terraform provider is community supported. Although this provider is supported by Zscaler employees, it is **NOT** supported by Zscaler support. Please open all enhancement requests and issues on [Github Issues](https://github.com/zscaler/terraform-provider-zpa/issues) for support.
+# Support Disclaimer
+
+!> **Disclaimer:** This command line tool is community supported. Although the tool is supported by Zscaler employees, it is **NOT** supported by Zscaler support. Please open all enhancement requests and issues via [Github Issues](https://github.com/zscaler/terraform-provider-zpa/issues) for support.
 
 ## Overview
 
