@@ -12,6 +12,11 @@
 [![linter](https://github.com/zscaler/zscaler-terraformer/actions/workflows/linter.yml/badge.svg)](https://github.com/zscaler/zscaler-terraformer/actions/workflows/linter.yml)
 [![Zscaler Community](https://img.shields.io/badge/zscaler-community-blue)](https://community.zscaler.com/)
 [![Slack](https://img.shields.io/badge/Join%20Our%20Community-Slack-blue)](https://forms.gle/3iMJvVmJDvmUy36q9)
+
+Support Disclaimer
+-------
+!> **Disclaimer:** This Terraform provider is community supported. Although this provider is supported by Zscaler employees, it is **NOT** supported by Zscaler support. Please open all enhancement requests and issues on [Guthub Issues](https://github.com/zscaler/terraform-provider-zpa/issues) for support.
+
 ## Overview
 
 `zscaler-terraformer` is A CLI tool that generates ``tf`` and ``tfstate`` files based on existing ZPA and/or ZIA resources.
