@@ -16,7 +16,7 @@ on:
       - 'LICENSE'
 
   schedule:
-    - cron: '0 13 * * *'
+    - cron: '0 13 * * 1-5' # UTC
 
 jobs:
   test:
