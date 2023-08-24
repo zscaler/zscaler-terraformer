@@ -77,6 +77,23 @@ var importCommand = &cobra.Command{
 	PreRun: sharedPreRun,
 }
 
+type APIError struct {
+	Params []string `json:"params"`
+	ID     string   `json:"id"`
+	Reason string   `json:"reason"`
+}
+
+// Check if the error is due to license issue
+func isLicenseError(err error) (bool, string) {
+	const licenseErrorMsg = "authz.featureflag.permission.denied"
+	if strings.Contains(err.Error(), licenseErrorMsg) {
+		apiErr := &APIError{}
+		json.Unmarshal([]byte(err.Error()), apiErr)
+		return true, apiErr.Reason
+	}
+	return false, ""
+}
+
 func runImport() func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
 		if resources != "" {
@@ -122,7 +139,13 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 	case "zpa_app_connector_group":
 		list, _, err := api.zpa.appconnectorgroup.GetAll()
 		if err != nil {
-			log.Fatal(err)
+			isLicErr, reason := isLicenseError(err)
+			// If it's a license error, log and continue, otherwise, terminate.
+			if isLicErr {
+				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+			} else {
+				log.Fatal(err)
+			}
 		}
 		jsonPayload := []appconnectorgroup.AppConnectorGroup{}
 		for _, i := range list {
