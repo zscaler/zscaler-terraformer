@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.1 (August 25, 2023)
+
+### Notes
+
+- Release date: **(August 25, 2023)**
+- Supported Terraform version: **v1.x.x**
+
+### Bug Fixes
+
+- [PR #123](https://github.com/zscaler/zscaler-terraformer/pull/123) Implemented feature flag check to `zpa_app_connector_group` to ensure import continues when error `Feature flag ui.waf disabled` error is returned.
+
 ## 0.3.0 (June 21, 2023)
 
 ### Notes
