@@ -36,7 +36,7 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/urlcategories"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/urlfilteringpolicies"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/user_authentication_settings"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/usermanagement"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/usermanagement/usermanagement"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appconnectorcontroller"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appconnectorgroup"
@@ -269,7 +269,6 @@ func createClientMock(r http.RoundTripper, resourceType, zpaClientID, zpaClientS
 				timewindow:                   timewindow.New(ziaClient),
 				urlcategories:                urlcategories.New(ziaClient),
 				urlfilteringpolicies:         urlfilteringpolicies.New(ziaClient),
-				usermanagement:               usermanagement.New(ziaClient),
 				virtualipaddresslist:         virtualipaddresslist.New(ziaClient),
 				vpncredentials:               vpncredentials.New(ziaClient),
 				gretunnels:                   gretunnels.New(ziaClient),
@@ -286,6 +285,7 @@ func createClientMock(r http.RoundTripper, resourceType, zpaClientID, zpaClientS
 				rule_labels:                  rule_labels.New(ziaClient),
 				security_policy_settings:     security_policy_settings.New(ziaClient),
 				user_authentication_settings: user_authentication_settings.New(ziaClient),
+				usermanagement:               usermanagement.New(ziaClient),
 			},
 		}
 	}

@@ -37,7 +37,7 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/urlcategories"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/urlfilteringpolicies"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/user_authentication_settings"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/usermanagement"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/usermanagement/usermanagement"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appconnectorcontroller"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appconnectorgroup"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/applicationsegment"
@@ -321,6 +321,11 @@ func nestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 
 	for _, block := range sortedNestedBlocks {
 		apiBlock := mapTfFieldNameToApi(resourceType, block)
+
+		// Skip 'applications' block for 'zpa_segment_group' resource
+		if (resourceType == "zpa_segment_group" || resourceType == "zpa_server_group") && block == "applications" {
+			continue // This skips the current iteration of the loop
+		}
 		// special cases mapping
 		if resourceType == "zia_admin_users" && block == "admin_scope" {
 			output += "admin_scope {\n"

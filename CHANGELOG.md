@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.2 (October 3, 2023)
+
+### Notes
+
+- Release date: **(October 3, 2023)**
+- Supported Terraform version: **v1.x.x**
+
+### Bug Fixes
+
+- [PR #134](https://github.com/zscaler/zscaler-terraformer/pull/134) Implement condition to exclude ``applications`` block from the ZPA resources `zpa_segment_group` and `zpa_server_group`.
+
 ## 0.3.1 (August 25, 2023)
 
 ### Notes

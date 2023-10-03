@@ -38,7 +38,7 @@ Usage:
 
 Available Commands:
   completion  Generate the autocompletion script for the specified shell
-  generate    Fetch resources from the Cloudflare API and generate the respective Terraform stanzas
+  generate    Fetch resources from the ZPA and ZIA API and generate the respective Terraform stanzas
   help        Help about any command
   import      Output `terraform import` compatible commands in order to import resources into state
   version     Print the version number of zscaler-terraformer
