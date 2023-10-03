@@ -1,6 +1,6 @@
 module github.com/zscaler/zscaler-terraformer
 
-go 1.19
+go 1.20
 
 require (
 	github.com/dnaeon/go-vcr v1.2.0
@@ -15,7 +15,7 @@ require (
 	github.com/spf13/viper v1.16.0
 	github.com/stretchr/testify v1.8.4
 	github.com/zclconf/go-cty v1.14.0
-	github.com/zscaler/zscaler-sdk-go/v2 v2.1.1
+	github.com/zscaler/zscaler-sdk-go/v2 v2.1.2
 )
 
 require (
@@ -54,6 +54,6 @@ require (
 	golang.org/x/sys v0.12.0 // indirect
 	golang.org/x/text v0.13.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
-	gopkg.in/yaml.v2 v2.4.0 // indirect
+	gopkg.in/yaml.v2 v2.2.8 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

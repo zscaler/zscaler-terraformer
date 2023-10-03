@@ -338,6 +338,7 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 			if i.Name == "Zscaler Deception" {
 				continue
 			}
+			i.Applications = nil // Suppress the applications block
 			jsonPayload = append(jsonPayload, i)
 		}
 		resourceCount = len(jsonPayload)
@@ -353,6 +354,7 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 			if i.Name == "Zscaler Deception" {
 				continue
 			}
+			i.Applications = nil // Suppress the applications block
 			jsonPayload = append(jsonPayload, i)
 		}
 		resourceCount = len(jsonPayload)
