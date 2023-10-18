@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.3 (October 18, 2023)
+
+### Notes
+
+- Release date: **(August 18, 2023)**
+- Supported Terraform version: **v1.x.x**
+
+### Bug Fixes
+
+- [PR #139](https://github.com/zscaler/zscaler-terraformer/pull/139) Fixed ZIA ``zia_location_management`` resource to ensure sub-locations are also imported.
+
 ## 0.3.2 (October 3, 2023)
 
 ### Notes

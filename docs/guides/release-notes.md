@@ -12,9 +12,31 @@ Track all Zscaler Terraformer Tool releases. New resources, features, and bug fi
 
 ---
 
-``Last updated: v0.3.1``
+``Last updated: v0.3.3``
 
 ---
+
+## 0.3.3 (October 18, 2023)
+
+### Notes
+
+- Release date: **(August 18, 2023)**
+- Supported Terraform version: **v1.x.x**
+
+### Bug Fixes
+
+- [PR #139](https://github.com/zscaler/zscaler-terraformer/pull/139) Fixed ZIA ``zia_location_management`` resource to ensure sub-locations are also imported.
+
+## 0.3.2 (October 3, 2023)
+
+### Notes
+
+- Release date: **(October 3, 2023)**
+- Supported Terraform version: **v1.x.x**
+
+### Bug Fixes
+
+- [PR #134](https://github.com/zscaler/zscaler-terraformer/pull/134) Implement condition to exclude ``applications`` block from the ZPA resources `zpa_segment_group` and `zpa_server_group`.
 
 ## 0.3.1 (September 17, 2023)
 

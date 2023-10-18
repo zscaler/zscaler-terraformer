@@ -460,6 +460,7 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_location_management":
+		// Get all parent locations
 		jsonPayload, err := api.zia.locationmanagement.GetAll()
 		if err != nil {
 			log.Fatal(err)
@@ -467,6 +468,22 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		m, _ := json.Marshal(jsonPayload)
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
+
+		// Get all sublocations
+		sublocationsPayload, err := api.zia.locationmanagement.GetAllSublocations()
+		if err != nil {
+			log.Fatal(err)
+		}
+		m, _ = json.Marshal(sublocationsPayload)
+		subResourceCount := len(sublocationsPayload)
+		var subJsonStructData []interface{}
+		_ = json.Unmarshal(m, &subJsonStructData)
+
+		// Append sublocations to the main jsonStructData slice
+		jsonStructData = append(jsonStructData, subJsonStructData...)
+
+		resourceCount += subResourceCount
+
 	case "zia_url_categories":
 		list, err := api.zia.urlcategories.GetAll()
 		if err != nil {
@@ -538,9 +555,11 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		log.Printf("%q is not yet supported for state import", resourceType)
 		return
 	}
+
 	if resourceCount == 0 {
 		return
 	}
+
 	tf, _, workingDir := initTf(resourceType)
 	f, err := os.Create(strings.TrimSuffix(workingDir, "/") + "/" + resourceType + ".tf")
 	if err != nil {
@@ -548,6 +567,7 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 	}
 	generate(cmd, f, resourceType)
 	f.Close()
+
 	for _, data := range jsonStructData {
 		strcutData := data.(map[string]interface{})
 		resourceID, ok := strcutData["id"].(string)
