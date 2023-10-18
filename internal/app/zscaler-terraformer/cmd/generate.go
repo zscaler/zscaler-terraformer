@@ -84,7 +84,7 @@ func init() {
 
 var generateCmd = &cobra.Command{
 	Use:    "generate",
-	Short:  "Fetch resources from the Cloudflare API and generate the respective Terraform stanzas",
+	Short:  "Fetch resources from the ZIA and Or ZPA API and generate the respective Terraform stanzas",
 	Run:    generateResources(),
 	PreRun: sharedPreRun,
 }
@@ -147,6 +147,10 @@ func buildResourceName(resourceType string, structData map[string]interface{}) s
 	resID = strings.ReplaceAll(resID, `"`, "")
 	resID = strings.ReplaceAll(resID, `'`, "")
 	resID = strings.ReplaceAll(resID, "`", "")
+
+	// Remove any double underscores
+	resID = strings.ReplaceAll(resID, "__", "_")
+
 	return resID
 }
 
@@ -601,6 +605,7 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_location_management":
+		// Get all parent locations
 		jsonPayload, err := api.zia.locationmanagement.GetAll()
 		if err != nil {
 			log.Fatal(err)
@@ -608,6 +613,21 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
+
+		// Get all sublocations
+		sublocationsPayload, err := api.zia.locationmanagement.GetAllSublocations()
+		if err != nil {
+			log.Fatal(err)
+		}
+		m, _ = json.Marshal(sublocationsPayload)
+		subResourceCount := len(sublocationsPayload)
+		var subJsonStructData []interface{}
+		_ = json.Unmarshal(m, &subJsonStructData)
+
+		// Append sublocations to the main jsonStructData slice
+		jsonStructData = append(jsonStructData, subJsonStructData...)
+
+		resourceCount += subResourceCount
 	case "zia_url_categories":
 		list, err := api.zia.urlcategories.GetAll()
 		if err != nil {
@@ -722,11 +742,9 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 
 			// No need to output computed attributes that are also not
 			// optional.
-			if r.Block.Attributes[attrName].Computed && !r.Block.Attributes[attrName].Optional && attrName != "static_ip_id" {
-				continue
-			}
-
-			if r.Block.Attributes[attrName].Computed && !r.Block.Attributes[attrName].Optional && attrName != "tunnel_id" {
+			// Here is the corrected part for handling "static_ip_id" and "tunnel_id"
+			bypassAttributes := []string{"static_ip_id", "tunnel_id"}
+			if r.Block.Attributes[attrName].Computed && !r.Block.Attributes[attrName].Optional && isInList(attrName, bypassAttributes) {
 				continue
 			}
 
@@ -734,12 +752,25 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 			switch {
 			case ty.IsPrimitiveType():
 				switch ty {
-				case cty.String, cty.Bool, cty.Number:
+				case cty.String, cty.Bool:
 					value := structData[apiAttrName]
-					if resourceType == "zia_dlp_notification_templates" && isInList(attrName, []string{"subject", "plain_text_message", "html_message"}) {
+					// Handle any string modifications here, if necessary.
+
+					output += writeAttrLine(attrName, value, false)
+
+				case cty.Number:
+					value := structData[apiAttrName]
+
+					// Handle parent_id specially to prevent scientific notation.
+					if attrName == "parent_id" {
+						intValue, ok := value.(float64)
+						if ok {
+							output += fmt.Sprintf("%s = %d\n", attrName, int64(intValue))
+							continue
+						}
+					} else if resourceType == "zia_dlp_notification_templates" && isInList(attrName, []string{"subject", "plain_text_message", "html_message"}) {
 						value = strings.ReplaceAll(value.(string), "${", "$${")
-					}
-					if resourceType == "zpa_service_edge_group" && attrName == "is_public" {
+					} else if resourceType == "zpa_service_edge_group" && attrName == "is_public" {
 						if value == nil {
 							value = false
 						} else {
@@ -747,10 +778,13 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 							value = isPublic
 						}
 					}
+
 					output += writeAttrLine(attrName, value, false)
+
 				default:
 					log.Debugf("unexpected primitive type %q", ty.FriendlyName())
 				}
+
 			case ty.IsCollectionType():
 				switch {
 				case ty.IsListType(), ty.IsSetType(), ty.IsMapType():

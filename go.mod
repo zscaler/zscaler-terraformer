@@ -1,6 +1,6 @@
 module github.com/zscaler/zscaler-terraformer
 
-go 1.20
+go 1.19
 
 require (
 	github.com/dnaeon/go-vcr v1.2.0
@@ -15,7 +15,7 @@ require (
 	github.com/spf13/viper v1.17.0
 	github.com/stretchr/testify v1.8.4
 	github.com/zclconf/go-cty v1.14.1
-	github.com/zscaler/zscaler-sdk-go/v2 v2.1.3
+	github.com/zscaler/zscaler-sdk-go/v2 v2.1.4
 )
 
 require (
