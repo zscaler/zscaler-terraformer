@@ -11,32 +11,33 @@ import (
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/adminuserrolemgmt"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/adminuserrolemgmt/admins"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/devicegroups"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp_engines"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp_notification_templates"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp_web_rules"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlpdictionaries"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp/dlp_engines"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp/dlp_notification_templates"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp/dlp_web_rules"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp/dlpdictionaries"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/filteringrules"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/ipdestinationgroups"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/ipsourcegroups"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkapplications"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkapplicationgroups"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkservicegroups"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkservices"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/timewindow"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/locationmanagement"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/locationmanagement/locationgroups"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/location/locationgroups"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/location/locationmanagement"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/rule_labels"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/security_policy_settings"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/greinternalipranges"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/gretunnelinfo"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/gretunnels"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/staticips"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/virtualipaddresslist"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/virtualipaddress"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/vpncredentials"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/urlcategories"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/urlfilteringpolicies"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/user_authentication_settings"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/usermanagement/usermanagement"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/usermanagement/users"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appconnectorcontroller"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appconnectorgroup"
@@ -260,16 +261,17 @@ func createClientMock(r http.RoundTripper, resourceType, zpaClientID, zpaClientS
 		cli = &Client{
 			ZiaClient: ziaClient,
 			zia: &ZIAClient{
-				adminuserrolemgmt:            adminuserrolemgmt.New(ziaClient),
+				admins:                       admins.New(ziaClient),
 				filteringrules:               filteringrules.New(ziaClient),
 				ipdestinationgroups:          ipdestinationgroups.New(ziaClient),
 				ipsourcegroups:               ipsourcegroups.New(ziaClient),
-				networkapplications:          networkapplications.New(ziaClient),
+				networkapplicationgroups:     networkapplicationgroups.New(ziaClient),
+				networkservicegroups:         networkservicegroups.New(ziaClient),
 				networkservices:              networkservices.New(ziaClient),
 				timewindow:                   timewindow.New(ziaClient),
 				urlcategories:                urlcategories.New(ziaClient),
 				urlfilteringpolicies:         urlfilteringpolicies.New(ziaClient),
-				virtualipaddresslist:         virtualipaddresslist.New(ziaClient),
+				virtualipaddress:             virtualipaddress.New(ziaClient),
 				vpncredentials:               vpncredentials.New(ziaClient),
 				gretunnels:                   gretunnels.New(ziaClient),
 				gretunnelinfo:                gretunnelinfo.New(ziaClient),
@@ -285,7 +287,7 @@ func createClientMock(r http.RoundTripper, resourceType, zpaClientID, zpaClientS
 				rule_labels:                  rule_labels.New(ziaClient),
 				security_policy_settings:     security_policy_settings.New(ziaClient),
 				user_authentication_settings: user_authentication_settings.New(ziaClient),
-				usermanagement:               usermanagement.New(ziaClient),
+				users:                        users.New(ziaClient),
 			},
 		}
 	}

@@ -21,10 +21,13 @@ resource "zpa_application_segment_inspection" "terraform_managed_resource" {
   tcp_port_ranges = ["80", "80"]
   common_apps_dto {
     apps_config {
-      app_types     = ["INSPECT"]
-      enabled       = false
-      hidden        = false
-      portal        = false
+      name                 = "jenkins.example.com"
+      domain               = "jenkins.example.com"
+      application_protocol = "HTTPS"
+      application_port     = "443"
+      certificate_id       = "21619625733130775"
+      enabled              = true
+      app_types            = [ "INSPECT" ]
     }
   }
   server_groups {

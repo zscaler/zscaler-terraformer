@@ -7,12 +7,10 @@ resource "zia_admin_users" "terraform_managed_resource" {
   is_service_update_comm_enabled  = true
   login_name                      = "john.smith@securitygeek.io"
   username                        = "John Smith"
-  admin_scope {
-    type = "DEPARTMENT"
-    scope_entities {
-      id = [25684245]
+  admin_scope_type = "DEPARTMENT"
+  admin_scope_entities {
+        id = [ 25684245 ]
     }
-  }
   role {
     id = 11521
   }
