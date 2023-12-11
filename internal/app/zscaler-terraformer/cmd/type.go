@@ -2,32 +2,33 @@ package cmd
 
 import (
 	"github.com/zscaler/zscaler-sdk-go/v2/zia"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/adminuserrolemgmt"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/adminuserrolemgmt/admins"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/devicegroups"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp_engines"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp_notification_templates"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp_web_rules"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlpdictionaries"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp/dlp_engines"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp/dlp_notification_templates"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp/dlp_web_rules"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp/dlpdictionaries"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/filteringrules"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/ipdestinationgroups"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/ipsourcegroups"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkapplications"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkapplicationgroups"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkservicegroups"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkservices"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/timewindow"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/locationmanagement"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/locationmanagement/locationgroups"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/location/locationgroups"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/location/locationmanagement"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/rule_labels"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/security_policy_settings"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/greinternalipranges"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/gretunnelinfo"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/gretunnels"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/staticips"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/virtualipaddresslist"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/virtualipaddress"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/vpncredentials"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/urlcategories"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/urlfilteringpolicies"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/user_authentication_settings"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/usermanagement/usermanagement"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/usermanagement/users"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appconnectorcontroller"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appconnectorgroup"
@@ -91,21 +92,22 @@ type ZPAClient struct {
 }
 
 type ZIAClient struct {
-	adminuserrolemgmt            *adminuserrolemgmt.Service
+	admins                       *admins.Service
 	filteringrules               *filteringrules.Service
 	ipdestinationgroups          *ipdestinationgroups.Service
 	ipsourcegroups               *ipsourcegroups.Service
-	networkapplications          *networkapplications.Service
+	networkapplicationgroups     *networkapplicationgroups.Service
+	networkservicegroups         *networkservicegroups.Service
 	networkservices              *networkservices.Service
 	timewindow                   *timewindow.Service
 	urlcategories                *urlcategories.Service
 	urlfilteringpolicies         *urlfilteringpolicies.Service
-	usermanagement               *usermanagement.Service
+	users                        *users.Service
 	gretunnels                   *gretunnels.Service
 	gretunnelinfo                *gretunnelinfo.Service
 	greinternalipranges          *greinternalipranges.Service
 	staticips                    *staticips.Service
-	virtualipaddresslist         *virtualipaddresslist.Service
+	virtualipaddress             *virtualipaddress.Service
 	vpncredentials               *vpncredentials.Service
 	locationmanagement           *locationmanagement.Service
 	locationgroups               *locationgroups.Service

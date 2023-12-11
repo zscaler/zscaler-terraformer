@@ -8,10 +8,12 @@ import (
 
 	"strconv"
 
+	"fmt"
+
 	"github.com/spf13/cobra"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlpdictionaries"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp/dlpdictionaries"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/filteringrules"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkapplications"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkapplicationgroups"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkservices"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/security_policy_settings"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/urlcategories"
@@ -20,8 +22,6 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/policysetcontroller"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/segmentgroup"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/servergroup"
-
-	"fmt"
 )
 
 // resourceImportStringFormats contains a mapping of the resource type to the
@@ -328,7 +328,7 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_admin_users":
-		jsonPayload, err := api.zia.adminuserrolemgmt.GetAllAdminUsers()
+		jsonPayload, err := api.zia.admins.GetAllAdminUsers()
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -413,7 +413,7 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		resourceCount = len(servicesFiltered)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_firewall_filtering_network_service_groups":
-		jsonPayload, err := api.zia.networkservices.GetAllNetworkServiceGroups()
+		jsonPayload, err := api.zia.networkservicegroups.GetAllNetworkServiceGroups()
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -421,11 +421,11 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_firewall_filtering_network_application_groups":
-		groups, err := api.zia.networkapplications.GetAllNetworkApplicationGroups()
+		groups, err := api.zia.networkapplicationgroups.GetAllNetworkApplicationGroups()
 		if err != nil {
 			log.Fatal(err)
 		}
-		groupsFiltered := []networkapplications.NetworkApplicationGroups{}
+		groupsFiltered := []networkapplicationgroups.NetworkApplicationGroups{}
 		for _, rule := range groups {
 			if isInList(rule.Name, []string{"Microsoft Office365"}) {
 				continue
@@ -518,7 +518,7 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_user_management":
-		jsonPayload, err := api.zia.usermanagement.GetAllUsers()
+		jsonPayload, err := api.zia.users.GetAllUsers()
 		if err != nil {
 			log.Fatal(err)
 		}

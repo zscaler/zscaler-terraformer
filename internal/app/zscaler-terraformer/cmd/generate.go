@@ -19,9 +19,9 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zclconf/go-cty/cty"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlpdictionaries"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp/dlpdictionaries"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/filteringrules"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkapplications"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkapplicationgroups"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkservices"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/security_policy_settings"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/urlcategories"
@@ -473,7 +473,7 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_admin_users":
-		jsonPayload, err := api.zia.adminuserrolemgmt.GetAllAdminUsers()
+		jsonPayload, err := api.zia.admins.GetAllAdminUsers()
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -558,7 +558,7 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		m, _ := json.Marshal(servicesFiltered)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_firewall_filtering_network_service_groups":
-		jsonPayload, err := api.zia.networkservices.GetAllNetworkServiceGroups()
+		jsonPayload, err := api.zia.networkservicegroups.GetAllNetworkServiceGroups()
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -566,11 +566,11 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_firewall_filtering_network_application_groups":
-		groups, err := api.zia.networkapplications.GetAllNetworkApplicationGroups()
+		groups, err := api.zia.networkapplicationgroups.GetAllNetworkApplicationGroups()
 		if err != nil {
 			log.Fatal(err)
 		}
-		groupsFiltered := []networkapplications.NetworkApplicationGroups{}
+		groupsFiltered := []networkapplicationgroups.NetworkApplicationGroups{}
 		for _, group := range groups {
 			if isInList(group.Name, []string{"Microsoft Office365"}) {
 				continue
@@ -662,7 +662,7 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_user_management":
-		jsonPayload, err := api.zia.usermanagement.GetAllUsers()
+		jsonPayload, err := api.zia.users.GetAllUsers()
 		if err != nil {
 			log.Fatal(err)
 		}
