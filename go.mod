@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/dnaeon/go-vcr v1.2.0
-	github.com/google/uuid v1.5.0
+	github.com/google/uuid v1.6.0
 	github.com/hashicorp/hc-install v0.6.2
 	github.com/hashicorp/terraform-exec v0.20.0
 	github.com/hashicorp/terraform-json v0.21.0
@@ -15,7 +15,7 @@ require (
 	github.com/spf13/viper v1.18.2
 	github.com/stretchr/testify v1.8.4
 	github.com/zclconf/go-cty v1.14.2
-	github.com/zscaler/zscaler-sdk-go/v2 v2.3.6
+	github.com/zscaler/zscaler-sdk-go/v2 v2.3.7
 )
 
 require (
