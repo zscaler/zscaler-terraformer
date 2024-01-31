@@ -19,6 +19,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zclconf/go-cty/cty"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp/dlp_engines"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp/dlpdictionaries"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/filteringrules"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkapplicationgroups"
@@ -543,9 +544,16 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_dlp_engines":
-		jsonPayload, err := api.zia.dlp_engines.GetAll()
+		list, err := api.zia.dlp_engines.GetAll()
 		if err != nil {
 			log.Fatal(err)
+		}
+		jsonPayload := []dlp_engines.DLPEngines{}
+		for _, i := range list {
+			if !i.CustomDlpEngine {
+				continue
+			}
+			jsonPayload = append(jsonPayload, i)
 		}
 		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
