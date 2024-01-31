@@ -25,6 +25,8 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkservicegroups"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkservices"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/timewindow"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/forwarding_control_policy/forwarding_rules"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/forwarding_control_policy/zpa_gateways"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/location/locationgroups"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/location/locationmanagement"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/rule_labels"
@@ -47,6 +49,9 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appservercontroller"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/bacertificate"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/browseraccess"
+	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/cloudbrowserisolation/cbibannercontroller"
+	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/cloudbrowserisolation/cbicertificatecontroller"
+	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/cloudbrowserisolation/cbiprofilecontroller"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/cloudconnectorgroup"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/customerversionprofile"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/enrollmentcert"
@@ -56,6 +61,7 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/inspectioncontrol/inspection_profile"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/lssconfigcontroller"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/machinegroup"
+	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/microtenants"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/policysetcontroller"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/postureprofile"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/provisioningkey"
@@ -169,6 +175,9 @@ func sharedPreRun(cmd *cobra.Command, args []string) {
 				applicationsegmentinspection:   applicationsegmentinspection.New(zpaClient),
 				appservercontroller:            appservercontroller.New(zpaClient),
 				bacertificate:                  bacertificate.New(zpaClient),
+				cbibannercontroller:            cbibannercontroller.New(zpaClient),
+				cbicertificatecontroller:       cbicertificatecontroller.New(zpaClient),
+				cbiprofilecontroller:           cbiprofilecontroller.New(zpaClient),
 				cloudconnectorgroup:            cloudconnectorgroup.New(zpaClient),
 				customerversionprofile:         customerversionprofile.New(zpaClient),
 				enrollmentcert:                 enrollmentcert.New(zpaClient),
@@ -190,6 +199,7 @@ func sharedPreRun(cmd *cobra.Command, args []string) {
 				inspection_custom_controls:     inspection_custom_controls.New(zpaClient),
 				inspection_predefined_controls: inspection_predefined_controls.New(zpaClient),
 				inspection_profile:             inspection_profile.New(zpaClient),
+				microtenants:                   microtenants.New(zpaClient),
 			}
 		}
 		if strings.HasPrefix(resourceType_, "zia_") || strings.Contains(resources, "zia_") || resources == "*" || resources == "zia" {
@@ -226,6 +236,8 @@ func sharedPreRun(cmd *cobra.Command, args []string) {
 				rule_labels:                  rule_labels.New(ziaClient),
 				security_policy_settings:     security_policy_settings.New(ziaClient),
 				user_authentication_settings: user_authentication_settings.New(ziaClient),
+				forwarding_rules:             forwarding_rules.New(ziaClient),
+				zpa_gateways:                 zpa_gateways.New(ziaClient),
 			}
 		}
 	}

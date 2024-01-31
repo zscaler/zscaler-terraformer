@@ -16,7 +16,7 @@ on:
       - 'LICENSE'
 
   schedule:
-    - cron: '0 13 * * 1-5' # UTC
+    - cron: '0 14 * * 1-5' # UTC
   workflow_dispatch:
 
 jobs:
@@ -37,6 +37,7 @@ jobs:
         with:
           path: ~/go/pkg/mod
           key: ${{ runner.os }}-go${{ matrix.go-version }}-${{ hashFiles('**/go.sum') }}
+
       - name: Download Go Dependencies
         run: go mod tidy && go mod vendor
       - name: Vet
