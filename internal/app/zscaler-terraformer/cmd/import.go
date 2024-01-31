@@ -33,6 +33,9 @@ var resourceImportStringFormats = map[string]string{
 	"zpa_application_segment_pra":                       ":id",
 	"zpa_application_segment_inspection":                ":id",
 	"zpa_application_segment_browser_access":            ":id",
+	"zpa_cloud_browser_isolation_banner":                ":id",
+	"zpa_cloud_browser_isolation_certificate":           ":id",
+	"zpa_cloud_browser_isolation_external_profile":      ":id",
 	"zpa_segment_group":                                 ":id",
 	"zpa_server_group":                                  ":id",
 	"zpa_policy_access_rule":                            ":id",
@@ -44,8 +47,10 @@ var resourceImportStringFormats = map[string]string{
 	"zpa_lss_config_controller":                         ":id",
 	"zpa_inspection_custom_controls":                    ":id",
 	"zpa_inspection_profile":                            ":id",
+	"zpa_microtenant_controller":                        ":id",
 	"zia_admin_users":                                   ":id",
 	"zia_dlp_dictionaries":                              ":id",
+	"zia_dlp_engines":                                   ":id",
 	"zia_dlp_notification_templates":                    ":id",
 	"zia_dlp_web_rules":                                 ":id",
 	"zia_firewall_filtering_rule":                       ":id",
@@ -54,6 +59,8 @@ var resourceImportStringFormats = map[string]string{
 	"zia_firewall_filtering_network_service":            ":id",
 	"zia_firewall_filtering_network_service_groups":     ":id",
 	"zia_firewall_filtering_network_application_groups": ":id",
+	"zia_forwarding_control_rule":                       ":id",
+	"zia_forwarding_control_zpa_gateway":                ":id",
 	"zia_traffic_forwarding_static_ip":                  ":id",
 	"zia_traffic_forwarding_vpn_credentials":            ":id",
 	"zia_traffic_forwarding_gre_tunnel":                 ":id",
@@ -189,6 +196,56 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		m, _ := json.Marshal(jsonPayload)
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
+	case "zpa_ba_certificate":
+		jsonPayload, _, err := api.zpa.bacertificate.GetAll()
+		if err != nil {
+			log.Fatal(err)
+		}
+		m, _ := json.Marshal(jsonPayload)
+		resourceCount = len(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zpa_cloud_browser_isolation_banner":
+		jsonPayload, _, err := api.zpa.cbibannercontroller.GetAll()
+		if err != nil {
+			isLicErr, reason := isLicenseError(err)
+			// If it's a license error, log and continue, otherwise, terminate.
+			if isLicErr {
+				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+			} else {
+				log.Fatal(err)
+			}
+		}
+		m, _ := json.Marshal(jsonPayload)
+		resourceCount = len(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zpa_cloud_browser_isolation_external_profile":
+		jsonPayload, _, err := api.zpa.cbiprofilecontroller.GetAll()
+		if err != nil {
+			isLicErr, reason := isLicenseError(err)
+			// If it's a license error, log and continue, otherwise, terminate.
+			if isLicErr {
+				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+			} else {
+				log.Fatal(err)
+			}
+		}
+		m, _ := json.Marshal(jsonPayload)
+		resourceCount = len(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zpa_cloud_browser_isolation_certificate":
+		jsonPayload, _, err := api.zpa.cbicertificatecontroller.GetAll()
+		if err != nil {
+			isLicErr, reason := isLicenseError(err)
+			// If it's a license error, log and continue, otherwise, terminate.
+			if isLicErr {
+				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+			} else {
+				log.Fatal(err)
+			}
+		}
+		m, _ := json.Marshal(jsonPayload)
+		resourceCount = len(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
 	case "zpa_segment_group":
 		list, _, err := api.zpa.segmentgroup.GetAll()
 		if err != nil {
@@ -314,7 +371,13 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 	case "zpa_inspection_custom_controls":
 		jsonPayload, _, err := api.zpa.inspection_custom_controls.GetAll()
 		if err != nil {
-			log.Fatal(err)
+			isLicErr, reason := isLicenseError(err)
+			// If it's a license error, log and continue, otherwise, terminate.
+			if isLicErr {
+				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+			} else {
+				log.Fatal(err)
+			}
 		}
 		m, _ := json.Marshal(jsonPayload)
 		resourceCount = len(jsonPayload)
@@ -322,7 +385,27 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 	case "zpa_inspection_profile":
 		jsonPayload, _, err := api.zpa.inspection_profile.GetAll()
 		if err != nil {
-			log.Fatal(err)
+			isLicErr, reason := isLicenseError(err)
+			// If it's a license error, log and continue, otherwise, terminate.
+			if isLicErr {
+				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+			} else {
+				log.Fatal(err)
+			}
+		}
+		m, _ := json.Marshal(jsonPayload)
+		resourceCount = len(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zpa_microtenant_controller":
+		jsonPayload, _, err := api.zpa.microtenants.GetAll()
+		if err != nil {
+			isLicErr, reason := isLicenseError(err)
+			// If it's a license error, log and continue, otherwise, terminate.
+			if isLicErr {
+				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+			} else {
+				log.Fatal(err)
+			}
 		}
 		m, _ := json.Marshal(jsonPayload)
 		resourceCount = len(jsonPayload)
@@ -346,6 +429,14 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 				continue
 			}
 			jsonPayload = append(jsonPayload, i)
+		}
+		m, _ := json.Marshal(jsonPayload)
+		resourceCount = len(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zia_dlp_engines":
+		jsonPayload, err := api.zia.dlp_engines.GetAll()
+		if err != nil {
+			log.Fatal(err)
 		}
 		m, _ := json.Marshal(jsonPayload)
 		resourceCount = len(jsonPayload)
@@ -548,6 +639,22 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 			log.Fatal(err)
 		}
 		jsonPayload := []*security_policy_settings.ListUrls{urls}
+		m, _ := json.Marshal(jsonPayload)
+		resourceCount = len(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zia_forwarding_control_rule":
+		jsonPayload, err := api.zia.forwarding_rules.GetAll()
+		if err != nil {
+			log.Fatal(err)
+		}
+		m, _ := json.Marshal(jsonPayload)
+		resourceCount = len(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zia_forwarding_control_zpa_gateway":
+		jsonPayload, err := api.zia.zpa_gateways.GetAll()
+		if err != nil {
+			log.Fatal(err)
+		}
 		m, _ := json.Marshal(jsonPayload)
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)

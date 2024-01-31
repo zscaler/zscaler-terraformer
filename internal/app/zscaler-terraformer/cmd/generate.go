@@ -45,6 +45,10 @@ var allGeneratableResources = []string{
 	"zpa_application_segment_pra",
 	"zpa_application_segment_inspection",
 	"zpa_application_segment_browser_access",
+	"zpa_ba_certificate",
+	"zpa_cloud_browser_isolation_banner",
+	"zpa_cloud_browser_isolation_certificate",
+	"zpa_cloud_browser_isolation_external_profile",
 	"zpa_segment_group",
 	"zpa_server_group",
 	"zpa_policy_access_rule",
@@ -56,8 +60,10 @@ var allGeneratableResources = []string{
 	"zpa_lss_config_controller",
 	"zpa_inspection_custom_controls",
 	"zpa_inspection_profile",
+	"zpa_microtenant_controller",
 	"zia_admin_users",
 	"zia_dlp_dictionaries",
+	"zia_dlp_engines",
 	"zia_dlp_notification_templates",
 	"zia_dlp_web_rules",
 	"zia_firewall_filtering_rule",
@@ -332,6 +338,38 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
+	case "zpa_ba_certificate":
+		jsonPayload, _, err := api.zpa.bacertificate.GetAll()
+		if err != nil {
+			log.Fatal(err)
+		}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zpa_cloud_browser_isolation_banner":
+		jsonPayload, _, err := api.zpa.cbibannercontroller.GetAll()
+		if err != nil {
+			log.Fatal(err)
+		}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zpa_cloud_browser_isolation_certificate":
+		jsonPayload, _, err := api.zpa.cbicertificatecontroller.GetAll()
+		if err != nil {
+			log.Fatal(err)
+		}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zpa_cloud_browser_isolation_external_profile":
+		jsonPayload, _, err := api.zpa.cbiprofilecontroller.GetAll()
+		if err != nil {
+			log.Fatal(err)
+		}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
 	case "zpa_segment_group":
 		list, _, err := api.zpa.segmentgroup.GetAll()
 		if err != nil {
@@ -472,6 +510,15 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
+	case "zpa_microtenant_controller":
+		jsonPayload, _, err := api.zpa.microtenants.GetAll()
+		if err != nil {
+			log.Fatal(err)
+		}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+
 	case "zia_admin_users":
 		jsonPayload, err := api.zia.admins.GetAllAdminUsers()
 		if err != nil {
@@ -491,6 +538,14 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 				continue
 			}
 			jsonPayload = append(jsonPayload, i)
+		}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zia_dlp_engines":
+		jsonPayload, err := api.zia.dlp_engines.GetAll()
+		if err != nil {
+			log.Fatal(err)
 		}
 		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
@@ -692,6 +747,22 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 			log.Fatal(err)
 		}
 		jsonPayload := []*security_policy_settings.ListUrls{urls}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zia_forwarding_control_rule":
+		jsonPayload, err := api.zia.forwarding_rules.GetAll()
+		if err != nil {
+			log.Fatal(err)
+		}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zia_forwarding_control_zpa_gateway":
+		jsonPayload, err := api.zia.zpa_gateways.GetAll()
+		if err != nil {
+			log.Fatal(err)
+		}
 		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)

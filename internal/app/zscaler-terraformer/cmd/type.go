@@ -15,6 +15,8 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkservicegroups"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkservices"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/timewindow"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/forwarding_control_policy/forwarding_rules"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/forwarding_control_policy/zpa_gateways"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/location/locationgroups"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/location/locationmanagement"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/rule_labels"
@@ -38,6 +40,9 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appservercontroller"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/bacertificate"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/browseraccess"
+	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/cloudbrowserisolation/cbibannercontroller"
+	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/cloudbrowserisolation/cbicertificatecontroller"
+	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/cloudbrowserisolation/cbiprofilecontroller"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/cloudconnectorgroup"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/customerversionprofile"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/enrollmentcert"
@@ -47,6 +52,7 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/inspectioncontrol/inspection_profile"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/lssconfigcontroller"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/machinegroup"
+	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/microtenants"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/policysetcontroller"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/postureprofile"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/provisioningkey"
@@ -68,6 +74,9 @@ type ZPAClient struct {
 	applicationsegmentinspection   *applicationsegmentinspection.Service
 	appservercontroller            *appservercontroller.Service
 	bacertificate                  *bacertificate.Service
+	cbibannercontroller            *cbibannercontroller.Service
+	cbicertificatecontroller       *cbicertificatecontroller.Service
+	cbiprofilecontroller           *cbiprofilecontroller.Service
 	cloudconnectorgroup            *cloudconnectorgroup.Service
 	customerversionprofile         *customerversionprofile.Service
 	enrollmentcert                 *enrollmentcert.Service
@@ -89,6 +98,7 @@ type ZPAClient struct {
 	inspection_custom_controls     *inspection_custom_controls.Service
 	inspection_predefined_controls *inspection_predefined_controls.Service
 	inspection_profile             *inspection_profile.Service
+	microtenants                   *microtenants.Service
 }
 
 type ZIAClient struct {
@@ -119,6 +129,8 @@ type ZIAClient struct {
 	rule_labels                  *rule_labels.Service
 	security_policy_settings     *security_policy_settings.Service
 	user_authentication_settings *user_authentication_settings.Service
+	forwarding_rules             *forwarding_rules.Service
+	zpa_gateways                 *zpa_gateways.Service
 }
 
 type Client struct {

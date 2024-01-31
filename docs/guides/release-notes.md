@@ -12,9 +12,31 @@ Track all Zscaler Terraformer Tool releases. New resources, features, and bug fi
 
 ---
 
-``Last updated: v0.3.4``
+``Last updated: v1.0.0``
 
 ---
+
+## 1.0.0 (January, 30 2024)
+
+### Notes
+
+- Release date: **(January, 30 2024)**
+- Supported Terraform version: **v1.x.x**
+
+### Enhacements
+
+- [PR #167](https://github.com/zscaler/zscaler-terraformer/pull/167) ✨ Added support for ZIA Custom ZPA Gateway import.
+- [PR #167](https://github.com/zscaler/zscaler-terraformer/pull/167) ✨ Added support for ZIA Forwarding Control Rule import.
+- [PR #167](https://github.com/zscaler/zscaler-terraformer/pull/167) ✨ Added support for ZIA DLP Engine import.
+- [PR #167](https://github.com/zscaler/zscaler-terraformer/pull/167) ✨ Added support for ZPA Microtenant import.
+- [PR #167](https://github.com/zscaler/zscaler-terraformer/pull/167) ✨ Added support for ZPA Browser Access import.
+- [PR #167](https://github.com/zscaler/zscaler-terraformer/pull/167) ✨ Added support for ZPA Cloud Browser Isolation Banner import.
+- [PR #167](https://github.com/zscaler/zscaler-terraformer/pull/167) ✨ Added support for ZPA Cloud Browser Isolation Certificate import.
+- [PR #167](https://github.com/zscaler/zscaler-terraformer/pull/167) ✨ Added support for ZPA Cloud Browser Isolation External Profile import.
+
+### Bug Fixes
+
+- [PR #167](https://github.com/zscaler/zscaler-terraformer/pull/167) Fixed license error for ZPA unlicensed .
 
 ## 0.3.4 (December, 11 2023)
 
