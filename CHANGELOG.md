@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.1 (February, 14 2024)
+
+### Notes
+
+- Release date: **(February, 14 2024)**
+- Supported Terraform version: **v1.x.x**
+
+### Bug Fixes
+
+- [PR #170](https://github.com/zscaler/zscaler-terraformer/pull/170) Fixed ZIA ``zia_firewall_filtering_rule`` missformatted ID for rules containing the `users` nested block
+- [PR #170](https://github.com/zscaler/zscaler-terraformer/pull/170) Upgraded to [Zscaler-SDK-GO v2.3.9](https://github.com/zscaler/zscaler-sdk-go/releases/tag/v2.3.9)
+
 ## 1.0.0 (January, 30 2024)
 
 ### Notes
