@@ -840,6 +840,16 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 				case cty.Number:
 					value := structData[apiAttrName]
 
+					// Special handling for idle_time_in_minutes and surrogate_refresh_time_in_minutes to prevent scientific notation
+					if attrName == "idle_time_in_minutes" || attrName == "surrogate_refresh_time_in_minutes" {
+						floatValue, ok := value.(float64)
+						if ok {
+							// Explicitly convert and format as integer
+							output += fmt.Sprintf("%s = %d\n", attrName, int64(floatValue))
+							continue // Skip the rest of the logic for these specific fields
+						}
+					}
+
 					// Handle parent_id specially to prevent scientific notation.
 					if attrName == "parent_id" {
 						intValue, ok := value.(float64)

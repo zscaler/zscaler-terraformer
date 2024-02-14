@@ -390,7 +390,7 @@ func nestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 			}
 			output += "}\n"
 			continue
-		} else if isInList(resourceType, []string{"zia_firewall_filtering_network_service_groups", "zia_url_filtering_rules", "zia_dlp_web_rules", "zia_user_management"}) && isInList(block, []string{"departments",
+		} else if isInList(resourceType, []string{"zia_firewall_filtering_network_service_groups", "zia_firewall_filtering_rule", "zia_url_filtering_rules", "zia_dlp_web_rules", "zia_user_management"}) && isInList(block, []string{"departments",
 			"groups",
 			"locations",
 			"dlp_engines",
@@ -410,7 +410,9 @@ func nestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 		} else if isInList(resourceType, []string{"zia_firewall_filtering_rule"}) && isInList(block, []string{"dest_ip_groups", "nw_services",
 			"departments",
 			"groups",
-			"time_windows"}) {
+			"time_windows",
+			"users",
+		}) {
 			output += listIdsIntBlock(block, structData[mapTfFieldNameToApi(resourceType, block)])
 			continue
 		} else if isInList(resourceType, []string{"zpa_application_segment",
