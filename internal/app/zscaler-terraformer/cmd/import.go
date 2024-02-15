@@ -14,8 +14,12 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp/dlp_engines"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp/dlpdictionaries"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/filteringrules"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/ipdestinationgroups"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/ipsourcegroups"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkapplicationgroups"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkservices"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/forwarding_control_policy/forwarding_rules"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/forwarding_control_policy/zpa_gateways"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/security_policy_settings"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/urlcategories"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/user_authentication_settings"
@@ -472,7 +476,7 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		}
 		rulesFiltered := []filteringrules.FirewallFilteringRules{}
 		for _, rule := range rules {
-			if isInList(rule.Name, []string{"Office 365 One Click Rule", "UCaaS One Click Rule", "Default Firewall Filtering Rule"}) {
+			if isInList(rule.Name, []string{"Office 365 One Click Rule", "UCaaS One Click Rule", "Default Firewall Filtering Rule", "Block All IPv6", "Block malicious IPs and domains"}) {
 				continue
 			}
 			rulesFiltered = append(rulesFiltered, rule)
@@ -481,20 +485,34 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		resourceCount = len(rulesFiltered)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_firewall_filtering_destination_groups":
-		jsonPayload, err := api.zia.ipdestinationgroups.GetAll()
+		groups, err := api.zia.ipdestinationgroups.GetAll()
 		if err != nil {
 			log.Fatal(err)
 		}
-		m, _ := json.Marshal(jsonPayload)
-		resourceCount = len(jsonPayload)
+		groupsFiltered := []ipdestinationgroups.IPDestinationGroups{}
+		for _, group := range groups {
+			if isInList(group.Name, []string{"All IPv4"}) {
+				continue
+			}
+			groupsFiltered = append(groupsFiltered, group)
+		}
+		m, _ := json.Marshal(groupsFiltered)
+		resourceCount = len(groupsFiltered)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_firewall_filtering_ip_source_groups":
-		jsonPayload, err := api.zia.ipsourcegroups.GetAll()
+		groups, err := api.zia.ipsourcegroups.GetAll()
 		if err != nil {
 			log.Fatal(err)
 		}
-		m, _ := json.Marshal(jsonPayload)
-		resourceCount = len(jsonPayload)
+		groupsFiltered := []ipsourcegroups.IPSourceGroups{}
+		for _, group := range groups {
+			if isInList(group.Name, []string{"All IPv4"}) {
+				continue
+			}
+			groupsFiltered = append(groupsFiltered, group)
+		}
+		m, _ := json.Marshal(groupsFiltered)
+		resourceCount = len(groupsFiltered)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_firewall_filtering_network_service":
 		services, err := api.zia.networkservices.GetAllNetworkServices()
@@ -582,7 +600,6 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		jsonStructData = append(jsonStructData, subJsonStructData...)
 
 		resourceCount += subResourceCount
-
 	case "zia_url_categories":
 		list, err := api.zia.urlcategories.GetAll()
 		if err != nil {
@@ -651,20 +668,34 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_forwarding_control_rule":
-		jsonPayload, err := api.zia.forwarding_rules.GetAll()
+		rules, err := api.zia.forwarding_rules.GetAll()
 		if err != nil {
 			log.Fatal(err)
 		}
-		m, _ := json.Marshal(jsonPayload)
-		resourceCount = len(jsonPayload)
+		rulesFiltered := []forwarding_rules.ForwardingRules{}
+		for _, rule := range rules {
+			if isInList(rule.Name, []string{"Client Connector Traffic Direct", "ZPA Pool For Stray Traffic", "ZIA Inspected ZPA Apps", "Fallback mode of ZPA Forwarding"}) {
+				continue
+			}
+			rulesFiltered = append(rulesFiltered, rule)
+		}
+		m, _ := json.Marshal(rulesFiltered)
+		resourceCount = len(rulesFiltered)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_forwarding_control_zpa_gateway":
-		jsonPayload, err := api.zia.zpa_gateways.GetAll()
+		gws, err := api.zia.zpa_gateways.GetAll()
 		if err != nil {
 			log.Fatal(err)
 		}
-		m, _ := json.Marshal(jsonPayload)
-		resourceCount = len(jsonPayload)
+		gwsFiltered := []zpa_gateways.ZPAGateways{}
+		for _, gw := range gws {
+			if isInList(gw.Name, []string{"Auto ZPA Gateway"}) {
+				continue
+			}
+			gwsFiltered = append(gwsFiltered, gw)
+		}
+		m, _ := json.Marshal(gwsFiltered)
+		resourceCount = len(gwsFiltered)
 		_ = json.Unmarshal(m, &jsonStructData)
 	default:
 		log.Printf("%q is not yet supported for state import", resourceType)

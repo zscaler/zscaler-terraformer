@@ -415,6 +415,7 @@ func nestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 		}) {
 			output += listIdsIntBlock(block, structData[mapTfFieldNameToApi(resourceType, block)])
 			continue
+
 		} else if isInList(resourceType, []string{"zpa_application_segment",
 			"zpa_application_segment_inspection",
 			"zpa_application_segment_pra",
@@ -615,6 +616,14 @@ func writeNestedBlock(resourceType string, attributes []string, schemaBlock *tfj
 // writeAttrLine outputs a line of HCL configuration with a configurable depth
 // for known types.
 func writeAttrLine(key string, value interface{}, usedInBlock bool) string {
+	if key == "id" {
+		// Attempt to convert the value to an integer if it's a float
+		if floatValue, ok := value.(float64); ok {
+			// Convert to int64 to handle large IDs, then format as a string
+			return fmt.Sprintf("%s = %d\n", key, int64(floatValue))
+		}
+	}
+
 	switch values := value.(type) {
 	case map[string]interface{}:
 		sortedKeys := make([]string, 0, len(values))
