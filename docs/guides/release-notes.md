@@ -12,9 +12,21 @@ Track all Zscaler Terraformer Tool releases. New resources, features, and bug fi
 
 ---
 
-``Last updated: v1.0.1``
+``Last updated: v1.0.2``
 
 ---
+
+## 1.0.2 (February, 15 2024)
+
+### Notes
+
+- Release date: **(February, 15 2024)**
+- Supported Terraform version: **v1.x.x**
+
+### Bug Fixes
+
+- [PR #171](https://github.com/zscaler/zscaler-terraformer/pull/171) Fixed ZIA ``zia_forwarding_control_rule`` missformatted ID for `zpa_gateway` nested block `id` attribute.
+- [PR #171](https://github.com/zscaler/zscaler-terraformer/pull/171) Implemented exclusion of pre-built unmanaged resources for ZIA.
 
 ## 1.0.1 (February, 14 2024)
 

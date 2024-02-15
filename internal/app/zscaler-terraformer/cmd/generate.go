@@ -22,8 +22,12 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp/dlp_engines"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp/dlpdictionaries"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/filteringrules"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/ipdestinationgroups"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/ipsourcegroups"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkapplicationgroups"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkservices"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/forwarding_control_policy/forwarding_rules"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/forwarding_control_policy/zpa_gateways"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/security_policy_settings"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/urlcategories"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/user_authentication_settings"
@@ -83,6 +87,8 @@ var allGeneratableResources = []string{
 	"zia_rule_labels",
 	"zia_auth_settings_urls",
 	"zia_security_settings",
+	"zia_forwarding_control_zpa_gateway",
+	"zia_forwarding_control_rule",
 }
 
 func init() {
@@ -590,20 +596,34 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		m, _ := json.Marshal(rulesFiltered)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_firewall_filtering_destination_groups":
-		jsonPayload, err := api.zia.ipdestinationgroups.GetAll()
+		groups, err := api.zia.ipdestinationgroups.GetAll()
 		if err != nil {
 			log.Fatal(err)
 		}
-		resourceCount = len(jsonPayload)
-		m, _ := json.Marshal(jsonPayload)
+		groupsFiltered := []ipdestinationgroups.IPDestinationGroups{}
+		for _, group := range groups {
+			if isInList(group.Name, []string{"All IPv4"}) {
+				continue
+			}
+			groupsFiltered = append(groupsFiltered, group)
+		}
+		resourceCount = len(groupsFiltered)
+		m, _ := json.Marshal(groupsFiltered)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_firewall_filtering_ip_source_groups":
-		jsonPayload, err := api.zia.ipsourcegroups.GetAll()
+		groups, err := api.zia.ipsourcegroups.GetAll()
 		if err != nil {
 			log.Fatal(err)
 		}
-		resourceCount = len(jsonPayload)
-		m, _ := json.Marshal(jsonPayload)
+		groupsFiltered := []ipsourcegroups.IPSourceGroups{}
+		for _, group := range groups {
+			if isInList(group.Name, []string{"All IPv4"}) {
+				continue
+			}
+			groupsFiltered = append(groupsFiltered, group)
+		}
+		resourceCount = len(groupsFiltered)
+		m, _ := json.Marshal(groupsFiltered)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_firewall_filtering_network_service":
 		services, err := api.zia.networkservices.GetAllNetworkServices()
@@ -759,20 +779,34 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_forwarding_control_rule":
-		jsonPayload, err := api.zia.forwarding_rules.GetAll()
+		rules, err := api.zia.forwarding_rules.GetAll()
 		if err != nil {
 			log.Fatal(err)
 		}
-		resourceCount = len(jsonPayload)
-		m, _ := json.Marshal(jsonPayload)
+		rulesFiltered := []forwarding_rules.ForwardingRules{}
+		for _, rule := range rules {
+			if isInList(rule.Name, []string{"Client Connector Traffic Direct", "ZPA Pool For Stray Traffic", "ZIA Inspected ZPA Apps", "Fallback mode of ZPA Forwarding"}) {
+				continue
+			}
+			rulesFiltered = append(rulesFiltered, rule)
+		}
+		resourceCount = len(rulesFiltered)
+		m, _ := json.Marshal(rulesFiltered)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_forwarding_control_zpa_gateway":
-		jsonPayload, err := api.zia.zpa_gateways.GetAll()
+		gws, err := api.zia.zpa_gateways.GetAll()
 		if err != nil {
 			log.Fatal(err)
 		}
-		resourceCount = len(jsonPayload)
-		m, _ := json.Marshal(jsonPayload)
+		gwsFiltered := []zpa_gateways.ZPAGateways{}
+		for _, gw := range gws {
+			if isInList(gw.Name, []string{"Auto ZPA Gateway"}) {
+				continue
+			}
+			gwsFiltered = append(gwsFiltered, gw)
+		}
+		resourceCount = len(gwsFiltered)
+		m, _ := json.Marshal(gwsFiltered)
 		_ = json.Unmarshal(m, &jsonStructData)
 	default:
 		fmt.Fprintf(cmd.OutOrStdout(), "%q is not yet supported for automatic generation", resourceType)
