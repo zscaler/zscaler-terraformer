@@ -130,8 +130,8 @@ github.com/subosito/gotenv v1.6.0/go.mod h1:Dk4QP5c2W3ibzajGcXpNraDfq2IrhjMIvMSW
 github.com/xanzy/ssh-agent v0.3.3 h1:+/15pJfg/RsTxqYcX6fHqOXZwwMP+2VyYWJeWM2qQFM=
 github.com/zclconf/go-cty v1.14.2 h1:kTG7lqmBou0Zkx35r6HJHUQTvaRPr5bIAf3AoHS0izI=
 github.com/zclconf/go-cty v1.14.2/go.mod h1:VvMs5i0vgZdhYawQNq5kePSpLAoz8u1xvZgrPIxfnZE=
-github.com/zscaler/zscaler-sdk-go/v2 v2.3.9 h1:7EcMIOKJqHABJonOdQEE/i4zjmGnZtxvr4O5woPJy9w=
-github.com/zscaler/zscaler-sdk-go/v2 v2.3.9/go.mod h1:v8TLsPbVlQ3kAvGs8sIWsuhSAVggLbowiyDzaGYPWKg=
+github.com/zscaler/zscaler-sdk-go/v2 v2.3.10 h1:vWrnKo5gaBEq/wzVgXj1UYTyTCpHqgr3aLGbRuZVeLY=
+github.com/zscaler/zscaler-sdk-go/v2 v2.3.10/go.mod h1:F98vnN4GBvXozTOnkYtFlw2zZIXt8v7VWISAjYEjpvw=
 go.uber.org/atomic v1.9.0 h1:ECmE8Bn/WFTYwEW/bpKD3M8VtR/zQVbavAoalC1PYyE=
 go.uber.org/atomic v1.9.0/go.mod h1:fEN4uk6kAWBTFdckzkM89CLk9XfWZrxpCo0nPH17wJc=
 go.uber.org/multierr v1.9.0 h1:7fIwc/ZtS0q++VgcfqFDxSBZVv/Xo49/SYnDFupUwlI=
