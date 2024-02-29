@@ -35,6 +35,11 @@ test_zia:
 fmt:
 	gofmt -w $(GO_FILES)
 
+lint: vendor
+	@echo "✓ Linting source code with https://staticcheck.io/ ..."
+	@go run honnef.co/go/tools/cmd/staticcheck@v0.4.0 ./...
+
+
 validate-tf:
 	@bash scripts/validate-tf.sh
 
