@@ -37,7 +37,7 @@ fmt:
 
 lint: vendor
 	@echo "✓ Linting source code with https://staticcheck.io/ ..."
-	@go run honnef.co/go/tools/cmd/staticcheck@v0.4.0 ./...
+	@go run honnef.co/go/tools/cmd/staticcheck@v0.4.6 ./...
 
 
 validate-tf:
