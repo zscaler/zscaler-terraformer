@@ -136,6 +136,12 @@ zscaler-terraformer import --resources="zpa"
 zscaler-terraformer import --resources="zpa_application_segment"
 ```
 
+### Exclude specific ZPA resources from Importing
+
+```bash
+zscaler-terraformer import --resources="zpa" --exclude='zpa_segment_group,zpa_server_group'
+```
+
 By default, ``zscaler-terraformer`` will create a local configuration directory where it is being executed. You can also indicate the path where the imported configuration should be stored by using the folowing environment variable ``ZSCALER_ZPA_TERRAFORM_INSTALL_PATH``.
 
 ```bash
@@ -162,6 +168,12 @@ zscaler-terraformer import --resources="zia"
 
 ```bash
 zscaler-terraformer import --resources="zia_firewall_filtering_rule"
+```
+
+### Exclude specific ZIA resources from Importing
+
+```bash
+zscaler-terraformer import --resources="zia" --exclude='zia_forwarding_control_rule,zia_forwarding_control_zpa_gateway,zia_user_management'
 ```
 
 By default, ``zscaler-terraformer`` will create a local configuration directory where it is being executed. You can also indicate the path where the imported configuration should be stored by using the folowing environment variable ``ZSCALER_ZIA_TERRAFORM_INSTALL_PATH``.
@@ -228,7 +240,7 @@ $ zscaler-terraformer import \
 
 Any resources not listed are currently not supported.
 
-Last updated August 17, 2022
+Last updated February 29, 2024
 
 | Resource | Resource Scope | Generate Supported | Import Supported |
 |----------|-----------|----------|----------|
@@ -239,9 +251,13 @@ Last updated August 17, 2022
 | [zpa_application_segment_browser_access](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_application_segment_browser_access) | app segment | ✅ | ✅ |
 | [zpa_application_segment_inspection](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_application_segment_inspection) | app segment | ✅ | ✅ |
 | [zpa_application_segment_pra](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_application_segment_pra) | app segment | ✅ | ✅ |
+| [zpa_cloud_browser_isolation_banner](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_cloud_browser_isolation_banner) | isolation | ✅ | ✅ |
+| [zpa_cloud_browser_isolation_certificate](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_cloud_browser_isolation_certificate) | isolation | ✅ | ✅ |
+| [zpa_cloud_browser_isolation_external_profile](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_cloud_browser_isolation_external_profile) | isolation | ✅ | ✅ |
 | [zpa_segment_group](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_segment_group) | group | ✅ | ✅ |
 | [zpa_server_group](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_server_group) | group | ✅ | ✅ |
 | [zpa_lss_config_controller](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_lss_config_controller) | lss | ✅ | ✅ |
+| [zpa_microtenant_controller](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_microtenant_controller) | microtenant | ✅ | ✅ |
 | [zpa_provisioning_key](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_provisioning_key) | key | ✅ | ✅ |
 | [zpa_inspection_custom_controls](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_inspection_custom_control) | Inspection | ✅ | ✅ |
 | [zpa_inspection_profile](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_inspection_profile) | Inspection | ✅ | ✅ |
@@ -249,15 +265,17 @@ Last updated August 17, 2022
 | [zpa_policy_access_timeout_rule](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_policy_access_timeout_rule) | Policy | ✅ | ✅ |
 | [zpa_policy_access_forwarding_rule](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_policy_access_forwarding_rule) | Policy | ✅ | ✅ |
 | [zpa_policy_access_inspection_rule](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_policy_access_inspection_rule) | Policy | ✅ | ✅ |
+| [zpa_policy_access_redirection_rule](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_policy_access_redirection_rule) | Policy | ✅ | ✅ |
 
 ## ZIA Supported Resources
 
 Any resources not listed are currently not supported.
 
-Last updated August 17, 2022
+Last updated February 29, 2024
 
 | Resource | Resource Scope | Generate Supported | Import Supported |
 |----------|-----------|----------|----------|
+| [zia_dlp_engines](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_dlp_engines) | DLP | ✅ | ✅ |
 | [zia_dlp_dictionaries](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_dlp_dictionaries) | DLP | ✅ | ✅ |
 | [zia_dlp_notification_templates](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_dlp_notification_templates) | DLP | ✅ | ✅ |
 | [zia_dlp_web_rules](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_dlp_web_rules) | DLP | ✅ | ✅ |
@@ -277,6 +295,8 @@ Last updated August 17, 2022
 | [zia_auth_settings_urls](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_auth_settings_urls) | URL | ✅ | ✅ |
 | [zia_security_policy_settings](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_security_policy_settings) | URL | ✅ | ✅ |
 | [zia_user_management](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_user_management) | User | ✅ | ✅ |
+| [zia_forwarding_control_rule](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_forwarding_control_rule) | Forward | ✅ | ✅ |
+| [zia_forwarding_control_zpa_gateway](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_forwarding_control_zpa_gateway) | Forward | ✅ | ✅ |
 
 ## Testing
 

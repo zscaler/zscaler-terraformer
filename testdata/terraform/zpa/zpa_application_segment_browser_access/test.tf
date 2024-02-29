@@ -14,8 +14,8 @@ resource "zpa_application_segment_browser_access" "terraform_managed_resource" {
   tcp_port_ranges        = ["1", "52", "54", "65535"]
   udp_port_ranges        = ["1", "52", "54", "65535"]
   clientless_apps {
-    application_port     = "80"
-    application_protocol = "HTTP"
+    application_port     = "443"
+    application_protocol = "HTTPS"
     certificate_id       = "1"
     enabled              = false
     hidden               = false
@@ -26,19 +26,7 @@ resource "zpa_application_segment_browser_access" "terraform_managed_resource" {
     id = ["216196257331301306"]
   }
   tcp_port_range {
-    from = "1"
-    to   = "52"
-  }
-  tcp_port_range {
-    from = "54"
-    to   = "65535"
-  }
-  udp_port_range {
-    from = "1"
-    to   = "52"
-  }
-  udp_port_range {
-    from = "54"
-    to   = "65535"
+    from = "443"
+    to   = "443"
   }
 }

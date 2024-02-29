@@ -1,19 +1,13 @@
-name: tests
+name: ZT Test
 
 on:
-  push:
-    branches: [ master ]
-    paths-ignore:
-      - 'README.md'
-      - 'CHANGELOG.md'
-      - 'LICENSE'
-
   pull_request:
-    branches: [ master ]
-    paths-ignore:
-      - 'README.md'
-      - 'CHANGELOG.md'
-      - 'LICENSE'
+    types: [opened, synchronize]
+  merge_group:
+    types: [checks_requested]
+  push:
+    branches:
+      - master
 
   schedule:
     - cron: '0 14 * * 1-5' # UTC
@@ -72,15 +66,19 @@ jobs:
             EOF
       - name: terraform init
         run: terraform init
+        
       - name: Run go test
         env:
             ZPA_CLIENT_ID: ${{ secrets.ZPA_CLIENT_ID }}
             ZPA_CLIENT_SECRET: ${{ secrets.ZPA_CLIENT_SECRET }}
             ZPA_CUSTOMER_ID: ${{ secrets.ZPA_CUSTOMER_ID }}
+            ZPA_CLOUD: ${{ secrets.ZPA_CLOUD }}
             ZIA_USERNAME: ${{ secrets.ZIA_USERNAME }}
             ZIA_PASSWORD: ${{ secrets.ZIA_PASSWORD }}
             ZIA_API_KEY: ${{ secrets.ZIA_API_KEY }}
             ZIA_CLOUD: ${{ secrets.ZIA_CLOUD }}
             ZSCALER_TERRAFORM_INSTALL_PATH: ${{ github.workspace }}
-        run: make test
+        run: | 
+          make test_zpa
+          make test_zia
 

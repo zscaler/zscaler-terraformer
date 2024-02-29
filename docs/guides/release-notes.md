@@ -12,9 +12,20 @@ Track all Zscaler Terraformer Tool releases. New resources, features, and bug fi
 
 ---
 
-``Last updated: v1.0.2``
+``Last updated: v1.0.3``
 
 ---
+
+## 1.0.3 (February, 29 2024)
+
+### Notes
+
+- Release date: **(February, 29 2024)**
+- Supported Terraform version: **v1.x.x**
+
+### Enhancements
+
+- [PR #173](https://github.com/zscaler/zscaler-terraformer/pull/173) Introduced the ability to exclude multiple resource names during the importing process.
 
 ## 1.0.2 (February, 15 2024)
 

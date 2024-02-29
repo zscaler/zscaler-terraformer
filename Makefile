@@ -3,7 +3,7 @@ GO_FILES              ?= $$(find . -name '*.go')
 
 VERSION               ?= $$(git describe --tags --abbrev=0)-pre-release+$$(git rev-parse --short=12 HEAD)
 ROOT_DIR               = $$PWD
-
+ZSCALER_TERRAFORM_INSTALL_PATH=$$PWD
 HASHICORP_CHECKPOINT_TIMEMOUT ?= 30000
 
 build:
@@ -20,6 +20,7 @@ test_zpa:
 		ZPA_CLIENT_ID="$(ZPA_CLIENT_ID)" \
 		ZPA_CLIENT_SECRET="$(ZPA_CLIENT_SECRET)" \
 		ZPA_CUSTOMER_ID="$(ZPA_CUSTOMER_ID)" \
+		ZPA_CLOUD="$(ZPA_CLOUD)" \
 		go test $(TEST) -timeout 120m -v $(TESTARGS)
 
 test_zia:
