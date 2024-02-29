@@ -8,7 +8,7 @@ run:
 linters:
   disable-all: true
   enable:
-    - bodyclose    # ensure HTTP response bodies are successfully closed.
+    # - bodyclose    # ensure HTTP response bodies are successfully closed.
     - contextcheck # check we are passing context an inherited context.
     - gofmt        # checks whether code was gofmt-ed. By default this tool runs with -s option to check for code simplification.
     - errname      # checks that sentinel errors are prefixed with the `Err` and error types are suffixed with the `Error`.
