@@ -4,7 +4,7 @@ resource "zia_url_filtering_rules" "terraform_managed_resource" {
   description           = "Block all inappropriate content for all users."
   name                  = "Block Inappropriate Content"
   order                 = 1
-  protocols             = ["ANY"]
+  protocols             = ["ANY_RULE"]
   rank                  = 7
   request_methods       = ["OPTIONS", "GET", "HEAD", "POST", "PUT", "DELETE", "TRACE", "CONNECT", "OTHER"]
   state                 = "ENABLED"
