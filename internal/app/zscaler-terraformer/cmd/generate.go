@@ -117,17 +117,13 @@ func generateResources() func(cmd *cobra.Command, args []string) {
 			} else {
 				resourceTypes = strings.Split(resources, ",")
 			}
+			// Split the excludedResources string on commas to get a slice of excluded resource names.
+			excludedResourcesTypes := strings.Split(excludedResources, ",")
+
 			for _, rt := range resourceTypes {
-				excluded := false
 				resourceTyp := strings.Trim(rt, " ")
-				excludedResourcesTypes := strings.Split(excludedResources, ",")
-				for _, execludedRType := range excludedResourcesTypes {
-					if execludedRType == resourceTyp {
-						excluded = true
-						break
-					}
-				}
-				if excluded {
+				// Check if the current resource type is in the slice of excluded resources.
+				if isInList(resourceTyp, excludedResourcesTypes) {
 					continue
 				}
 				generate(cmd, cmd.OutOrStdout(), resourceTyp)
@@ -447,6 +443,21 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
+	case "zpa_policy_isolation_rule":
+		list, _, err := api.zpa.policysetcontroller.GetAllByType("ISOLATION_POLICY")
+		if err != nil {
+			log.Fatal(err)
+		}
+		jsonPayload := []policysetcontroller.PolicyRule{}
+		for _, i := range list {
+			if i.Name == "Zscaler Deception" {
+				continue
+			}
+			jsonPayload = append(jsonPayload, i)
+		}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
 	case "zpa_policy_timeout_rule":
 		list, _, err := api.zpa.policysetcontroller.GetAllByType("TIMEOUT_POLICY")
 		if err != nil {
@@ -587,7 +598,7 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		}
 		rulesFiltered := []filteringrules.FirewallFilteringRules{}
 		for _, rule := range rules {
-			if isInList(rule.Name, []string{"Office 365 One Click Rule", "UCaaS One Click Rule", "Default Firewall Filtering Rule"}) {
+			if isInList(rule.Name, []string{"Office 365 One Click Rule", "UCaaS One Click Rule", "Default Firewall Filtering Rule", "Recommended Firewall Rule", "Block All IPv6", "Block malicious IPs and domains", "Zscaler Proxy Traffic"}) {
 				continue
 			}
 			rulesFiltered = append(rulesFiltered, rule)

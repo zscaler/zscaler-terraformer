@@ -1,10 +1,11 @@
 TEST                  ?= $$(go list ./...)
-GO_FILES              ?= $$(find . -name '*.go')
-
+GOFMT_FILES              ?= $$(find . -name '*.go')
 VERSION               ?= $$(git describe --tags --abbrev=0)-pre-release+$$(git rev-parse --short=12 HEAD)
 ROOT_DIR               = $$PWD
-
+ZSCALER_TERRAFORM_INSTALL_PATH=$$PWD
 HASHICORP_CHECKPOINT_TIMEMOUT ?= 30000
+TFPROVIDERLINT=tfproviderlint
+STATICCHECK=staticcheck
 
 build:
 	@go build \
@@ -20,6 +21,7 @@ test_zpa:
 		ZPA_CLIENT_ID="$(ZPA_CLIENT_ID)" \
 		ZPA_CLIENT_SECRET="$(ZPA_CLIENT_SECRET)" \
 		ZPA_CUSTOMER_ID="$(ZPA_CUSTOMER_ID)" \
+		ZPA_CLOUD="$(ZPA_CLOUD)" \
 		go test $(TEST) -timeout 120m -v $(TESTARGS)
 
 test_zia:
@@ -31,8 +33,37 @@ test_zia:
 		ZIA_API_KEY="$(ZIA_API_KEY)" \
 		ZIA_CLOUD="$(ZIA_CLOUD)" \
 		go test $(TEST) -timeout 120m -v $(TESTARGS)
+
+vet:
+	@echo "==> Checking source code against go vet and staticcheck"
+	@go vet ./...
+	@staticcheck ./...
+
+imports:
+	goimports -w $(GOFMT_FILES)
+
 fmt:
-	gofmt -w $(GO_FILES)
+	gofmt -w $(GOFMT_FILES)
+
+fmtcheck:
+	@sh -c "'$(CURDIR)/scripts/gofmtcheck.sh'"
+
+errcheck:
+	@sh -c "'$(CURDIR)/scripts/errcheck.sh'"
+
+lint: vendor
+	@echo "✓ Linting source code with https://staticcheck.io/ ..."
+	@go run honnef.co/go/tools/cmd/staticcheck@v0.4.6 ./...
+
+tools:
+	@which $(GOFMT) || go install mvdan.cc/gofumpt@v0.5.0
+	@which $(TFPROVIDERLINT) || go install github.com/bflad/tfproviderlint/cmd/tfproviderlint@v0.29.0
+	@which $(STATICCHECK) || go install honnef.co/go/tools/cmd/staticcheck@v0.4.6
+
+tools-update:
+	@go install mvdan.cc/gofumpt@v0.5.0
+	@go install github.com/bflad/tfproviderlint/cmd/tfproviderlint@v0.29.0
+	@go install honnef.co/go/tools/cmd/staticcheck@v0.4.6
 
 validate-tf:
 	@bash scripts/validate-tf.sh
@@ -55,4 +86,4 @@ install:
 	-ldflags="-X github.com/zscaler/zscaler-terraformer/internal/app/zscaler-terraformer/cmd.versionString=$(VERSION)" \
 	-o $(DESTINATION)/zscaler-terraformer ./cmd/zscaler-terraformer/main.go
 
-.PHONY: build test fmt validate-tf
+.PHONY: build test fmt validate-tf vendor-status vet fmt fmtcheck errcheck tools vendor-status
