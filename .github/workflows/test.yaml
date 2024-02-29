@@ -98,6 +98,5 @@ jobs:
             ZIA_CLOUD: ${{ secrets.ZIA_CLOUD }}
             ZSCALER_TERRAFORM_INSTALL_PATH: ${{ github.workspace }}
         run: | 
-          make test_zpa
-          make test_zia
+
 

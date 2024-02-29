@@ -1,8 +1,10 @@
+# THIS IS AN AUTOMATED GENERATED TEST DATA.
+# THE INFORMATION BELOW IS NOT VALID OR USED IN PRODUCTION SYSTEMS
 ---
 version: 1
 interactions:
 - request:
-    body: client_id=MjE2MTk5NjE4MTQzMTkxMDUzLTAyNTQ3MTlhLWFhOGItNDE2Ny04YjkyLWIzYzk5NTQ2Njk0Zg%3D%3D&client_secret=DY%25BN%5EkL8COEdjJWRi%3Bia2%5D%7D%3DG8sM%28bl
+    body: client_id=1222clientid&client_secret=1222clientsec
     form: {}
     headers:
       Content-Type:
@@ -15,7 +17,7 @@ interactions:
     body: |-
       {
         "token_type" : "Bearer",
-        "access_token" : "eyJraWQiOiI0bzZFS1k4STFqS1kwN2tQdjlqWV9xd3AyYmt4eTd2Y1V1WGhUSGJBazgwIiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJNakUyTVRrNU5qRTRNVFF6TVRreE1EVXpMVEF5TlRRM01UbGhMV0ZoT0dJdE5ERTJOeTA0WWpreUxXSXpZems1TlRRMk5qazBaZz09IiwiYXVkIjoiaHR0cHM6XC9cL2F1dGh6MS5wcm9kLnpwYXRoLm5ldCIsInJlc3RyaWN0ZWRSb2xlIjpmYWxzZSwicm9sZUlkIjoyOCwiY3VzdElkIjoiMjE2MTk5NjE4MTQzMTkxMDQwIiwiaXNzIjoiaHR0cHM6XC9cL3VzMS16cGEtYXV0aG4ucHJpdmF0ZS56c2NhbGVyLmNvbSIsInR5cGUiOiJDTElFTlRfQ1JFREVOVElBTFMiLCJleHAiOjE3MDkyNDAwMTUsImlhdCI6MTcwOTIzNjQxNSwianRpIjoic202ZTI5d2VsM3o0M2o1MWl2ZnpvNngzIn0.txTz1h1rxVkd96jOyhLaAAw_qAlLg3sJOo_5eW4a4Y1WMH_UqoCdYBV4sSZGz2pXB9ZYogd4r998AjMW6hzDsnwPgwNjmZtHc2-RsjofUy5EaNm5JeA_Myi1iB3y9wy8PCItM3EoGCn2F1-F3H9vFw8g9MxdwY-2qWKEAQ6A40Oq8K0SHn9mma8u8mY2UjG-8kRsMuVafvJSph0_bDvZu7e943X_2WBMdldi7CNBzbLBykZdgWvQXmL44dMMHf8sP227kO4x3zVD5H78NqmT9Qh2fSVn58kR-ycMPjJVb-BZMPUyuvcetCzxxocggm-qnNsuK6sMiHanQ2Bnq_bnew",
+        "access_token" : "jwt",
         "expires_in" : "3600"
       }
     headers:
