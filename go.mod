@@ -1,6 +1,8 @@
 module github.com/zscaler/zscaler-terraformer
 
-go 1.20
+go 1.21
+
+toolchain go1.22.0
 
 require (
 	github.com/dnaeon/go-vcr v1.2.0

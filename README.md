@@ -271,7 +271,7 @@ Last updated February 29, 2024
 
 Any resources not listed are currently not supported.
 
-Last updated February 29, 2024
+Last updated March 7, 2024
 
 | Resource | Resource Scope | Generate Supported | Import Supported |
 |----------|-----------|----------|----------|
@@ -294,6 +294,7 @@ Last updated February 29, 2024
 | [zia_url_filtering_rules](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_url_filtering_rules) | URL | ✅ | ✅ |
 | [zia_auth_settings_urls](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_auth_settings_urls) | URL | ✅ | ✅ |
 | [zia_security_policy_settings](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_security_policy_settings) | URL | ✅ | ✅ |
+| [zia_sandbox_behavioral_analysis](https://https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_sandbox_behavioral_analysis) | URL | ✅ | ✅ |
 | [zia_user_management](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_user_management) | User | ✅ | ✅ |
 | [zia_forwarding_control_rule](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_forwarding_control_rule) | Forward | ✅ | ✅ |
 | [zia_forwarding_control_zpa_gateway](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_forwarding_control_zpa_gateway) | Forward | ✅ | ✅ |

@@ -20,6 +20,7 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkservices"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/forwarding_control_policy/forwarding_rules"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/forwarding_control_policy/zpa_gateways"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/sandbox/sandbox_settings"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/security_policy_settings"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/urlcategories"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/user_authentication_settings"
@@ -76,6 +77,7 @@ var resourceImportStringFormats = map[string]string{
 	"zia_rule_labels":                                   ":id",
 	"zia_auth_settings_urls":                            ":id",
 	"zia_security_settings":                             ":id",
+	"zia_sandbox_behavioral_analysis":                   ":id",
 }
 
 func init() {
@@ -666,6 +668,15 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 			log.Fatal(err)
 		}
 		jsonPayload := []*user_authentication_settings.ExemptedUrls{exemptedUrls}
+		m, _ := json.Marshal(jsonPayload)
+		resourceCount = len(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zia_sandbox_behavioral_analysis":
+		hashes, err := api.zia.sandbox_settings.Get()
+		if err != nil {
+			log.Fatal(err)
+		}
+		jsonPayload := []*sandbox_settings.BaAdvancedSettings{hashes}
 		m, _ := json.Marshal(jsonPayload)
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)

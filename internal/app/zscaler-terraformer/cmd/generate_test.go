@@ -29,6 +29,7 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/location/locationgroups"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/location/locationmanagement"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/rule_labels"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/sandbox/sandbox_settings"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/security_policy_settings"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/greinternalipranges"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/gretunnelinfo"
@@ -186,6 +187,7 @@ func TestResourceGeneration(t *testing.T) {
 		"zia rule labels":                                   {identiferType: "rule", resourceType: "zia_rule_labels", testdataFilename: "zia_rule_labels"},
 		"zia auth settings urls":                            {identiferType: "auth", resourceType: "zia_auth_settings_urls", testdataFilename: "zia_auth_settings_urls"},
 		"zia security settings":                             {identiferType: "security", resourceType: "zia_security_settings", testdataFilename: "zia_security_settings"},
+		"zia sandbox settings":                              {identiferType: "sandbox", resourceType: "zia_sandbox_behavioral_analysis", testdataFilename: "zia_sandbox_behavioral_analysis"},
 		//"zia forward control rule":                          {identiferType: "forward", resourceType: "zia_forwarding_control_rule", testdataFilename: "zia_forwarding_control_rule"},
 		//"zia zpa gateway":                                   {identiferType: "forward", resourceType: "zia_forwarding_control_zpa_gateway", testdataFilename: "zia_forwarding_control_zpa_gateway"},
 	}
@@ -305,6 +307,7 @@ func createClientMock(r http.RoundTripper, resourceType, zpaClientID, zpaClientS
 				dlp_web_rules:                dlp_web_rules.New(ziaClient),
 				rule_labels:                  rule_labels.New(ziaClient),
 				security_policy_settings:     security_policy_settings.New(ziaClient),
+				sandbox_settings:             sandbox_settings.New(ziaClient),
 				user_authentication_settings: user_authentication_settings.New(ziaClient),
 				users:                        users.New(ziaClient),
 				forwarding_rules:             forwarding_rules.New(ziaClient),

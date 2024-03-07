@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.1.0 (March, 7 2024)
+
+### Notes
+
+- Release date: **(March, 7 2024)**
+- Supported Terraform version: **v1.x.x**
+
+### Enhancements
+
+- [PR #176](https://github.com/zscaler/zscaler-terraformer/pull/176) Updated [support guide](/docs/guides/support.md) with new Zscaler support model.
+- [PR #176](https://github.com/zscaler/zscaler-terraformer/pull/176) Introduced importing support for the following ZIA resource(s):
+    * ``zia_sandbox_behavioral_analysis``
+### Fixes
+- [PR #176](https://github.com/zscaler/zscaler-terraformer/pull/176) Fixed importing issue with the following ZIA resources:
+    * ``zia_security_settings``
+    * ``zia_url_categories``
+
 ## 1.0.3 (February, 29 2024)
 
 ### Notes

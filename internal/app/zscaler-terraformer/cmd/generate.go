@@ -28,6 +28,7 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkservices"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/forwarding_control_policy/forwarding_rules"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/forwarding_control_policy/zpa_gateways"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/sandbox/sandbox_settings"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/security_policy_settings"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/urlcategories"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/user_authentication_settings"
@@ -86,6 +87,7 @@ var allGeneratableResources = []string{
 	"zia_user_management",
 	"zia_rule_labels",
 	"zia_auth_settings_urls",
+	"zia_sandbox_behavioral_analysis",
 	"zia_security_settings",
 	"zia_forwarding_control_zpa_gateway",
 	"zia_forwarding_control_rule",
@@ -135,29 +137,45 @@ func generateResources() func(cmd *cobra.Command, args []string) {
 }
 
 func buildResourceName(resourceType string, structData map[string]interface{}) string {
-	id := ""
-	resourceID := ""
-	if structData["id"] != nil {
+	// Define a variable for the short UUID.
+	var shortUUID string
+
+	// For resources that typically lack a unique identifier, generate a short UUID.
+	resourcesRequiringShortID := []string{"zia_sandbox_behavioral_analysis", "zia_security_settings", "zia_auth_settings_urls"}
+	if isInList(resourceType, resourcesRequiringShortID) {
+		// Generate a UUID and use the first 8 characters.
+		shortUUID = uuid.New().String()[:8]
+	}
+
+	// Construct the resource ID using only the short UUID for specific resources, or use the existing logic for others.
+	var resID string
+	if shortUUID != "" {
+		resID = fmt.Sprintf("resource_%s", shortUUID)
+	} else if structData["id"] != nil {
+		var resourceID string
 		switch structData["id"].(type) {
 		case float64:
 			resourceID = fmt.Sprintf("%d", int64(structData["id"].(float64)))
 		default:
 			resourceID = structData["id"].(string)
 		}
-	}
-	id = strings.ToLower(strip(id))
-	if structData["name"] != nil {
+		resID = fmt.Sprintf("resource_%s_%s", resourceType, resourceID)
+	} else if structData["name"] != nil {
 		name := structData["name"].(string)
 		if name != "" {
-			id = strings.ReplaceAll(strings.ToLower(strip(name)), " ", "_")
+			id := strings.ReplaceAll(strings.ToLower(strip(name)), " ", "_")
+			resID = fmt.Sprintf("resource_%s_%s", resourceType, id)
 		}
 	}
-	resID := fmt.Sprintf("resource_%s_%s", id, resourceID)
+
+	if resID == "" {
+		// Fallback to using the short UUID if no other identifier is available.
+		resID = fmt.Sprintf("resource_%s", shortUUID)
+	}
+
 	resID = strings.ReplaceAll(resID, `"`, "")
 	resID = strings.ReplaceAll(resID, `'`, "")
 	resID = strings.ReplaceAll(resID, "`", "")
-
-	// Remove any double underscores
 	resID = strings.ReplaceAll(resID, "__", "_")
 
 	return resID
@@ -777,6 +795,15 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 			log.Fatal(err)
 		}
 		jsonPayload := []*user_authentication_settings.ExemptedUrls{exemptedUrls}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zia_sandbox_behavioral_analysis":
+		hashes, err := api.zia.sandbox_settings.Get()
+		if err != nil {
+			log.Fatal(err)
+		}
+		jsonPayload := []*sandbox_settings.BaAdvancedSettings{hashes}
 		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)

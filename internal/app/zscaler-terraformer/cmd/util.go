@@ -30,6 +30,7 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/location/locationgroups"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/location/locationmanagement"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/rule_labels"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/sandbox/sandbox_settings"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/security_policy_settings"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/greinternalipranges"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/gretunnelinfo"
@@ -235,6 +236,7 @@ func sharedPreRun(cmd *cobra.Command, args []string) {
 				dlp_web_rules:                dlp_web_rules.New(ziaClient),
 				rule_labels:                  rule_labels.New(ziaClient),
 				security_policy_settings:     security_policy_settings.New(ziaClient),
+				sandbox_settings:             sandbox_settings.New(ziaClient),
 				user_authentication_settings: user_authentication_settings.New(ziaClient),
 				forwarding_rules:             forwarding_rules.New(ziaClient),
 				zpa_gateways:                 zpa_gateways.New(ziaClient),
