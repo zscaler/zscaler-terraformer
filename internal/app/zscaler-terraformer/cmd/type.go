@@ -20,6 +20,7 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/location/locationgroups"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/location/locationmanagement"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/rule_labels"
+	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/sandbox/sandbox_settings"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/security_policy_settings"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/greinternalipranges"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/gretunnelinfo"
@@ -128,6 +129,7 @@ type ZIAClient struct {
 	dlp_web_rules                *dlp_web_rules.Service
 	rule_labels                  *rule_labels.Service
 	security_policy_settings     *security_policy_settings.Service
+	sandbox_settings             *sandbox_settings.Service
 	user_authentication_settings *user_authentication_settings.Service
 	forwarding_rules             *forwarding_rules.Service
 	zpa_gateways                 *zpa_gateways.Service
