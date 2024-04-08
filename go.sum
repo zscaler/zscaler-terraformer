@@ -151,8 +151,8 @@ github.com/xanzy/ssh-agent v0.3.3 h1:+/15pJfg/RsTxqYcX6fHqOXZwwMP+2VyYWJeWM2qQFM
 github.com/xanzy/ssh-agent v0.3.3/go.mod h1:6dzNDKs0J9rVPHPhaGCukekBHKqfl+L3KghI1Bc68Uw=
 github.com/zclconf/go-cty v1.14.4 h1:uXXczd9QDGsgu0i/QFR/hzI5NYCHLf6NQw/atrbnhq8=
 github.com/zclconf/go-cty v1.14.4/go.mod h1:VvMs5i0vgZdhYawQNq5kePSpLAoz8u1xvZgrPIxfnZE=
-github.com/zscaler/zscaler-sdk-go/v2 v2.4.31 h1:1fEyDsVZe5MNJEvZVqO1Q04n6C+i+Lx20Qabcb0Fua0=
-github.com/zscaler/zscaler-sdk-go/v2 v2.4.31/go.mod h1:tkYuT8WhbBCr/0itvRY123NiYp82V/BLN9it0BY48Gw=
+github.com/zscaler/zscaler-sdk-go/v2 v2.4.33 h1:78Te1ne+luWggBDWp9Y9UEDmUmHck8CRSfmLPbQtM+M=
+github.com/zscaler/zscaler-sdk-go/v2 v2.4.33/go.mod h1:tkYuT8WhbBCr/0itvRY123NiYp82V/BLN9it0BY48Gw=
 go.uber.org/multierr v1.11.0 h1:blXXJkSxSSfBVBlC76pxqeO+LN3aDfLQo+309xJstO0=
 go.uber.org/multierr v1.11.0/go.mod h1:20+QtiLqy0Nd6FdQB9TLXag12DsQkrbs3htMFfDN80Y=
 golang.org/x/crypto v0.20.0 h1:jmAMJJZXr5KiCw05dfYK9QnqaqKLYXijU23lsEdcQqg=
