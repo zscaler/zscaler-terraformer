@@ -12,9 +12,36 @@ Track all Zscaler Terraformer Tool releases. New resources, features, and bug fi
 
 ---
 
-``Last updated: v1.0.3``
+``Last updated: v1.1.1``
 
 ---
+
+## 1.1.1 (May, 7 2024)
+
+### Notes
+
+- Release date: **(May, 7 2024)**
+- Supported Terraform version: **v1.x.x**
+
+### Fixes
+- [PR #187](https://github.com/zscaler/zscaler-terraformer/pull/187) Fixed importing issue with `zia_url_filtering_rules` attributes: `override_users` and `override_groups`. Attributes are now correctly imported as a list of IDs.
+
+## 1.1.0 (March, 7 2024)
+
+### Notes
+
+- Release date: **(March, 7 2024)**
+- Supported Terraform version: **v1.x.x**
+
+### Enhancements
+
+- [PR #176](https://github.com/zscaler/zscaler-terraformer/pull/176) Updated [support guide](/docs/guides/support.md) with new Zscaler support model.
+- [PR #176](https://github.com/zscaler/zscaler-terraformer/pull/176) Introduced importing support for the following ZIA resource(s):
+    * ``zia_sandbox_behavioral_analysis``
+### Fixes
+- [PR #176](https://github.com/zscaler/zscaler-terraformer/pull/176) Fixed importing issue with the following ZIA resources:
+    * ``zia_security_settings``
+    * ``zia_url_categories``
 
 ## 1.0.3 (February, 29 2024)
 
@@ -50,7 +77,6 @@ Track all Zscaler Terraformer Tool releases. New resources, features, and bug fi
 
 - [PR #170](https://github.com/zscaler/zscaler-terraformer/pull/170) Fixed ZIA ``zia_firewall_filtering_rule`` missformatted ID for rules containing the `users` nested block
 - [PR #170](https://github.com/zscaler/zscaler-terraformer/pull/170) Upgraded to [Zscaler-SDK-GO v2.3.9](https://github.com/zscaler/zscaler-sdk-go/releases/tag/v2.3.9)
-
 
 ## 1.0.0 (January, 30 2024)
 
@@ -108,11 +134,11 @@ Track all Zscaler Terraformer Tool releases. New resources, features, and bug fi
 
 - [PR #134](https://github.com/zscaler/zscaler-terraformer/pull/134) Implement condition to exclude ``applications`` block from the ZPA resources `zpa_segment_group` and `zpa_server_group`.
 
-## 0.3.1 (September 17, 2023)
+## 0.3.1 (August 25, 2023)
 
 ### Notes
 
-- Release date: **(August 17, 2023)**
+- Release date: **(August 25, 2023)**
 - Supported Terraform version: **v1.x.x**
 
 ### Bug Fixes

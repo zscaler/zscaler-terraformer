@@ -401,6 +401,11 @@ func nestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 			"users",
 			"labels",
 			"services",
+			"users",
+			"override_groups",
+			"override_users",
+			"device_groups",
+			"source_ip_groups",
 		}) {
 			output += listIdsIntBlock(block, structData[mapTfFieldNameToApi(resourceType, block)])
 			continue
