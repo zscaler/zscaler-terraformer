@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.1 (May, 7 2024)
+
+### Notes
+
+- Release date: **(May, 7 2024)**
+- Supported Terraform version: **v1.x.x**
+
+### Fixes
+- [PR #187](https://github.com/zscaler/zscaler-terraformer/pull/187) Fixed importing issue with `zia_url_filtering_rules` attributes: `override_users` and `override_groups`. Attributes are now correctly imported as a list of IDs.
+
 ## 1.1.0 (March, 7 2024)
 
 ### Notes
