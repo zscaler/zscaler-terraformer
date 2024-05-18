@@ -63,7 +63,7 @@ interactions:
     method: GET
   response:
     body: '{"totalPages":"1","totalCount":"0","list":[{"id":"216199618143212400","modifiedTime":"1705066939","creationTime":"1675812458","modifiedBy":"216199618143191053","name":"Default_Rule","description":"This
-      is the default Isolation Policy rule","ruleOrder":"1","priority":"1","policyType":"5","operator":"AND","conditions":[{"id":"3794594","modifiedTime":"1675812458","creationTime":"1675812458","modifiedBy":"72057594037930840","operator":"OR","negated":false,"operands":[{"id":"3794595","creationTime":"1675812458","modifiedBy":"72057594037930840","objectType":"CLIENT_TYPE","lhs":"id","rhs":"zpn_client_type_exporter","name":"zpn_client_type_exporter"}]}],"action":"BYPASS_ISOLATE","defaultRule":true,"defaultRuleName":"Default_Rule"}]}'
+      is the default Isolation Policy rule","ruleOrder":"1","priority":"1","policyType":"5","operator":"AND","conditions":[{"id":"3794594","modifiedTime":"1675812458","creationTime":"1675812458","modifiedBy":"72057594037930840","operator":"OR","operands":[{"id":"3794595","creationTime":"1675812458","modifiedBy":"72057594037930840","objectType":"CLIENT_TYPE","lhs":"id","rhs":"zpn_client_type_exporter","name":"zpn_client_type_exporter"}]}],"action":"BYPASS_ISOLATE","defaultRule":true,"defaultRuleName":"Default_Rule"}]}'
     headers:
       Cache-Control:
       - no-store

@@ -6,7 +6,6 @@ resource "zpa_policy_isolation_rule" "terraform_managed_resource" {
   policy_type         = "5"
 
   conditions {
-    negated = false
     operator = "OR"
     operands {
       object_type = "CLIENT_TYPE"
