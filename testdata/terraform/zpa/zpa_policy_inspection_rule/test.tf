@@ -6,7 +6,6 @@ resource "zpa_policy_inspection_rule" "terraform_managed_resource" {
   operator            = "AND"
   policy_type         = "1"
   conditions {
-    negated  = false
     operator = "OR"
     operands {
       lhs         = "id"

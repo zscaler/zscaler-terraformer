@@ -881,13 +881,14 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		for k := range r.Block.Attributes {
 			sortedBlockAttributes = append(sortedBlockAttributes, k)
 		}
+
 		sort.Strings(sortedBlockAttributes)
 		// Block attributes are for any attributes where assignment is involved.
 		for _, attrName := range sortedBlockAttributes {
 			apiAttrName := mapTfFieldNameToApi(resourceType, attrName)
 			// Don't bother outputting the ID for the resource as that is only for
 			// internal use (such as importing state).
-			if attrName == "id" {
+			if attrName == "id" || attrName == "provisioning_key" {
 				continue
 			}
 

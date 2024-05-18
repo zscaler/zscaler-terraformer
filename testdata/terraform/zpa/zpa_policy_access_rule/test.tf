@@ -11,7 +11,6 @@ resource "zpa_policy_access_rule" "terraform_managed_resource" {
     id = ["216196257331301306"]
   }
   conditions {
-    negated  = false
     operator = "OR"
     operands {
       lhs         = "id"
