@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.2 (May, 17 2024)
+
+### Notes
+
+- Release date: **(May, 17 2024)**
+- Supported Terraform version: **v1.x.x**
+
+### Fixes
+- [PR #190](https://github.com/zscaler/zscaler-terraformer/pull/190) Fixed ZPA `provisioning_key` computed attribute. The attribute is now excluded from the HCL generation during the import process.
+
 ## 1.1.1 (May, 7 2024)
 
 ### Notes
