@@ -908,6 +908,18 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 					value := structData[apiAttrName]
 					// Handle any string modifications here, if necessary.
 
+					if resourceType == "zpa_service_edge_group" && attrName == "is_public" {
+						if value == nil {
+							value = false
+						} else {
+							isPublicStr, ok := value.(string)
+							if ok {
+								isPublic, _ := strconv.ParseBool(isPublicStr)
+								value = isPublic
+							}
+						}
+					}
+
 					output += writeAttrLine(attrName, value, false)
 
 				case cty.Number:

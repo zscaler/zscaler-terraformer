@@ -433,6 +433,12 @@ func nestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 		} else if isInList(resourceType, []string{"zpa_server_group", "zpa_policy_access_rule"}) && block == "app_connector_groups" {
 			output += listIdsStringBlock(block, structData["appConnectorGroups"])
 			continue
+		} else if isInList(resourceType, []string{"zpa_service_edge_group"}) && block == "service_edges" {
+			output += listIdsStringBlock(block, structData["serviceEdges"])
+			continue
+		} else if isInList(resourceType, []string{"zpa_service_edge_group"}) && block == "trusted_networks" {
+			output += listIdsStringBlock(block, structData["trustedNetworks"])
+			continue
 		} else if isInList(resourceType, []string{"zpa_server_group", "zpa_segment_group"}) && block == "applications" {
 			output += listIdsStringBlock(block, structData["applications"])
 			continue

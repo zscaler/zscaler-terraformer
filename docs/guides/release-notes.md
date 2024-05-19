@@ -12,9 +12,23 @@ Track all Zscaler Terraformer Tool releases. New resources, features, and bug fi
 
 ---
 
-``Last updated: v1.1.2``
+``Last updated: v1.1.3``
 
 ---
+
+## 1.1.3 (May, 18 2024)
+
+### Notes
+
+- Release date: **(May, 18 2024)**
+- Supported Terraform version: **v1.x.x**
+
+### Fixes
+- [PR #191](https://github.com/zscaler/zscaler-terraformer/pull/191) Fixed ZPA `provisioning_key` computed attribute. The attribute is now excluded from the HCL generation during the import process.
+
+- [PR #191](https://github.com/zscaler/zscaler-terraformer/pull/191) Fixed ZPA `zpa_service_edge_group` to convert `is_public` attribute to expected bool format.
+
+- [PR #191](https://github.com/zscaler/zscaler-terraformer/pull/191) Fixed ZPA `zpa_service_edge_group` to properly convert nested attribute blocks `service_edge` and `trusted_networks`
 
 ## 1.1.2 (May, 17 2024)
 
