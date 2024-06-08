@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.2.0 (June, 7 2024)
+
+### Notes
+
+- Release date: **(June, 7 2024)**
+- Supported Terraform version: **v1.x.x**
+
+### Deprecations
+- [PR #199](https://github.com/zscaler/zscaler-terraformer/pull/199) Deprecated the following ZPA resource:
+    - `zpa_cloud_browser_isolation_banner`
+    - `zpa_cloud_browser_isolation_certificate`
+    - `zpa_cloud_browser_isolation_external_profile`
+
+### Fixes
+- [PR #199](https://github.com/zscaler/zscaler-terraformer/pull/199) Implemented fix to resource `zpa_microtenant_controller`, to ignore the importing of `Default` Microtenant.
+
 ## 1.1.3 (May, 18 2024)
 
 ### Notes
