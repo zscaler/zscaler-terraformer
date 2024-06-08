@@ -33,6 +33,7 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/urlcategories"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/user_authentication_settings"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appconnectorgroup"
+	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/microtenants"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/policysetcontroller"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/segmentgroup"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/servergroup"
@@ -52,9 +53,6 @@ var allGeneratableResources = []string{
 	"zpa_application_segment_inspection",
 	"zpa_application_segment_browser_access",
 	"zpa_ba_certificate",
-	"zpa_cloud_browser_isolation_banner",
-	"zpa_cloud_browser_isolation_certificate",
-	"zpa_cloud_browser_isolation_external_profile",
 	"zpa_segment_group",
 	"zpa_server_group",
 	"zpa_policy_access_rule",
@@ -367,30 +365,6 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
-	case "zpa_cloud_browser_isolation_banner":
-		jsonPayload, _, err := api.zpa.cbibannercontroller.GetAll()
-		if err != nil {
-			log.Fatal(err)
-		}
-		resourceCount = len(jsonPayload)
-		m, _ := json.Marshal(jsonPayload)
-		_ = json.Unmarshal(m, &jsonStructData)
-	case "zpa_cloud_browser_isolation_certificate":
-		jsonPayload, _, err := api.zpa.cbicertificatecontroller.GetAll()
-		if err != nil {
-			log.Fatal(err)
-		}
-		resourceCount = len(jsonPayload)
-		m, _ := json.Marshal(jsonPayload)
-		_ = json.Unmarshal(m, &jsonStructData)
-	case "zpa_cloud_browser_isolation_external_profile":
-		jsonPayload, _, err := api.zpa.cbiprofilecontroller.GetAll()
-		if err != nil {
-			log.Fatal(err)
-		}
-		resourceCount = len(jsonPayload)
-		m, _ := json.Marshal(jsonPayload)
-		_ = json.Unmarshal(m, &jsonStructData)
 	case "zpa_segment_group":
 		list, _, err := api.zpa.segmentgroup.GetAll()
 		if err != nil {
@@ -551,10 +525,16 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		resourceCount = len(jsonPayload)
-		m, _ := json.Marshal(jsonPayload)
+		// Filter out any resources with name == "Default"
+		var filteredPayload []microtenants.MicroTenant
+		for _, item := range jsonPayload {
+			if item.Name != "Default" {
+				filteredPayload = append(filteredPayload, item)
+			}
+		}
+		m, _ := json.Marshal(filteredPayload)
+		resourceCount = len(filteredPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
-
 	case "zia_admin_users":
 		jsonPayload, err := api.zia.admins.GetAllAdminUsers()
 		if err != nil {
