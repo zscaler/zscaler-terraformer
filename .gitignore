@@ -70,3 +70,4 @@ terraform.tfvars.json
 vendor/
 local_test
 zscaler-terraformer
+build
