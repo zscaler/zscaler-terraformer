@@ -1,6 +1,10 @@
 
 # Visit https://goreleaser.com for documentation on how to customize this
 # behavior.
+version: 2
+
+project_name: zscaler-terraformer
+
 before:
   hooks:
     # this is just an example and not a requirement for provider building/publishing
@@ -29,6 +33,14 @@ checksum:
   name_template: '{{ .ProjectName }}_{{ .Version }}_SHA256SUMS'
   algorithm: sha256
 
+gomod:
+  proxy: true
+  gobinary: go
+
+github_urls:
+  download: https://github.com
+  api: https://api.github.com/
+
 signs:
   - artifacts: checksum
     args:
@@ -49,5 +61,4 @@ release:
     owner: Zscaler
     name: zscaler-terraformer
   draft: true
-changelog:
-  skip: true
+  name_template: '{{.Tag}}'

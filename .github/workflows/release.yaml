@@ -3,6 +3,10 @@ on:
   push:
     tags:
       - 'v*'
+
+permissions:
+  contents: write
+
 jobs:
   goreleaser:
     runs-on: ubuntu-latest
@@ -29,23 +33,12 @@ jobs:
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v6.0.0
+        uses: goreleaser/goreleaser-action@v6
         with:
-          version: latest
-          args: release --rm-dist
+          version: '~> v2'
+          args: release --clean
         env:
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
           # GitHub sets this automatically
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ env.VERSION }}
-
-      # only attempt to bump the cask if the release was successful
-      - name: Bump zscaler-terraformer cask in zscaler/homebrew-zscaler-terraformer
-        uses: macauley/action-homebrew-bump-cask@v1
-        if: steps.build.outcome == 'success'
-        with:
-          token: ${{ secrets.BUMP_CASK_TOKEN }}
-          tap: zscaler/homebrew-zscaler-terraformer
-          cask: zscaler-terraformer
-          livecheck: true
-          dryrun: false
