@@ -37,9 +37,9 @@ gomod:
   proxy: true
   gobinary: go
 
-github_urls:
-  download: https://github.com
-  api: https://api.github.com
+# github_urls:
+#   download: https://github.com
+#   api: https://api.github.com/
 
 signs:
   - artifacts: checksum
