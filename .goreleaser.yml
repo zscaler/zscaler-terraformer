@@ -39,7 +39,7 @@ gomod:
 
 github_urls:
   download: https://github.com
-  api: https://api.github.com/
+  api: https://api.github.com
 
 signs:
   - artifacts: checksum
