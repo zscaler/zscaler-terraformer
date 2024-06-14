@@ -1,18 +1,79 @@
-TEST                  ?= $$(go list ./...)
-GOFMT_FILES              ?= $$(find . -name '*.go')
-VERSION               ?= $$(git describe --tags --abbrev=0)-pre-release+$$(git rev-parse --short=12 HEAD)
-ROOT_DIR               = $$PWD
-ZSCALER_TERRAFORM_INSTALL_PATH=$$PWD
+COLOR_OK=\\x1b[0;32m
+COLOR_NONE=\x1b[0m
+COLOR_ERROR=\x1b[31;01m
+COLOR_DESTROY=\033[31m # Red
+COLOR_WARNING=\x1b[33;05m
+COLOR_ZSCALER=\x1B[34;01m
+GOFMT := gofumpt
+GOIMPORTS := goimports
+
+help:
+	@echo "$(COLOR_ZSCALER)"
+	@echo "  ______              _           "
+	@echo " |___  /             | |          "
+	@echo "    / / ___  ___ __ _| | ___ _ __ "
+	@echo "   / / / __|/ __/ _\` | |/ _ \ '__|"
+	@echo "  / /__\__ \ (_| (_| | |  __/ |   "
+	@echo " /_____|___/\___\__,_|_|\___|_|   "
+	@echo "                                  "
+	@echo "                                  "
+	@echo "$(COLOR_OK)Zscaler-Terraformer CLI$(COLOR_NONE)"
+	@echo ""
+	@echo "$(COLOR_WARNING)Usage:$(COLOR_NONE)"
+	@echo "$(COLOR_OK)  make [command]$(COLOR_NONE)"
+	@echo ""
+	@echo "$(COLOR_WARNING)Available commands:$(COLOR_NONE)"
+	@echo "$(COLOR_WARNING)Build$(COLOR_NONE)"
+	@echo "$(COLOR_OK)  build                 	Builds the Binary For The Current Platform and Architecture$(COLOR_NONE)"
+	@echo "$(COLOR_OK)  build_all               	Builds the Binary For Multiple Platforms $(COLOR_NONE)"
+	@echo "$(COLOR_WARNING)Install$(COLOR_NONE)"
+	@echo "$(COLOR_OK)  build                 	Builds and Installs The Binary For The Current Platform and Architecture$(COLOR_NONE)"
+	@echo "$(COLOR_WARNING)test$(COLOR_NONE)"
+	@echo "$(COLOR_OK)  test_zia        	Run only zia integration tests$(COLOR_NONE)"
+	@echo "$(COLOR_OK)  test_zpa        	Run only zpa integration tests$(COLOR_NONE)"
+
+
+TEST ?= $(shell go list ./...)
+GOFMT_FILES ?= $(shell find . -name '*.go')
+VERSION ?= $(shell git describe --tags --abbrev=0)-pre-release+$(shell git rev-parse --short=12 HEAD)
+ROOT_DIR = $(PWD)
+ZSCALER_TERRAFORM_INSTALL_PATH=$(PWD)
 HASHICORP_CHECKPOINT_TIMEMOUT ?= 30000
-TFPROVIDERLINT=tfproviderlint
-STATICCHECK=staticcheck
+TFPROVIDERLINT = tfproviderlint
+STATICCHECK = staticcheck
+BINARY_NAME = zscaler-terraformer
 
 build:
 	@go build \
 		-gcflags=all=-trimpath=$(GOPATH) \
 		-asmflags=all=-trimpath=$(GOPATH) \
 		-ldflags="-X github.com/zscaler/zscaler-terraformer/internal/app/zscaler-terraformer/cmd.versionString=$(VERSION)" \
-		-o zscaler-terraformer cmd/zscaler-terraformer/main.go
+		-o $(BINARY_NAME) cmd/zscaler-terraformer/main.go
+
+install: GOOS=$(shell go env GOOS)
+install: GOARCH=$(shell go env GOARCH)
+ifeq ($(OS),Windows_NT)
+install: DESTINATION=C:\Windows\System32
+else
+install: DESTINATION=/usr/local/bin
+endif
+install:
+	@echo "==> Installing $(BINARY_NAME) CLI in: $(DESTINATION)/$(BINARY_NAME)"
+	@mkdir -p $(DESTINATION)
+	@rm -f $(DESTINATION)/$(BINARY_NAME)
+	@go build \
+		-gcflags=all=-trimpath=$(GOPATH) \
+		-asmflags=all=-trimpath=$(GOPATH) \
+		-ldflags="-X github.com/zscaler/zscaler-terraformer/internal/app/zscaler-terraformer/cmd.versionString=$(VERSION)" \
+		-o $(DESTINATION)/$(BINARY_NAME) ./cmd/zscaler-terraformer/main.go
+
+build_all:
+	@echo "==> Building $(BINARY_NAME) for Windows, macOS, and Linux..."
+	GOOS=windows GOARCH=amd64 go build -o build/$(BINARY_NAME).exe cmd/zscaler-terraformer/main.go
+	GOOS=darwin GOARCH=amd64 go build -o build/$(BINARY_NAME)_darwin_amd64 cmd/zscaler-terraformer/main.go
+	GOOS=darwin GOARCH=arm64 go build -o build/$(BINARY_NAME)_darwin_arm64 cmd/zscaler-terraformer/main.go
+	GOOS=linux GOARCH=amd64 go build -o build/$(BINARY_NAME)_linux_amd64 cmd/zscaler-terraformer/main.go
+	GOOS=linux GOARCH=arm64 go build -o build/$(BINARY_NAME)_linux_arm64 cmd/zscaler-terraformer/main.go
 
 test_zpa:
 	@CI=true \
@@ -67,23 +128,5 @@ tools-update:
 
 validate-tf:
 	@bash scripts/validate-tf.sh
-
-
-install: GOOS=$(shell go env GOOS)
-install: GOARCH=$(shell go env GOARCH)
-ifeq ($(OS),Windows_NT)  # is Windows_NT on XP, 2000, 7, Vista, 10...
-install: DESTINATION=C:\Windows\System32
-else
-install: DESTINATION=/usr/local/bin
-endif
-install:
-	@echo "==> Installing zscaler-terraformer cli in: $(DESTINATION)/zscaler-terraformer"
-	@mkdir -p $(DESTINATION)
-	@rm -f $(DESTINATION)/zscaler-terraformer
-	@go build \
-	-gcflags=all=-trimpath=$(GOPATH) \
-	-asmflags=all=-trimpath=$(GOPATH) \
-	-ldflags="-X github.com/zscaler/zscaler-terraformer/internal/app/zscaler-terraformer/cmd.versionString=$(VERSION)" \
-	-o $(DESTINATION)/zscaler-terraformer ./cmd/zscaler-terraformer/main.go
 
 .PHONY: build test fmt validate-tf vendor-status vet fmt fmtcheck errcheck tools vendor-status

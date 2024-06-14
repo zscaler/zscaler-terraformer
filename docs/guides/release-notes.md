@@ -12,9 +12,19 @@ Track all Zscaler Terraformer Tool releases. New resources, features, and bug fi
 
 ---
 
-``Last updated: v1.2.0``
+``Last updated: v1.2.1``
 
 ---
+
+## 1.2.1 (June, 13 2024)
+
+### Notes
+
+- Release date: **(June, 13 2024)**
+- Supported Terraform version: **v1.x.x**
+
+### Fixes
+- [PR #203](https://github.com/zscaler/zscaler-terraformer/pull/203) Improved the command ``zscaler-terraformer version`` output to display the CLI version, terraform version and latest available version.
 
 ## 1.2.0 (June, 7 2024)
 
