@@ -8,7 +8,7 @@
 - Supported Terraform version: **v1.x.x**
 
 ### Deprecations
-- [PR #199](https://github.com/zscaler/zscaler-terraformer/pull/199) Deprecated the following ZPA resource:
+- [PR #206](https://github.com/zscaler/zscaler-terraformer/pull/206) Deprecated the following ZPA resource:
     - `zpa_application_segment_browser_access`
     - `zpa_application_segment_inspection`
     - `zpa_application_segment_pra`

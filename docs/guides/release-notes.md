@@ -24,11 +24,11 @@ Track all Zscaler Terraformer Tool releases. New resources, features, and bug fi
 - Supported Terraform version: **v1.x.x**
 
 ### Deprecations
-- [PR #199](https://github.com/zscaler/zscaler-terraformer/pull/199) Deprecated the following ZPA resource:
+- [PR #206](https://github.com/zscaler/zscaler-terraformer/pull/206) Deprecated the following ZPA resource:
     - `zpa_application_segment_browser_access`
     - `zpa_application_segment_inspection`
     - `zpa_application_segment_pra`
-    
+
 ## 1.2.1 (June, 13 2024)
 
 ### Notes
