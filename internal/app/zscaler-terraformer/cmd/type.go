@@ -36,11 +36,8 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appconnectorcontroller"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appconnectorgroup"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/applicationsegment"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/applicationsegmentinspection"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/applicationsegmentpra"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appservercontroller"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/bacertificate"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/browseraccess"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/cloudbrowserisolation/cbibannercontroller"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/cloudbrowserisolation/cbicertificatecontroller"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/cloudbrowserisolation/cbiprofilecontroller"
@@ -68,11 +65,12 @@ import (
 )
 
 type ZPAClient struct {
-	appconnectorgroup              *appconnectorgroup.Service
-	appconnectorcontroller         *appconnectorcontroller.Service
-	applicationsegment             *applicationsegment.Service
-	applicationsegmentpra          *applicationsegmentpra.Service
-	applicationsegmentinspection   *applicationsegmentinspection.Service
+	appconnectorgroup      *appconnectorgroup.Service
+	appconnectorcontroller *appconnectorcontroller.Service
+	applicationsegment     *applicationsegment.Service
+	// applicationsegmentpra          *applicationsegmentpra.Service
+	// applicationsegmentinspection   *applicationsegmentinspection.Service
+	// browseraccess                  *browseraccess.Service
 	appservercontroller            *appservercontroller.Service
 	bacertificate                  *bacertificate.Service
 	cbibannercontroller            *cbibannercontroller.Service
@@ -95,7 +93,6 @@ type ZPAClient struct {
 	serviceedgegroup               *serviceedgegroup.Service
 	serviceedgecontroller          *serviceedgecontroller.Service
 	trustednetwork                 *trustednetwork.Service
-	browseraccess                  *browseraccess.Service
 	inspection_custom_controls     *inspection_custom_controls.Service
 	inspection_predefined_controls *inspection_predefined_controls.Service
 	inspection_profile             *inspection_profile.Service
