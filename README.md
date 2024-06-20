@@ -248,11 +248,6 @@ Last updated February 29, 2024
 | [zpa_service_edge_group](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_service_edge_group) | group | ✅ | ✅ |
 | [zpa_application_server](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_application_server) | application | ✅ | ✅ |
 | [zpa_application_segment](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_application_segment) | app segment | ✅ | ✅ |
-| [zpa_application_segment_browser_access](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_application_segment_browser_access) | app segment | ✅ | ✅ |
-| [zpa_application_segment_inspection](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_application_segment_inspection) | app segment | ✅ | ✅ |
-| [zpa_application_segment_pra](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_application_segment_pra) | app segment | ✅ | ✅ |
-| [zpa_cloud_browser_isolation_banner](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_cloud_browser_isolation_banner) | isolation | ✅ | ✅ |
-| [zpa_cloud_browser_isolation_certificate](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_cloud_browser_isolation_certificate) | isolation | ✅ | ✅ |
 | [zpa_cloud_browser_isolation_external_profile](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_cloud_browser_isolation_external_profile) | isolation | ✅ | ✅ |
 | [zpa_segment_group](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_segment_group) | group | ✅ | ✅ |
 | [zpa_server_group](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_server_group) | group | ✅ | ✅ |

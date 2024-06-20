@@ -49,9 +49,9 @@ var allGeneratableResources = []string{
 	"zpa_app_connector_group",
 	"zpa_application_server",
 	"zpa_application_segment",
-	"zpa_application_segment_pra",
-	"zpa_application_segment_inspection",
-	"zpa_application_segment_browser_access",
+	// "zpa_application_segment_pra",
+	// "zpa_application_segment_inspection",
+	// "zpa_application_segment_browser_access",
 	"zpa_ba_certificate",
 	"zpa_segment_group",
 	"zpa_server_group",
@@ -341,22 +341,30 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
-	case "zpa_application_segment_pra":
-		jsonPayload, _, err := api.zpa.applicationsegmentpra.GetAll()
-		if err != nil {
-			log.Fatal(err)
-		}
-		resourceCount = len(jsonPayload)
-		m, _ := json.Marshal(jsonPayload)
-		_ = json.Unmarshal(m, &jsonStructData)
-	case "zpa_application_segment_inspection":
-		jsonPayload, _, err := api.zpa.applicationsegmentinspection.GetAll()
-		if err != nil {
-			log.Fatal(err)
-		}
-		resourceCount = len(jsonPayload)
-		m, _ := json.Marshal(jsonPayload)
-		_ = json.Unmarshal(m, &jsonStructData)
+	// case "zpa_application_segment_browser_access":
+	// 	jsonPayload, _, err := api.zpa.browseraccess.GetAll()
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// 	resourceCount = len(jsonPayload)
+	// 	m, _ := json.Marshal(jsonPayload)
+	// 	_ = json.Unmarshal(m, &jsonStructData)
+	// case "zpa_application_segment_pra":
+	// 	jsonPayload, _, err := api.zpa.applicationsegmentpra.GetAll()
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// 	resourceCount = len(jsonPayload)
+	// 	m, _ := json.Marshal(jsonPayload)
+	// 	_ = json.Unmarshal(m, &jsonStructData)
+	// case "zpa_application_segment_inspection":
+	// 	jsonPayload, _, err := api.zpa.applicationsegmentinspection.GetAll()
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// 	resourceCount = len(jsonPayload)
+	// 	m, _ := json.Marshal(jsonPayload)
+	// 	_ = json.Unmarshal(m, &jsonStructData)
 	case "zpa_ba_certificate":
 		jsonPayload, _, err := api.zpa.bacertificate.GetAll()
 		if err != nil {
@@ -393,14 +401,6 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 			}
 			i.Applications = nil // Suppress the applications block
 			jsonPayload = append(jsonPayload, i)
-		}
-		resourceCount = len(jsonPayload)
-		m, _ := json.Marshal(jsonPayload)
-		_ = json.Unmarshal(m, &jsonStructData)
-	case "zpa_application_segment_browser_access":
-		jsonPayload, _, err := api.zpa.browseraccess.GetAll()
-		if err != nil {
-			log.Fatal(err)
 		}
 		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)

@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.2.2 (June, 20 2024)
+
+### Notes
+
+- Release date: **(June, 20 2024)**
+- Supported Terraform version: **v1.x.x**
+
+### Deprecations
+- [PR #206](https://github.com/zscaler/zscaler-terraformer/pull/206) Deprecated the following ZPA resource:
+    - `zpa_application_segment_browser_access`
+    - `zpa_application_segment_inspection`
+    - `zpa_application_segment_pra`
+
 ## 1.2.1 (June, 13 2024)
 
 ### Notes

@@ -34,12 +34,12 @@ import (
 // resourceImportStringFormats contains a mapping of the resource type to the
 // composite ID that is compatible with performing an import.
 var resourceImportStringFormats = map[string]string{
-	"zpa_app_connector_group":                           ":id",
-	"zpa_application_server":                            ":id",
-	"zpa_application_segment":                           ":id",
-	"zpa_application_segment_pra":                       ":id",
-	"zpa_application_segment_inspection":                ":id",
-	"zpa_application_segment_browser_access":            ":id",
+	"zpa_app_connector_group": ":id",
+	"zpa_application_server":  ":id",
+	"zpa_application_segment": ":id",
+	// "zpa_application_segment_pra":                       ":id",
+	// "zpa_application_segment_inspection":                ":id",
+	// "zpa_application_segment_browser_access":            ":id",
 	"zpa_segment_group":                                 ":id",
 	"zpa_server_group":                                  ":id",
 	"zpa_policy_access_rule":                            ":id",
@@ -181,22 +181,30 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		m, _ := json.Marshal(jsonPayload)
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
-	case "zpa_application_segment_pra":
-		jsonPayload, _, err := api.zpa.applicationsegmentpra.GetAll()
-		if err != nil {
-			log.Fatal(err)
-		}
-		m, _ := json.Marshal(jsonPayload)
-		resourceCount = len(jsonPayload)
-		_ = json.Unmarshal(m, &jsonStructData)
-	case "zpa_application_segment_inspection":
-		jsonPayload, _, err := api.zpa.applicationsegmentinspection.GetAll()
-		if err != nil {
-			log.Fatal(err)
-		}
-		m, _ := json.Marshal(jsonPayload)
-		resourceCount = len(jsonPayload)
-		_ = json.Unmarshal(m, &jsonStructData)
+	// case "zpa_application_segment_browser_access":
+	// 	jsonPayload, _, err := api.zpa.browseraccess.GetAll()
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// 	m, _ := json.Marshal(jsonPayload)
+	// 	resourceCount = len(jsonPayload)
+	// 	_ = json.Unmarshal(m, &jsonStructData)
+	// case "zpa_application_segment_pra":
+	// 	jsonPayload, _, err := api.zpa.applicationsegmentpra.GetAll()
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// 	m, _ := json.Marshal(jsonPayload)
+	// 	resourceCount = len(jsonPayload)
+	// 	_ = json.Unmarshal(m, &jsonStructData)
+	// case "zpa_application_segment_inspection":
+	// 	jsonPayload, _, err := api.zpa.applicationsegmentinspection.GetAll()
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// 	m, _ := json.Marshal(jsonPayload)
+	// 	resourceCount = len(jsonPayload)
+	// 	_ = json.Unmarshal(m, &jsonStructData)
 	case "zpa_ba_certificate":
 		jsonPayload, _, err := api.zpa.bacertificate.GetAll()
 		if err != nil {
@@ -231,14 +239,6 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 				continue
 			}
 			jsonPayload = append(jsonPayload, i)
-		}
-		m, _ := json.Marshal(jsonPayload)
-		resourceCount = len(jsonPayload)
-		_ = json.Unmarshal(m, &jsonStructData)
-	case "zpa_application_segment_browser_access":
-		jsonPayload, _, err := api.zpa.browseraccess.GetAll()
-		if err != nil {
-			log.Fatal(err)
 		}
 		m, _ := json.Marshal(jsonPayload)
 		resourceCount = len(jsonPayload)

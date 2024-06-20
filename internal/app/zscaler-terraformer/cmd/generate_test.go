@@ -45,11 +45,8 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appconnectorcontroller"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appconnectorgroup"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/applicationsegment"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/applicationsegmentinspection"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/applicationsegmentpra"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appservercontroller"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/bacertificate"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/browseraccess"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/cloudbrowserisolation/cbibannercontroller"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/cloudbrowserisolation/cbicertificatecontroller"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/cloudbrowserisolation/cbiprofilecontroller"
@@ -238,11 +235,12 @@ func createClientMock(r http.RoundTripper, resourceType, zpaClientID, zpaClientS
 		cli = &Client{
 			ZpaClient: zpaClient,
 			zpa: &ZPAClient{
-				appconnectorgroup:              appconnectorgroup.New(zpaClient),
-				appconnectorcontroller:         appconnectorcontroller.New(zpaClient),
-				applicationsegment:             applicationsegment.New(zpaClient),
-				applicationsegmentpra:          applicationsegmentpra.New(zpaClient),
-				applicationsegmentinspection:   applicationsegmentinspection.New(zpaClient),
+				appconnectorgroup:      appconnectorgroup.New(zpaClient),
+				appconnectorcontroller: appconnectorcontroller.New(zpaClient),
+				applicationsegment:     applicationsegment.New(zpaClient),
+				// applicationsegmentpra:          applicationsegmentpra.New(zpaClient),
+				// applicationsegmentinspection:   applicationsegmentinspection.New(zpaClient),
+				// browseraccess:                  browseraccess.New(zpaClient),
 				cbibannercontroller:            cbibannercontroller.New(zpaClient),
 				cbicertificatecontroller:       cbicertificatecontroller.New(zpaClient),
 				cbiprofilecontroller:           cbiprofilecontroller.New(zpaClient),
@@ -265,7 +263,6 @@ func createClientMock(r http.RoundTripper, resourceType, zpaClientID, zpaClientS
 				serviceedgegroup:               serviceedgegroup.New(zpaClient),
 				serviceedgecontroller:          serviceedgecontroller.New(zpaClient),
 				trustednetwork:                 trustednetwork.New(zpaClient),
-				browseraccess:                  browseraccess.New(zpaClient),
 				inspection_custom_controls:     inspection_custom_controls.New(zpaClient),
 				inspection_predefined_controls: inspection_predefined_controls.New(zpaClient),
 				inspection_profile:             inspection_profile.New(zpaClient),
