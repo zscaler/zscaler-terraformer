@@ -11,86 +11,15 @@ import (
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/adminuserrolemgmt/admins"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/devicegroups"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp/dlp_engines"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp/dlp_notification_templates"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp/dlp_web_rules"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp/dlpdictionaries"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/filteringrules"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/ipdestinationgroups"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/ipsourcegroups"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkapplicationgroups"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkservicegroups"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkservices"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/timewindow"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/forwarding_control_policy/forwarding_rules"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/forwarding_control_policy/zpa_gateways"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/location/locationgroups"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/location/locationmanagement"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/rule_labels"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/sandbox/sandbox_settings"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/security_policy_settings"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/greinternalipranges"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/gretunnelinfo"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/gretunnels"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/staticips"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/virtualipaddress"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/vpncredentials"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/urlcategories"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/urlfilteringpolicies"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/user_authentication_settings"
+	ziaServices "github.com/zscaler/zscaler-sdk-go/v2/zia/services"
+	zpaGateways "github.com/zscaler/zscaler-sdk-go/v2/zia/services/forwarding_control_policy/zpa_gateways"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/usermanagement/users"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appconnectorcontroller"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appconnectorgroup"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/applicationsegment"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appservercontroller"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/bacertificate"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/cloudbrowserisolation/cbibannercontroller"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/cloudbrowserisolation/cbicertificatecontroller"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/cloudbrowserisolation/cbiprofilecontroller"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/cloudconnectorgroup"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/customerversionprofile"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/enrollmentcert"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/idpcontroller"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/inspectioncontrol/inspection_custom_controls"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/inspectioncontrol/inspection_predefined_controls"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/inspectioncontrol/inspection_profile"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/lssconfigcontroller"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/machinegroup"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/microtenants"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/policysetcontroller"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/postureprofile"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/provisioningkey"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/samlattribute"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/scimattributeheader"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/scimgroup"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/segmentgroup"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/servergroup"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/serviceedgecontroller"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/serviceedgegroup"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/trustednetwork"
+	zpaServices "github.com/zscaler/zscaler-sdk-go/v2/zpa/services"
 )
 
 var (
-	// listOfString is an example representation of a key where the value is a
-	// list of string values.
-	//
-	//   resource "example" "example" {
-	//     attr = [ "b", "c", "d"]
-	//   }
-	listOfString = []interface{}{"b", "c", "d"}
-
-	// configBlockOfStrings is an example of where a key is a "block" assignment
-	// in HCL.
-	//
-	//   resource "example" "example" {
-	//     attr = {
-	//       c = "d"
-	//       e = "f"
-	//     }
-	//   }
+	listOfString         = []interface{}{"b", "c", "d"}
 	configBlockOfStrings = map[string]interface{}{
 		"c": "d",
 		"e": "f",
@@ -138,34 +67,33 @@ func TestResourceGeneration(t *testing.T) {
 		testdataFilename string
 	}{
 		// ZPA Resource
-		"zpa app connector group":                {identiferType: "group", resourceType: "zpa_app_connector_group", testdataFilename: "zpa_app_connector_group"},
-		"zpa application server":                 {identiferType: "server", resourceType: "zpa_application_server", testdataFilename: "zpa_application_server"},
-		"zpa application segment":                {identiferType: "appsegment", resourceType: "zpa_application_segment", testdataFilename: "zpa_application_segment"},
-		"zpa application segment pra":            {identiferType: "appsegment", resourceType: "zpa_application_segment_pra", testdataFilename: "zpa_application_segment_pra"},
-		"zpa application segment inspection":     {identiferType: "appsegment", resourceType: "zpa_application_segment_inspection", testdataFilename: "zpa_application_segment_inspection"},
-		"zpa application segment browser access": {identiferType: "appsegment", resourceType: "zpa_application_segment_browser_access", testdataFilename: "zpa_application_segment_browser_access"},
-		//"zpa cloud browser isolation banner":      {identiferType: "isolation", resourceType: "zpa_cloud_browser_isolation_banner", testdataFilename: "zpa_cloud_browser_isolation_banner"},
-		//"zpa cloud browser isolation certificate": {identiferType: "isolation", resourceType: "zpa_cloud_browser_isolation_certificate", testdataFilename: "zpa_cloud_browser_isolation_certificate"},
-		//"zpa cloud browser isolation profile":     {identiferType: "isolation", resourceType: "zpa_cloud_browser_isolation_external_profile", testdataFilename: "zpa_cloud_browser_isolation_external_profile"},
-		"zpa segment group":          {identiferType: "group", resourceType: "zpa_segment_group", testdataFilename: "zpa_segment_group"},
-		"zpa server group":           {identiferType: "group", resourceType: "zpa_server_group", testdataFilename: "zpa_server_group"},
-		"zpa policy access rule":     {identiferType: "policy", resourceType: "zpa_policy_access_rule", testdataFilename: "zpa_policy_access_rule"},
-		"zpa policy inspection rule": {identiferType: "policy", resourceType: "zpa_policy_inspection_rule", testdataFilename: "zpa_policy_inspection_rule"},
-		"zpa policy timeout rule":    {identiferType: "policy", resourceType: "zpa_policy_timeout_rule", testdataFilename: "zpa_policy_timeout_rule"},
-		"zpa policy forwarding rule": {identiferType: "policy", resourceType: "zpa_policy_forwarding_rule", testdataFilename: "zpa_policy_forwarding_rule"},
-		"zpa policy isolation rule":  {identiferType: "policy", resourceType: "zpa_policy_isolation_rule", testdataFilename: "zpa_policy_isolation_rule"},
-		//"zpa policy redirection rule": {identiferType: "policy", resourceType: "zpa_policy_redirection_rule", testdataFilename: "zpa_policy_redirection_rule"},
-		//"zpa provisioning key":      {identiferType: "key", resourceType: "zpa_provisioning_key", testdataFilename: "zpa_provisioning_key"},
-		"zpa service edge group":    {identiferType: "group", resourceType: "zpa_service_edge_group", testdataFilename: "zpa_service_edge_group"},
-		"zpa lss config controller": {identiferType: "lss", resourceType: "zpa_lss_config_controller", testdataFilename: "zpa_lss_config_controller"},
-		//"zpa inspection custom controls": {identiferType: "inspection", resourceType: "zpa_inspection_custom_controls", testdataFilename: "zpa_inspection_custom_controls"},
-		//"zpa inspection profile": {identiferType: "inspection", resourceType: "zpa_inspection_profile", testdataFilename: "zpa_inspection_profile"},
-		//"zpa microtenant controller": {identiferType: "microtenant", resourceType: "zpa_microtenant_controller", testdataFilename: "zpa_microtenant_controller"},
+		"zpa app connector group":            {identiferType: "group", resourceType: "zpa_app_connector_group", testdataFilename: "zpa_app_connector_group"},
+		"zpa application server":             {identiferType: "server", resourceType: "zpa_application_server", testdataFilename: "zpa_application_server"},
+		"zpa application segment ba":         {identiferType: "appsegment", resourceType: "zpa_application_segment_browser_access", testdataFilename: "zpa_application_segment_browser_access"},
+		"zpa application segment":            {identiferType: "appsegment", resourceType: "zpa_application_segment", testdataFilename: "zpa_application_segment"},
+		"zpa application segment inspection": {identiferType: "appsegment", resourceType: "zpa_application_segment_inspection", testdataFilename: "zpa_application_segment_inspection"},
+		"zpa application segment pra":        {identiferType: "appsegmentpra", resourceType: "zpa_application_segment_pra", testdataFilename: "zpa_application_segment_pra"},
+		"zpa segment group":                  {identiferType: "group", resourceType: "zpa_segment_group", testdataFilename: "zpa_segment_group"},
+		"zpa server group":                   {identiferType: "group", resourceType: "zpa_server_group", testdataFilename: "zpa_server_group"},
+		"zpa pra credential":                 {identiferType: "pra", resourceType: "zpa_pra_credential_controller", testdataFilename: "zpa_pra_credential_controller"},
+		"zpa pra portal":                     {identiferType: "pra", resourceType: "zpa_pra_portal_controller", testdataFilename: "zpa_pra_portal_controller"},
+		"zpa policy access rule":             {identiferType: "policy", resourceType: "zpa_policy_access_rule", testdataFilename: "zpa_policy_access_rule"},
+		"zpa policy inspection rule":         {identiferType: "policy", resourceType: "zpa_policy_inspection_rule", testdataFilename: "zpa_policy_inspection_rule"},
+		"zpa policy timeout rule":            {identiferType: "policy", resourceType: "zpa_policy_timeout_rule", testdataFilename: "zpa_policy_timeout_rule"},
+		"zpa policy forwarding rule":         {identiferType: "policy", resourceType: "zpa_policy_forwarding_rule", testdataFilename: "zpa_policy_forwarding_rule"},
+		"zpa policy isolation rule":          {identiferType: "policy", resourceType: "zpa_policy_isolation_rule", testdataFilename: "zpa_policy_isolation_rule"},
+		"zpa policy redirection rule":        {identiferType: "policy", resourceType: "zpa_policy_redirection_rule", testdataFilename: "zpa_policy_redirection_rule"},
+		"zpa provisioning key":               {identiferType: "key", resourceType: "zpa_provisioning_key", testdataFilename: "zpa_provisioning_key"},
+		"zpa service edge group":             {identiferType: "group", resourceType: "zpa_service_edge_group", testdataFilename: "zpa_service_edge_group"},
+		"zpa lss config controller":          {identiferType: "lss", resourceType: "zpa_lss_config_controller", testdataFilename: "zpa_lss_config_controller"},
+		"zpa inspection custom controls":     {identiferType: "inspection", resourceType: "zpa_inspection_custom_controls", testdataFilename: "zpa_inspection_custom_controls"},
+		"zpa inspection profile":             {identiferType: "inspection", resourceType: "zpa_inspection_profile", testdataFilename: "zpa_inspection_profile"},
+		"zpa microtenant controller":         {identiferType: "microtenant", resourceType: "zpa_microtenant_controller", testdataFilename: "zpa_microtenant_controller"},
 
 		// ZIA Resource
-		"zia admin users":      {identiferType: "users", resourceType: "zia_admin_users", testdataFilename: "zia_admin_users"},
-		"zia dlp dictionaries": {identiferType: "dlp", resourceType: "zia_dlp_dictionaries", testdataFilename: "zia_dlp_dictionaries"},
-		// "zia dlp engines":                                   {identiferType: "dlp", resourceType: "zia_dlp_engines", testdataFilename: "zia_dlp_engines"},
+		"zia admin users":                                   {identiferType: "users", resourceType: "zia_admin_users", testdataFilename: "zia_admin_users"},
+		"zia dlp dictionaries":                              {identiferType: "dlp", resourceType: "zia_dlp_dictionaries", testdataFilename: "zia_dlp_dictionaries"},
+		"zia dlp engines":                                   {identiferType: "dlp", resourceType: "zia_dlp_engines", testdataFilename: "zia_dlp_engines"},
 		"zia dlp notification templates":                    {identiferType: "dlp", resourceType: "zia_dlp_notification_templates", testdataFilename: "zia_dlp_notification_templates"},
 		"zia dlp web rules":                                 {identiferType: "dlp", resourceType: "zia_dlp_web_rules", testdataFilename: "zia_dlp_web_rules"},
 		"zia firewall filtering rule":                       {identiferType: "rule", resourceType: "zia_firewall_filtering_rule", testdataFilename: "zia_firewall_filtering_rule"},
@@ -185,8 +113,8 @@ func TestResourceGeneration(t *testing.T) {
 		"zia auth settings urls":                            {identiferType: "auth", resourceType: "zia_auth_settings_urls", testdataFilename: "zia_auth_settings_urls"},
 		"zia security settings":                             {identiferType: "security", resourceType: "zia_security_settings", testdataFilename: "zia_security_settings"},
 		"zia sandbox settings":                              {identiferType: "sandbox", resourceType: "zia_sandbox_behavioral_analysis", testdataFilename: "zia_sandbox_behavioral_analysis"},
-		//"zia forward control rule":                          {identiferType: "forward", resourceType: "zia_forwarding_control_rule", testdataFilename: "zia_forwarding_control_rule"},
-		//"zia zpa gateway":                                   {identiferType: "forward", resourceType: "zia_forwarding_control_zpa_gateway", testdataFilename: "zia_forwarding_control_zpa_gateway"},
+		"zia forward control rule":                          {identiferType: "forward", resourceType: "zia_forwarding_control_rule", testdataFilename: "zia_forwarding_control_rule"},
+		"zia zpa gateway":                                   {identiferType: "forward", resourceType: "zia_forwarding_control_zpa_gateway", testdataFilename: "zia_forwarding_control_zpa_gateway"},
 	}
 
 	for name, tc := range tests {
@@ -235,38 +163,27 @@ func createClientMock(r http.RoundTripper, resourceType, zpaClientID, zpaClientS
 		cli = &Client{
 			ZpaClient: zpaClient,
 			zpa: &ZPAClient{
-				appconnectorgroup:      appconnectorgroup.New(zpaClient),
-				appconnectorcontroller: appconnectorcontroller.New(zpaClient),
-				applicationsegment:     applicationsegment.New(zpaClient),
-				// applicationsegmentpra:          applicationsegmentpra.New(zpaClient),
-				// applicationsegmentinspection:   applicationsegmentinspection.New(zpaClient),
-				// browseraccess:                  browseraccess.New(zpaClient),
-				cbibannercontroller:            cbibannercontroller.New(zpaClient),
-				cbicertificatecontroller:       cbicertificatecontroller.New(zpaClient),
-				cbiprofilecontroller:           cbiprofilecontroller.New(zpaClient),
-				appservercontroller:            appservercontroller.New(zpaClient),
-				bacertificate:                  bacertificate.New(zpaClient),
-				cloudconnectorgroup:            cloudconnectorgroup.New(zpaClient),
-				customerversionprofile:         customerversionprofile.New(zpaClient),
-				enrollmentcert:                 enrollmentcert.New(zpaClient),
-				idpcontroller:                  idpcontroller.New(zpaClient),
-				lssconfigcontroller:            lssconfigcontroller.New(zpaClient),
-				machinegroup:                   machinegroup.New(zpaClient),
-				postureprofile:                 postureprofile.New(zpaClient),
-				policysetcontroller:            policysetcontroller.New(zpaClient),
-				provisioningkey:                provisioningkey.New(zpaClient),
-				samlattribute:                  samlattribute.New(zpaClient),
-				scimgroup:                      scimgroup.New(zpaClient),
-				scimattributeheader:            scimattributeheader.New(zpaClient),
-				segmentgroup:                   segmentgroup.New(zpaClient),
-				servergroup:                    servergroup.New(zpaClient),
-				serviceedgegroup:               serviceedgegroup.New(zpaClient),
-				serviceedgecontroller:          serviceedgecontroller.New(zpaClient),
-				trustednetwork:                 trustednetwork.New(zpaClient),
-				inspection_custom_controls:     inspection_custom_controls.New(zpaClient),
-				inspection_predefined_controls: inspection_predefined_controls.New(zpaClient),
-				inspection_profile:             inspection_profile.New(zpaClient),
-				microtenants:                   microtenants.New(zpaClient),
+				appconnectorgroup:              zpaServices.New(zpaClient),
+				appconnectorcontroller:         zpaServices.New(zpaClient),
+				applicationsegmentinspection:   zpaServices.New(zpaClient),
+				applicationsegment:             zpaServices.New(zpaClient),
+				applicationsegmentpra:          zpaServices.New(zpaClient),
+				appservercontroller:            zpaServices.New(zpaClient),
+				browseraccess:                  zpaServices.New(zpaClient),
+				bacertificate:                  zpaServices.New(zpaClient),
+				lssconfigcontroller:            zpaServices.New(zpaClient),
+				policysetcontroller:            zpaServices.New(zpaClient),
+				policysetcontrollerv2:          zpaServices.New(zpaClient),
+				praportal:                      zpaServices.New(zpaClient),
+				provisioningkey:                zpaServices.New(zpaClient),
+				segmentgroup:                   zpaServices.New(zpaClient),
+				servergroup:                    zpaServices.New(zpaClient),
+				serviceedgegroup:               zpaServices.New(zpaClient),
+				serviceedgecontroller:          zpaServices.New(zpaClient),
+				inspection_custom_controls:     zpaServices.New(zpaClient),
+				inspection_predefined_controls: zpaServices.New(zpaClient),
+				inspection_profile:             zpaServices.New(zpaClient),
+				microtenants:                   zpaServices.New(zpaClient),
 			},
 		}
 	} else if strings.HasPrefix(resourceType, "zia_") {
@@ -279,36 +196,30 @@ func createClientMock(r http.RoundTripper, resourceType, zpaClientID, zpaClientS
 		cli = &Client{
 			ZiaClient: ziaClient,
 			zia: &ZIAClient{
-				admins:                       admins.New(ziaClient),
-				filteringrules:               filteringrules.New(ziaClient),
-				ipdestinationgroups:          ipdestinationgroups.New(ziaClient),
-				ipsourcegroups:               ipsourcegroups.New(ziaClient),
-				networkapplicationgroups:     networkapplicationgroups.New(ziaClient),
-				networkservicegroups:         networkservicegroups.New(ziaClient),
-				networkservices:              networkservices.New(ziaClient),
-				timewindow:                   timewindow.New(ziaClient),
-				urlcategories:                urlcategories.New(ziaClient),
-				urlfilteringpolicies:         urlfilteringpolicies.New(ziaClient),
-				virtualipaddress:             virtualipaddress.New(ziaClient),
-				vpncredentials:               vpncredentials.New(ziaClient),
-				gretunnels:                   gretunnels.New(ziaClient),
-				gretunnelinfo:                gretunnelinfo.New(ziaClient),
-				greinternalipranges:          greinternalipranges.New(ziaClient),
-				staticips:                    staticips.New(ziaClient),
-				locationmanagement:           locationmanagement.New(ziaClient),
-				locationgroups:               locationgroups.New(ziaClient),
-				devicegroups:                 devicegroups.New(ziaClient),
-				dlpdictionaries:              dlpdictionaries.New(ziaClient),
-				dlp_engines:                  dlp_engines.New(ziaClient),
-				dlp_notification_templates:   dlp_notification_templates.New(ziaClient),
-				dlp_web_rules:                dlp_web_rules.New(ziaClient),
-				rule_labels:                  rule_labels.New(ziaClient),
-				security_policy_settings:     security_policy_settings.New(ziaClient),
-				sandbox_settings:             sandbox_settings.New(ziaClient),
-				user_authentication_settings: user_authentication_settings.New(ziaClient),
+				admins:                       ziaServices.New(ziaClient),
+				filteringrules:               ziaServices.New(ziaClient),
+				ipdestinationgroups:          ziaServices.New(ziaClient),
+				ipsourcegroups:               ziaServices.New(ziaClient),
+				networkapplicationgroups:     ziaServices.New(ziaClient),
+				networkservicegroups:         ziaServices.New(ziaClient),
+				networkservices:              ziaServices.New(ziaClient),
+				urlcategories:                ziaServices.New(ziaClient),
+				urlfilteringpolicies:         ziaServices.New(ziaClient),
+				vpncredentials:               ziaServices.New(ziaClient),
+				gretunnels:                   ziaServices.New(ziaClient),
+				staticips:                    ziaServices.New(ziaClient),
+				locationmanagement:           ziaServices.New(ziaClient),
+				dlpdictionaries:              ziaServices.New(ziaClient),
+				dlp_engines:                  ziaServices.New(ziaClient),
+				dlp_notification_templates:   ziaServices.New(ziaClient),
+				dlp_web_rules:                ziaServices.New(ziaClient),
+				rule_labels:                  ziaServices.New(ziaClient),
+				security_policy_settings:     ziaServices.New(ziaClient),
+				sandbox_settings:             ziaServices.New(ziaClient),
+				user_authentication_settings: ziaServices.New(ziaClient),
 				users:                        users.New(ziaClient),
-				forwarding_rules:             forwarding_rules.New(ziaClient),
-				zpa_gateways:                 zpa_gateways.New(ziaClient),
+				forwarding_rules:             ziaServices.New(ziaClient),
+				zpa_gateways:                 zpaGateways.New(ziaClient),
 			},
 		}
 	}

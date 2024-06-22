@@ -10,67 +10,11 @@ import (
 	"strings"
 
 	"github.com/iancoleman/strcase"
-
 	"github.com/sirupsen/logrus"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/adminuserrolemgmt/admins"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/devicegroups"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp/dlp_engines"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp/dlp_notification_templates"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp/dlp_web_rules"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp/dlpdictionaries"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/filteringrules"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/ipdestinationgroups"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/ipsourcegroups"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkapplicationgroups"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkservicegroups"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkservices"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/timewindow"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/forwarding_control_policy/forwarding_rules"
+	ziaServices "github.com/zscaler/zscaler-sdk-go/v2/zia/services"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/forwarding_control_policy/zpa_gateways"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/location/locationgroups"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/location/locationmanagement"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/rule_labels"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/sandbox/sandbox_settings"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/security_policy_settings"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/greinternalipranges"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/gretunnelinfo"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/gretunnels"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/staticips"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/virtualipaddress"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/vpncredentials"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/urlcategories"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/urlfilteringpolicies"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/user_authentication_settings"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/usermanagement/users"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appconnectorcontroller"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appconnectorgroup"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/applicationsegment"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appservercontroller"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/bacertificate"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/cloudbrowserisolation/cbibannercontroller"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/cloudbrowserisolation/cbicertificatecontroller"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/cloudbrowserisolation/cbiprofilecontroller"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/cloudconnectorgroup"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/customerversionprofile"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/enrollmentcert"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/idpcontroller"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/inspectioncontrol/inspection_custom_controls"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/inspectioncontrol/inspection_predefined_controls"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/inspectioncontrol/inspection_profile"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/lssconfigcontroller"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/machinegroup"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/microtenants"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/policysetcontroller"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/postureprofile"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/provisioningkey"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/samlattribute"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/scimattributeheader"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/scimgroup"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/segmentgroup"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/servergroup"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/serviceedgecontroller"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/serviceedgegroup"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/trustednetwork"
+	zpaServices "github.com/zscaler/zscaler-sdk-go/v2/zpa/services"
 
 	"github.com/google/uuid"
 	tfjson "github.com/hashicorp/terraform-json"
@@ -166,38 +110,25 @@ func sharedPreRun(cmd *cobra.Command, args []string) {
 			}
 			zpaClient := zpa.NewClient(zpaConfig)
 			api.zpa = &ZPAClient{
-				appconnectorgroup:      appconnectorgroup.New(zpaClient),
-				appconnectorcontroller: appconnectorcontroller.New(zpaClient),
-				applicationsegment:     applicationsegment.New(zpaClient),
-				// applicationsegmentpra:        applicationsegmentpra.New(zpaClient),
-				// applicationsegmentinspection: applicationsegmentinspection.New(zpaClient),
-				// browseraccess:                  browseraccess.New(zpaClient),
-				appservercontroller:            appservercontroller.New(zpaClient),
-				bacertificate:                  bacertificate.New(zpaClient),
-				cbibannercontroller:            cbibannercontroller.New(zpaClient),
-				cbicertificatecontroller:       cbicertificatecontroller.New(zpaClient),
-				cbiprofilecontroller:           cbiprofilecontroller.New(zpaClient),
-				cloudconnectorgroup:            cloudconnectorgroup.New(zpaClient),
-				customerversionprofile:         customerversionprofile.New(zpaClient),
-				enrollmentcert:                 enrollmentcert.New(zpaClient),
-				idpcontroller:                  idpcontroller.New(zpaClient),
-				lssconfigcontroller:            lssconfigcontroller.New(zpaClient),
-				machinegroup:                   machinegroup.New(zpaClient),
-				postureprofile:                 postureprofile.New(zpaClient),
-				policysetcontroller:            policysetcontroller.New(zpaClient),
-				provisioningkey:                provisioningkey.New(zpaClient),
-				samlattribute:                  samlattribute.New(zpaClient),
-				scimgroup:                      scimgroup.New(zpaClient),
-				scimattributeheader:            scimattributeheader.New(zpaClient),
-				segmentgroup:                   segmentgroup.New(zpaClient),
-				servergroup:                    servergroup.New(zpaClient),
-				serviceedgegroup:               serviceedgegroup.New(zpaClient),
-				serviceedgecontroller:          serviceedgecontroller.New(zpaClient),
-				trustednetwork:                 trustednetwork.New(zpaClient),
-				inspection_custom_controls:     inspection_custom_controls.New(zpaClient),
-				inspection_predefined_controls: inspection_predefined_controls.New(zpaClient),
-				inspection_profile:             inspection_profile.New(zpaClient),
-				microtenants:                   microtenants.New(zpaClient),
+				appconnectorgroup:              zpaServices.New(zpaClient),
+				applicationsegment:             zpaServices.New(zpaClient),
+				applicationsegmentpra:          zpaServices.New(zpaClient),
+				appservercontroller:            zpaServices.New(zpaClient),
+				browseraccess:                  zpaServices.New(zpaClient),
+				bacertificate:                  zpaServices.New(zpaClient),
+				lssconfigcontroller:            zpaServices.New(zpaClient),
+				policysetcontroller:            zpaServices.New(zpaClient),
+				policysetcontrollerv2:          zpaServices.New(zpaClient),
+				pracredential:                  zpaServices.New(zpaClient),
+				praportal:                      zpaServices.New(zpaClient),
+				provisioningkey:                zpaServices.New(zpaClient),
+				segmentgroup:                   zpaServices.New(zpaClient),
+				servergroup:                    zpaServices.New(zpaClient),
+				serviceedgegroup:               zpaServices.New(zpaClient),
+				inspection_custom_controls:     zpaServices.New(zpaClient),
+				inspection_predefined_controls: zpaServices.New(zpaClient),
+				inspection_profile:             zpaServices.New(zpaClient),
+				microtenants:                   zpaServices.New(zpaClient),
 			}
 		}
 		if strings.HasPrefix(resourceType_, "zia_") || strings.Contains(resources, "zia_") || resources == "*" || resources == "zia" {
@@ -207,35 +138,29 @@ func sharedPreRun(cmd *cobra.Command, args []string) {
 				log.Fatal("failed to initialize zscaler-sdk-go (zia)", err)
 			}
 			api.zia = &ZIAClient{
-				admins:                       admins.New(ziaClient),
-				filteringrules:               filteringrules.New(ziaClient),
-				ipdestinationgroups:          ipdestinationgroups.New(ziaClient),
-				ipsourcegroups:               ipsourcegroups.New(ziaClient),
-				networkapplicationgroups:     networkapplicationgroups.New(ziaClient),
-				networkservicegroups:         networkservicegroups.New(ziaClient),
-				networkservices:              networkservices.New(ziaClient),
-				timewindow:                   timewindow.New(ziaClient),
-				urlcategories:                urlcategories.New(ziaClient),
-				urlfilteringpolicies:         urlfilteringpolicies.New(ziaClient),
+				admins:                       ziaServices.New(ziaClient),
+				filteringrules:               ziaServices.New(ziaClient),
+				ipdestinationgroups:          ziaServices.New(ziaClient),
+				ipsourcegroups:               ziaServices.New(ziaClient),
+				networkapplicationgroups:     ziaServices.New(ziaClient),
+				networkservicegroups:         ziaServices.New(ziaClient),
+				networkservices:              ziaServices.New(ziaClient),
+				urlcategories:                ziaServices.New(ziaClient),
+				urlfilteringpolicies:         ziaServices.New(ziaClient),
 				users:                        users.New(ziaClient),
-				virtualipaddress:             virtualipaddress.New(ziaClient),
-				vpncredentials:               vpncredentials.New(ziaClient),
-				gretunnels:                   gretunnels.New(ziaClient),
-				gretunnelinfo:                gretunnelinfo.New(ziaClient),
-				greinternalipranges:          greinternalipranges.New(ziaClient),
-				staticips:                    staticips.New(ziaClient),
-				locationmanagement:           locationmanagement.New(ziaClient),
-				locationgroups:               locationgroups.New(ziaClient),
-				devicegroups:                 devicegroups.New(ziaClient),
-				dlpdictionaries:              dlpdictionaries.New(ziaClient),
-				dlp_engines:                  dlp_engines.New(ziaClient),
-				dlp_notification_templates:   dlp_notification_templates.New(ziaClient),
-				dlp_web_rules:                dlp_web_rules.New(ziaClient),
-				rule_labels:                  rule_labels.New(ziaClient),
-				security_policy_settings:     security_policy_settings.New(ziaClient),
-				sandbox_settings:             sandbox_settings.New(ziaClient),
-				user_authentication_settings: user_authentication_settings.New(ziaClient),
-				forwarding_rules:             forwarding_rules.New(ziaClient),
+				vpncredentials:               ziaServices.New(ziaClient),
+				gretunnels:                   ziaServices.New(ziaClient),
+				staticips:                    ziaServices.New(ziaClient),
+				locationmanagement:           ziaServices.New(ziaClient),
+				dlpdictionaries:              ziaServices.New(ziaClient),
+				dlp_engines:                  ziaServices.New(ziaClient),
+				dlp_notification_templates:   ziaServices.New(ziaClient),
+				dlp_web_rules:                ziaServices.New(ziaClient),
+				rule_labels:                  ziaServices.New(ziaClient),
+				security_policy_settings:     ziaServices.New(ziaClient),
+				sandbox_settings:             ziaServices.New(ziaClient),
+				user_authentication_settings: ziaServices.New(ziaClient),
+				forwarding_rules:             ziaServices.New(ziaClient),
 				zpa_gateways:                 zpa_gateways.New(ziaClient),
 			}
 		}
@@ -295,6 +220,7 @@ func listIdsIntBlock(fieldName string, obj interface{}) string {
 	}
 	return output
 }
+
 func listIdsStringBlock(fieldName string, obj interface{}) string {
 	output := fieldName + " {\n"
 	output += "id=["
@@ -319,6 +245,72 @@ func listIdsStringBlock(fieldName string, obj interface{}) string {
 	return output
 }
 
+func listNestedBlock(fieldName string, obj interface{}) string {
+	output := fieldName + " {\n"
+	if obj != nil {
+		for _, v := range obj.([]interface{}) {
+			m, ok := v.(map[string]interface{})
+			if !ok || m == nil {
+				continue
+			}
+			output += "apps_config {\n"
+			for key, value := range m {
+				snakeKey := strcase.ToSnake(key)
+				if isComputedAttribute(snakeKey) {
+					continue
+				}
+				switch value := value.(type) {
+				case string:
+					output += fmt.Sprintf("%s = \"%s\"\n", snakeKey, value)
+				case bool:
+					output += fmt.Sprintf("%s = %t\n", snakeKey, value)
+				case []interface{}:
+					output += fmt.Sprintf("%s = [", snakeKey)
+					for i, val := range value {
+						if i > 0 {
+							output += ","
+						}
+						output += fmt.Sprintf("\"%v\"", val)
+					}
+					output += "]\n"
+				}
+
+				// Inject app_types based on application_protocol
+				if key == "applicationProtocol" {
+					appTypes := []string{}
+					switch value {
+					case "RDP", "SSH":
+						appTypes = []string{"SECURE_REMOTE_ACCESS"}
+					case "HTTPS", "HTTP":
+						appTypes = []string{"BROWSER_ACCESS"}
+					}
+					output += "app_types = ["
+					for i, appType := range appTypes {
+						if i > 0 {
+							output += ","
+						}
+						output += fmt.Sprintf("\"%s\"", appType)
+					}
+					output += "]\n"
+				}
+			}
+			output += "}\n"
+		}
+	}
+	output += "}\n"
+	return output
+}
+
+func isComputedAttribute(attr string) bool {
+	computedAttributes := []string{"portal", "app_id", "hidden", "id"}
+	for _, computed := range computedAttributes {
+		if attr == computed {
+			return true
+		}
+	}
+	return false
+}
+
 // nestBlocks takes a schema and generates all of the appropriate nesting of any
 // top-level blocks as well as nested lists or sets.
 func nestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData map[string]interface{}, parentID string, indexedNestedBlocks map[string][]string) string {
@@ -339,6 +331,7 @@ func nestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 		if (resourceType == "zpa_segment_group" || resourceType == "zpa_server_group") && block == "applications" {
 			continue // This skips the current iteration of the loop
 		}
+
 		// special cases mapping
 		if resourceType == "zia_admin_users" && block == "admin_scope" {
 			output += "admin_scope {\n"
@@ -420,21 +413,29 @@ func nestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 			output += listIdsIntBlock(block, structData[mapTfFieldNameToApi(resourceType, block)])
 			continue
 
-		} else if isInList(resourceType, []string{"zpa_application_segment",
-			"zpa_application_segment_inspection",
-			"zpa_application_segment_pra",
-			"zpa_application_segment_browser_access",
-		}) && block == "server_groups" {
+		} else if isInList(resourceType, []string{"zpa_application_segment"}) && block == "server_groups" {
 			output += listIdsStringBlock(block, structData["serverGroups"])
+			continue
+		} else if isInList(resourceType, []string{"zpa_application_segment_browser_access"}) && block == "server_groups" {
+			output += listIdsStringBlock(block, structData["serverGroups"])
+			continue
+		} else if isInList(resourceType, []string{"zpa_application_segment_pra"}) && block == "server_groups" {
+			output += listIdsStringBlock(block, structData["serverGroups"])
+			continue
+		} else if isInList(resourceType, []string{"zpa_application_segment_pra"}) && block == "common_apps_dto" {
+			output += listNestedBlock(block, structData["praApps"])
+			continue
+		} else if isInList(resourceType, []string{"zpa_application_segment_inspection"}) && block == "server_groups" {
+			output += listIdsStringBlock(block, structData["serverGroups"])
+			continue
+		} else if isInList(resourceType, []string{"zpa_application_segment_inspection"}) && block == "common_apps_dto" {
+			output += listNestedBlock(block, structData["inspectionApps"])
 			continue
 		} else if isInList(resourceType, []string{"zpa_server_group", "zpa_policy_access_rule"}) && block == "app_connector_groups" {
 			output += listIdsStringBlock(block, structData["appConnectorGroups"])
 			continue
-		} else if isInList(resourceType, []string{"zpa_service_edge_group"}) && block == "service_edges" {
-			output += listIdsStringBlock(block, structData["serviceEdges"])
-			continue
-		} else if isInList(resourceType, []string{"zpa_service_edge_group"}) && block == "trusted_networks" {
-			output += listIdsStringBlock(block, structData["trustedNetworks"])
+		} else if isInList(resourceType, []string{"zpa_service_edge_group"}) && isInList(block, []string{"service_edges", "trusted_networks"}) {
+			output += listIdsStringBlock(block, structData[apiBlock])
 			continue
 		} else if isInList(resourceType, []string{"zpa_server_group", "zpa_segment_group"}) && block == "applications" {
 			output += listIdsStringBlock(block, structData["applications"])
@@ -598,6 +599,7 @@ func nestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 	return output
 }
 
+/*
 func writeNestedBlock(resourceType string, attributes []string, schemaBlock *tfjson.SchemaBlock, attrStruct map[string]interface{}, parentID string) string {
 	nestedBlockOutput := ""
 
@@ -615,6 +617,40 @@ func writeNestedBlock(resourceType string, attributes []string, schemaBlock *tfj
 			}
 		case ty.IsListType(), ty.IsSetType(), ty.IsMapType():
 			nestedBlockOutput += writeAttrLine(attrName, attrStruct[apiFieldName], true)
+		default:
+			log.Debugf("unexpected nested type %T for %s", ty, attrName)
+		}
+	}
+
+	return nestedBlockOutput
+}
+*/
+
+func writeNestedBlock(resourceType string, attributes []string, schemaBlock *tfjson.SchemaBlock, attrStruct map[string]interface{}, parentID string) string {
+	nestedBlockOutput := ""
+
+	for _, attrName := range attributes {
+		apiFieldName := mapTfFieldNameToApi(resourceType, attrName)
+		ty := schemaBlock.Attributes[attrName].AttributeType
+
+		// Exclude specific computed attributes
+		if attrName == "id" || attrName == "appId" || attrName == "portal" || attrName == "hidden" {
+			continue
+		}
+
+		// Convert attributes to snake_case
+		snakeCaseAttrName := strcase.ToSnake(attrName)
+
+		switch {
+		case ty.IsPrimitiveType():
+			switch ty {
+			case cty.String, cty.Bool, cty.Number:
+				nestedBlockOutput += writeAttrLine(snakeCaseAttrName, attrStruct[apiFieldName], false)
+			default:
+				log.Debugf("unexpected primitive type %q", ty.FriendlyName())
+			}
+		case ty.IsListType(), ty.IsSetType(), ty.IsMapType():
+			nestedBlockOutput += writeAttrLine(snakeCaseAttrName, attrStruct[apiFieldName], true)
 		default:
 			log.Debugf("unexpected nested type %T for %s", ty, attrName)
 		}
