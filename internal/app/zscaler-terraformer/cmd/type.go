@@ -13,7 +13,6 @@ type ZPAClient struct {
 	appconnectorgroup              *zpaServices.Service
 	appconnectorcontroller         *zpaServices.Service
 	applicationsegment             *zpaServices.Service
-	applicationsegmentinspection   *zpaServices.Service
 	applicationsegmentpra          *zpaServices.Service
 	appservercontroller            *zpaServices.Service
 	browseraccess                  *zpaServices.Service

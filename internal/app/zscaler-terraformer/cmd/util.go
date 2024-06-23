@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -110,8 +111,9 @@ func sharedPreRun(cmd *cobra.Command, args []string) {
 			}
 			zpaClient := zpa.NewClient(zpaConfig)
 			api.zpa = &ZPAClient{
-				appconnectorgroup:              zpaServices.New(zpaClient),
-				applicationsegment:             zpaServices.New(zpaClient),
+				appconnectorgroup:  zpaServices.New(zpaClient),
+				applicationsegment: zpaServices.New(zpaClient),
+				// applicationsegmentinspection:   zpaServices.New(zpaClient),
 				applicationsegmentpra:          zpaServices.New(zpaClient),
 				appservercontroller:            zpaServices.New(zpaClient),
 				browseraccess:                  zpaServices.New(zpaClient),
@@ -245,6 +247,66 @@ func listIdsStringBlock(fieldName string, obj interface{}) string {
 	return output
 }
 
+// / Custom function to Removes attributes from ZPA StateFile
+func removeTcpPortRangesFromState(stateFile string) {
+	// Read the state file
+	stateData, err := ioutil.ReadFile(stateFile)
+	if err != nil {
+		log.Fatalf("failed to read state file: %s", err)
+	}
+
+	// Unmarshal the JSON data
+	var state map[string]interface{}
+	if err := json.Unmarshal(stateData, &state); err != nil {
+		log.Fatalf("failed to unmarshal state file: %s", err)
+	}
+
+	// Traverse the state file structure to remove tcp_port_ranges
+	resources, ok := state["resources"].([]interface{})
+	if !ok {
+		log.Fatalf("unexpected structure in state file: resources not found or not a list")
+	}
+
+	for _, resource := range resources {
+		resourceMap, ok := resource.(map[string]interface{})
+		if !ok {
+			log.Fatalf("unexpected structure in state file: resource is not a map")
+		}
+
+		instances, ok := resourceMap["instances"].([]interface{})
+		if !ok {
+			continue
+		}
+
+		for _, instance := range instances {
+			instanceMap, ok := instance.(map[string]interface{})
+			if !ok {
+				continue
+			}
+
+			attributes, ok := instanceMap["attributes"].(map[string]interface{})
+			if !ok {
+				continue
+			}
+
+			// Remove the tcp_port_ranges attribute
+			delete(attributes, "tcp_port_ranges")
+		}
+	}
+
+	// Marshal the modified state back to JSON
+	modifiedStateData, err := json.MarshalIndent(state, "", "  ")
+	if err != nil {
+		log.Fatalf("failed to marshal modified state file: %s", err)
+	}
+
+	// Write the modified state back to the file
+	if err := ioutil.WriteFile(stateFile, modifiedStateData, 0644); err != nil {
+		log.Fatalf("failed to write modified state file: %s", err)
+	}
+}
+
+// / Custom function to manipulate generate and import of ZPA application segments
 func listNestedBlock(fieldName string, obj interface{}) string {
 	output := fieldName + " {\n"
 	if obj != nil {
@@ -301,6 +363,7 @@ func listNestedBlock(fieldName string, obj interface{}) string {
 	return output
 }
 
+// / Remove computed from ZPA Application Segments
 func isComputedAttribute(attr string) bool {
 	computedAttributes := []string{"portal", "app_id", "hidden", "id"}
 	for _, computed := range computedAttributes {
@@ -332,6 +395,9 @@ func nestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 			continue // This skips the current iteration of the loop
 		}
 
+		if block == "tcp_port_ranges" {
+			continue
+		}
 		// special cases mapping
 		if resourceType == "zia_admin_users" && block == "admin_scope" {
 			output += "admin_scope {\n"
@@ -424,12 +490,6 @@ func nestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 			continue
 		} else if isInList(resourceType, []string{"zpa_application_segment_pra"}) && block == "common_apps_dto" {
 			output += listNestedBlock(block, structData["praApps"])
-			continue
-		} else if isInList(resourceType, []string{"zpa_application_segment_inspection"}) && block == "server_groups" {
-			output += listIdsStringBlock(block, structData["serverGroups"])
-			continue
-		} else if isInList(resourceType, []string{"zpa_application_segment_inspection"}) && block == "common_apps_dto" {
-			output += listNestedBlock(block, structData["inspectionApps"])
 			continue
 		} else if isInList(resourceType, []string{"zpa_server_group", "zpa_policy_access_rule"}) && block == "app_connector_groups" {
 			output += listIdsStringBlock(block, structData["appConnectorGroups"])

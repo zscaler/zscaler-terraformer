@@ -69,9 +69,9 @@ func TestResourceGeneration(t *testing.T) {
 		// ZPA Resource
 		"zpa app connector group":            {identiferType: "group", resourceType: "zpa_app_connector_group", testdataFilename: "zpa_app_connector_group"},
 		"zpa application server":             {identiferType: "server", resourceType: "zpa_application_server", testdataFilename: "zpa_application_server"},
-		"zpa application segment ba":         {identiferType: "appsegment", resourceType: "zpa_application_segment_browser_access", testdataFilename: "zpa_application_segment_browser_access"},
+		"zpa application segment ba":         {identiferType: "appsegmentba", resourceType: "zpa_application_segment_browser_access", testdataFilename: "zpa_application_segment_browser_access"},
 		"zpa application segment":            {identiferType: "appsegment", resourceType: "zpa_application_segment", testdataFilename: "zpa_application_segment"},
-		"zpa application segment inspection": {identiferType: "appsegment", resourceType: "zpa_application_segment_inspection", testdataFilename: "zpa_application_segment_inspection"},
+		"zpa application segment inspection": {identiferType: "appsegmentinspection", resourceType: "zpa_application_segment_inspection", testdataFilename: "zpa_application_segment_inspection"},
 		"zpa application segment pra":        {identiferType: "appsegmentpra", resourceType: "zpa_application_segment_pra", testdataFilename: "zpa_application_segment_pra"},
 		"zpa segment group":                  {identiferType: "group", resourceType: "zpa_segment_group", testdataFilename: "zpa_segment_group"},
 		"zpa server group":                   {identiferType: "group", resourceType: "zpa_server_group", testdataFilename: "zpa_server_group"},
@@ -163,10 +163,10 @@ func createClientMock(r http.RoundTripper, resourceType, zpaClientID, zpaClientS
 		cli = &Client{
 			ZpaClient: zpaClient,
 			zpa: &ZPAClient{
-				appconnectorgroup:              zpaServices.New(zpaClient),
-				appconnectorcontroller:         zpaServices.New(zpaClient),
-				applicationsegmentinspection:   zpaServices.New(zpaClient),
-				applicationsegment:             zpaServices.New(zpaClient),
+				appconnectorgroup:      zpaServices.New(zpaClient),
+				appconnectorcontroller: zpaServices.New(zpaClient),
+				applicationsegment:     zpaServices.New(zpaClient),
+				// applicationsegmentinspection:   zpaServices.New(zpaClient),
 				applicationsegmentpra:          zpaServices.New(zpaClient),
 				appservercontroller:            zpaServices.New(zpaClient),
 				browseraccess:                  zpaServices.New(zpaClient),

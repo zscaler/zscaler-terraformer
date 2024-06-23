@@ -36,7 +36,6 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/user_authentication_settings"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appconnectorgroup"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/applicationsegment"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/applicationsegmentinspection"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/applicationsegmentpra"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appservercontroller"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/bacertificate"
@@ -61,7 +60,6 @@ var resourceImportStringFormats = map[string]string{
 	"zpa_application_server":                            ":id",
 	"zpa_application_segment":                           ":id",
 	"zpa_application_segment_browser_access":            ":id",
-	"zpa_application_segment_inspection":                ":id",
 	"zpa_application_segment_pra":                       ":id",
 	"zpa_segment_group":                                 ":id",
 	"zpa_server_group":                                  ":id",
@@ -206,36 +204,42 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		m, _ := json.Marshal(jsonPayload)
-		resourceCount = len(jsonPayload)
-		_ = json.Unmarshal(m, &jsonStructData)
+		jsonStructData = make([]interface{}, len(jsonPayload))
+		for i, item := range jsonPayload {
+			m, _ := json.Marshal(item)
+			var mapItem map[string]interface{}
+			_ = json.Unmarshal(m, &mapItem)
+			jsonStructData[i] = mapItem
+		}
+		resourceCount = len(jsonStructData)
 	case "zpa_application_segment_browser_access":
 		zpaClient := api.zpa.browseraccess
 		jsonPayload, _, err := browseraccess.GetAll(zpaClient)
 		if err != nil {
 			log.Fatal(err)
 		}
-		m, _ := json.Marshal(jsonPayload)
-		resourceCount = len(jsonPayload)
-		_ = json.Unmarshal(m, &jsonStructData)
-	case "zpa_application_segment_inspection":
-		zpaClient := api.zpa.applicationsegmentinspection
-		jsonPayload, _, err := applicationsegmentinspection.GetAll(zpaClient)
-		if err != nil {
-			log.Fatal(err)
+		jsonStructData = make([]interface{}, len(jsonPayload))
+		for i, item := range jsonPayload {
+			m, _ := json.Marshal(item)
+			var mapItem map[string]interface{}
+			_ = json.Unmarshal(m, &mapItem)
+			jsonStructData[i] = mapItem
 		}
-		m, _ := json.Marshal(jsonPayload)
-		resourceCount = len(jsonPayload)
-		_ = json.Unmarshal(m, &jsonStructData)
+		resourceCount = len(jsonStructData)
 	case "zpa_application_segment_pra":
 		zpaClient := api.zpa.applicationsegmentpra
 		jsonPayload, _, err := applicationsegmentpra.GetAll(zpaClient)
 		if err != nil {
 			log.Fatal(err)
 		}
-		m, _ := json.Marshal(jsonPayload)
-		resourceCount = len(jsonPayload)
-		_ = json.Unmarshal(m, &jsonStructData)
+		jsonStructData = make([]interface{}, len(jsonPayload))
+		for i, item := range jsonPayload {
+			m, _ := json.Marshal(item)
+			var mapItem map[string]interface{}
+			_ = json.Unmarshal(m, &mapItem)
+			jsonStructData[i] = mapItem
+		}
+		resourceCount = len(jsonStructData)
 	case "zpa_ba_certificate":
 		zpaClient := api.zpa.bacertificate
 		jsonPayload, _, err := bacertificate.GetAll(zpaClient)
@@ -784,21 +788,22 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 	f.Close()
 
 	for _, data := range jsonStructData {
-		strcutData := data.(map[string]interface{})
-		resourceID, ok := strcutData["id"].(string)
+		structData := data.(map[string]interface{})
+
+		resourceID, ok := structData["id"].(string)
 		if !ok {
-			resourceIDInt, ok := strcutData["id"].(int)
+			resourceIDInt, ok := structData["id"].(int)
 			if ok {
 				resourceID = strconv.Itoa(resourceIDInt)
 			} else {
-				resourceIDFloat64, ok := strcutData["id"].(float64)
+				resourceIDFloat64, ok := structData["id"].(float64)
 				if ok {
 					resourceID = strconv.FormatInt(int64(resourceIDFloat64), 10)
 				}
 			}
 		}
 		if resourceID != "" {
-			name := buildResourceName(resourceType, strcutData)
+			name := buildResourceName(resourceType, structData)
 			fmt.Fprint(writer, buildCompositeID(resourceType, resourceID, name))
 			err := tf.Import(cmd.Context(), resourceType+"."+name, resourceID)
 			if err != nil {
@@ -806,6 +811,10 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 			}
 		}
 	}
+
+	// After importing, remove tcp_port_ranges from the state file
+	stateFile := workingDir + "/terraform.tfstate"
+	removeTcpPortRangesFromState(stateFile)
 }
 
 // buildCompositeID takes the resourceType and resourceID in order to lookup the

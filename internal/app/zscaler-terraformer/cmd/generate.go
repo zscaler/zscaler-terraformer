@@ -44,7 +44,6 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/user_authentication_settings"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appconnectorgroup"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/applicationsegment"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/applicationsegmentinspection"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/applicationsegmentpra"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appservercontroller"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/bacertificate"
@@ -73,7 +72,6 @@ var allGeneratableResources = []string{
 	"zpa_application_server",
 	"zpa_application_segment",
 	"zpa_application_segment_browser_access",
-	"zpa_application_segment_inspection",
 	"zpa_application_segment_pra",
 	"zpa_ba_certificate",
 	"zpa_segment_group",
@@ -369,18 +367,20 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
+		/*
+			case "zpa_application_segment_inspection":
+				zpaClient := api.zpa.applicationsegmentinspection
+				jsonPayload, _, err := applicationsegmentinspection.GetAll(zpaClient)
+				if err != nil {
+					log.Fatal(err)
+				}
+				resourceCount = len(jsonPayload)
+				m, _ := json.Marshal(jsonPayload)
+				_ = json.Unmarshal(m, &jsonStructData)
+		*/
 	case "zpa_application_segment_browser_access":
 		zpaClient := api.zpa.browseraccess
 		jsonPayload, _, err := browseraccess.GetAll(zpaClient)
-		if err != nil {
-			log.Fatal(err)
-		}
-		m, _ := json.Marshal(jsonPayload)
-		resourceCount = len(jsonPayload)
-		_ = json.Unmarshal(m, &jsonStructData)
-	case "zpa_application_segment_inspection":
-		zpaClient := api.zpa.applicationsegmentinspection
-		jsonPayload, _, err := applicationsegmentinspection.GetAll(zpaClient)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -949,12 +949,9 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		}
 
 		sort.Strings(sortedBlockAttributes)
-		// Block attributes are for any attributes where assignment is involved.
 		for _, attrName := range sortedBlockAttributes {
 			apiAttrName := mapTfFieldNameToApi(resourceType, attrName)
-			// Don't bother outputting the ID for the resource as that is only for
-			// internal use (such as importing state).
-			if attrName == "id" || attrName == "provisioning_key" {
+			if attrName == "id" || attrName == "provisioning_key" || attrName == "tcp_port_ranges" {
 				continue
 			}
 
