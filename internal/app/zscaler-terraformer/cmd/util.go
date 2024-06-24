@@ -289,8 +289,9 @@ func removeTcpPortRangesFromState(stateFile string) {
 				continue
 			}
 
-			// Remove the tcp_port_ranges attribute
+			// Remove the tcp_port_ranges and udp_port_ranges attribute
 			delete(attributes, "tcp_port_ranges")
+			delete(attributes, "udp_port_ranges")
 		}
 	}
 
@@ -341,7 +342,7 @@ func listNestedBlock(fieldName string, obj interface{}) string {
 				if key == "applicationProtocol" {
 					appTypes := []string{}
 					switch value {
-					case "RDP", "SSH":
+					case "RDP", "SSH", "VNC":
 						appTypes = []string{"SECURE_REMOTE_ACCESS"}
 					case "HTTPS", "HTTP":
 						appTypes = []string{"BROWSER_ACCESS"}
@@ -396,6 +397,9 @@ func nestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 		}
 
 		if block == "tcp_port_ranges" {
+			continue
+		}
+		if block == "udp_port_ranges" {
 			continue
 		}
 		// special cases mapping
@@ -485,12 +489,14 @@ func nestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 		} else if isInList(resourceType, []string{"zpa_application_segment_browser_access"}) && block == "server_groups" {
 			output += listIdsStringBlock(block, structData["serverGroups"])
 			continue
-		} else if isInList(resourceType, []string{"zpa_application_segment_pra"}) && block == "server_groups" {
-			output += listIdsStringBlock(block, structData["serverGroups"])
+		} else if isInList(resourceType, []string{"zpa_application_segment_pra"}) {
+			if block == "server_groups" {
+				output += listIdsStringBlock(block, structData["serverGroups"])
+			} else if block == "common_apps_dto" {
+				output += listNestedBlock(block, structData["praApps"])
+			}
 			continue
-		} else if isInList(resourceType, []string{"zpa_application_segment_pra"}) && block == "common_apps_dto" {
-			output += listNestedBlock(block, structData["praApps"])
-			continue
+
 		} else if isInList(resourceType, []string{"zpa_server_group", "zpa_policy_access_rule"}) && block == "app_connector_groups" {
 			output += listIdsStringBlock(block, structData["appConnectorGroups"])
 			continue

@@ -11,12 +11,10 @@ var log = logrus.New()
 var cfgFile, terraformInstallPath string
 var zpaCloud, zpaClientID, zpaClientSecret, zpaCustomerID string
 var ziaCloud, ziaUsername, ziaPassword, ziaApiKey string
-
-var verbose bool
-var displayReleaseVersion bool
-
+var verbose, displayReleaseVersion bool
 var api *Client
 var terraformImportCmdPrefix = "terraform import"
+var zpaProviderNamespace string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -82,6 +80,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&ziaCloud, "ziaCloud", "", "", "ZIA Cloud (i.e zscalerthree)")
 	_ = viper.BindPFlag("ziaCloud", rootCmd.PersistentFlags().Lookup("ziaCloud"))
 	_ = viper.BindEnv("ziaCloud", "ZIA_CLOUD")
+
 	// Debug logging mode
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Specify verbose output (same as setting log level to debug)")
 
@@ -94,16 +93,24 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&excludedResources, "exclude", "", "Which resources you wish to exclude")
 
 	rootCmd.PersistentFlags().StringVar(&terraformInstallPath, "terraform-install-path", ".", "Path to the default Terraform installation")
-
 	_ = viper.BindPFlag("terraform-install-path", rootCmd.PersistentFlags().Lookup("terraform-install-path"))
 	_ = viper.BindEnv("terraform-install-path", "ZSCALER_TERRAFORM_INSTALL_PATH")
 
 	rootCmd.PersistentFlags().StringVar(&terraformInstallPath, "zpa-terraform-install-path", ".", "Path to the ZPA Terraform installation")
 	_ = viper.BindPFlag("zpa-terraform-install-path", rootCmd.PersistentFlags().Lookup("zpa-terraform-install-path"))
 	_ = viper.BindEnv("zpa-terraform-install-path", "ZSCALER_ZPA_TERRAFORM_INSTALL_PATH")
+
 	rootCmd.PersistentFlags().StringVar(&terraformInstallPath, "zia-terraform-install-path", ".", "Path to the ZIA Terraform installation")
 	_ = viper.BindPFlag("zia-terraform-install-path", rootCmd.PersistentFlags().Lookup("zia-terraform-install-path"))
 	_ = viper.BindEnv("zia-terraform-install-path", "ZSCALER_ZIA_TERRAFORM_INSTALL_PATH")
+
+	rootCmd.PersistentFlags().StringVar(&zpaProviderNamespace, "zpa-provider-namespace", "", "Custom namespace for the ZPA provider")
+	_ = viper.BindPFlag("zpa-provider-namespace", rootCmd.PersistentFlags().Lookup("zpa-provider-namespace"))
+	_ = viper.BindEnv("zpa-provider-namespace", "ZPA_PROVIDER_NAMESPACE")
+
+	rootCmd.PersistentFlags().StringVar(&zpaProviderNamespace, "zia-provider-namespace", "", "Custom namespace for the ZIA provider")
+	_ = viper.BindPFlag("zia-provider-namespace", rootCmd.PersistentFlags().Lookup("zia-provider-namespace"))
+	_ = viper.BindEnv("zia-provider-namespace", "ZIA_PROVIDER_NAMESPACE")
 }
 
 // initConfig reads in config file and ENV variables if set.

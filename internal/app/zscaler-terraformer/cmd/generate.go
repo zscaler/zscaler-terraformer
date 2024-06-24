@@ -206,7 +206,6 @@ func initTf(resourceType string) (tf *tfexec.Terraform, r *tfjson.Schema, workin
 	// Check if Terraform is already installed
 	execPath, err := exec.LookPath("terraform")
 	if err != nil {
-		// Terraform is not found, install it
 		log.Debugf("Terraform not found, installing...")
 		installDir := "/usr/local/bin"
 		installer := &releases.LatestVersion{
@@ -217,9 +216,9 @@ func initTf(resourceType string) (tf *tfexec.Terraform, r *tfjson.Schema, workin
 		if err != nil {
 			log.Fatalf("error installing Terraform: %s", err)
 		}
-		log.Debugf("Terraform installed at:%s", execPath)
+		log.Debugf("Terraform installed at: %s", execPath)
 	} else {
-		log.Debugf("Terraform already installed at:%s", execPath)
+		log.Debugf("Terraform already installed at: %s", execPath)
 	}
 
 	cloudType := ""
@@ -229,8 +228,6 @@ func initTf(resourceType string) (tf *tfexec.Terraform, r *tfjson.Schema, workin
 		cloudType = "zia"
 	}
 	workingDir = viper.GetString(cloudType + "-terraform-install-path")
-	// Setup and configure Terraform to operate in the temporary directory where
-	// the provider is already configured.
 	if workingDir == "" {
 		workingDir = viper.GetString("terraform-install-path")
 	}
@@ -249,22 +246,63 @@ func initTf(resourceType string) (tf *tfexec.Terraform, r *tfjson.Schema, workin
 		log.Fatal("NewTerraform failed", err)
 	}
 
+	providerNamespace := viper.GetString("zpa-provider-namespace")
+	if providerNamespace != "" {
+		log.Debugf("Using custom provider namespace: %s", providerNamespace)
+		filename := workingDir + "/" + cloudType + "-provider.tf"
+		f, err := os.Create(filename)
+		if err != nil {
+			log.Fatal("failed creating "+filename, err)
+		}
+		_, _ = f.WriteString(fmt.Sprintf(`terraform {
+  required_providers {
+    %s = {
+      source = "%s"
+    }
+  }
+}
+provider "%s" {
+  // provider configuration
+}`, cloudType, providerNamespace, cloudType))
+		f.Close()
+	} else {
+		log.Debug("Using default provider namespace")
+		filename := workingDir + "/" + cloudType + "-provider.tf"
+		f, err := os.Create(filename)
+		if err != nil {
+			log.Fatal("failed creating "+filename, err)
+		}
+		_, _ = f.WriteString(fmt.Sprintf(`terraform {
+  required_providers {
+    %s = {
+      source = "zscaler/%s"
+    }
+  }
+}
+provider "%s" {
+  // provider configuration
+}`, cloudType, cloudType, cloudType))
+		f.Close()
+	}
+
+	// Initialize Terraform with the provider configuration
 	err = tf.Init(context.Background(), tfexec.Upgrade(true))
 	if err != nil {
 		log.Fatal("tf init failed ", err)
 	}
-	log.Debug("reading Terraform schema for " + cloudType + " provider")
+
 	ps, err := tf.ProvidersSchema(context.Background())
 	if err != nil {
 		log.Fatal("failed to read provider schema", err)
 	}
+	log.Debug("ps.Schemas:", ps.Schemas)
+
 	providerNames := []string{
 		fmt.Sprintf("zscaler.com/%s/%s", cloudType, cloudType),
 		fmt.Sprintf("zscaler/%s", cloudType),
 		fmt.Sprintf("registry.terraform.io/zscaler/%s", cloudType),
 	}
 	var s *tfjson.ProviderSchema
-	log.Debug("ps.Schemas:", ps.Schemas)
 	for _, p := range providerNames {
 		if ps, ok := ps.Schemas[p]; ok {
 			s = ps
@@ -272,45 +310,18 @@ func initTf(resourceType string) (tf *tfexec.Terraform, r *tfjson.Schema, workin
 		}
 	}
 	if s == nil {
-		// try to init it
-		filename := workingDir + "/" + cloudType + "-provider.tf"
-		f, err := os.Create(filename)
-		if err != nil {
-			log.Fatal("failed creating "+filename, err)
-		}
-		_, _ = f.WriteString(fmt.Sprintf("terraform {\n\trequired_providers {\n\t  %s = {\n\t	source = \"zscaler/%s\"\n\t  }\n\t}\n}\n", cloudType, cloudType))
-		f.Close()
-
-		err = tf.Init(context.Background(), tfexec.Upgrade(true))
-		if err != nil {
-			log.Fatal("tf init failed ", err)
-		}
-		ps, err = tf.ProvidersSchema(context.Background())
-		if err != nil {
-			log.Fatal("failed to read provider schema", err)
-		}
-		log.Debug("ps.Schemas:", ps.Schemas)
-		for _, p := range providerNames {
-			if ps, ok := ps.Schemas[p]; ok {
-				s = ps
-				break
-			}
-		}
-		if s == nil {
-			log.Fatal("failed to detect " + cloudType + " provider installation")
-		}
+		log.Fatal("failed to detect " + cloudType + " provider installation")
 	}
 	r = s.ResourceSchemas[resourceType]
 	if displayReleaseVersion {
 		tfVrsion, providerVersions, err := tf.Version(context.Background(), false)
 		if err == nil {
 			if tfVrsion != nil {
-				log.Infof("Terrafrom Version: %s", tfVrsion.String())
+				log.Infof("Terraform Version: %s", tfVrsion.String())
 			}
 			for provider, version := range providerVersions {
 				log.Infof("Provider %s:%s", provider, version.String())
 			}
-
 		}
 	}
 	return
@@ -367,17 +378,6 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
-		/*
-			case "zpa_application_segment_inspection":
-				zpaClient := api.zpa.applicationsegmentinspection
-				jsonPayload, _, err := applicationsegmentinspection.GetAll(zpaClient)
-				if err != nil {
-					log.Fatal(err)
-				}
-				resourceCount = len(jsonPayload)
-				m, _ := json.Marshal(jsonPayload)
-				_ = json.Unmarshal(m, &jsonStructData)
-		*/
 	case "zpa_application_segment_browser_access":
 		zpaClient := api.zpa.browseraccess
 		jsonPayload, _, err := browseraccess.GetAll(zpaClient)
@@ -393,9 +393,24 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
+		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
+	// case "zpa_application_segment_pra":
+	// 	zpaClient := api.zpa.applicationsegmentpra
+	// 	jsonPayload, _, err := applicationsegmentpra.GetAll(zpaClient)
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// 	jsonStructData = make([]interface{}, len(jsonPayload))
+	// 	for i, item := range jsonPayload {
+	// 		m, _ := json.Marshal(item)
+	// 		var mapItem map[string]interface{}
+	// 		_ = json.Unmarshal(m, &mapItem)
+	// 		jsonStructData[i] = mapItem
+	// 	}
+	// 	jsonStructData = filterResources(jsonStructData, resourceType)
+	// 	resourceCount = len(jsonStructData)
 	case "zpa_ba_certificate":
 		zpaClient := api.zpa.bacertificate
 		jsonPayload, _, err := bacertificate.GetAll(zpaClient)
@@ -951,7 +966,7 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		sort.Strings(sortedBlockAttributes)
 		for _, attrName := range sortedBlockAttributes {
 			apiAttrName := mapTfFieldNameToApi(resourceType, attrName)
-			if attrName == "id" || attrName == "provisioning_key" || attrName == "tcp_port_ranges" {
+			if attrName == "id" || attrName == "provisioning_key" || attrName == "tcp_port_ranges" || attrName == "udp_port_ranges" {
 				continue
 			}
 
