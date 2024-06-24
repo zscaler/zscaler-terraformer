@@ -857,3 +857,25 @@ func strip(s string) string {
 	}
 	return result.String()
 }
+
+func generateOutputs(resourceType string, resourceID string, workingDir string) {
+	// Define the output file path
+	outputsFile := fmt.Sprintf("%s/outputs.tf", strings.TrimSuffix(workingDir, "/"))
+
+	// Open the file in append mode or create it if it doesn't exist
+	f, err := os.OpenFile(outputsFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Fatalf("failed to open outputs file: %s", err)
+	}
+	defer f.Close()
+
+	// Write the output block to the file
+	outputBlock := fmt.Sprintf(`output "%s_%s_id" {
+  value = "${%s.%s.id}"
+}
+
+`, resourceType, resourceID, resourceType, resourceID)
+	if _, err := f.WriteString(outputBlock); err != nil {
+		log.Fatalf("failed to write to outputs file: %s", err)
+	}
+}

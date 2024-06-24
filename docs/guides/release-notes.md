@@ -12,9 +12,28 @@ Track all Zscaler Terraformer Tool releases. New resources, features, and bug fi
 
 ---
 
-``Last updated: v1.2.2``
+``Last updated: v1.3.0``
 
 ---
+
+## 1.3.0 (June, xx 2024)
+
+### Notes
+
+- Release date: **(June, xx 2024)**
+- Supported Terraform version: **v1.x.x**
+
+### Enhancements
+- [PR #206](https://github.com/zscaler/zscaler-terraformer/pull/206). The tool now creates a ``outputs.tf`` file containg the `id` export of each invidual exported resource.
+
+### Bug Fixes
+- [PR #206](https://github.com/zscaler/zscaler-terraformer/pull/206). Fixed the import for the following resources:
+    - `zpa_application_segment_browser_access`
+    - `zpa_application_segment_inspection`
+    - `zpa_application_segment_pra`
+
+### Internal Changes
+- [PR #206](https://github.com/zscaler/zscaler-terraformer/pull/206). The tool introduced two new internal environment variables for development purposes: ``ZPA_PROVIDER_NAMESPACE`` and ``ZIA_PROVIDER_NAMESPACE``. By setting these enviornment variables it allows a developer to leverage a local Terraform Provider installation for testing purposes. i.e ``export ZPA_PROVIDER_NAMESPACE=zscaler.com/zpa/zpa``. This will force the tool to use a local provider binary installation. If not set, then the tool will download the latest version of the provider from the Terraform registry.
 
 ## 1.2.2 (June, 20 2024)
 

@@ -331,7 +331,7 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 	if resourceType == "" {
 		log.Fatal("you must define a resource type to generate")
 	}
-	tf, r, _ := initTf(resourceType)
+	tf, r, workingDir := initTf(resourceType) // Ensure workingDir is obtained
 	log.Debugf("beginning to read and build %s resources", resourceType)
 
 	// Initialise `resourceCount` outside of the switch for supported resources
@@ -396,21 +396,6 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		m, _ := json.Marshal(jsonPayload)
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
-	// case "zpa_application_segment_pra":
-	// 	zpaClient := api.zpa.applicationsegmentpra
-	// 	jsonPayload, _, err := applicationsegmentpra.GetAll(zpaClient)
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
-	// 	jsonStructData = make([]interface{}, len(jsonPayload))
-	// 	for i, item := range jsonPayload {
-	// 		m, _ := json.Marshal(item)
-	// 		var mapItem map[string]interface{}
-	// 		_ = json.Unmarshal(m, &mapItem)
-	// 		jsonStructData[i] = mapItem
-	// 	}
-	// 	jsonStructData = filterResources(jsonStructData, resourceType)
-	// 	resourceCount = len(jsonStructData)
 	case "zpa_ba_certificate":
 		zpaClient := api.zpa.bacertificate
 		jsonPayload, _, err := bacertificate.GetAll(zpaClient)
@@ -1055,6 +1040,10 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 
 		output += nestBlocks(resourceType, r.Block, jsonStructData[i].(map[string]interface{}), uuid.New().String(), map[string][]string{})
 		output += "}\n\n"
+
+		// Generate the output for this resource
+
+		generateOutputs(resourceType, resourceID, workingDir)
 	}
 
 	output, err := tf.FormatString(context.Background(), output)
