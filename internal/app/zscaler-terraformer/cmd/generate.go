@@ -951,14 +951,17 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		} else {
 			resourceName = fmt.Sprintf("ID %v", structData["id"])
 		}
+
 		output += fmt.Sprintf("# __generated__ by Zscaler Terraformer from %s\n", resourceName)
 		output += fmt.Sprintf(`resource "%s" "%s" {`+"\n", resourceType, resourceID)
+
 		sortedBlockAttributes := make([]string, 0, len(r.Block.Attributes))
 		for k := range r.Block.Attributes {
 			sortedBlockAttributes = append(sortedBlockAttributes, k)
 		}
 
 		sort.Strings(sortedBlockAttributes)
+
 		for _, attrName := range sortedBlockAttributes {
 			apiAttrName := mapTfFieldNameToApi(resourceType, attrName)
 			if attrName == "id" || attrName == "provisioning_key" || attrName == "tcp_port_ranges" || attrName == "udp_port_ranges" {
@@ -993,7 +996,18 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 						}
 					}
 
-					output += writeAttrLine(attrName, value, false)
+					if resourceType == "zia_dlp_notification_templates" && isInList(attrName, []string{"subject", "plain_text_message", "html_message"}) {
+						valueStr := strings.ReplaceAll(value.(string), "$", "$$")
+						formattedValue := formatHeredoc(valueStr)
+						switch attrName {
+						case "html_message", "plain_text_message":
+							output += fmt.Sprintf("  %s = <<-EOT\n%sEOT\n\n", attrName, formattedValue)
+						case "subject":
+							output += fmt.Sprintf("  %s = <<-EOT\n%sEOT\n", attrName, formattedValue)
+						}
+					} else {
+						output += writeAttrLine(attrName, value, false)
+					}
 
 				case cty.Number:
 					value := structData[apiAttrName]
@@ -1016,7 +1030,14 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 							continue
 						}
 					} else if resourceType == "zia_dlp_notification_templates" && isInList(attrName, []string{"subject", "plain_text_message", "html_message"}) {
-						value = strings.ReplaceAll(value.(string), "${", "$${")
+						valueStr := strings.ReplaceAll(value.(string), "$", "$$")
+						formattedValue := formatHeredoc(valueStr)
+						switch attrName {
+						case "html_message", "plain_text_message":
+							output += fmt.Sprintf("  %s = <<-EOT\n%sEOT\n\n", attrName, formattedValue)
+						case "subject":
+							output += fmt.Sprintf("  %s = <<-EOT\n%sEOT\n", attrName, formattedValue)
+						}
 					} else if resourceType == "zpa_service_edge_group" && attrName == "is_public" {
 						if value == nil {
 							value = false
@@ -1052,7 +1073,6 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		output += "}\n\n"
 
 		// Generate the output for this resource
-
 		generateOutputs(resourceType, resourceID, workingDir)
 	}
 
@@ -1062,4 +1082,18 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 	}
 
 	fmt.Fprint(writer, output)
+}
+
+func formatHeredoc(value string) string {
+	lines := strings.Split(value, "\n")
+	formatted := ""
+	for i, line := range lines {
+		trimmedLine := strings.TrimSpace(line)
+		if trimmedLine != "" {
+			formatted += fmt.Sprintf("%s\n", trimmedLine)
+		} else if i != len(lines)-1 {
+			formatted += "\n"
+		}
+	}
+	return formatted
 }
