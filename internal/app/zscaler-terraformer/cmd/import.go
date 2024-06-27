@@ -55,26 +55,25 @@ import (
 // resourceImportStringFormats contains a mapping of the resource type to the
 // composite ID that is compatible with performing an import.
 var resourceImportStringFormats = map[string]string{
-	"zpa_app_connector_group":                ":id",
-	"zpa_application_server":                 ":id",
-	"zpa_application_segment":                ":id",
-	"zpa_application_segment_browser_access": ":id",
-	"zpa_application_segment_pra":            ":id",
-	"zpa_segment_group":                      ":id",
-	"zpa_server_group":                       ":id",
-	"zpa_policy_access_rule":                 ":id",
-	"zpa_policy_inspection_rule":             ":id",
-	"zpa_policy_timeout_rule":                ":id",
-	"zpa_policy_forwarding_rule":             ":id",
-	"zpa_pra_credential_controller":          ":id",
-	"zpa_pra_portal_controller":              ":id",
-	"zpa_provisioning_key":                   ":id",
-	"zpa_service_edge_group":                 ":id",
-	"zpa_lss_config_controller":              ":id",
-	"zpa_inspection_custom_controls":         ":id",
-	"zpa_inspection_profile":                 ":id",
-	"zpa_microtenant_controller":             ":id",
-	// "zia_admin_users":                                   ":id",
+	"zpa_app_connector_group":                           ":id",
+	"zpa_application_server":                            ":id",
+	"zpa_application_segment":                           ":id",
+	"zpa_application_segment_browser_access":            ":id",
+	"zpa_application_segment_pra":                       ":id",
+	"zpa_segment_group":                                 ":id",
+	"zpa_server_group":                                  ":id",
+	"zpa_policy_access_rule":                            ":id",
+	"zpa_policy_inspection_rule":                        ":id",
+	"zpa_policy_timeout_rule":                           ":id",
+	"zpa_policy_forwarding_rule":                        ":id",
+	"zpa_pra_credential_controller":                     ":id",
+	"zpa_pra_portal_controller":                         ":id",
+	"zpa_provisioning_key":                              ":id",
+	"zpa_service_edge_group":                            ":id",
+	"zpa_lss_config_controller":                         ":id",
+	"zpa_inspection_custom_controls":                    ":id",
+	"zpa_inspection_profile":                            ":id",
+	"zpa_microtenant_controller":                        ":id",
 	"zia_dlp_dictionaries":                              ":id",
 	"zia_dlp_engines":                                   ":id",
 	"zia_dlp_notification_templates":                    ":id",
@@ -93,7 +92,6 @@ var resourceImportStringFormats = map[string]string{
 	"zia_location_management":                           ":id",
 	"zia_url_categories":                                ":id",
 	"zia_url_filtering_rules":                           ":id",
-	"zia_user_management":                               ":id",
 	"zia_rule_labels":                                   ":id",
 	"zia_auth_settings_urls":                            ":id",
 	"zia_security_settings":                             ":id",
@@ -451,15 +449,6 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		m, _ := json.Marshal(filteredPayload)
 		resourceCount = len(filteredPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
-	// case "zia_admin_users":
-	// 	ziaClient := api.zia.admins
-	// 	jsonPayload, err := admins.GetAllAdminUsers(ziaClient)
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
-	// 	m, _ := json.Marshal(jsonPayload)
-	// 	resourceCount = len(jsonPayload)
-	// 	_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_dlp_dictionaries":
 		ziaClient := api.zia.dlpdictionaries
 		list, err := dlpdictionaries.GetAll(ziaClient)
@@ -686,14 +675,6 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		m, _ := json.Marshal(jsonPayload)
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
-	// case "zia_user_management":
-	// 	jsonPayload, err := api.zia.users.GetAllUsers()
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
-	// 	m, _ := json.Marshal(jsonPayload)
-	// 	resourceCount = len(jsonPayload)
-	// 	_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_rule_labels":
 		ziaClient := api.zia.rule_labels
 		jsonPayload, err := rule_labels.GetAll(ziaClient)

@@ -880,7 +880,3 @@ func generateOutputs(resourceType string, resourceID string, workingDir string) 
 		log.Fatalf("failed to write to outputs file: %s", err)
 	}
 }
-
-func writeHeredoc(attrName, value string) string {
-	return fmt.Sprintf("%s = <<-EOT\n%s\nEOT\n", attrName, value)
-}

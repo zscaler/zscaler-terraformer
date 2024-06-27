@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/google/uuid"
@@ -86,7 +87,6 @@ var allGeneratableResources = []string{
 	"zpa_inspection_custom_controls",
 	"zpa_inspection_profile",
 	"zpa_microtenant_controller",
-	// "zia_admin_users",
 	"zia_dlp_dictionaries",
 	"zia_dlp_engines",
 	"zia_dlp_notification_templates",
@@ -103,7 +103,6 @@ var allGeneratableResources = []string{
 	"zia_location_management",
 	"zia_url_categories",
 	"zia_url_filtering_rules",
-	//"zia_user_management",
 	"zia_rule_labels",
 	"zia_auth_settings_urls",
 	"zia_sandbox_behavioral_analysis",
@@ -627,15 +626,6 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		m, _ := json.Marshal(filteredPayload)
 		resourceCount = len(filteredPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
-	// case "zia_admin_users":
-	// 	ziaClient := api.zia.admins
-	// 	jsonPayload, err := admins.GetAllAdminUsers(ziaClient)
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
-	// 	resourceCount = len(jsonPayload)
-	// 	m, _ := json.Marshal(jsonPayload)
-	// 	_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_dlp_dictionaries":
 		ziaClient := api.zia.dlpdictionaries
 		list, err := dlpdictionaries.GetAll(ziaClient)
@@ -862,14 +852,6 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
-	// case "zia_user_management":
-	// 	jsonPayload, err := api.zia.users.GetAllUsers()
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
-	// 	resourceCount = len(jsonPayload)
-	// 	m, _ := json.Marshal(jsonPayload)
-	// 	_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_rule_labels":
 		ziaClient := api.zia.rule_labels
 		jsonPayload, err := rule_labels.GetAll(ziaClient)
@@ -997,13 +979,21 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 				switch ty {
 				case cty.String, cty.Bool:
 					value := structData[apiAttrName]
+					// Handle any string modifications here, if necessary.
 
-					// Handle special cases for `html_message`, `plain_text_message and subject`
-					if resourceType == "zia_dlp_notification_templates" && (attrName == "html_message" || attrName == "plain_text_message" || attrName == "subject") {
-						output += writeHeredoc(attrName, value.(string))
-					} else {
-						output += writeAttrLine(attrName, value, false)
+					if resourceType == "zpa_service_edge_group" && attrName == "is_public" {
+						if value == nil {
+							value = false
+						} else {
+							isPublicStr, ok := value.(string)
+							if ok {
+								isPublic, _ := strconv.ParseBool(isPublicStr)
+								value = isPublic
+							}
+						}
 					}
+
+					output += writeAttrLine(attrName, value, false)
 
 				case cty.Number:
 					value := structData[apiAttrName]
@@ -1025,8 +1015,15 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 							output += fmt.Sprintf("%s = %d\n", attrName, int64(intValue))
 							continue
 						}
-					} else if resourceType == "zia_dlp_notification_templates" && isInList(attrName, []string{"subject"}) {
+					} else if resourceType == "zia_dlp_notification_templates" && isInList(attrName, []string{"subject", "plain_text_message", "html_message"}) {
 						value = strings.ReplaceAll(value.(string), "${", "$${")
+					} else if resourceType == "zpa_service_edge_group" && attrName == "is_public" {
+						if value == nil {
+							value = false
+						} else {
+							isPublic, _ := strconv.ParseBool(value.(string))
+							value = isPublic
+						}
 					}
 
 					output += writeAttrLine(attrName, value, false)
