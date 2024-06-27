@@ -128,6 +128,7 @@ func isLicenseError(err error) (bool, string) {
 
 func runImport() func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
+		managedResourceTypes := make(map[string]bool)
 		if resources != "" {
 			var resourceTypes []string
 			if resources == "*" {
@@ -143,24 +144,42 @@ func runImport() func(cmd *cobra.Command, args []string) {
 			} else {
 				resourceTypes = strings.Split(resources, ",")
 			}
-			// Split the excludedResources string on commas to get a slice of excluded resource names.
 			excludedResourcesTypes := strings.Split(excludedResources, ",")
 
 			for _, rt := range resourceTypes {
 				resourceTyp := strings.Trim(rt, " ")
-				// Check if the current resource type is in the slice of excluded resources.
 				if isInList(resourceTyp, excludedResourcesTypes) {
 					continue
 				}
-				importResource(cmd, cmd.OutOrStdout(), resourceTyp)
+				importResource(cmd, cmd.OutOrStdout(), resourceTyp, managedResourceTypes)
+			}
+			if len(managedResourceTypes) > 0 {
+				fmt.Println("\033[33mThe following resources are already managed by Terraform:\033[0m")
+				for resource := range managedResourceTypes {
+					fmt.Println(resource)
+				}
+			} else {
+				fmt.Println("\033[32mImport successful!\033[0m")
+				fmt.Println("\033[32mThe resources imported via Zscaler Terraformer are shown above.\033[0m")
+				fmt.Println("\033[32mThese resources are now in your Terraform state and will be managed by Terraform.\033[0m")
 			}
 			return
 		}
-		importResource(cmd, cmd.OutOrStdout(), resourceType_)
+		importResource(cmd, cmd.OutOrStdout(), resourceType_, managedResourceTypes)
+		if len(managedResourceTypes) > 0 {
+			fmt.Println("\033[33mThe following resources are already managed by Terraform:\033[0m")
+			for resource := range managedResourceTypes {
+				fmt.Println(resource)
+			}
+		} else {
+			fmt.Println("\033[32mImport successful!\033[0m")
+			fmt.Println("\033[32mThe resources imported via Zscaler Terraformer are shown above.\033[0m")
+			fmt.Println("\033[32mThese resources are now in your Terraform state and will be managed by Terraform.\033[0m")
+		}
 	}
 }
 
-func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
+func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, managedResourceTypes map[string]bool) {
 	var jsonStructData []interface{}
 	resourceCount := 0
 	switch resourceType {
@@ -782,12 +801,15 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string) {
 			fmt.Fprint(writer, buildCompositeID(resourceType, resourceID, name))
 			err := tf.Import(cmd.Context(), resourceType+"."+name, resourceID)
 			if err != nil {
-				log.Printf("[ERROR] error while running import:%v", err)
+				if strings.Contains(err.Error(), "Resource already managed by Terraform") {
+					managedResourceTypes[resourceType] = true
+				} else {
+					log.Printf("[ERROR] error while running import: %v", err)
+				}
 			}
 		}
 	}
 
-	// After importing, remove tcp_port_ranges and udp_port_ranges from the state file
 	stateFile := workingDir + "/terraform.tfstate"
 	removeTcpPortRangesFromState(stateFile)
 }
