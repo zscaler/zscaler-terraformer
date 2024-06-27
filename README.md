@@ -53,10 +53,10 @@ Flags:
   -v, --verbose                             Specify verbose output (same as setting log level to debug)
       --version                             Display the release version
       --zia-terraform-install-path string   Path to the ZIA Terraform installation (default ".")
-      --ziaApiKey string                    ZIA API Key
-      --ziaCloud string                     ZIA Cloud (i.e zscalerthree)
-      --ziaPassword string                  ZIA password
-      --ziaUsername string                  ZIA username
+      --zia_api_key string                    ZIA API Key
+      --zia_cloud string                     ZIA Cloud (i.e zscalerthree)
+      --zia_password string                  ZIA password
+      --zia_username string                  ZIA username
       --zpa-terraform-install-path string   Path to the ZPA Terraform installation (default ".")
       --zpaClientID string                  ZPA client ID
       --zpaClientSecret string              ZPA client secret

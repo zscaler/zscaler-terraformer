@@ -8,7 +8,6 @@ import (
 	"os"
 	"os/exec"
 	"sort"
-	"strconv"
 	"strings"
 
 	"github.com/google/uuid"
@@ -19,7 +18,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zclconf/go-cty/cty"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/adminuserrolemgmt/admins"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp/dlp_engines"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp/dlp_notification_templates"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp/dlp_web_rules"
@@ -88,7 +86,7 @@ var allGeneratableResources = []string{
 	"zpa_inspection_custom_controls",
 	"zpa_inspection_profile",
 	"zpa_microtenant_controller",
-	"zia_admin_users",
+	// "zia_admin_users",
 	"zia_dlp_dictionaries",
 	"zia_dlp_engines",
 	"zia_dlp_notification_templates",
@@ -105,7 +103,7 @@ var allGeneratableResources = []string{
 	"zia_location_management",
 	"zia_url_categories",
 	"zia_url_filtering_rules",
-	"zia_user_management",
+	//"zia_user_management",
 	"zia_rule_labels",
 	"zia_auth_settings_urls",
 	"zia_sandbox_behavioral_analysis",
@@ -246,15 +244,11 @@ func initTf(resourceType string) (tf *tfexec.Terraform, r *tfjson.Schema, workin
 		log.Fatal("NewTerraform failed", err)
 	}
 
-	providerNamespace := viper.GetString("zpa-provider-namespace")
+	providerNamespace := viper.GetString(cloudType + "-provider-namespace")
+	var providerConfig string
 	if providerNamespace != "" {
 		log.Debugf("Using custom provider namespace: %s", providerNamespace)
-		filename := workingDir + "/" + cloudType + "-provider.tf"
-		f, err := os.Create(filename)
-		if err != nil {
-			log.Fatal("failed creating "+filename, err)
-		}
-		_, _ = f.WriteString(fmt.Sprintf(`terraform {
+		providerConfig = fmt.Sprintf(`terraform {
   required_providers {
     %s = {
       source = "%s"
@@ -262,17 +256,10 @@ func initTf(resourceType string) (tf *tfexec.Terraform, r *tfjson.Schema, workin
   }
 }
 provider "%s" {
-  // provider configuration
-}`, cloudType, providerNamespace, cloudType))
-		f.Close()
+`, cloudType, providerNamespace, cloudType)
 	} else {
 		log.Debug("Using default provider namespace")
-		filename := workingDir + "/" + cloudType + "-provider.tf"
-		f, err := os.Create(filename)
-		if err != nil {
-			log.Fatal("failed creating "+filename, err)
-		}
-		_, _ = f.WriteString(fmt.Sprintf(`terraform {
+		providerConfig = fmt.Sprintf(`terraform {
   required_providers {
     %s = {
       source = "zscaler/%s"
@@ -280,10 +267,51 @@ provider "%s" {
   }
 }
 provider "%s" {
-  // provider configuration
-}`, cloudType, cloudType, cloudType))
-		f.Close()
+`, cloudType, cloudType, cloudType)
 	}
+
+	// Add credentials if they are provided
+	if cloudType == "zpa" {
+		zpaClientID := viper.GetString("zpa_client_id")
+		zpaClientSecret := viper.GetString("zpa_client_secret")
+		zpaCustomerID := viper.GetString("zpa_customer_id")
+		zpaCloud := viper.GetString("zpa_cloud")
+
+		if zpaClientID != "" && zpaClientSecret != "" && zpaCustomerID != "" && zpaCloud != "" {
+			providerConfig += fmt.Sprintf(`
+  zpa_client_id     = "%s"
+  zpa_client_secret = "%s"
+  zpa_customer_id   = "%s"
+  zpa_cloud         = "%s"
+`, zpaClientID, zpaClientSecret, zpaCustomerID, zpaCloud)
+		}
+	} else if cloudType == "zia" {
+		ziaUsername := viper.GetString("zia_username")
+		ziaPassword := viper.GetString("zia_password")
+		ziaApiKey := viper.GetString("zia_api_key")
+		ziaCloud := viper.GetString("zia_cloud")
+
+		if ziaUsername != "" && ziaPassword != "" && ziaApiKey != "" && ziaCloud != "" {
+			providerConfig += fmt.Sprintf(`
+  username  = "%s"
+  password  = "%s"
+  api_key   = "%s"
+  zia_cloud     = "%s"
+`, ziaUsername, ziaPassword, ziaApiKey, ziaCloud)
+		}
+	}
+
+	providerConfig += `
+}
+`
+
+	filename := workingDir + "/" + cloudType + "-provider.tf"
+	f, err := os.Create(filename)
+	if err != nil {
+		log.Fatal("failed creating "+filename, err)
+	}
+	_, _ = f.WriteString(providerConfig)
+	f.Close()
 
 	// Initialize Terraform with the provider configuration
 	err = tf.Init(context.Background(), tfexec.Upgrade(true))
@@ -599,15 +627,15 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		m, _ := json.Marshal(filteredPayload)
 		resourceCount = len(filteredPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
-	case "zia_admin_users":
-		ziaClient := api.zia.admins
-		jsonPayload, err := admins.GetAllAdminUsers(ziaClient)
-		if err != nil {
-			log.Fatal(err)
-		}
-		resourceCount = len(jsonPayload)
-		m, _ := json.Marshal(jsonPayload)
-		_ = json.Unmarshal(m, &jsonStructData)
+	// case "zia_admin_users":
+	// 	ziaClient := api.zia.admins
+	// 	jsonPayload, err := admins.GetAllAdminUsers(ziaClient)
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// 	resourceCount = len(jsonPayload)
+	// 	m, _ := json.Marshal(jsonPayload)
+	// 	_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_dlp_dictionaries":
 		ziaClient := api.zia.dlpdictionaries
 		list, err := dlpdictionaries.GetAll(ziaClient)
@@ -834,14 +862,14 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
-	case "zia_user_management":
-		jsonPayload, err := api.zia.users.GetAllUsers()
-		if err != nil {
-			log.Fatal(err)
-		}
-		resourceCount = len(jsonPayload)
-		m, _ := json.Marshal(jsonPayload)
-		_ = json.Unmarshal(m, &jsonStructData)
+	// case "zia_user_management":
+	// 	jsonPayload, err := api.zia.users.GetAllUsers()
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// 	resourceCount = len(jsonPayload)
+	// 	m, _ := json.Marshal(jsonPayload)
+	// 	_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_rule_labels":
 		ziaClient := api.zia.rule_labels
 		jsonPayload, err := rule_labels.GetAll(ziaClient)
@@ -969,21 +997,13 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 				switch ty {
 				case cty.String, cty.Bool:
 					value := structData[apiAttrName]
-					// Handle any string modifications here, if necessary.
 
-					if resourceType == "zpa_service_edge_group" && attrName == "is_public" {
-						if value == nil {
-							value = false
-						} else {
-							isPublicStr, ok := value.(string)
-							if ok {
-								isPublic, _ := strconv.ParseBool(isPublicStr)
-								value = isPublic
-							}
-						}
+					// Handle special cases for `html_message`, `plain_text_message and subject`
+					if resourceType == "zia_dlp_notification_templates" && (attrName == "html_message" || attrName == "plain_text_message" || attrName == "subject") {
+						output += writeHeredoc(attrName, value.(string))
+					} else {
+						output += writeAttrLine(attrName, value, false)
 					}
-
-					output += writeAttrLine(attrName, value, false)
 
 				case cty.Number:
 					value := structData[apiAttrName]
@@ -1005,15 +1025,8 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 							output += fmt.Sprintf("%s = %d\n", attrName, int64(intValue))
 							continue
 						}
-					} else if resourceType == "zia_dlp_notification_templates" && isInList(attrName, []string{"subject", "plain_text_message", "html_message"}) {
+					} else if resourceType == "zia_dlp_notification_templates" && isInList(attrName, []string{"subject"}) {
 						value = strings.ReplaceAll(value.(string), "${", "$${")
-					} else if resourceType == "zpa_service_edge_group" && attrName == "is_public" {
-						if value == nil {
-							value = false
-						} else {
-							isPublic, _ := strconv.ParseBool(value.(string))
-							value = isPublic
-						}
 					}
 
 					output += writeAttrLine(attrName, value, false)

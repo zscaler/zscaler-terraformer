@@ -68,44 +68,44 @@ func sharedPreRun(cmd *cobra.Command, args []string) {
 	if os.Getenv("CI") != "true" {
 		if strings.HasPrefix(resourceType_, "zpa_") || strings.Contains(resources, "zpa_") || resources == "*" || resources == "zpa" {
 			// init zpa
-			zpaCloud = viper.GetString("zpaCloud")
-			if zpaClientID = viper.GetString("zpaClientID"); zpaClientID == "" {
-				log.Fatal("'zpaClientID' must be set.")
+			zpa_cloud = viper.GetString("zpa_cloud")
+			if zpa_client_id = viper.GetString("zpa_client_id"); zpa_client_id == "" {
+				log.Fatal("'zpa_client_id' must be set.")
 			}
-			if zpaClientSecret = viper.GetString("zpaClientSecret"); zpaClientSecret == "" {
-				log.Fatal("'zpaClientSecret' must be set.")
+			if zpa_client_secret = viper.GetString("zpa_client_secret"); zpa_client_secret == "" {
+				log.Fatal("'zpa_client_secret' must be set.")
 			}
-			if zpaCustomerID = viper.GetString("zpaCustomerID"); zpaCustomerID == "" {
-				log.Fatal("'zpaCustomerID' must be set.")
+			if zpa_customer_id = viper.GetString("zpa_customer_id"); zpa_customer_id == "" {
+				log.Fatal("'zpa_customer_id' must be set.")
 			}
 
 			log.WithFields(logrus.Fields{
-				"zpaClientID":   zpaClientID,
-				"zpaCustomerID": "zpaCustomerID",
-				"zpaCloud":      "zpaCloud",
+				"zpa_client_id":   zpa_client_id,
+				"zpa_customer_id": "zpa_customer_id",
+				"zpa_cloud":       "zpa_cloud",
 			}).Debug("initializing zscaler-sdk-go[ZPA]")
 		}
 		if strings.HasPrefix(resourceType_, "zia_") || strings.Contains(resources, "zia_") || resources == "*" || resources == "zia" {
 			// init zia
-			ziaCloud = viper.GetString("ziaCloud")
-			if ziaUsername = viper.GetString("ziaUsername"); ziaUsername == "" {
-				log.Fatal("'ziaUsername' must be set.")
+			zia_cloud = viper.GetString("zia_cloud")
+			if zia_username = viper.GetString("zia_username"); zia_username == "" {
+				log.Fatal("'zia_username' must be set.")
 			}
-			if ziaPassword = viper.GetString("ziaPassword"); ziaPassword == "" {
-				log.Fatal("'ziaPassword' must be set.")
+			if zia_password = viper.GetString("zia_password"); zia_password == "" {
+				log.Fatal("'zia_password' must be set.")
 			}
-			if ziaApiKey = viper.GetString("ziaApiKey"); ziaApiKey == "" {
-				log.Fatal("'ziaApiKey' must be set.")
+			if zia_api_key = viper.GetString("zia_api_key"); zia_api_key == "" {
+				log.Fatal("'zia_api_key' must be set.")
 			}
 
 			log.WithFields(logrus.Fields{
-				"ziaUsername": ziaUsername,
-				"ziaCloud":    "ziaCloud",
+				"zia_username": zia_username,
+				"zia_cloud":    "zia_cloud",
 			}).Debug("initializing zscaler-sdk-go[ZIA]")
 		}
 		api = &Client{}
 		if strings.HasPrefix(resourceType_, "zpa_") || strings.Contains(resources, "zpa_") || resources == "*" || resources == "zpa" {
-			zpaConfig, err := zpa.NewConfig(zpaClientID, zpaClientSecret, zpaCustomerID, zpaCloud, "zscaler-terraformer")
+			zpaConfig, err := zpa.NewConfig(zpa_client_id, zpa_client_secret, zpa_customer_id, zpa_cloud, "zscaler-terraformer")
 			if err != nil {
 				log.Fatal("failed to initialize zscaler-sdk-go (zpa)", err)
 			}
@@ -135,7 +135,7 @@ func sharedPreRun(cmd *cobra.Command, args []string) {
 		}
 		if strings.HasPrefix(resourceType_, "zia_") || strings.Contains(resources, "zia_") || resources == "*" || resources == "zia" {
 			// init zia
-			ziaClient, err := zia.NewClient(ziaUsername, ziaPassword, ziaApiKey, ziaCloud, "zscaler-terraformer")
+			ziaClient, err := zia.NewClient(zia_username, zia_password, zia_api_key, zia_cloud, "zscaler-terraformer")
 			if err != nil {
 				log.Fatal("failed to initialize zscaler-sdk-go (zia)", err)
 			}
@@ -452,7 +452,7 @@ func nestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 			}
 			output += "}\n"
 			continue
-		} else if isInList(resourceType, []string{"zia_firewall_filtering_network_service_groups", "zia_firewall_filtering_rule", "zia_url_filtering_rules", "zia_dlp_web_rules", "zia_user_management"}) && isInList(block, []string{"departments",
+		} else if isInList(resourceType, []string{"zia_firewall_filtering_network_service_groups", "zia_firewall_filtering_rule", "zia_url_filtering_rules", "zia_dlp_web_rules"}) && isInList(block, []string{"departments",
 			"groups",
 			"locations",
 			"dlp_engines",
@@ -831,6 +831,7 @@ func writeAttrLine(key string, value interface{}, usedInBlock bool) string {
 	return ""
 }
 
+// Probably can be deprecated. Need to evaluate.
 func mapTfFieldNameToApi(resourceType, fieldName string) string {
 	switch resourceType {
 	case "zia_admin_users":
@@ -878,4 +879,8 @@ func generateOutputs(resourceType string, resourceID string, workingDir string) 
 	if _, err := f.WriteString(outputBlock); err != nil {
 		log.Fatalf("failed to write to outputs file: %s", err)
 	}
+}
+
+func writeHeredoc(attrName, value string) string {
+	return fmt.Sprintf("%s = <<-EOT\n%s\nEOT\n", attrName, value)
 }

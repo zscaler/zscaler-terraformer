@@ -1,6 +1,11 @@
 package cmd
 
 import (
+	"encoding/json"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -8,9 +13,9 @@ import (
 )
 
 var log = logrus.New()
-var cfgFile, terraformInstallPath string
-var zpaCloud, zpaClientID, zpaClientSecret, zpaCustomerID string
-var ziaCloud, ziaUsername, ziaPassword, ziaApiKey string
+var terraformInstallPath, credentialsFileName string
+var zpa_cloud, zpa_client_id, zpa_client_secret, zpa_customer_id string
+var zia_cloud, zia_username, zia_password, zia_api_key string
 var verbose, displayReleaseVersion bool
 var api *Client
 var terraformImportCmdPrefix = "terraform import"
@@ -43,43 +48,44 @@ func init() {
 		return
 	}
 
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
-	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", home+"/.zscaler-terraformer.yaml", "Path to config file")
+	// Define flags and configuration settings.
+	rootCmd.PersistentFlags().StringVarP(&credentialsFileName, "credentials", "", home+"/.zpa/credentials.json", "Path to credentials file")
+	_ = viper.BindPFlag("credentials", rootCmd.PersistentFlags().Lookup("credentials"))
+	_ = viper.BindEnv("credentials", "ZPA_CREDENTIALS")
 
-	// API credentials
-	rootCmd.PersistentFlags().StringVarP(&zpaClientID, "zpaClientID", "", "", "ZPA client ID")
-	_ = viper.BindPFlag("zpaClientID", rootCmd.PersistentFlags().Lookup("zpaClientID"))
-	_ = viper.BindEnv("zpaClientID", "ZPA_CLIENT_ID")
+	// ZPA API credentials
+	rootCmd.PersistentFlags().StringVarP(&zpa_client_id, "zpa_client_id", "", "", "ZPA client ID")
+	_ = viper.BindPFlag("zpa_client_id", rootCmd.PersistentFlags().Lookup("zpa_client_id"))
+	_ = viper.BindEnv("zpa_client_id", "ZPA_CLIENT_ID")
 
-	rootCmd.PersistentFlags().StringVarP(&zpaClientSecret, "zpaClientSecret", "", "", "ZPA client secret")
-	_ = viper.BindPFlag("zpaClientSecret", rootCmd.PersistentFlags().Lookup("zpaClientSecret"))
-	_ = viper.BindEnv("zpaClientSecret", "ZPA_CLIENT_SECRET")
+	rootCmd.PersistentFlags().StringVarP(&zpa_client_secret, "zpa_client_secret", "", "", "ZPA client secret")
+	_ = viper.BindPFlag("zpa_client_secret", rootCmd.PersistentFlags().Lookup("zpa_client_secret"))
+	_ = viper.BindEnv("zpa_client_secret", "ZPA_CLIENT_SECRET")
 
-	rootCmd.PersistentFlags().StringVarP(&zpaCustomerID, "zpaCustomerID", "", "", "ZPA Customer ID")
-	_ = viper.BindPFlag("zpaCustomerID", rootCmd.PersistentFlags().Lookup("zpaCustomerID"))
-	_ = viper.BindEnv("zpaCustomerID", "ZPA_CUSTOMER_ID")
+	rootCmd.PersistentFlags().StringVarP(&zpa_customer_id, "zpa_customer_id", "", "", "ZPA Customer ID")
+	_ = viper.BindPFlag("zpa_customer_id", rootCmd.PersistentFlags().Lookup("zpa_customer_id"))
+	_ = viper.BindEnv("zpa_customer_id", "ZPA_CUSTOMER_ID")
 
-	rootCmd.PersistentFlags().StringVarP(&zpaCloud, "zpaCloud", "", "", "ZPA Cloud (BETA or PRODUCTION)")
-	_ = viper.BindPFlag("zpaCloud", rootCmd.PersistentFlags().Lookup("zpaCloud"))
-	_ = viper.BindEnv("zpaCloud", "ZPA_CLOUD")
+	rootCmd.PersistentFlags().StringVarP(&zpa_cloud, "zpa_cloud", "", "", "ZPA Cloud (BETA or PRODUCTION)")
+	_ = viper.BindPFlag("zpa_cloud", rootCmd.PersistentFlags().Lookup("zpa_cloud"))
+	_ = viper.BindEnv("zpa_cloud", "ZPA_CLOUD")
 
-	rootCmd.PersistentFlags().StringVarP(&ziaUsername, "ziaUsername", "", "", "ZIA username")
-	_ = viper.BindPFlag("ziaUsername", rootCmd.PersistentFlags().Lookup("ziaUsername"))
-	_ = viper.BindEnv("ziaUsername", "ZIA_USERNAME")
+	// ZIA API credentials
+	rootCmd.PersistentFlags().StringVarP(&zia_username, "zia_username", "", "", "ZIA username")
+	_ = viper.BindPFlag("zia_username", rootCmd.PersistentFlags().Lookup("zia_username"))
+	_ = viper.BindEnv("zia_username", "ZIA_USERNAME")
 
-	rootCmd.PersistentFlags().StringVarP(&ziaPassword, "ziaPassword", "", "", "ZIA password")
-	_ = viper.BindPFlag("ziaPassword", rootCmd.PersistentFlags().Lookup("ziaPassword"))
-	_ = viper.BindEnv("ziaPassword", "ZIA_PASSWORD")
+	rootCmd.PersistentFlags().StringVarP(&zia_password, "zia_password", "", "", "ZIA password")
+	_ = viper.BindPFlag("zia_password", rootCmd.PersistentFlags().Lookup("zia_password"))
+	_ = viper.BindEnv("zia_password", "ZIA_PASSWORD")
 
-	rootCmd.PersistentFlags().StringVarP(&ziaApiKey, "ziaApiKey", "", "", "ZIA API Key")
-	_ = viper.BindPFlag("ziaApiKey", rootCmd.PersistentFlags().Lookup("ziaApiKey"))
-	_ = viper.BindEnv("ziaApiKey", "ZIA_API_KEY")
+	rootCmd.PersistentFlags().StringVarP(&zia_api_key, "zia_api_key", "", "", "ZIA API Key")
+	_ = viper.BindPFlag("zia_api_key", rootCmd.PersistentFlags().Lookup("zia_api_key"))
+	_ = viper.BindEnv("zia_api_key", "ZIA_API_KEY")
 
-	rootCmd.PersistentFlags().StringVarP(&ziaCloud, "ziaCloud", "", "", "ZIA Cloud (i.e zscalerthree)")
-	_ = viper.BindPFlag("ziaCloud", rootCmd.PersistentFlags().Lookup("ziaCloud"))
-	_ = viper.BindEnv("ziaCloud", "ZIA_CLOUD")
+	rootCmd.PersistentFlags().StringVarP(&zia_cloud, "zia_cloud", "", "", "ZIA Cloud (i.e zscalerthree)")
+	_ = viper.BindPFlag("zia_cloud", rootCmd.PersistentFlags().Lookup("zia_cloud"))
+	_ = viper.BindEnv("zia_cloud", "ZIA_CLOUD")
 
 	// Debug logging mode
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Specify verbose output (same as setting log level to debug)")
@@ -115,27 +121,40 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	if cfgFile != "" {
-		viper.SetConfigFile(cfgFile)
-	} else {
-		home, err := homedir.Dir()
+	home, err := homedir.Dir()
+	if err != nil {
+		log.Debug(err)
+		return
+	}
+
+	// Read JSON credentials file from specified path or default to $HOME/.zpa/credentials.json
+	credentialsFile := viper.GetString("credentials")
+	if _, err := os.Stat(credentialsFile); err != nil {
+		credentialsFile = filepath.Join(home, ".zpa/credentials.json")
+	}
+
+	if _, err := os.Stat(credentialsFile); err == nil {
+		fileContent, err := ioutil.ReadFile(credentialsFile)
 		if err != nil {
-			log.Debug(err)
-			return
+			log.Fatal("Failed to read credentials file:", err)
 		}
 
-		// Search config in home directory with name ".zscaler-terraformer" (without extension).
-		viper.AddConfigPath(home)
-		viper.SetConfigName(".zscaler-terraformer")
+		var credentials map[string]string
+		if err := json.Unmarshal(fileContent, &credentials); err != nil {
+			log.Fatal("Failed to unmarshal JSON credentials:", err)
+		}
+
+		for key, value := range credentials {
+			viper.Set(key, value)
+		}
+
+		log.Debug("Loaded credentials from:", credentialsFile)
+	} else {
+		log.Debug("No credentials file found at:", credentialsFile)
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
 	viper.SetEnvPrefix("")
-
-	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
-		log.Debug("using config file:", viper.ConfigFileUsed())
-	}
 
 	var cfgLogLevel = logrus.InfoLevel
 
@@ -144,4 +163,14 @@ func initConfig() {
 	}
 
 	log.SetLevel(cfgLogLevel)
+
+	// Debugging statements to verify the values
+	log.Debug("ZPA Client ID:", viper.GetString("zpa_client_id"))
+	log.Debug("ZPA Client Secret:", viper.GetString("zpa_client_secret"))
+	log.Debug("ZPA Customer ID:", viper.GetString("zpa_customer_id"))
+	log.Debug("ZPA Cloud:", viper.GetString("zpa_cloud"))
+	log.Debug("ZIA Username:", viper.GetString("zia_username"))
+	log.Debug("ZIA Password:", viper.GetString("zia_password"))
+	log.Debug("ZIA API Key:", viper.GetString("zia_api_key"))
+	log.Debug("ZIA Cloud:", viper.GetString("zia_cloud"))
 }
