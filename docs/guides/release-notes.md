@@ -32,11 +32,19 @@ Track all Zscaler Terraformer Tool releases. New resources, features, and bug fi
     
 ### Bug Fixes
 - [PR #206](https://github.com/zscaler/zscaler-terraformer/pull/206). Fixed issues with credential input support via credential file and inline credential authentication.
+- [PR #206](https://github.com/zscaler/zscaler-terraformer/pull/206). Fixed importing of ZIA resource ``zia_dlp_web_rules`` attribute blocks:
+    - `icap_server`
+    - `notification_templates`
+    - `auditor`
 
 ### Deprecations
 - [PR #206](https://github.com/zscaler/zscaler-terraformer/pull/206) Deprecated the following ZIA resources:
     - `zia_user_management`
     - `zia_admin_users`
+- [PR #206](https://github.com/zscaler/zscaler-terraformer/pull/206) Deprecated support to authentication via ``credentials.json`` file. The Tool now supports environment variables and inline based credentials. See [README](https://github.com/zscaler/zscaler-terraformer?tab=readme-ov-file#authentication) for further details.
+
+### Internal Changes
+- [PR #206](https://github.com/zscaler/zscaler-terraformer/pull/206). The tool introduced two new internal environment variables for development purposes: ``ZPA_PROVIDER_NAMESPACE`` and ``ZIA_PROVIDER_NAMESPACE``. By setting these enviornment variables it allows a developer to leverage a local Terraform Provider installation for testing purposes. i.e ``export ZPA_PROVIDER_NAMESPACE=zscaler.com/zpa/zpa``. This will force the tool to use a local provider binary installation. If not set, then the tool will download the latest version of the provider from the Terraform registry.
 
 ## 1.2.2 (June, 20 2024)
 
