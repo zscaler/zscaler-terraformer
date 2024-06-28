@@ -16,6 +16,10 @@
     
 ### Bug Fixes
 - [PR #206](https://github.com/zscaler/zscaler-terraformer/pull/206). Fixed issues with credential input support via credential file and inline credential authentication.
+- [PR #206](https://github.com/zscaler/zscaler-terraformer/pull/206). Fixed importing of ZIA resource ``zia_dlp_web_rules`` attribute blocks:
+    - `icap_server`
+    - `notification_templates`
+    - `auditor`
 
 ### Deprecations
 - [PR #206](https://github.com/zscaler/zscaler-terraformer/pull/206) Deprecated the following ZIA resources:

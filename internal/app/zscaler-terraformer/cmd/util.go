@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/iancoleman/strcase"
 	"github.com/sirupsen/logrus"
@@ -167,6 +168,11 @@ func sharedPreRun(cmd *cobra.Command, args []string) {
 			}
 		}
 	}
+}
+
+func epochToRFC1123(epoch int64) string {
+	t := time.Unix(epoch, 0).UTC()
+	return t.Format(time.RFC1123)
 }
 
 func isInList(item string, list []string) bool {
@@ -665,33 +671,6 @@ func nestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 	return output
 }
 
-/*
-func writeNestedBlock(resourceType string, attributes []string, schemaBlock *tfjson.SchemaBlock, attrStruct map[string]interface{}, parentID string) string {
-	nestedBlockOutput := ""
-
-	for _, attrName := range attributes {
-		apiFieldName := mapTfFieldNameToApi(resourceType, attrName)
-		ty := schemaBlock.Attributes[attrName].AttributeType
-
-		switch {
-		case ty.IsPrimitiveType():
-			switch ty {
-			case cty.String, cty.Bool, cty.Number:
-				nestedBlockOutput += writeAttrLine(attrName, attrStruct[apiFieldName], false)
-			default:
-				log.Debugf("unexpected primitive type %q", ty.FriendlyName())
-			}
-		case ty.IsListType(), ty.IsSetType(), ty.IsMapType():
-			nestedBlockOutput += writeAttrLine(attrName, attrStruct[apiFieldName], true)
-		default:
-			log.Debugf("unexpected nested type %T for %s", ty, attrName)
-		}
-	}
-
-	return nestedBlockOutput
-}
-*/
-
 func writeNestedBlock(resourceType string, attributes []string, schemaBlock *tfjson.SchemaBlock, attrStruct map[string]interface{}, parentID string) string {
 	nestedBlockOutput := ""
 
@@ -733,6 +712,15 @@ func writeAttrLine(key string, value interface{}, usedInBlock bool) string {
 		if floatValue, ok := value.(float64); ok {
 			// Convert to int64 to handle large IDs, then format as a string
 			return fmt.Sprintf("%s = %d\n", key, int64(floatValue))
+		}
+	}
+
+	// Special handling for validity_start_time and validity_end_time
+	if key == "validity_start_time" || key == "validity_end_time" {
+		if floatValue, ok := value.(float64); ok {
+			return fmt.Sprintf("%s = %q\n", key, epochToRFC1123(int64(floatValue)))
+		} else if intValue, ok := value.(int); ok {
+			return fmt.Sprintf("%s = %q\n", key, epochToRFC1123(int64(intValue)))
 		}
 	}
 

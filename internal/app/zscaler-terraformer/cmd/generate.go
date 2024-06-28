@@ -1029,6 +1029,11 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 							output += fmt.Sprintf("%s = %d\n", attrName, int64(intValue))
 							continue
 						}
+					} else if resourceType == "zia_url_filtering_rules" && (attrName == "validity_start_time" || attrName == "validity_end_time") {
+						// Directly use the string value for validity times
+						if strValue, ok := value.(string); ok {
+							value = strValue
+						}
 					} else if resourceType == "zia_dlp_notification_templates" && isInList(attrName, []string{"subject", "plain_text_message", "html_message"}) {
 						valueStr := strings.ReplaceAll(value.(string), "$", "$$")
 						formattedValue := formatHeredoc(valueStr)
