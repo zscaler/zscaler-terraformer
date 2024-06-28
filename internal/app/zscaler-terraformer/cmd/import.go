@@ -35,6 +35,7 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/user_authentication_settings"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appconnectorgroup"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/applicationsegment"
+	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/applicationsegmentinspection"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/applicationsegmentpra"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appservercontroller"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/bacertificate"
@@ -59,6 +60,7 @@ var resourceImportStringFormats = map[string]string{
 	"zpa_application_server":                            ":id",
 	"zpa_application_segment":                           ":id",
 	"zpa_application_segment_browser_access":            ":id",
+	"zpa_application_segment_inspection":                ":id",
 	"zpa_application_segment_pra":                       ":id",
 	"zpa_segment_group":                                 ":id",
 	"zpa_server_group":                                  ":id",
@@ -242,6 +244,15 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 			jsonStructData[i] = mapItem
 		}
 		resourceCount = len(jsonStructData)
+	case "zpa_application_segment_inspection":
+		zpaClient := api.zpa.applicationsegmentinspection
+		jsonPayload, _, err := applicationsegmentinspection.GetAll(zpaClient)
+		if err != nil {
+			log.Fatal(err)
+		}
+		m, _ := json.Marshal(jsonPayload)
+		resourceCount = len(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
 	case "zpa_application_segment_pra":
 		zpaClient := api.zpa.applicationsegmentpra
 		jsonPayload, _, err := applicationsegmentpra.GetAll(zpaClient)

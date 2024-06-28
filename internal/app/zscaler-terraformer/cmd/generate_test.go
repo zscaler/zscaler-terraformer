@@ -164,6 +164,7 @@ func createClientMock(r http.RoundTripper, resourceType, zpaClientID, zpaClientS
 				appconnectorgroup:              zpaServices.New(zpaClient),
 				appconnectorcontroller:         zpaServices.New(zpaClient),
 				applicationsegment:             zpaServices.New(zpaClient),
+				applicationsegmentinspection:   zpaServices.New(zpaClient),
 				applicationsegmentpra:          zpaServices.New(zpaClient),
 				appservercontroller:            zpaServices.New(zpaClient),
 				browseraccess:                  zpaServices.New(zpaClient),

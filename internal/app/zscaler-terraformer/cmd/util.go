@@ -112,9 +112,9 @@ func sharedPreRun(cmd *cobra.Command, args []string) {
 			}
 			zpaClient := zpa.NewClient(zpaConfig)
 			api.zpa = &ZPAClient{
-				appconnectorgroup:  zpaServices.New(zpaClient),
-				applicationsegment: zpaServices.New(zpaClient),
-				// applicationsegmentinspection:   zpaServices.New(zpaClient),
+				appconnectorgroup:              zpaServices.New(zpaClient),
+				applicationsegment:             zpaServices.New(zpaClient),
+				applicationsegmentinspection:   zpaServices.New(zpaClient),
 				applicationsegmentpra:          zpaServices.New(zpaClient),
 				appservercontroller:            zpaServices.New(zpaClient),
 				browseraccess:                  zpaServices.New(zpaClient),

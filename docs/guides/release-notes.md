@@ -16,7 +16,7 @@ Track all Zscaler Terraformer Tool releases. New resources, features, and bug fi
 
 ---
 
-## 1.3.0 (June, xx 2024)
+## 1.3.0 (July, xx 2024)
 
 ### Notes
 
