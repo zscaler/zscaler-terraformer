@@ -269,34 +269,38 @@ provider "%s" {
 `, cloudType, cloudType, cloudType)
 	}
 
-	// Add credentials if they are provided
+	// Add credentials if they are provided inline (not from environment variables)
 	if cloudType == "zpa" {
-		zpaClientID := viper.GetString("zpa_client_id")
-		zpaClientSecret := viper.GetString("zpa_client_secret")
-		zpaCustomerID := viper.GetString("zpa_customer_id")
-		zpaCloud := viper.GetString("zpa_cloud")
+		zpa_client_id := viper.GetString("zpa_client_id")
+		zpa_client_secret := viper.GetString("zpa_client_secret")
+		zpa_customer_id := viper.GetString("zpa_customer_id")
+		zpa_cloud := viper.GetString("zpa_cloud")
 
-		if zpaClientID != "" && zpaClientSecret != "" && zpaCustomerID != "" && zpaCloud != "" {
-			providerConfig += fmt.Sprintf(`
+		if os.Getenv("ZPA_CLIENT_ID") == "" && os.Getenv("ZPA_CLIENT_SECRET") == "" && os.Getenv("ZPA_CUSTOMER_ID") == "" && os.Getenv("ZPA_CLOUD") == "" {
+			if zpa_client_id != "" && zpa_client_secret != "" && zpa_customer_id != "" && zpa_cloud != "" {
+				providerConfig += fmt.Sprintf(`
   zpa_client_id     = "%s"
   zpa_client_secret = "%s"
   zpa_customer_id   = "%s"
   zpa_cloud         = "%s"
-`, zpaClientID, zpaClientSecret, zpaCustomerID, zpaCloud)
+`, zpa_client_id, zpa_client_secret, zpa_customer_id, zpa_cloud)
+			}
 		}
 	} else if cloudType == "zia" {
-		ziaUsername := viper.GetString("zia_username")
-		ziaPassword := viper.GetString("zia_password")
-		ziaApiKey := viper.GetString("zia_api_key")
-		ziaCloud := viper.GetString("zia_cloud")
+		zia_username := viper.GetString("zia_username")
+		zia_password := viper.GetString("zia_password")
+		zia_api_key := viper.GetString("zia_api_key")
+		zia_cloud := viper.GetString("zia_cloud")
 
-		if ziaUsername != "" && ziaPassword != "" && ziaApiKey != "" && ziaCloud != "" {
-			providerConfig += fmt.Sprintf(`
+		if os.Getenv("ZIA_USERNAME") == "" && os.Getenv("ZIA_PASSWORD") == "" && os.Getenv("ZIA_API_KEY") == "" && os.Getenv("ZIA_CLOUD") == "" {
+			if zia_username != "" && zia_password != "" && zia_api_key != "" && zia_cloud != "" {
+				providerConfig += fmt.Sprintf(`
   username  = "%s"
   password  = "%s"
   api_key   = "%s"
-  zia_cloud     = "%s"
-`, ziaUsername, ziaPassword, ziaApiKey, ziaCloud)
+  zia_cloud = "%s"
+`, zia_username, zia_password, zia_api_key, zia_cloud)
+			}
 		}
 	}
 

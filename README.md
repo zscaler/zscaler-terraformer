@@ -44,24 +44,23 @@ Available Commands:
   version     Print the version number of zscaler-terraformer
 
 Flags:
-  -c, --config string                       Path to config file (default "/Users/username/.zscaler-terraformer.yaml")
       --exclude string                      Which resources you wish to exclude
   -h, --help                                help for zscaler-terraformer
       --resource-type string                Which resource you wish to generate
       --resources string                    Which resources you wish to import
       --terraform-install-path string       Path to the default Terraform installation (default ".")
   -v, --verbose                             Specify verbose output (same as setting log level to debug)
-      --version                             Display the release version
-      --zia-terraform-install-path string   Path to the ZIA Terraform installation (default ".")
-      --zia_api_key string                    ZIA API Key
+      --version                              Display the release version
+      --zia-terraform-install-path string    Path to the ZIA Terraform installation (default ".")
+      --zia_api_key string                   ZIA API Key
       --zia_cloud string                     ZIA Cloud (i.e zscalerthree)
       --zia_password string                  ZIA password
       --zia_username string                  ZIA username
-      --zpa-terraform-install-path string   Path to the ZPA Terraform installation (default ".")
-      --zpaClientID string                  ZPA client ID
-      --zpaClientSecret string              ZPA client secret
-      --zpaCloud string                     ZPA Cloud (BETA or PRODUCTION)
-      --zpaCustomerID string                ZPA Customer ID
+      --zpa-terraform-install-path string    Path to the ZPA Terraform installation (default ".")
+      --zpa_client_id string                 ZPA client ID
+      --zpa_client_secret string             ZPA client secret
+      --zpa_customer_id string               ZPA Customer ID
+      --zpa_cloud string                     ZPA Cloud (``BETA``, ``GOV``, ``GOVUS``, ``PRODUCTION``, ``ZPATWO``)
 
 Use "zscaler-terraformer [command] --help" for more information about a command.
 
@@ -91,7 +90,17 @@ demonstrated below.
 export ZPA_CLIENT_ID      = "xxxxxxxxxxxxxxxx"
 export ZPA_CLIENT_SECRET  = "xxxxxxxxxxxxxxxx"
 export ZPA_CUSTOMER_ID    = "xxxxxxxxxxxxxxxx"
-export ZPA_CLOUD          = "BETA" // Use "GOV" for ZPA Gov Cloud
+export ZPA_CLOUD          = "BETA", "GOV", "GOVUS", "PRODUCTION" or "ZPATWO"
+```
+
+### ZPA Inline Authentication
+
+```bash
+zscaler-terraformer import --resources="zpa" \
+--zpa_client_id="xxxxxxxxxxxxxxxx" \
+--zpa_client_secret="xxxxxxxxxxxxxxxx" \
+--zpa_customer_id="xxxxxxxxxxxxxxxx" \
+--zpa_cloud="BETA", "GOV", "GOVUS", "PRODUCTION" or "ZPATWO"
 ```
 
 ### ZIA Environment Variables
@@ -106,14 +115,14 @@ export ZIA_CLOUD    = "xxxxxxxxxxxxxxxx" (i.e zscalerthree)
 
 ```
 
-Alternatively, if using a config file, then specify the inputs using the following `flag` names. Example:
+### ZIA Inline Authentication
 
 ```bash
-$ cat ~/.zscaler-terraformer.yaml
-zpaClientID: "Mrwefhoijhviihew"
-zpaClientSecret: "{HBRjowhdowqj"
-zpaCustomerID: "123456789"
-zpaCloud: "BETA"
+zscaler-terraformer import --resources="zia" \
+--zia_username="xxxxxxxxxxxxxxxx" \
+--zia_password="xxxxxxxxxxxxxxxx" \
+--zia_api_key="xxxxxxxxxxxxxxxx" \
+--zia_cloud=(i.e zscalerthree)
 ```
 
 ## ZPA Example usage
@@ -139,7 +148,7 @@ zscaler-terraformer import --resources="zpa_application_segment"
 ### Exclude specific ZPA resources from Importing
 
 ```bash
-zscaler-terraformer import --resources="zpa" --exclude='zpa_segment_group,zpa_server_group'
+zscaler-terraformer import --resources="zpa" --exclude='zpa_segment_group, zpa_server_group'
 ```
 
 By default, ``zscaler-terraformer`` will create a local configuration directory where it is being executed. You can also indicate the path where the imported configuration should be stored by using the folowing environment variable ``ZSCALER_ZPA_TERRAFORM_INSTALL_PATH``.
@@ -248,7 +257,6 @@ Last updated February 29, 2024
 | [zpa_service_edge_group](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_service_edge_group) | group | ✅ | ✅ |
 | [zpa_application_server](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_application_server) | application | ✅ | ✅ |
 | [zpa_application_segment](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_application_segment) | app segment | ✅ | ✅ |
-| [zpa_cloud_browser_isolation_external_profile](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_cloud_browser_isolation_external_profile) | isolation | ✅ | ✅ |
 | [zpa_segment_group](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_segment_group) | group | ✅ | ✅ |
 | [zpa_server_group](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_server_group) | group | ✅ | ✅ |
 | [zpa_lss_config_controller](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_lss_config_controller) | lss | ✅ | ✅ |
@@ -290,7 +298,6 @@ Last updated March 7, 2024
 | [zia_auth_settings_urls](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_auth_settings_urls) | URL | ✅ | ✅ |
 | [zia_security_policy_settings](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_security_policy_settings) | URL | ✅ | ✅ |
 | [zia_sandbox_behavioral_analysis](https://https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_sandbox_behavioral_analysis) | URL | ✅ | ✅ |
-| [zia_user_management](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_user_management) | User | ✅ | ✅ |
 | [zia_forwarding_control_rule](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_forwarding_control_rule) | Forward | ✅ | ✅ |
 | [zia_forwarding_control_zpa_gateway](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_forwarding_control_zpa_gateway) | Forward | ✅ | ✅ |
 

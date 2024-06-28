@@ -1,19 +1,13 @@
 package cmd
 
 import (
-	"encoding/json"
-	"io/ioutil"
-	"os"
-	"path/filepath"
-
-	homedir "github.com/mitchellh/go-homedir"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 var log = logrus.New()
-var terraformInstallPath, credentialsFileName string
+var terraformInstallPath string
 var zpa_cloud, zpa_client_id, zpa_client_secret, zpa_customer_id string
 var zia_cloud, zia_username, zia_password, zia_api_key string
 var verbose, displayReleaseVersion bool
@@ -42,17 +36,7 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	home, err := homedir.Dir()
-	if err != nil {
-		log.Debug(err)
-		return
-	}
-
 	// Define flags and configuration settings.
-	rootCmd.PersistentFlags().StringVarP(&credentialsFileName, "credentials", "", home+"/.zpa/credentials.json", "Path to credentials file")
-	_ = viper.BindPFlag("credentials", rootCmd.PersistentFlags().Lookup("credentials"))
-	_ = viper.BindEnv("credentials", "ZPA_CREDENTIALS")
-
 	// ZPA API credentials
 	rootCmd.PersistentFlags().StringVarP(&zpa_client_id, "zpa_client_id", "", "", "ZPA client ID")
 	_ = viper.BindPFlag("zpa_client_id", rootCmd.PersistentFlags().Lookup("zpa_client_id"))
@@ -66,7 +50,7 @@ func init() {
 	_ = viper.BindPFlag("zpa_customer_id", rootCmd.PersistentFlags().Lookup("zpa_customer_id"))
 	_ = viper.BindEnv("zpa_customer_id", "ZPA_CUSTOMER_ID")
 
-	rootCmd.PersistentFlags().StringVarP(&zpa_cloud, "zpa_cloud", "", "", "ZPA Cloud (BETA or PRODUCTION)")
+	rootCmd.PersistentFlags().StringVarP(&zpa_cloud, "zpa_cloud", "", "", "ZPA Cloud (BETA, GOV, GOVUS, PRODUCTION, ZPATWO)")
 	_ = viper.BindPFlag("zpa_cloud", rootCmd.PersistentFlags().Lookup("zpa_cloud"))
 	_ = viper.BindEnv("zpa_cloud", "ZPA_CLOUD")
 
@@ -121,38 +105,6 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	home, err := homedir.Dir()
-	if err != nil {
-		log.Debug(err)
-		return
-	}
-
-	// Read JSON credentials file from specified path or default to $HOME/.zpa/credentials.json
-	credentialsFile := viper.GetString("credentials")
-	if _, err := os.Stat(credentialsFile); err != nil {
-		credentialsFile = filepath.Join(home, ".zpa/credentials.json")
-	}
-
-	if _, err := os.Stat(credentialsFile); err == nil {
-		fileContent, err := ioutil.ReadFile(credentialsFile)
-		if err != nil {
-			log.Fatal("Failed to read credentials file:", err)
-		}
-
-		var credentials map[string]string
-		if err := json.Unmarshal(fileContent, &credentials); err != nil {
-			log.Fatal("Failed to unmarshal JSON credentials:", err)
-		}
-
-		for key, value := range credentials {
-			viper.Set(key, value)
-		}
-
-		log.Debug("Loaded credentials from:", credentialsFile)
-	} else {
-		log.Debug("No credentials file found at:", credentialsFile)
-	}
-
 	viper.AutomaticEnv() // read in environment variables that match
 	viper.SetEnvPrefix("")
 
