@@ -351,7 +351,7 @@ func listNestedBlock(fieldName string, obj interface{}) string {
 					case "RDP", "SSH", "VNC":
 						appTypes = []string{"SECURE_REMOTE_ACCESS"}
 					case "HTTPS", "HTTP":
-						appTypes = []string{"BROWSER_ACCESS"}
+						appTypes = []string{"INSPECT"}
 					}
 					output += "app_types = ["
 					for i, appType := range appTypes {
@@ -372,7 +372,7 @@ func listNestedBlock(fieldName string, obj interface{}) string {
 
 // / Remove computed from ZPA Application Segments
 func isComputedAttribute(attr string) bool {
-	computedAttributes := []string{"portal", "app_id", "hidden", "id"}
+	computedAttributes := []string{"portal", "app_id", "hidden", "id", "certificate_name"}
 	for _, computed := range computedAttributes {
 		if attr == computed {
 			return true
@@ -502,7 +502,13 @@ func nestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 				output += listNestedBlock(block, structData["praApps"])
 			}
 			continue
-
+		} else if isInList(resourceType, []string{"zpa_application_segment_inspection"}) {
+			if block == "server_groups" {
+				output += listIdsStringBlock(block, structData["serverGroups"])
+			} else if block == "common_apps_dto" {
+				output += listNestedBlock(block, structData["inspectionApps"])
+			}
+			continue
 		} else if isInList(resourceType, []string{"zpa_server_group", "zpa_policy_access_rule"}) && block == "app_connector_groups" {
 			output += listIdsStringBlock(block, structData["appConnectorGroups"])
 			continue
@@ -679,7 +685,7 @@ func writeNestedBlock(resourceType string, attributes []string, schemaBlock *tfj
 		ty := schemaBlock.Attributes[attrName].AttributeType
 
 		// Exclude specific computed attributes
-		if attrName == "id" || attrName == "appId" || attrName == "portal" || attrName == "hidden" {
+		if attrName == "id" || attrName == "appId" || attrName == "portal" || attrName == "hidden" || attrName == "certificate_name" {
 			continue
 		}
 
