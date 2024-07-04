@@ -50,6 +50,12 @@ build:
 		-ldflags="-X github.com/zscaler/zscaler-terraformer/internal/app/zscaler-terraformer/cmd.versionString=$(VERSION)" \
 		-o $(BINARY_NAME) cmd/zscaler-terraformer/main.go
 
+BINARY_NAME=zscaler-terraformer
+VERSION=$(shell git describe --tags --always --dirty)
+
+BINARY_NAME=zscaler-terraformer
+VERSION=$(shell git describe --tags --always --dirty)
+
 install: GOOS=$(shell go env GOOS)
 install: GOARCH=$(shell go env GOARCH)
 ifeq ($(OS),Windows_NT)
@@ -61,11 +67,15 @@ install:
 	@echo "==> Installing $(BINARY_NAME) CLI in: $(DESTINATION)/$(BINARY_NAME)"
 	@mkdir -p $(DESTINATION)
 	@rm -f $(DESTINATION)/$(BINARY_NAME)
+	@go get github.com/zscaler/zscaler-sdk-go/v2@v2.61.7
+	@go mod tidy
+	@go mod vendor
 	@go build \
 		-gcflags=all=-trimpath=$(GOPATH) \
 		-asmflags=all=-trimpath=$(GOPATH) \
 		-ldflags="-X github.com/zscaler/zscaler-terraformer/internal/app/zscaler-terraformer/cmd.versionString=$(VERSION)" \
 		-o $(DESTINATION)/$(BINARY_NAME) ./cmd/zscaler-terraformer/main.go
+
 
 build_all:
 	@echo "==> Building $(BINARY_NAME) for Windows, macOS, and Linux..."
@@ -75,6 +85,12 @@ build_all:
 	GOOS=linux GOARCH=amd64 go build -o build/$(BINARY_NAME)_linux_amd64 cmd/zscaler-terraformer/main.go
 	GOOS=linux GOARCH=arm64 go build -o build/$(BINARY_NAME)_linux_arm64 cmd/zscaler-terraformer/main.go
 
+test\:integration\:zpa:
+	@echo "$(COLOR_ZSCALER)Running zpa integration tests...$(COLOR_NONE)"
+	cd ./tests/integration/zpa && terraform init && terraform validate
+	cd ./tests/integration/zpa && terraform init && terraform plan
+	cd ./tests/integration/zpa && terraform init && terraform apply --auto-approve -parallelism=1
+ 
 test_zpa:
 	@CI=true \
 		USE_STATIC_RESOURCE_IDS=true \
