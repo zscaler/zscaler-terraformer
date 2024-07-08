@@ -41,7 +41,6 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/bacertificate"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/browseraccess"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/inspectioncontrol/inspection_custom_controls"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/inspectioncontrol/inspection_profile"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/lssconfigcontroller"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/microtenants"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/policysetcontroller"
@@ -56,25 +55,25 @@ import (
 // resourceImportStringFormats contains a mapping of the resource type to the
 // composite ID that is compatible with performing an import.
 var resourceImportStringFormats = map[string]string{
-	"zpa_app_connector_group":                           ":id",
-	"zpa_application_server":                            ":id",
-	"zpa_application_segment":                           ":id",
-	"zpa_application_segment_browser_access":            ":id",
-	"zpa_application_segment_inspection":                ":id",
-	"zpa_application_segment_pra":                       ":id",
-	"zpa_segment_group":                                 ":id",
-	"zpa_server_group":                                  ":id",
-	"zpa_policy_access_rule":                            ":id",
-	"zpa_policy_inspection_rule":                        ":id",
-	"zpa_policy_timeout_rule":                           ":id",
-	"zpa_policy_forwarding_rule":                        ":id",
-	"zpa_pra_credential_controller":                     ":id",
-	"zpa_pra_portal_controller":                         ":id",
-	"zpa_provisioning_key":                              ":id",
-	"zpa_service_edge_group":                            ":id",
-	"zpa_lss_config_controller":                         ":id",
-	"zpa_inspection_custom_controls":                    ":id",
-	"zpa_inspection_profile":                            ":id",
+	"zpa_app_connector_group":                ":id",
+	"zpa_application_server":                 ":id",
+	"zpa_application_segment":                ":id",
+	"zpa_application_segment_browser_access": ":id",
+	"zpa_application_segment_inspection":     ":id",
+	"zpa_application_segment_pra":            ":id",
+	"zpa_segment_group":                      ":id",
+	"zpa_server_group":                       ":id",
+	"zpa_policy_access_rule":                 ":id",
+	"zpa_policy_inspection_rule":             ":id",
+	"zpa_policy_timeout_rule":                ":id",
+	"zpa_policy_forwarding_rule":             ":id",
+	"zpa_pra_credential_controller":          ":id",
+	"zpa_pra_portal_controller":              ":id",
+	"zpa_provisioning_key":                   ":id",
+	"zpa_service_edge_group":                 ":id",
+	"zpa_lss_config_controller":              ":id",
+	"zpa_inspection_custom_controls":         ":id",
+	// "zpa_inspection_profile":                            ":id",
 	"zpa_microtenant_controller":                        ":id",
 	"zia_dlp_dictionaries":                              ":id",
 	"zia_dlp_engines":                                   ":id",
@@ -131,6 +130,7 @@ func isLicenseError(err error) (bool, string) {
 func runImport() func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
 		managedResourceTypes := make(map[string]bool)
+		includedSensitiveResources := make(map[string]bool)
 		if resources != "" {
 			var resourceTypes []string
 			if resources == "*" {
@@ -153,7 +153,7 @@ func runImport() func(cmd *cobra.Command, args []string) {
 				if isInList(resourceTyp, excludedResourcesTypes) {
 					continue
 				}
-				importResource(cmd, cmd.OutOrStdout(), resourceTyp, managedResourceTypes)
+				importResource(cmd, cmd.OutOrStdout(), resourceTyp, managedResourceTypes, includedSensitiveResources)
 			}
 			if len(managedResourceTypes) > 0 {
 				fmt.Println("\033[33mThe following resources are already managed by Terraform:\033[0m")
@@ -165,9 +165,12 @@ func runImport() func(cmd *cobra.Command, args []string) {
 				fmt.Println("\033[32mThe resources imported via Zscaler Terraformer are shown above.\033[0m")
 				fmt.Println("\033[32mThese resources are now in your Terraform state and will be managed by Terraform.\033[0m")
 			}
+			if includedSensitiveResources["zpa_pra_credential_controller"] {
+				fmt.Println("\033[33mThe resource zpa_pra_credential_controller contains sensitive values not included in the generated code.\033[0m")
+			}
 			return
 		}
-		importResource(cmd, cmd.OutOrStdout(), resourceType_, managedResourceTypes)
+		importResource(cmd, cmd.OutOrStdout(), resourceType_, managedResourceTypes, includedSensitiveResources)
 		if len(managedResourceTypes) > 0 {
 			fmt.Println("\033[33mThe following resources are already managed by Terraform:\033[0m")
 			for resource := range managedResourceTypes {
@@ -178,10 +181,13 @@ func runImport() func(cmd *cobra.Command, args []string) {
 			fmt.Println("\033[32mThe resources imported via Zscaler Terraformer are shown above.\033[0m")
 			fmt.Println("\033[32mThese resources are now in your Terraform state and will be managed by Terraform.\033[0m")
 		}
+		if includedSensitiveResources["zpa_pra_credential_controller"] {
+			fmt.Println("\033[33mThe resource zpa_pra_credential_controller contains sensitive values not included in the generated code.\033[0m")
+		}
 	}
 }
 
-func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, managedResourceTypes map[string]bool) {
+func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, managedResourceTypes map[string]bool, includedSensitiveResources map[string]bool) {
 	var jsonStructData []interface{}
 	resourceCount := 0
 	switch resourceType {
@@ -401,6 +407,8 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
+
+		includedSensitiveResources[resourceType] = true
 	case "zpa_provisioning_key":
 		zpaClient := api.zpa.provisioningkey
 		jsonPayload, err := provisioningkey.GetAll(zpaClient)
@@ -443,21 +451,21 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		m, _ := json.Marshal(jsonPayload)
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
-	case "zpa_inspection_profile":
-		zpaClient := api.zpa.inspection_profile
-		jsonPayload, _, err := inspection_profile.GetAll(zpaClient)
-		if err != nil {
-			isLicErr, reason := isLicenseError(err)
-			// If it's a license error, log and continue, otherwise, terminate.
-			if isLicErr {
-				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
-			} else {
-				log.Fatal(err)
-			}
-		}
-		m, _ := json.Marshal(jsonPayload)
-		resourceCount = len(jsonPayload)
-		_ = json.Unmarshal(m, &jsonStructData)
+	// case "zpa_inspection_profile":
+	// 	zpaClient := api.zpa.inspection_profile
+	// 	jsonPayload, _, err := inspection_profile.GetAll(zpaClient)
+	// 	if err != nil {
+	// 		isLicErr, reason := isLicenseError(err)
+	// 		// If it's a license error, log and continue, otherwise, terminate.
+	// 		if isLicErr {
+	// 			log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+	// 		} else {
+	// 			log.Fatal(err)
+	// 		}
+	// 	}
+	// 	m, _ := json.Marshal(jsonPayload)
+	// 	resourceCount = len(jsonPayload)
+	// 	_ = json.Unmarshal(m, &jsonStructData)
 	case "zpa_microtenant_controller":
 		zpaClient := api.zpa.microtenants
 		jsonPayload, _, err := microtenants.GetAll(zpaClient)

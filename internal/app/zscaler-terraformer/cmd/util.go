@@ -112,26 +112,26 @@ func sharedPreRun(cmd *cobra.Command, args []string) {
 			}
 			zpaClient := zpa.NewClient(zpaConfig)
 			api.zpa = &ZPAClient{
-				appconnectorgroup:              zpaServices.New(zpaClient),
-				applicationsegment:             zpaServices.New(zpaClient),
-				applicationsegmentinspection:   zpaServices.New(zpaClient),
-				applicationsegmentpra:          zpaServices.New(zpaClient),
-				appservercontroller:            zpaServices.New(zpaClient),
-				browseraccess:                  zpaServices.New(zpaClient),
-				bacertificate:                  zpaServices.New(zpaClient),
-				lssconfigcontroller:            zpaServices.New(zpaClient),
-				policysetcontroller:            zpaServices.New(zpaClient),
-				policysetcontrollerv2:          zpaServices.New(zpaClient),
-				pracredential:                  zpaServices.New(zpaClient),
-				praportal:                      zpaServices.New(zpaClient),
-				provisioningkey:                zpaServices.New(zpaClient),
-				segmentgroup:                   zpaServices.New(zpaClient),
-				servergroup:                    zpaServices.New(zpaClient),
-				serviceedgegroup:               zpaServices.New(zpaClient),
-				inspection_custom_controls:     zpaServices.New(zpaClient),
-				inspection_predefined_controls: zpaServices.New(zpaClient),
-				inspection_profile:             zpaServices.New(zpaClient),
-				microtenants:                   zpaServices.New(zpaClient),
+				appconnectorgroup:            zpaServices.New(zpaClient),
+				applicationsegment:           zpaServices.New(zpaClient),
+				applicationsegmentinspection: zpaServices.New(zpaClient),
+				applicationsegmentpra:        zpaServices.New(zpaClient),
+				appservercontroller:          zpaServices.New(zpaClient),
+				browseraccess:                zpaServices.New(zpaClient),
+				bacertificate:                zpaServices.New(zpaClient),
+				lssconfigcontroller:          zpaServices.New(zpaClient),
+				policysetcontroller:          zpaServices.New(zpaClient),
+				policysetcontrollerv2:        zpaServices.New(zpaClient),
+				pracredential:                zpaServices.New(zpaClient),
+				praportal:                    zpaServices.New(zpaClient),
+				provisioningkey:              zpaServices.New(zpaClient),
+				segmentgroup:                 zpaServices.New(zpaClient),
+				servergroup:                  zpaServices.New(zpaClient),
+				serviceedgegroup:             zpaServices.New(zpaClient),
+				inspection_custom_controls:   zpaServices.New(zpaClient),
+				// inspection_predefined_controls: zpaServices.New(zpaClient),
+				// inspection_profile:             zpaServices.New(zpaClient),
+				microtenants: zpaServices.New(zpaClient),
 			}
 		}
 		if strings.HasPrefix(resourceType_, "zia_") || strings.Contains(resources, "zia_") || resources == "*" || resources == "zia" {
@@ -520,9 +520,6 @@ func nestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 			continue
 		} else if isInList(resourceType, []string{"zpa_policy_access_rule"}) && block == "app_server_groups" {
 			output += listIdsStringBlock(block, structData["appServerGroups"])
-			continue
-		} else if isInList(resourceType, []string{"zpa_inspection_custom_controls"}) && block == "associated_inspection_profile_names" {
-			output += listIdsStringBlock(block, structData["associatedInspectionProfileNames"])
 			continue
 		} else if isInList(resourceType, []string{"zpa_lss_config_controller"}) && block == "connector_groups" {
 			output += listIdsStringBlock(block, structData["connectorGroups"])

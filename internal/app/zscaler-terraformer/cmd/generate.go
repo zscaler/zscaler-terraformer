@@ -49,7 +49,6 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/bacertificate"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/browseraccess"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/inspectioncontrol/inspection_custom_controls"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/inspectioncontrol/inspection_profile"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/lssconfigcontroller"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/microtenants"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/policysetcontroller"
@@ -87,7 +86,7 @@ var allGeneratableResources = []string{
 	"zpa_service_edge_group",
 	"zpa_lss_config_controller",
 	"zpa_inspection_custom_controls",
-	"zpa_inspection_profile",
+	// "zpa_inspection_profile",
 	"zpa_microtenant_controller",
 	"zia_dlp_dictionaries",
 	"zia_dlp_engines",
@@ -616,15 +615,15 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
-	case "zpa_inspection_profile":
-		zpaClient := api.zpa.inspection_profile
-		jsonPayload, _, err := inspection_profile.GetAll(zpaClient)
-		if err != nil {
-			log.Fatal(err)
-		}
-		resourceCount = len(jsonPayload)
-		m, _ := json.Marshal(jsonPayload)
-		_ = json.Unmarshal(m, &jsonStructData)
+	// case "zpa_inspection_profile":
+	// 	zpaClient := api.zpa.inspection_profile
+	// 	jsonPayload, _, err := inspection_profile.GetAll(zpaClient)
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// 	resourceCount = len(jsonPayload)
+	// 	m, _ := json.Marshal(jsonPayload)
+	// 	_ = json.Unmarshal(m, &jsonStructData)
 	case "zpa_microtenant_controller":
 		zpaClient := api.zpa.microtenants
 		jsonPayload, _, err := microtenants.GetAll(zpaClient)
@@ -970,6 +969,10 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		output += fmt.Sprintf("# __generated__ by Zscaler Terraformer from %s\n", resourceName)
 		output += fmt.Sprintf(`resource "%s" "%s" {`+"\n", resourceType, resourceID)
 
+		if resourceType == "zpa_pra_credential_controller" {
+			output += "# This resource supports attributes with sensitive values and will not be imported\n"
+		}
+
 		sortedBlockAttributes := make([]string, 0, len(r.Block.Attributes))
 		for k := range r.Block.Attributes {
 			sortedBlockAttributes = append(sortedBlockAttributes, k)
@@ -1089,10 +1092,36 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 			}
 		}
 
-		output += nestBlocks(resourceType, r.Block, jsonStructData[i].(map[string]interface{}), uuid.New().String(), map[string][]string{})
+		if resourceType == "zpa_inspection_custom_controls" {
+			if controlRuleJson, ok := structData["controlRuleJson"]; ok {
+				var controlRules []map[string]interface{}
+				err := json.Unmarshal([]byte(controlRuleJson.(string)), &controlRules)
+				if err != nil {
+					log.Fatalf("failed to unmarshal controlRuleJson: %v", err)
+				}
+				for _, rule := range controlRules {
+					output += "  rules {\n"
+					for key, value := range rule {
+						if key == "conditions" {
+							output += "    conditions {\n"
+							for _, condition := range value.([]interface{}) {
+								conditionMap := condition.(map[string]interface{})
+								for condKey, condValue := range conditionMap {
+									output += writeAttrLine(condKey, condValue, false)
+								}
+							}
+							output += "    }\n"
+						} else {
+							output += writeAttrLine(key, value, false)
+						}
+					}
+					output += "  }\n"
+				}
+			}
+		}
+
 		output += "}\n\n"
 
-		// Generate the output for this resource
 		generateOutputs(resourceType, resourceID, workingDir)
 	}
 

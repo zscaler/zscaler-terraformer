@@ -263,7 +263,6 @@ Last updated February 29, 2024
 | [zpa_microtenant_controller](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_microtenant_controller) | microtenant | ✅ | ✅ |
 | [zpa_provisioning_key](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_provisioning_key) | key | ✅ | ✅ |
 | [zpa_inspection_custom_controls](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_inspection_custom_control) | Inspection | ✅ | ✅ |
-| [zpa_inspection_profile](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_inspection_profile) | Inspection | ✅ | ✅ |
 | [zpa_policy_access_rule](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_policy_access_rule) | Policy | ✅ | ✅ |
 | [zpa_policy_timeout_rule](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_policy_access_timeout_rule) | Policy | ✅ | ✅ |
 | [zpa_policy_forwarding_rule](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_policy_access_forwarding_rule) | Policy | ✅ | ✅ |

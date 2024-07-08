@@ -10,28 +10,27 @@ import (
 )
 
 type ZPAClient struct {
-	appconnectorgroup              *zpaServices.Service
-	appconnectorcontroller         *zpaServices.Service
-	applicationsegment             *zpaServices.Service
-	applicationsegmentinspection   *zpaServices.Service
-	applicationsegmentpra          *zpaServices.Service
-	appservercontroller            *zpaServices.Service
-	browseraccess                  *zpaServices.Service
-	bacertificate                  *zpaServices.Service
-	lssconfigcontroller            *zpaServices.Service
-	policysetcontroller            *zpaServices.Service
-	policysetcontrollerv2          *zpaServices.Service
-	pracredential                  *zpaServices.Service
-	praportal                      *zpaServices.Service
-	provisioningkey                *zpaServices.Service
-	segmentgroup                   *zpaServices.Service
-	servergroup                    *zpaServices.Service
-	serviceedgegroup               *zpaServices.Service
-	serviceedgecontroller          *zpaServices.Service
-	inspection_custom_controls     *zpaServices.Service
-	inspection_predefined_controls *zpaServices.Service
-	inspection_profile             *zpaServices.Service
-	microtenants                   *zpaServices.Service
+	appconnectorgroup            *zpaServices.Service
+	appconnectorcontroller       *zpaServices.Service
+	applicationsegment           *zpaServices.Service
+	applicationsegmentinspection *zpaServices.Service
+	applicationsegmentpra        *zpaServices.Service
+	appservercontroller          *zpaServices.Service
+	browseraccess                *zpaServices.Service
+	bacertificate                *zpaServices.Service
+	lssconfigcontroller          *zpaServices.Service
+	policysetcontroller          *zpaServices.Service
+	policysetcontrollerv2        *zpaServices.Service
+	pracredential                *zpaServices.Service
+	praportal                    *zpaServices.Service
+	provisioningkey              *zpaServices.Service
+	segmentgroup                 *zpaServices.Service
+	servergroup                  *zpaServices.Service
+	serviceedgegroup             *zpaServices.Service
+	serviceedgecontroller        *zpaServices.Service
+	inspection_custom_controls   *zpaServices.Service
+	// inspection_profile             *zpaServices.Service
+	microtenants *zpaServices.Service
 }
 
 type ZIAClient struct {

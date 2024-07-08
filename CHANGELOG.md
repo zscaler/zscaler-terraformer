@@ -9,6 +9,8 @@
 
 ### Enhancements
 - [PR #206](https://github.com/zscaler/zscaler-terraformer/pull/206). The tool now creates a ``outputs.tf`` file containg the `id` export of each invidual exported resource.
+- [PR #206](https://github.com/zscaler/zscaler-terraformer/pull/206). The tool now displays a message when the resource import is successful.
+- [PR #206](https://github.com/zscaler/zscaler-terraformer/pull/206). The tool now displays a warning message when the imported resource contain attributes that may carry sensitive values i.e `passwords`. Notice that the value is not included in the HCL code for security reasons.
 - [PR #206](https://github.com/zscaler/zscaler-terraformer/pull/206). Re-introduced support for the import of the following resources:
     - `zpa_application_segment_browser_access`
     - `zpa_application_segment_inspection`
@@ -20,11 +22,14 @@
     - `icap_server`
     - `notification_templates`
     - `auditor`
+- [PR #206](https://github.com/zscaler/zscaler-terraformer/pull/206). Fixed importing of ZPA resource ``zpa_inspection_custom_controls`` `rules` block.
 
 ### Deprecations
 - [PR #206](https://github.com/zscaler/zscaler-terraformer/pull/206) Deprecated the following ZIA resources:
     - `zia_user_management`
     - `zia_admin_users`
+- [PR #206](https://github.com/zscaler/zscaler-terraformer/pull/206) Temporary deprecation of the resources: `zpa_inspection_profile`
+
 - [PR #206](https://github.com/zscaler/zscaler-terraformer/pull/206) Deprecated support to authentication via ``credentials.json`` file. The Tool now supports environment variables and inline based credentials. See [README](https://github.com/zscaler/zscaler-terraformer?tab=readme-ov-file#authentication) for further details.
 
 ### Internal Changes
