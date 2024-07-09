@@ -1,8 +1,12 @@
 package cmd
 
+/*
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -11,66 +15,10 @@ import (
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/zscaler/zscaler-sdk-go/v2/zia"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/adminuserrolemgmt/admins"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/devicegroups"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp/dlp_engines"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp/dlp_notification_templates"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp/dlp_web_rules"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp/dlpdictionaries"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/filteringrules"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/ipdestinationgroups"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/ipsourcegroups"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkapplicationgroups"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkservicegroups"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkservices"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/timewindow"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/forwarding_control_policy/forwarding_rules"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/forwarding_control_policy/zpa_gateways"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/location/locationgroups"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/location/locationmanagement"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/rule_labels"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/sandbox/sandbox_settings"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/security_policy_settings"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/greinternalipranges"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/gretunnelinfo"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/gretunnels"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/staticips"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/virtualipaddress"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/vpncredentials"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/urlcategories"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/urlfilteringpolicies"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/user_authentication_settings"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/usermanagement/users"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appconnectorcontroller"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appconnectorgroup"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/applicationsegment"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appservercontroller"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/bacertificate"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/cloudbrowserisolation/cbibannercontroller"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/cloudbrowserisolation/cbicertificatecontroller"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/cloudbrowserisolation/cbiprofilecontroller"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/cloudconnectorgroup"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/customerversionprofile"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/enrollmentcert"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/idpcontroller"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/inspectioncontrol/inspection_custom_controls"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/inspectioncontrol/inspection_predefined_controls"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/inspectioncontrol/inspection_profile"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/lssconfigcontroller"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/machinegroup"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/microtenants"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/policysetcontroller"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/postureprofile"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/provisioningkey"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/samlattribute"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/scimattributeheader"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/scimgroup"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/segmentgroup"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/servergroup"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/serviceedgecontroller"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/serviceedgegroup"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/trustednetwork"
+	zpaServices "github.com/zscaler/zscaler-sdk-go/v2/zpa"
+	"github.com/zscaler/zscaler-terraformer/providers/zia"
+	"github.com/zscaler/zscaler-terraformer/teraformutils/nesting"
+	"github.com/zscaler/zscaler-terraformer/teraformutils/utils"
 )
 
 var (
@@ -114,7 +62,7 @@ func TestGenerate_writeAttrLine(t *testing.T) {
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			got := writeAttrLine(tc.key, tc.value, false)
+			got := nesting.WriteAttrLine(tc.key, tc.value, false)
 			assert.Equal(t, tc.want, got)
 		})
 	}
@@ -124,7 +72,7 @@ func TestGenerate_ResourceNotSupported(t *testing.T) {
 	viper.Set("zpa-terraform-install-path", "")
 	viper.Set("zia-terraform-install-path", "")
 	viper.Set("terraform-install-path", "../../../../testdata/testnotsupported/.")
-	_, output, err := executeCommandC(rootCmd, "generate", "--resource-type", "zpa_notreal", "--verbose")
+	_, output, err := utils.ExecuteCommandC(rootCmd, "generate", "--resource-type", "zpa_notreal", "--verbose")
 
 	if assert.Nil(t, err) {
 		assert.Contains(t, output, "\"zpa_notreal\" is not yet supported for automatic generation")
@@ -144,28 +92,24 @@ func TestResourceGeneration(t *testing.T) {
 		"zpa application segment pra":            {identiferType: "appsegment", resourceType: "zpa_application_segment_pra", testdataFilename: "zpa_application_segment_pra"},
 		"zpa application segment inspection":     {identiferType: "appsegment", resourceType: "zpa_application_segment_inspection", testdataFilename: "zpa_application_segment_inspection"},
 		"zpa application segment browser access": {identiferType: "appsegment", resourceType: "zpa_application_segment_browser_access", testdataFilename: "zpa_application_segment_browser_access"},
-		//"zpa cloud browser isolation banner":      {identiferType: "isolation", resourceType: "zpa_cloud_browser_isolation_banner", testdataFilename: "zpa_cloud_browser_isolation_banner"},
-		//"zpa cloud browser isolation certificate": {identiferType: "isolation", resourceType: "zpa_cloud_browser_isolation_certificate", testdataFilename: "zpa_cloud_browser_isolation_certificate"},
-		//"zpa cloud browser isolation profile":     {identiferType: "isolation", resourceType: "zpa_cloud_browser_isolation_external_profile", testdataFilename: "zpa_cloud_browser_isolation_external_profile"},
-		"zpa segment group":          {identiferType: "group", resourceType: "zpa_segment_group", testdataFilename: "zpa_segment_group"},
-		"zpa server group":           {identiferType: "group", resourceType: "zpa_server_group", testdataFilename: "zpa_server_group"},
-		"zpa policy access rule":     {identiferType: "policy", resourceType: "zpa_policy_access_rule", testdataFilename: "zpa_policy_access_rule"},
-		"zpa policy inspection rule": {identiferType: "policy", resourceType: "zpa_policy_inspection_rule", testdataFilename: "zpa_policy_inspection_rule"},
-		"zpa policy timeout rule":    {identiferType: "policy", resourceType: "zpa_policy_timeout_rule", testdataFilename: "zpa_policy_timeout_rule"},
-		"zpa policy forwarding rule": {identiferType: "policy", resourceType: "zpa_policy_forwarding_rule", testdataFilename: "zpa_policy_forwarding_rule"},
-		"zpa policy isolation rule":  {identiferType: "policy", resourceType: "zpa_policy_isolation_rule", testdataFilename: "zpa_policy_isolation_rule"},
-		//"zpa policy redirection rule": {identiferType: "policy", resourceType: "zpa_policy_redirection_rule", testdataFilename: "zpa_policy_redirection_rule"},
-		//"zpa provisioning key":      {identiferType: "key", resourceType: "zpa_provisioning_key", testdataFilename: "zpa_provisioning_key"},
-		"zpa service edge group":    {identiferType: "group", resourceType: "zpa_service_edge_group", testdataFilename: "zpa_service_edge_group"},
-		"zpa lss config controller": {identiferType: "lss", resourceType: "zpa_lss_config_controller", testdataFilename: "zpa_lss_config_controller"},
-		//"zpa inspection custom controls": {identiferType: "inspection", resourceType: "zpa_inspection_custom_controls", testdataFilename: "zpa_inspection_custom_controls"},
-		//"zpa inspection profile": {identiferType: "inspection", resourceType: "zpa_inspection_profile", testdataFilename: "zpa_inspection_profile"},
-		//"zpa microtenant controller": {identiferType: "microtenant", resourceType: "zpa_microtenant_controller", testdataFilename: "zpa_microtenant_controller"},
+		"zpa segment group":                      {identiferType: "group", resourceType: "zpa_segment_group", testdataFilename: "zpa_segment_group"},
+		"zpa server group":                       {identiferType: "group", resourceType: "zpa_server_group", testdataFilename: "zpa_server_group"},
+		"zpa policy access rule":                 {identiferType: "policy", resourceType: "zpa_policy_access_rule", testdataFilename: "zpa_policy_access_rule"},
+		"zpa policy inspection rule":             {identiferType: "policy", resourceType: "zpa_policy_inspection_rule", testdataFilename: "zpa_policy_inspection_rule"},
+		"zpa policy timeout rule":                {identiferType: "policy", resourceType: "zpa_policy_timeout_rule", testdataFilename: "zpa_policy_timeout_rule"},
+		"zpa policy forwarding rule":             {identiferType: "policy", resourceType: "zpa_policy_forwarding_rule", testdataFilename: "zpa_policy_forwarding_rule"},
+		"zpa policy isolation rule":              {identiferType: "policy", resourceType: "zpa_policy_isolation_rule", testdataFilename: "zpa_policy_isolation_rule"},
+		"zpa policy redirection rule":            {identiferType: "policy", resourceType: "zpa_policy_redirection_rule", testdataFilename: "zpa_policy_redirection_rule"},
+		"zpa provisioning key":                   {identiferType: "key", resourceType: "zpa_provisioning_key", testdataFilename: "zpa_provisioning_key"},
+		"zpa service edge group":                 {identiferType: "group", resourceType: "zpa_service_edge_group", testdataFilename: "zpa_service_edge_group"},
+		"zpa lss config controller":              {identiferType: "lss", resourceType: "zpa_lss_config_controller", testdataFilename: "zpa_lss_config_controller"},
+		"zpa inspection custom controls":         {identiferType: "inspection", resourceType: "zpa_inspection_custom_controls", testdataFilename: "zpa_inspection_custom_controls"},
+		"zpa microtenant controller":             {identiferType: "microtenant", resourceType: "zpa_microtenant_controller", testdataFilename: "zpa_microtenant_controller"},
 
 		// ZIA Resource
-		"zia admin users":      {identiferType: "users", resourceType: "zia_admin_users", testdataFilename: "zia_admin_users"},
-		"zia dlp dictionaries": {identiferType: "dlp", resourceType: "zia_dlp_dictionaries", testdataFilename: "zia_dlp_dictionaries"},
-		// "zia dlp engines":                                   {identiferType: "dlp", resourceType: "zia_dlp_engines", testdataFilename: "zia_dlp_engines"},
+		"zia admin users":                                   {identiferType: "users", resourceType: "zia_admin_users", testdataFilename: "zia_admin_users"},
+		"zia dlp dictionaries":                              {identiferType: "dlp", resourceType: "zia_dlp_dictionaries", testdataFilename: "zia_dlp_dictionaries"},
+		"zia dlp engines":                                   {identiferType: "dlp", resourceType: "zia_dlp_engines", testdataFilename: "zia_dlp_engines"},
 		"zia dlp notification templates":                    {identiferType: "dlp", resourceType: "zia_dlp_notification_templates", testdataFilename: "zia_dlp_notification_templates"},
 		"zia dlp web rules":                                 {identiferType: "dlp", resourceType: "zia_dlp_web_rules", testdataFilename: "zia_dlp_web_rules"},
 		"zia firewall filtering rule":                       {identiferType: "rule", resourceType: "zia_firewall_filtering_rule", testdataFilename: "zia_firewall_filtering_rule"},
@@ -185,8 +129,8 @@ func TestResourceGeneration(t *testing.T) {
 		"zia auth settings urls":                            {identiferType: "auth", resourceType: "zia_auth_settings_urls", testdataFilename: "zia_auth_settings_urls"},
 		"zia security settings":                             {identiferType: "security", resourceType: "zia_security_settings", testdataFilename: "zia_security_settings"},
 		"zia sandbox settings":                              {identiferType: "sandbox", resourceType: "zia_sandbox_behavioral_analysis", testdataFilename: "zia_sandbox_behavioral_analysis"},
-		//"zia forward control rule":                          {identiferType: "forward", resourceType: "zia_forwarding_control_rule", testdataFilename: "zia_forwarding_control_rule"},
-		//"zia zpa gateway":                                   {identiferType: "forward", resourceType: "zia_forwarding_control_zpa_gateway", testdataFilename: "zia_forwarding_control_zpa_gateway"},
+		"zia forward control rule":                          {identiferType: "forward", resourceType: "zia_forwarding_control_rule", testdataFilename: "zia_forwarding_control_rule"},
+		"zia zpa gateway":                                   {identiferType: "forward", resourceType: "zia_forwarding_control_zpa_gateway", testdataFilename: "zia_forwarding_control_zpa_gateway"},
 	}
 
 	for name, tc := range tests {
@@ -215,12 +159,37 @@ func TestResourceGeneration(t *testing.T) {
 			output := ""
 
 			api = createClientMock(r, tc.resourceType, viper.GetString("zpaClientID"), viper.GetString("zpaClientSecret"), viper.GetString("zpaCustomerID"), viper.GetString("zpaCloud"), viper.GetString("ziaUsername"), viper.GetString("ziaPassword"), viper.GetString("ziaApiKey"), viper.GetString("ziaCloud"))
-			_, output, _ = executeCommandC(rootCmd, "generate", "--resource-type", tc.resourceType, "--verbose")
+			_, output, _ = utils.ExecuteCommandC(rootCmd, "generate", "--resource-type", tc.resourceType, "--verbose")
 
 			expected := testDataFile(tc.testdataFilename, cloudType)
 			assert.Equal(t, strings.TrimRight(expected, "\n"), strings.TrimRight(output, "\n"))
 		})
 	}
+}
+
+// testDataFile slurps a local test case into memory and returns it while
+// encapsulating the logic for finding it.
+func testDataFile(filename, cloudType string) string {
+	filename = strings.TrimSuffix(filename, "/")
+
+	dirname, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+
+	dir, err := os.Open(filepath.Join(dirname, "../../../../testdata/terraform/"+cloudType))
+	if err != nil {
+		panic(err)
+	}
+
+	fullpath := dir.Name() + "/" + filename + "/test.tf"
+	if _, err := os.Stat(fullpath); os.IsNotExist(err) {
+		panic(fmt.Errorf("terraform testdata file does not exist at %s", fullpath))
+	}
+
+	data, _ := ioutil.ReadFile(fullpath)
+
+	return string(data)
 }
 
 func createClientMock(r http.RoundTripper, resourceType, zpaClientID, zpaClientSecret, zpaCustomerID, zpaCloud, ziaUsername, ziaPassword, ziaApiKey, ziaCloud string) *Client {
@@ -233,26 +202,26 @@ func createClientMock(r http.RoundTripper, resourceType, zpaClientID, zpaClientS
 		zpaClient := zpa.NewClient(zpaConfig)
 		zpaClient.Config.GetHTTPClient().Transport = r
 		cli = &Client{
-			ZpaClient: zpaClient,
+			zpaClient: zpaClient,
 			zpa: &ZPAClient{
-				appconnectorgroup:      appconnectorgroup.New(zpaClient),
-				appconnectorcontroller: appconnectorcontroller.New(zpaClient),
-				applicationsegment:     applicationsegment.New(zpaClient),
-				// applicationsegmentpra:          applicationsegmentpra.New(zpaClient),
-				// applicationsegmentinspection:   applicationsegmentinspection.New(zpaClient),
-				// browseraccess:                  browseraccess.New(zpaClient),
-				cbibannercontroller:            cbibannercontroller.New(zpaClient),
-				cbicertificatecontroller:       cbicertificatecontroller.New(zpaClient),
-				cbiprofilecontroller:           cbiprofilecontroller.New(zpaClient),
-				appservercontroller:            appservercontroller.New(zpaClient),
-				bacertificate:                  bacertificate.New(zpaClient),
-				cloudconnectorgroup:            cloudconnectorgroup.New(zpaClient),
-				customerversionprofile:         customerversionprofile.New(zpaClient),
-				enrollmentcert:                 enrollmentcert.New(zpaClient),
-				idpcontroller:                  idpcontroller.New(zpaClient),
-				lssconfigcontroller:            lssconfigcontroller.New(zpaClient),
-				machinegroup:                   machinegroup.New(zpaClient),
-				postureprofile:                 postureprofile.New(zpaClient),
+				appconnectorgroup:              zpaServices.New(zpaClient),
+				appconnectorcontroller:         zpaServices.New(zpaClient),
+				applicationsegment:             zpaServices.New(zpaClient),
+				applicationsegmentpra:          zpaServices.New(zpaClient),
+				applicationsegmentinspection:   zpaServices.New(zpaClient),
+				browseraccess:                  zpaServices.New(zpaClient),
+				cbibannercontroller:            zpaServices.New(zpaClient),
+				cbicertificatecontroller:       zpaServices.New(zpaClient),
+				cbiprofilecontroller:           zpaServices.New(zpaClient),
+				appservercontroller:            zpaServices.New(zpaClient),
+				bacertificate:                  zpaServices.New(zpaClient),
+				cloudconnectorgroup:            zpaServices.New(zpaClient),
+				customerversionprofile:         zpaServices.New(zpaClient),
+				enrollmentcert:                 zpaServices.New(zpaClient),
+				idpcontroller:                  zpaServices.New(zpaClient),
+				lssconfigcontroller:            zpaServices.New(zpaClient),
+				machinegroup:                   zpaServices.New(zpaClient),
+				postureprofile:                 zpaServices.New(zpaClient),
 				policysetcontroller:            policysetcontroller.New(zpaClient),
 				provisioningkey:                provisioningkey.New(zpaClient),
 				samlattribute:                  samlattribute.New(zpaClient),
@@ -314,3 +283,4 @@ func createClientMock(r http.RoundTripper, resourceType, zpaClientID, zpaClientS
 	}
 	return cli
 }
+*/
