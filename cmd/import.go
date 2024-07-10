@@ -66,14 +66,15 @@ var resourceImportStringFormats = map[string]string{
 	"zpa_application_segment_pra":                       ":id",
 	"zpa_segment_group":                                 ":id",
 	"zpa_server_group":                                  ":id",
+	"zpa_policy_access_rule":                            ":id",
+	"zpa_policy_timeout_rule":                           ":id",
+	"zpa_policy_forwarding_rule":                        ":id",
+	"zpa_policy_inspection_rule":                        ":id",
+	"zpa_policy_isolation_rule":                         ":id",
 	"zpa_pra_approval_controller":                       ":id",
 	"zpa_pra_credential_controller":                     ":id",
 	"zpa_pra_console_controller":                        ":id",
 	"zpa_pra_portal_controller":                         ":id",
-	"zpa_policy_access_rule":                            ":id",
-	"zpa_policy_inspection_rule":                        ":id",
-	"zpa_policy_timeout_rule":                           ":id",
-	"zpa_policy_forwarding_rule":                        ":id",
 	"zpa_provisioning_key":                              ":id",
 	"zpa_service_edge_group":                            ":id",
 	"zpa_lss_config_controller":                         ":id",
@@ -406,44 +407,6 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		m, _ := json.Marshal(jsonPayload)
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
-	case "zpa_policy_inspection_rule":
-		if api.ZPA == nil {
-			log.Fatal("ZPA client is not initialized")
-		}
-		zpaClient := api.ZPA.PolicySetController
-		list, _, err := policysetcontroller.GetAllByType(zpaClient, "INSPECTION_POLICY")
-		if err != nil {
-			log.Fatal(err)
-		}
-		jsonPayload := []policysetcontroller.PolicyRule{}
-		for _, i := range list {
-			if i.Name == "Zscaler Deception" {
-				continue
-			}
-			jsonPayload = append(jsonPayload, i)
-		}
-		m, _ := json.Marshal(jsonPayload)
-		resourceCount = len(jsonPayload)
-		_ = json.Unmarshal(m, &jsonStructData)
-	case "zpa_policy_isolation_rule":
-		if api.ZPA == nil {
-			log.Fatal("ZPA client is not initialized")
-		}
-		zpaClient := api.ZPA.PolicySetController
-		list, _, err := policysetcontroller.GetAllByType(zpaClient, "ISOLATION_POLICY")
-		if err != nil {
-			log.Fatal(err)
-		}
-		jsonPayload := []policysetcontroller.PolicyRule{}
-		for _, i := range list {
-			if i.Name == "Zscaler Deception" {
-				continue
-			}
-			jsonPayload = append(jsonPayload, i)
-		}
-		resourceCount = len(jsonPayload)
-		m, _ := json.Marshal(jsonPayload)
-		_ = json.Unmarshal(m, &jsonStructData)
 	case "zpa_policy_timeout_rule":
 		if api.ZPA == nil {
 			log.Fatal("ZPA client is not initialized")
@@ -481,6 +444,44 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		}
 		m, _ := json.Marshal(jsonPayload)
 		resourceCount = len(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zpa_policy_inspection_rule":
+		if api.ZPA == nil {
+			log.Fatal("ZPA client is not initialized")
+		}
+		zpaClient := api.ZPA.PolicySetController
+		list, _, err := policysetcontroller.GetAllByType(zpaClient, "INSPECTION_POLICY")
+		if err != nil {
+			log.Fatal(err)
+		}
+		jsonPayload := []policysetcontroller.PolicyRule{}
+		for _, i := range list {
+			if i.Name == "Zscaler Deception" {
+				continue
+			}
+			jsonPayload = append(jsonPayload, i)
+		}
+		m, _ := json.Marshal(jsonPayload)
+		resourceCount = len(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zpa_policy_isolation_rule":
+		if api.ZPA == nil {
+			log.Fatal("ZPA client is not initialized")
+		}
+		zpaClient := api.ZPA.PolicySetController
+		list, _, err := policysetcontroller.GetAllByType(zpaClient, "ISOLATION_POLICY")
+		if err != nil {
+			log.Fatal(err)
+		}
+		jsonPayload := []policysetcontroller.PolicyRule{}
+		for _, i := range list {
+			if i.Name == "Zscaler Deception" || i.Name == "Default_Rule" || i.DefaultRule {
+				continue
+			}
+			jsonPayload = append(jsonPayload, i)
+		}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zpa_provisioning_key":
 		if api.ZPA == nil {

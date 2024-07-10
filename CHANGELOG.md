@@ -1,17 +1,46 @@
 # Changelog
 
-## 1.2.2 (June, 20 2024)
+## 1.3.0 (July, 10 2024)
 
 ### Notes
 
-- Release date: **(June, 20 2024)**
+- Release date: **(July, 10 2024)**
 - Supported Terraform version: **v1.x.x**
 
-### Deprecations
-- [PR #206](https://github.com/zscaler/zscaler-terraformer/pull/206) Deprecated the following ZPA resource:
+### Enhancements
+- [PR #213](https://github.com/zscaler/zscaler-terraformer/pull/213). The tool now creates a ``outputs.tf`` file containg the `id` export of each invidual exported resource.
+- [PR #213](https://github.com/zscaler/zscaler-terraformer/pull/213). The tool now displays a message when the resource import is successful.
+- [PR #213](https://github.com/zscaler/zscaler-terraformer/pull/213). The tool now displays a warning message when the imported resource contain attributes that may carry sensitive values i.e `passwords`. Notice that the value is not included in the HCL code for security reasons.
+- [PR #213](https://github.com/zscaler/zscaler-terraformer/pull/213). Re-introduced support for the import of the following resources:
     - `zpa_application_segment_browser_access`
     - `zpa_application_segment_inspection`
     - `zpa_application_segment_pra`
+- [PR #213](https://github.com/zscaler/zscaler-terraformer/pull/213). Introduced support for the import of the following ZPA Privileged Remote Access resources:
+    - `zpa_pra_approval_controller`
+    - `zpa_pra_console_controller`
+    - `zpa_pra_credential_controller`
+    - `zpa_pra_portal_controller`
+
+### Bug Fixes
+- [PR #213](https://github.com/zscaler/zscaler-terraformer/pull/213). Fixed issues with credential with inline credential authentication.
+- [PR #213](https://github.com/zscaler/zscaler-terraformer/pull/213). Fixed importing of ZIA resource ``zia_dlp_web_rules`` attribute blocks:
+    - `icap_server`
+    - `notification_templates`
+    - `auditor`
+- [PR #213](https://github.com/zscaler/zscaler-terraformer/pull/213). Fixed importing of ZPA resource ``zpa_inspection_custom_controls`` `rules` block.
+- [PR #213](https://github.com/zscaler/zscaler-terraformer/pull/213). Fixed authentication methods to support both environment variables and inline credentials.
+
+### Deprecations
+- [PR #213](https://github.com/zscaler/zscaler-terraformer/pull/213) Deprecated the following ZIA resources:
+    - `zia_user_management`
+    - `zia_admin_users`
+- [PR #213](https://github.com/zscaler/zscaler-terraformer/pull/213) Temporary deprecation of the resources: `zpa_inspection_profile`
+
+- [PR #213](https://github.com/zscaler/zscaler-terraformer/pull/213) Deprecated support to authentication via ``credentials.json`` file. The Tool now supports environment variables and inline based credentials. See [README](https://github.com/zscaler/zscaler-terraformer?tab=readme-ov-file#authentication) for further details.
+
+### Internal Changes
+- [PR #213](https://github.com/zscaler/zscaler-terraformer/pull/213). The tool introduced two new internal environment variables for development purposes: ``ZPA_PROVIDER_NAMESPACE`` and ``ZIA_PROVIDER_NAMESPACE``. By setting these enviornment variables it allows a developer to leverage a local Terraform Provider installation for testing purposes. i.e ``export ZPA_PROVIDER_NAMESPACE=zscaler.com/zpa/zpa``. This will force the tool to use a local provider binary installation. If not set, then the tool will download the latest version of the provider from the Terraform registry.
+- [PR #213](https://github.com/zscaler/zscaler-terraformer/pull/213). Implemented new code structure for better code management.
 
 ## 1.2.1 (June, 13 2024)
 

@@ -284,3 +284,13 @@ func ListNestedBlock(fieldName string, obj interface{}) string {
 	output += "}\n"
 	return output
 }
+
+// This function handles TypeSet attributes
+func TypeSetNestedBlock(attrName string, value interface{}) string {
+	if attrMap, ok := value.(map[string]interface{}); ok {
+		if id, ok := attrMap["id"].(string); ok {
+			return fmt.Sprintf("%s {\n  id = %q\n}\n", attrName, id)
+		}
+	}
+	return ""
+}

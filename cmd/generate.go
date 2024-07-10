@@ -60,6 +60,7 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/segmentgroup"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/servergroup"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/serviceedgegroup"
+	"github.com/zscaler/zscaler-terraformer/teraformutils/conversion"
 	"github.com/zscaler/zscaler-terraformer/teraformutils/helpers"
 	"github.com/zscaler/zscaler-terraformer/teraformutils/nesting"
 
@@ -81,9 +82,10 @@ var allGeneratableResources = []string{
 	"zpa_segment_group",
 	"zpa_server_group",
 	"zpa_policy_access_rule",
-	"zpa_policy_inspection_rule",
 	"zpa_policy_timeout_rule",
 	"zpa_policy_forwarding_rule",
+	"zpa_policy_inspection_rule",
+	"zpa_policy_isolation_rule",
 	"zpa_pra_approval_controller",
 	"zpa_pra_console_controller",
 	"zpa_pra_credential_controller",
@@ -579,44 +581,6 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
-	case "zpa_policy_inspection_rule":
-		if api.ZPA == nil {
-			log.Fatal("ZPA client is not initialized")
-		}
-		zpaClient := api.ZPA.PolicySetController
-		list, _, err := policysetcontroller.GetAllByType(zpaClient, "INSPECTION_POLICY")
-		if err != nil {
-			log.Fatal(err)
-		}
-		jsonPayload := []policysetcontroller.PolicyRule{}
-		for _, i := range list {
-			if i.Name == "Zscaler Deception" {
-				continue
-			}
-			jsonPayload = append(jsonPayload, i)
-		}
-		resourceCount = len(jsonPayload)
-		m, _ := json.Marshal(jsonPayload)
-		_ = json.Unmarshal(m, &jsonStructData)
-	case "zpa_policy_isolation_rule":
-		if api.ZPA == nil {
-			log.Fatal("ZPA client is not initialized")
-		}
-		zpaClient := api.ZPA.PolicySetController
-		list, _, err := policysetcontroller.GetAllByType(zpaClient, "ISOLATION_POLICY")
-		if err != nil {
-			log.Fatal(err)
-		}
-		jsonPayload := []policysetcontroller.PolicyRule{}
-		for _, i := range list {
-			if i.Name == "Zscaler Deception" {
-				continue
-			}
-			jsonPayload = append(jsonPayload, i)
-		}
-		resourceCount = len(jsonPayload)
-		m, _ := json.Marshal(jsonPayload)
-		_ = json.Unmarshal(m, &jsonStructData)
 	case "zpa_policy_timeout_rule":
 		if api.ZPA == nil {
 			log.Fatal("ZPA client is not initialized")
@@ -642,6 +606,44 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		}
 		zpaClient := api.ZPA.PolicySetController
 		list, _, err := policysetcontroller.GetAllByType(zpaClient, "CLIENT_FORWARDING_POLICY")
+		if err != nil {
+			log.Fatal(err)
+		}
+		jsonPayload := []policysetcontroller.PolicyRule{}
+		for _, i := range list {
+			if i.Name == "Zscaler Deception" || i.Name == "Default_Rule" || i.DefaultRule {
+				continue
+			}
+			jsonPayload = append(jsonPayload, i)
+		}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zpa_policy_inspection_rule":
+		if api.ZPA == nil {
+			log.Fatal("ZPA client is not initialized")
+		}
+		zpaClient := api.ZPA.PolicySetController
+		list, _, err := policysetcontroller.GetAllByType(zpaClient, "INSPECTION_POLICY")
+		if err != nil {
+			log.Fatal(err)
+		}
+		jsonPayload := []policysetcontroller.PolicyRule{}
+		for _, i := range list {
+			if i.Name == "Zscaler Deception" {
+				continue
+			}
+			jsonPayload = append(jsonPayload, i)
+		}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zpa_policy_isolation_rule":
+		if api.ZPA == nil {
+			log.Fatal("ZPA client is not initialized")
+		}
+		zpaClient := api.ZPA.PolicySetController
+		list, _, err := policysetcontroller.GetAllByType(zpaClient, "ISOLATION_POLICY")
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -1132,7 +1134,7 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 
 		for _, attrName := range sortedBlockAttributes {
 			apiAttrName := nesting.MapTfFieldNameToAPI(resourceType, attrName)
-			if attrName == "id" || attrName == "provisioning_key" || attrName == "tcp_port_ranges" || attrName == "udp_port_ranges" {
+			if attrName == "id" || attrName == "tcp_port_ranges" || attrName == "udp_port_ranges" || attrName == "rule_order" {
 				continue
 			}
 
@@ -1194,6 +1196,14 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 						if ok {
 							output += fmt.Sprintf("%s = %d\n", attrName, int64(intValue))
 							continue
+						}
+					} else if resourceType == "zpa_pra_approval_controller" && (attrName == "start_time" || attrName == "end_time") {
+						// Convert epoch to RFC1123 for start_time and end_time
+						if strValue, ok := value.(string); ok {
+							epoch, err := strconv.ParseInt(strValue, 10, 64)
+							if err == nil {
+								value = conversion.EpochToRFC1123(epoch)
+							}
 						}
 					} else if resourceType == "zia_url_filtering_rules" && (attrName == "validity_start_time" || attrName == "validity_end_time") {
 						// Directly use the string value for validity times

@@ -3,6 +3,7 @@ package nesting
 import (
 	"fmt"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/google/uuid"
@@ -16,8 +17,6 @@ import (
 
 var log = logrus.New()
 
-// nestBlocks takes a schema and generates all of the appropriate nesting of any
-// top-level blocks as well as nested lists or sets.
 // nestBlocks takes a schema and generates all of the appropriate nesting of any
 // top-level blocks as well as nested lists or sets.
 func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData map[string]interface{}, parentID string, indexedNestedBlocks map[string][]string) string {
@@ -39,12 +38,32 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 			continue // This skips the current iteration of the loop
 		}
 
-		if block == "tcp_port_ranges" {
+		if block == "tcp_port_ranges" || block == "udp_port_ranges" {
 			continue
 		}
-		if block == "udp_port_ranges" {
-			continue
+
+		//Specific handling for zpa_pra_approval_controller resource
+		if resourceType == "zpa_pra_approval_controller" {
+			if block == "working_hours" {
+				if workingHours, ok := structData["workingHours"].(map[string]interface{}); ok {
+					// Collect attribute names for the nested block
+					attributes := make([]string, 0, len(schemaBlock.NestedBlocks[block].Block.Attributes))
+					for attrName := range schemaBlock.NestedBlocks[block].Block.Attributes {
+						attributes = append(attributes, attrName)
+					}
+					sort.Strings(attributes)
+					output += block + " {\n"
+					output += WriteNestedBlock(resourceType, attributes, schemaBlock.NestedBlocks[block].Block, workingHours, parentID)
+					// Adding handling for timezone here
+					if timeZone, ok := workingHours["timeZone"]; ok {
+						output += fmt.Sprintf("timezone = %q\n", timeZone)
+					}
+					output += "}\n"
+				}
+				continue
+			}
 		}
+
 		// special cases mapping
 		if resourceType == "zia_admin_users" && block == "admin_scope" {
 			output += "admin_scope {\n"
@@ -146,17 +165,26 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 				output += helpers.ListNestedBlock(block, structData["inspectionApps"])
 			}
 			continue
+		} else if helpers.IsInList(resourceType, []string{"zpa_pra_approval_controller"}) && block == "applications" {
+			output += helpers.ListIdsStringBlock(block, structData["applications"])
+			continue
+		} else if helpers.IsInList(resourceType, []string{"zpa_pra_console_controller"}) && block == "pra_portals" {
+			output += helpers.ListIdsStringBlock(block, structData["praPortals"])
+			continue
+		} else if helpers.IsInList(resourceType, []string{"zpa_pra_console_controller"}) && block == "pra_application" {
+			output += helpers.TypeSetNestedBlock(block, structData["praApplication"])
+			continue
 		} else if helpers.IsInList(resourceType, []string{"zpa_server_group", "zpa_policy_access_rule"}) && block == "app_connector_groups" {
 			output += helpers.ListIdsStringBlock(block, structData["appConnectorGroups"])
+			continue
+		} else if helpers.IsInList(resourceType, []string{"zpa_policy_access_rule"}) && block == "app_server_groups" {
+			output += helpers.ListIdsStringBlock(block, structData["appServerGroups"])
 			continue
 		} else if helpers.IsInList(resourceType, []string{"zpa_service_edge_group"}) && helpers.IsInList(block, []string{"service_edges", "trusted_networks"}) {
 			output += helpers.ListIdsStringBlock(block, structData[apiBlock])
 			continue
 		} else if helpers.IsInList(resourceType, []string{"zpa_server_group", "zpa_segment_group"}) && block == "applications" {
 			output += helpers.ListIdsStringBlock(block, structData["applications"])
-			continue
-		} else if helpers.IsInList(resourceType, []string{"zpa_policy_access_rule"}) && block == "app_server_groups" {
-			output += helpers.ListIdsStringBlock(block, structData["appServerGroups"])
 			continue
 		} else if helpers.IsInList(resourceType, []string{"zpa_lss_config_controller"}) && block == "connector_groups" {
 			output += helpers.ListIdsStringBlock(block, structData["connectorGroups"])
@@ -347,11 +375,33 @@ func WriteNestedBlock(resourceType string, attributes []string, schemaBlock *tfj
 // WriteAttrLine outputs a line of HCL configuration with a configurable depth
 // for known types.
 func WriteAttrLine(key string, value interface{}, usedInBlock bool) string {
+	// General handling for attributes that are returned as nil
+	if value == nil {
+		return ""
+	}
+
 	if key == "id" {
 		// Attempt to convert the value to an integer if it's a float
 		if floatValue, ok := value.(float64); ok {
 			// Convert to int64 to handle large IDs, then format as a string
 			return fmt.Sprintf("%s = %d\n", key, int64(floatValue))
+		}
+	}
+
+	// Special handling for start_time and end_time for zpa_pra_approval_controller
+	if key == "start_time" || key == "end_time" {
+		if epochStr, ok := value.(string); ok {
+			epoch, err := strconv.ParseInt(epochStr, 10, 64)
+			if err == nil {
+				return fmt.Sprintf("%s = %q\n", key, conversion.EpochToRFC1123(epoch))
+			}
+		}
+	}
+
+	// Special handling for timezone within working_hours block
+	if key == "timezone" {
+		if timeZone, ok := value.(string); ok && timeZone != "" {
+			return fmt.Sprintf("%s = %q\n", key, timeZone)
 		}
 	}
 
