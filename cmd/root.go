@@ -118,6 +118,12 @@ func initConfig() {
 	viper.AutomaticEnv() // read in environment variables that match
 	viper.SetEnvPrefix("")
 
+	// Ensure ZSCALER_SDK_CACHE_DISABLED is set to true
+	err := os.Setenv("ZSCALER_SDK_CACHE_DISABLED", "true")
+	if err != nil {
+		log.Fatalf("failed to set environment variable ZSCALER_SDK_CACHE_DISABLED: %v", err)
+	}
+
 	var cfgLogLevel = logrus.InfoLevel
 
 	if verbose {
