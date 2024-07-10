@@ -315,3 +315,44 @@ func TypeSetNestedBlock(attrName string, value interface{}) string {
 	}
 	return ""
 }
+
+// Dedicated function to convert Browser Isolation Profile Attributes
+// Dedicated function to convert Browser Isolation Profile Attributes
+func ConvertAttributes(structData map[string]interface{}) {
+	if banner, ok := structData["banner"].(map[string]interface{}); ok {
+		if id, idOk := banner["id"].(string); idOk {
+			structData["banner_id"] = id
+		} else {
+			log.Printf("[ERROR] banner_id is not of type string")
+		}
+		delete(structData, "banner")
+	}
+	if certificates, ok := structData["certificates"].([]interface{}); ok {
+		var certIDs []string
+		for _, cert := range certificates {
+			if certMap, ok := cert.(map[string]interface{}); ok {
+				if id, idOk := certMap["id"].(string); idOk {
+					certIDs = append(certIDs, id)
+				} else {
+					log.Printf("[ERROR] certificate id is not of type string")
+				}
+			}
+		}
+		structData["certificate_ids"] = certIDs
+		delete(structData, "certificates")
+	}
+	if regions, ok := structData["regions"].([]interface{}); ok {
+		var regionIDs []string
+		for _, region := range regions {
+			if regionMap, ok := region.(map[string]interface{}); ok {
+				if id, idOk := regionMap["id"].(string); idOk {
+					regionIDs = append(regionIDs, id)
+				} else {
+					log.Printf("[ERROR] region id is not of type string")
+				}
+			}
+		}
+		structData["region_ids"] = regionIDs
+		delete(structData, "regions")
+	}
+}

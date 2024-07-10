@@ -37,6 +37,8 @@ type Client struct {
 	AppServerController          *services.Service
 	BrowserAccess                *services.Service
 	BACertificate                *services.Service
+	CbiBanner                    *services.Service
+	CbiExternalProfile           *services.Service
 	LSSConfigController          *services.Service
 	PolicySetController          *services.Service
 	PolicySetControllerV2        *services.Service
@@ -78,6 +80,8 @@ func NewClient() (*Client, error) {
 		AppServerController:          services.New(client),
 		BrowserAccess:                services.New(client),
 		BACertificate:                services.New(client),
+		CbiBanner:                    services.New(client),
+		CbiExternalProfile:           services.New(client),
 		LSSConfigController:          services.New(client),
 		PolicySetController:          services.New(client),
 		PolicySetControllerV2:        services.New(client),

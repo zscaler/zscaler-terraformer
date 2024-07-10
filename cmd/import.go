@@ -61,6 +61,8 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appservercontroller"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/bacertificate"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/browseraccess"
+	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/cloudbrowserisolation/cbibannercontroller"
+	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/cloudbrowserisolation/cbiprofilecontroller"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/inspectioncontrol/inspection_custom_controls"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/lssconfigcontroller"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/microtenants"
@@ -85,6 +87,9 @@ var resourceImportStringFormats = map[string]string{
 	"zpa_application_segment_browser_access":            ":id",
 	"zpa_application_segment_inspection":                ":id",
 	"zpa_application_segment_pra":                       ":id",
+	"zpa_ba_certificate":                                ":id",
+	"zpa_cloud_browser_isolation_banner":                ":id",
+	"zpa_cloud_browser_isolation_external_profile":      ":id",
 	"zpa_segment_group":                                 ":id",
 	"zpa_server_group":                                  ":id",
 	"zpa_policy_access_rule":                            ":id",
@@ -322,6 +327,58 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		m, _ := json.Marshal(jsonPayload)
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
+	case "zpa_cloud_browser_isolation_external_profile":
+		if api.ZPA == nil {
+			log.Fatal("ZPA client is not initialized")
+		}
+		zpaClient := api.ZPA.CbiExternalProfile
+
+		allProfiles, _, err := cbiprofilecontroller.GetAll(zpaClient)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		for _, profile := range allProfiles {
+			profileDetails, _, err := cbiprofilecontroller.GetByNameOrID(zpaClient, profile.ID)
+			if err != nil {
+				log.Printf("error retrieving profile %s: %v", profile.ID, err)
+				continue
+			}
+			data, _ := json.Marshal(profileDetails)
+			var profileMap map[string]interface{}
+			_ = json.Unmarshal(data, &profileMap)
+			helpers.ConvertAttributes(profileMap) // Convert attributes here
+			jsonStructData = append(jsonStructData, profileMap)
+		}
+
+		resourceCount = len(jsonStructData)
+	case "zpa_cloud_browser_isolation_banner":
+		if api.ZPA == nil {
+			log.Fatal("ZPA client is not initialized")
+		}
+		zpaClient := api.ZPA.CbiBanner
+
+		// Retrieve all resources using GetAll
+		allBanners, _, err := cbibannercontroller.GetAll(zpaClient)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// Collect the payload data
+		for _, banner := range allBanners {
+			// Use the ID or name to get the full details of the banner
+			bannerDetails, _, err := cbibannercontroller.GetByNameOrID(zpaClient, banner.ID)
+			if err != nil {
+				log.Printf("error retrieving banner %s: %v", banner.ID, err)
+				continue
+			}
+			data, _ := json.Marshal(bannerDetails)
+			var bannerMap map[string]interface{}
+			_ = json.Unmarshal(data, &bannerMap)
+			jsonStructData = append(jsonStructData, bannerMap)
+		}
+
+		resourceCount = len(jsonStructData)
 	case "zpa_pra_approval_controller":
 		if api.ZPA == nil {
 			log.Fatal("ZPA client is not initialized")

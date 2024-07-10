@@ -69,6 +69,8 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appservercontroller"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/bacertificate"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/browseraccess"
+	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/cloudbrowserisolation/cbibannercontroller"
+	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/cloudbrowserisolation/cbiprofilecontroller"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/inspectioncontrol/inspection_custom_controls"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/lssconfigcontroller"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/microtenants"
@@ -100,6 +102,7 @@ var allGeneratableResources = []string{
 	"zpa_application_segment_inspection",
 	"zpa_application_segment_pra",
 	"zpa_ba_certificate",
+	"zpa_cloud_browser_isolation_banner",
 	"zpa_segment_group",
 	"zpa_server_group",
 	"zpa_policy_access_rule",
@@ -495,6 +498,58 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
+	case "zpa_cloud_browser_isolation_banner":
+		if api.ZPA == nil {
+			log.Fatal("ZPA client is not initialized")
+		}
+		zpaClient := api.ZPA.CbiBanner
+
+		// Retrieve all resources using GetAll
+		allBanners, _, err := cbibannercontroller.GetAll(zpaClient)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// Collect the payload data
+		for _, banner := range allBanners {
+			// Use the ID or name to get the full details of the banner
+			bannerDetails, _, err := cbibannercontroller.GetByNameOrID(zpaClient, banner.ID)
+			if err != nil {
+				log.Printf("error retrieving banner %s: %v", banner.ID, err)
+				continue
+			}
+			data, _ := json.Marshal(bannerDetails)
+			var bannerMap map[string]interface{}
+			_ = json.Unmarshal(data, &bannerMap)
+			jsonStructData = append(jsonStructData, bannerMap)
+		}
+
+		resourceCount = len(jsonStructData)
+	case "zpa_cloud_browser_isolation_external_profile":
+		if api.ZPA == nil {
+			log.Fatal("ZPA client is not initialized")
+		}
+		zpaClient := api.ZPA.CbiExternalProfile
+
+		allProfiles, _, err := cbiprofilecontroller.GetAll(zpaClient)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		for _, profile := range allProfiles {
+			profileDetails, _, err := cbiprofilecontroller.GetByNameOrID(zpaClient, profile.ID)
+			if err != nil {
+				log.Printf("error retrieving profile %s: %v", profile.ID, err)
+				continue
+			}
+			data, _ := json.Marshal(profileDetails)
+			var profileMap map[string]interface{}
+			_ = json.Unmarshal(data, &profileMap)
+			helpers.ConvertAttributes(profileMap) // Convert attributes here
+			jsonStructData = append(jsonStructData, profileMap)
+		}
+
+		resourceCount = len(jsonStructData)
 	case "zpa_pra_approval_controller":
 		if api.ZPA == nil {
 			log.Fatal("ZPA client is not initialized")
@@ -1113,7 +1168,6 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		return
 	}
 
-	// If we don't have any resources to generate, just bail out early.
 	if resourceCount == 0 {
 		fmt.Fprintf(cmd.OutOrStdout(), "no resources found to generate.")
 		return
@@ -1123,6 +1177,7 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 
 	for i := 0; i < resourceCount; i++ {
 		structData := jsonStructData[i].(map[string]interface{})
+		helpers.ConvertAttributes(structData) // Ensure the attributes are converted
 
 		resourceID := ""
 		if os.Getenv("USE_STATIC_RESOURCE_IDS") == "true" {
@@ -1142,10 +1197,6 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		output += fmt.Sprintf("# __generated__ by Zscaler Terraformer from %s\n", resourceName)
 		output += fmt.Sprintf(`resource "%s" "%s" {`+"\n", resourceType, resourceID)
 
-		if resourceType == "zpa_pra_credential_controller" {
-			output += "# This resource supports attributes with sensitive values and will not be imported\n"
-		}
-
 		sortedBlockAttributes := make([]string, 0, len(r.Block.Attributes))
 		for k := range r.Block.Attributes {
 			sortedBlockAttributes = append(sortedBlockAttributes, k)
@@ -1159,6 +1210,27 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 				continue
 			}
 
+			// Handle specific attributes for zpa_cloud_browser_isolation_external_profile
+			if attrName == "banner_id" || attrName == "certificate_ids" || attrName == "region_ids" {
+				value := structData[attrName]
+				if value == nil {
+					log.Printf("[DEBUG] %s attribute is nil", attrName)
+					continue
+				}
+
+				switch attrName {
+				case "certificate_ids", "region_ids":
+					ids, ok := value.([]string)
+					if !ok {
+						log.Printf("[ERROR] %s attribute is not of type []string", attrName)
+						continue
+					}
+					output += fmt.Sprintf("%s = [\"%s\"]\n", attrName, strings.Join(ids, "\", \""))
+				case "banner_id":
+					output += nesting.WriteAttrLine(attrName, value, false)
+				}
+				continue
+			}
 			// No need to output computed attributes that are also not optional.
 			bypassAttributes := []string{"static_ip_id", "tunnel_id"}
 			if r.Block.Attributes[attrName].Computed && !r.Block.Attributes[attrName].Optional && helpers.IsInList(attrName, bypassAttributes) {
@@ -1171,47 +1243,19 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 				switch ty {
 				case cty.String, cty.Bool:
 					value := structData[apiAttrName]
-					// Handle any string modifications here, if necessary.
-
-					if resourceType == "zpa_service_edge_group" && attrName == "is_public" {
-						if value == nil {
-							value = false
-						} else {
-							isPublicStr, ok := value.(string)
-							if ok {
-								isPublic, _ := strconv.ParseBool(isPublicStr)
-								value = isPublic
-							}
-						}
-					}
-
-					if resourceType == "zia_dlp_notification_templates" && helpers.IsInList(attrName, []string{"subject", "plain_text_message", "html_message"}) {
-						valueStr := strings.ReplaceAll(value.(string), "$", "$$")
-						formattedValue := formatHeredoc(valueStr)
-						switch attrName {
-						case "html_message", "plain_text_message":
-							output += fmt.Sprintf("  %s = <<-EOT\n%sEOT\n\n", attrName, formattedValue)
-						case "subject":
-							output += fmt.Sprintf("  %s = <<-EOT\n%sEOT\n", attrName, formattedValue)
-						}
-					} else {
-						output += nesting.WriteAttrLine(attrName, value, false)
-					}
+					output += nesting.WriteAttrLine(attrName, value, false)
 
 				case cty.Number:
 					value := structData[apiAttrName]
 
-					// Special handling for idle_time_in_minutes and surrogate_refresh_time_in_minutes to prevent scientific notation
 					if attrName == "idle_time_in_minutes" || attrName == "surrogate_refresh_time_in_minutes" {
 						floatValue, ok := value.(float64)
 						if ok {
-							// Explicitly convert and format as integer
 							output += fmt.Sprintf("%s = %d\n", attrName, int64(floatValue))
-							continue // Skip the rest of the logic for these specific fields
+							continue
 						}
 					}
 
-					// Handle parent_id specially to prevent scientific notation.
 					if attrName == "parent_id" {
 						intValue, ok := value.(float64)
 						if ok {
@@ -1219,7 +1263,6 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 							continue
 						}
 					} else if resourceType == "zpa_pra_approval_controller" && (attrName == "start_time" || attrName == "end_time") {
-						// Convert epoch to RFC1123 for start_time and end_time
 						if strValue, ok := value.(string); ok {
 							epoch, err := strconv.ParseInt(strValue, 10, 64)
 							if err == nil {
@@ -1227,7 +1270,6 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 							}
 						}
 					} else if resourceType == "zia_url_filtering_rules" && (attrName == "validity_start_time" || attrName == "validity_end_time") {
-						// Directly use the string value for validity times
 						if strValue, ok := value.(string); ok {
 							value = strValue
 						}
