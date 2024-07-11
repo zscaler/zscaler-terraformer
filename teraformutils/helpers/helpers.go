@@ -109,7 +109,7 @@ func GenerateOutputs(resourceType string, resourceID string, workingDir string) 
 	}
 }
 
-// / Custom function to Removes attributes from ZPA StateFile
+// / Custom function to Removes attributes from ZPA StateFile.
 func RemoveTcpPortRangesFromState(stateFile string) {
 	// Read the state file
 	stateData, err := ioutil.ReadFile(stateFile)
@@ -169,7 +169,7 @@ func RemoveTcpPortRangesFromState(stateFile string) {
 	}
 }
 
-// / Remove computed from ZPA Application Segments
+// / Remove computed from ZPA Application Segments.
 func IsComputedAttribute(attr string) bool {
 	computedAttributes := []string{"portal", "app_id", "hidden", "id", "certificate_name"}
 	for _, computed := range computedAttributes {
@@ -249,7 +249,7 @@ func ListIdsStringBlock(fieldName string, obj interface{}) string {
 	return output
 }
 
-// / Custom function to manipulate generate and import of ZPA application segments
+// / Custom function to manipulate generate and import of ZPA application segments.
 func ListNestedBlock(fieldName string, obj interface{}) string {
 	output := fieldName + " {\n"
 	if obj != nil {
