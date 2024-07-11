@@ -47,8 +47,8 @@ build:
 	@go build \
 		-gcflags=all=-trimpath=$(GOPATH) \
 		-asmflags=all=-trimpath=$(GOPATH) \
-		-ldflags="-X github.com/zscaler/zscaler-terraformer/internal/app/zscaler-terraformer/cmd.versionString=$(VERSION)" \
-		-o $(BINARY_NAME) cmd/zscaler-terraformer/main.go
+		-ldflags="-X main.versionString=$(VERSION)" \
+		-o $(BINARY_NAME) main.go
 
 install: GOOS=$(shell go env GOOS)
 install: GOARCH=$(shell go env GOARCH)
@@ -64,16 +64,16 @@ install:
 	@go build \
 		-gcflags=all=-trimpath=$(GOPATH) \
 		-asmflags=all=-trimpath=$(GOPATH) \
-		-ldflags="-X github.com/zscaler/zscaler-terraformer/internal/app/zscaler-terraformer/cmd.versionString=$(VERSION)" \
-		-o $(DESTINATION)/$(BINARY_NAME) ./cmd/zscaler-terraformer/main.go
+		-ldflags="-X main.versionString=$(VERSION)" \
+		-o $(DESTINATION)/$(BINARY_NAME) main.go
 
 build_all:
 	@echo "==> Building $(BINARY_NAME) for Windows, macOS, and Linux..."
-	GOOS=windows GOARCH=amd64 go build -o build/$(BINARY_NAME).exe cmd/zscaler-terraformer/main.go
-	GOOS=darwin GOARCH=amd64 go build -o build/$(BINARY_NAME)_darwin_amd64 cmd/zscaler-terraformer/main.go
-	GOOS=darwin GOARCH=arm64 go build -o build/$(BINARY_NAME)_darwin_arm64 cmd/zscaler-terraformer/main.go
-	GOOS=linux GOARCH=amd64 go build -o build/$(BINARY_NAME)_linux_amd64 cmd/zscaler-terraformer/main.go
-	GOOS=linux GOARCH=arm64 go build -o build/$(BINARY_NAME)_linux_arm64 cmd/zscaler-terraformer/main.go
+	GOOS=windows GOARCH=amd64 go build -o build/$(BINARY_NAME).exe main.go
+	GOOS=darwin GOARCH=amd64 go build -o build/$(BINARY_NAME)_darwin_amd64 main.go
+	GOOS=darwin GOARCH=arm64 go build -o build/$(BINARY_NAME)_darwin_arm64 main.go
+	GOOS=linux GOARCH=amd64 go build -o build/$(BINARY_NAME)_linux_amd64 main.go
+	GOOS=linux GOARCH=arm64 go build -o build/$(BINARY_NAME)_linux_arm64 main.go
 
 test_zpa:
 	@CI=true \

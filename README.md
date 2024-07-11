@@ -44,24 +44,23 @@ Available Commands:
   version     Print the version number of zscaler-terraformer
 
 Flags:
-  -c, --config string                       Path to config file (default "/Users/username/.zscaler-terraformer.yaml")
       --exclude string                      Which resources you wish to exclude
   -h, --help                                help for zscaler-terraformer
       --resource-type string                Which resource you wish to generate
       --resources string                    Which resources you wish to import
       --terraform-install-path string       Path to the default Terraform installation (default ".")
   -v, --verbose                             Specify verbose output (same as setting log level to debug)
-      --version                             Display the release version
-      --zia-terraform-install-path string   Path to the ZIA Terraform installation (default ".")
-      --ziaApiKey string                    ZIA API Key
-      --ziaCloud string                     ZIA Cloud (i.e zscalerthree)
-      --ziaPassword string                  ZIA password
-      --ziaUsername string                  ZIA username
-      --zpa-terraform-install-path string   Path to the ZPA Terraform installation (default ".")
-      --zpaClientID string                  ZPA client ID
-      --zpaClientSecret string              ZPA client secret
-      --zpaCloud string                     ZPA Cloud (BETA or PRODUCTION)
-      --zpaCustomerID string                ZPA Customer ID
+      --version                              Display the release version
+      --zia-terraform-install-path string    Path to the ZIA Terraform installation (default ".")
+      --zia_api_key string                   ZIA API Key
+      --zia_cloud string                     ZIA Cloud (i.e zscalerthree)
+      --zia_password string                  ZIA password
+      --zia_username string                  ZIA username
+      --zpa-terraform-install-path string    Path to the ZPA Terraform installation (default ".")
+      --zpa_client_id string                 ZPA client ID
+      --zpa_client_secret string             ZPA client secret
+      --zpa_customer_id string               ZPA Customer ID
+      --zpa_cloud string                     ZPA Cloud (``BETA``, ``GOV``, ``GOVUS``, ``PRODUCTION``, ``ZPATWO``)
 
 Use "zscaler-terraformer [command] --help" for more information about a command.
 
@@ -91,7 +90,17 @@ demonstrated below.
 export ZPA_CLIENT_ID      = "xxxxxxxxxxxxxxxx"
 export ZPA_CLIENT_SECRET  = "xxxxxxxxxxxxxxxx"
 export ZPA_CUSTOMER_ID    = "xxxxxxxxxxxxxxxx"
-export ZPA_CLOUD          = "BETA" // Use "GOV" for ZPA Gov Cloud
+export ZPA_CLOUD          = "BETA", "GOV", "GOVUS", "PRODUCTION" or "ZPATWO"
+```
+
+### ZPA Inline Authentication
+
+```bash
+zscaler-terraformer import --resources="zpa" \
+--zpa_client_id="xxxxxxxxxxxxxxxx" \
+--zpa_client_secret="xxxxxxxxxxxxxxxx" \
+--zpa_customer_id="xxxxxxxxxxxxxxxx" \
+--zpa_cloud="BETA", "GOV", "GOVUS", "PRODUCTION" or "ZPATWO"
 ```
 
 ### ZIA Environment Variables
@@ -106,14 +115,14 @@ export ZIA_CLOUD    = "xxxxxxxxxxxxxxxx" (i.e zscalerthree)
 
 ```
 
-Alternatively, if using a config file, then specify the inputs using the following `flag` names. Example:
+### ZIA Inline Authentication
 
 ```bash
-$ cat ~/.zscaler-terraformer.yaml
-zpaClientID: "Mrwefhoijhviihew"
-zpaClientSecret: "{HBRjowhdowqj"
-zpaCustomerID: "123456789"
-zpaCloud: "BETA"
+zscaler-terraformer import --resources="zia" \
+--zia_username="xxxxxxxxxxxxxxxx" \
+--zia_password="xxxxxxxxxxxxxxxx" \
+--zia_api_key="xxxxxxxxxxxxxxxx" \
+--zia_cloud=(i.e zscalerthree)
 ```
 
 ## ZPA Example usage
@@ -139,7 +148,7 @@ zscaler-terraformer import --resources="zpa_application_segment"
 ### Exclude specific ZPA resources from Importing
 
 ```bash
-zscaler-terraformer import --resources="zpa" --exclude='zpa_segment_group,zpa_server_group'
+zscaler-terraformer import --resources="zpa" --exclude='zpa_segment_group, zpa_server_group'
 ```
 
 By default, ``zscaler-terraformer`` will create a local configuration directory where it is being executed. You can also indicate the path where the imported configuration should be stored by using the folowing environment variable ``ZSCALER_ZPA_TERRAFORM_INSTALL_PATH``.
@@ -240,14 +249,24 @@ $ zscaler-terraformer import \
 
 Any resources not listed are currently not supported.
 
-Last updated February 29, 2024
+Last updated July 11, 2024
+
+Use the following command once the tool is installed to visualize the table of supported ZPA resources:
+```shell
+zscaler-terraformer --supported-resources="zpa"
+```
 
 | Resource | Resource Scope | Generate Supported | Import Supported |
 |----------|-----------|----------|----------|
 | [zpa_app_connector_group](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_app_connector_group) | group | ✅ | ✅ |
 | [zpa_service_edge_group](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_service_edge_group) | group | ✅ | ✅ |
 | [zpa_application_server](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_application_server) | application | ✅ | ✅ |
-| [zpa_application_segment](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_application_segment) | app segment | ✅ | ✅ |
+| [zpa_application_segment](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_application_segment) | application segment | ✅ | ✅ |
+| [zpa_application_segment_browser_access](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_application_segment_browser_access) | application segment | ✅ | ✅ |
+| [zpa_application_segment_inspection](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_application_segment_inspection) | application segment | ✅ | ✅ |
+| [zpa_application_segment_pra](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_application_segment_pra) | application segment | ✅ | ✅ |
+| [zpa_cloud_browser_isolation_banner](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_cloud_browser_isolation_banner) | isolation | ✅ | ✅ |
+| [zpa_cloud_browser_isolation_certificate](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_cloud_browser_isolation_certificate) | isolation | ✅ | ✅ |
 | [zpa_cloud_browser_isolation_external_profile](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_cloud_browser_isolation_external_profile) | isolation | ✅ | ✅ |
 | [zpa_segment_group](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_segment_group) | group | ✅ | ✅ |
 | [zpa_server_group](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_server_group) | group | ✅ | ✅ |
@@ -255,7 +274,10 @@ Last updated February 29, 2024
 | [zpa_microtenant_controller](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_microtenant_controller) | microtenant | ✅ | ✅ |
 | [zpa_provisioning_key](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_provisioning_key) | key | ✅ | ✅ |
 | [zpa_inspection_custom_controls](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_inspection_custom_control) | Inspection | ✅ | ✅ |
-| [zpa_inspection_profile](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_inspection_profile) | Inspection | ✅ | ✅ |
+| [zpa_pra_approval_controller](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_pra_approval_controller) | PRA | ✅ | ✅ |
+| [zpa_pra_console_controller](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_pra_console_controller) | PRA | ✅ | ✅ |
+| [zpa_pra_credential_controller](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_pra_credential_controller) | PRA | ✅ | ✅ |
+| [zpa_pra_portal_controller](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_pra_portal_controller) | PRA | ✅ | ✅ |
 | [zpa_policy_access_rule](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_policy_access_rule) | Policy | ✅ | ✅ |
 | [zpa_policy_timeout_rule](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_policy_access_timeout_rule) | Policy | ✅ | ✅ |
 | [zpa_policy_forwarding_rule](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_policy_access_forwarding_rule) | Policy | ✅ | ✅ |
@@ -266,7 +288,13 @@ Last updated February 29, 2024
 
 Any resources not listed are currently not supported.
 
-Last updated March 7, 2024
+Last updated July 11, 2024
+
+Use the following command once the tool is installed to visualize the table of supported ZIA resources:
+
+```shell
+zscaler-terraformer --supported-resources="zia"
+```
 
 | Resource | Resource Scope | Generate Supported | Import Supported |
 |----------|-----------|----------|----------|
@@ -290,7 +318,6 @@ Last updated March 7, 2024
 | [zia_auth_settings_urls](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_auth_settings_urls) | URL | ✅ | ✅ |
 | [zia_security_policy_settings](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_security_policy_settings) | URL | ✅ | ✅ |
 | [zia_sandbox_behavioral_analysis](https://https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_sandbox_behavioral_analysis) | URL | ✅ | ✅ |
-| [zia_user_management](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_user_management) | User | ✅ | ✅ |
 | [zia_forwarding_control_rule](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_forwarding_control_rule) | Forward | ✅ | ✅ |
 | [zia_forwarding_control_zpa_gateway](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_forwarding_control_zpa_gateway) | Forward | ✅ | ✅ |
 
