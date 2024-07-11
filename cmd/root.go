@@ -99,7 +99,7 @@ var allSupportedResources = []string{
 	"zia_forwarding_control_rule",
 }
 
-// rootCmd represents the base command when called without any subcommands
+// rootCmd represents the base command when called without any subcommands.
 var rootCmd = &cobra.Command{
 	Use:   "zscaler-terraformer",
 	Short: "Bootstrapping Terraform from existing ZPA/ZIA account",
