@@ -1243,6 +1243,22 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 				switch ty {
 				case cty.String, cty.Bool:
 					value := structData[apiAttrName]
+					if resourceType == "zpa_service_edge_group" {
+						if attrName == "is_public" {
+							if value == nil {
+								value = false
+							} else {
+								isPublicStr, ok := value.(string)
+								if ok {
+									isPublic, _ := strconv.ParseBool(isPublicStr)
+									value = isPublic
+								} else {
+									value = false
+								}
+							}
+						}
+					}
+
 					output += nesting.WriteAttrLine(attrName, value, false)
 
 				case cty.Number:
@@ -1282,15 +1298,7 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 						case "subject":
 							output += fmt.Sprintf("  %s = <<-EOT\n%sEOT\n", attrName, formattedValue)
 						}
-					} else if resourceType == "zpa_service_edge_group" && attrName == "is_public" {
-						if value == nil {
-							value = false
-						} else {
-							isPublic, _ := strconv.ParseBool(value.(string))
-							value = isPublic
-						}
 					}
-
 					output += nesting.WriteAttrLine(attrName, value, false)
 
 				default:

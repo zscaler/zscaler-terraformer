@@ -22,6 +22,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
@@ -50,9 +51,29 @@ type Client struct {
 var rootCmd = &cobra.Command{
 	Use:   "zscaler-terraformer",
 	Short: "Bootstrapping Terraform from existing ZPA/ZIA account",
-	Long: `zscaler-terraformer is an application that allows ZPA/ZIA users
-to be able to adopt Terraform by giving them a feasible way to get
-all of their existing ZPA/ZIA configuration into Terraform.`,
+	Long: "\x1B[34;01m" +
+		"  ______              _           \n" +
+		" |___  /             | |          \n" +
+		"    / / ___  ___ __ _| | ___ _ __ \n" +
+		"   / / / __|/ __/ _` | |/ _ \\ '__|\n" +
+		"  / /__\\__ \\ (_| (_| | |  __/ |   \n" +
+		" /_____|___/\\___\\__,_|_|\\___|_|   \n" +
+		"\x1B[0m\n" +
+		"zscaler-terraformer is an application that allows ZPA/ZIA users\n" +
+		"to be able to adopt Terraform by giving them a feasible way to get\n" +
+		"all of their existing ZPA/ZIA configuration into Terraform.",
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		if verbose {
+			log.SetLevel(logrus.DebugLevel)
+			log.Debug("Verbose mode enabled")
+		}
+	},
+	Run: func(cmd *cobra.Command, args []string) {
+		if len(args) > 0 {
+			fmt.Printf("Error: unrecognized command \"%s\"\n\n", args[0])
+			_ = cmd.Help()
+		}
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
