@@ -162,7 +162,6 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 		}) {
 			output += helpers.ListIdsIntBlock(block, structData[MapTfFieldNameToAPI(resourceType, block)])
 			continue
-
 		} else if helpers.IsInList(resourceType, []string{"zpa_application_segment"}) && block == "server_groups" {
 			output += helpers.ListIdsStringBlock(block, structData["serverGroups"])
 			continue
@@ -224,12 +223,10 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 			}
 
 			nestedBlockOutput := ""
-
 			// If the attribute we're looking at has further nesting, we'll.
 			// recursively call nestBlocks.
 			if len(schemaBlock.NestedBlocks[block].Block.NestedBlocks) > 0 {
 				if s, ok := structData[apiBlock]; ok {
-
 					switch s := s.(type) {
 					case map[string]interface{}:
 						nestedBlockOutput += NestBlocks(resourceType, schemaBlock.NestedBlocks[block].Block, s, parentID, indexedNestedBlocks)
@@ -244,22 +241,17 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 								parentID = uuid.New().String()
 								nestedItem.(map[string]interface{})["terraform_internal_id"] = parentID
 							}
-
 							nestedBlockOutput += NestBlocks(resourceType, schemaBlock.NestedBlocks[block].Block, nestedItem.(map[string]interface{}), parentID.(string), indexedNestedBlocks)
 							// The indexedNestedBlocks maps helps us know which parent we're rendering the nested block for.
 							// So we append the current child's output to it, for when we render it out later.
 							indexedNestedBlocks[parentID.(string)] = append(indexedNestedBlocks[parentID.(string)], nestedBlockOutput)
 						}
-
 					default:
 						log.Debugf("unable to generate recursively nested blocks for %T", s)
 					}
-
 				}
 			}
-
 			switch attrStruct := structData[apiBlock].(type) {
-
 			// Case for if the inner block's attributes are a map of interfaces, in.
 			// which case we can directly add them to the config.
 			case map[string]interface{}:
@@ -315,7 +307,6 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 							if !exists {
 								currentID = v.(map[string]interface{})["terraform_internal_id"].(string)
 							}
-
 							if len(indexedNestedBlocks[currentID]) > 0 {
 
 								currentNestIdx := len(indexedNestedBlocks[currentID]) - 1
@@ -357,7 +348,6 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 
 func WriteNestedBlock(resourceType string, attributes []string, schemaBlock *tfjson.SchemaBlock, attrStruct map[string]interface{}, _ string) string {
 	nestedBlockOutput := ""
-
 	for _, attrName := range attributes {
 		apiFieldName := MapTfFieldNameToAPI(resourceType, attrName)
 		ty := schemaBlock.Attributes[attrName].AttributeType
