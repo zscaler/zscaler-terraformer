@@ -57,24 +57,24 @@ func Strip(s string) string {
 }
 
 func GenerateOutputs(resourceType string, resourceID string, workingDir string) {
-	// Define the output file path
+	// Define the output file path.
 	outputsFile := fmt.Sprintf("%s/outputs.tf", strings.TrimSuffix(workingDir, "/"))
 
-	// Exclude specified resources from generating outputs
+	// Exclude specified resources from generating outputs.
 	excludedResources := []string{
 		"zia_auth_settings_urls",
 		"zia_sandbox_behavioral_analysis",
 		"zia_security_settings",
 	}
 
-	// Check if the resourceType is in the excluded list
+	// Check if the resourceType is in the excluded list.
 	for _, excludedResource := range excludedResources {
 		if resourceType == excludedResource {
 			return
 		}
 	}
 
-	// Read the existing outputs.tf file content if it exists
+	// Read the existing outputs.tf file content if it exists.
 	existingOutputs := ""
 	if _, err := os.Stat(outputsFile); err == nil {
 		content, err := os.ReadFile(outputsFile)
@@ -84,26 +84,26 @@ func GenerateOutputs(resourceType string, resourceID string, workingDir string) 
 		existingOutputs = string(content)
 	}
 
-	// Create the output block string
+	// Create the output block string.
 	outputBlock := fmt.Sprintf(`output "%s_%s_id" {
   value = "${%s.%s.id}"
 }
 
 `, resourceType, resourceID, resourceType, resourceID)
 
-	// Check if the output block already exists
+	// Check if the output block already exists.
 	if strings.Contains(existingOutputs, fmt.Sprintf(`output "%s_%s_id"`, resourceType, resourceID)) {
 		return
 	}
 
-	// Open the file in append mode or create it if it doesn't exist
+	// Open the file in append mode or create it if it doesn't exist.
 	f, err := os.OpenFile(outputsFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		log.Fatalf("failed to open outputs file: %s", err)
 	}
 	defer f.Close()
 
-	// Write the output block to the file
+	// Write the output block to the file.
 	if _, err := f.WriteString(outputBlock); err != nil {
 		log.Fatalf("failed to write to outputs file: %s", err)
 	}
@@ -123,7 +123,7 @@ func RemoveTcpPortRangesFromState(stateFile string) {
 		log.Fatalf("failed to unmarshal state file: %s", err)
 	}
 
-	// Traverse the state file structure to remove tcp_port_ranges
+	// Traverse the state file structure to remove tcp_port_ranges.
 	resources, ok := state["resources"].([]interface{})
 	if !ok {
 		log.Fatalf("unexpected structure in state file: resources not found or not a list")
@@ -151,13 +151,13 @@ func RemoveTcpPortRangesFromState(stateFile string) {
 				continue
 			}
 
-			// Remove the tcp_port_ranges and udp_port_ranges attribute
+			// Remove the tcp_port_ranges and udp_port_ranges attribute.
 			delete(attributes, "tcp_port_ranges")
 			delete(attributes, "udp_port_ranges")
 		}
 	}
 
-	// Marshal the modified state back to JSON
+	// Marshal the modified state back to JSON.
 	modifiedStateData, err := json.MarshalIndent(state, "", "  ")
 	if err != nil {
 		log.Fatalf("failed to marshal modified state file: %s", err)
@@ -280,7 +280,7 @@ func ListNestedBlock(fieldName string, obj interface{}) string {
 					output += "]\n"
 				}
 
-				// Inject app_types based on application_protocol
+				// Inject app_types based on application_protocol.
 				if key == "applicationProtocol" {
 					appTypes := []string{}
 					switch value {
@@ -306,7 +306,7 @@ func ListNestedBlock(fieldName string, obj interface{}) string {
 	return output
 }
 
-// This function handles TypeSet attributes
+// This function handles TypeSet attributes.
 func TypeSetNestedBlock(attrName string, value interface{}) string {
 	if attrMap, ok := value.(map[string]interface{}); ok {
 		if id, ok := attrMap["id"].(string); ok {
@@ -316,8 +316,7 @@ func TypeSetNestedBlock(attrName string, value interface{}) string {
 	return ""
 }
 
-// Dedicated function to convert Browser Isolation Profile Attributes
-// Dedicated function to convert Browser Isolation Profile Attributes
+// Dedicated function to convert Browser Isolation Profile Attributes.
 func ConvertAttributes(structData map[string]interface{}) {
 	if banner, ok := structData["banner"].(map[string]interface{}); ok {
 		if id, idOk := banner["id"].(string); idOk {

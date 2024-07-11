@@ -38,13 +38,12 @@ import (
 
 var log = logrus.New()
 
-// nestBlocks takes a schema and generates all of the appropriate nesting of any
+// nestBlocks takes a schema and generates all of the appropriate nesting of any.
 // top-level blocks as well as nested lists or sets.
 func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData map[string]interface{}, parentID string, indexedNestedBlocks map[string][]string) string {
 	output := ""
 
-	// Nested blocks are used for configuration options where assignment
-	// isn't required.
+	// Nested blocks are used for configuration options where assignment.
 	sortedNestedBlocks := make([]string, 0, len(schemaBlock.NestedBlocks))
 	for k := range schemaBlock.NestedBlocks {
 		sortedNestedBlocks = append(sortedNestedBlocks, k)
@@ -54,20 +53,20 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 	for _, block := range sortedNestedBlocks {
 		apiBlock := MapTfFieldNameToAPI(resourceType, block)
 
-		// Skip 'applications' block for 'zpa_segment_group' resource
+		// Skip 'applications' block for 'zpa_segment_group' resource.
 		if (resourceType == "zpa_segment_group" || resourceType == "zpa_server_group") && block == "applications" {
-			continue // This skips the current iteration of the loop
+			continue // This skips the current iteration of the loop.
 		}
 
 		if block == "tcp_port_ranges" || block == "udp_port_ranges" {
 			continue
 		}
 
-		//Specific handling for zpa_pra_approval_controller resource
+		//Specific handling for zpa_pra_approval_controller resource.
 		if resourceType == "zpa_pra_approval_controller" {
 			if block == "working_hours" {
 				if workingHours, ok := structData["workingHours"].(map[string]interface{}); ok {
-					// Collect attribute names for the nested block
+					// Collect attribute names for the nested block.
 					attributes := make([]string, 0, len(schemaBlock.NestedBlocks[block].Block.Attributes))
 					for attrName := range schemaBlock.NestedBlocks[block].Block.Attributes {
 						attributes = append(attributes, attrName)
@@ -75,7 +74,7 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 					sort.Strings(attributes)
 					output += block + " {\n"
 					output += WriteNestedBlock(resourceType, attributes, schemaBlock.NestedBlocks[block].Block, workingHours, parentID)
-					// Adding handling for timezone here
+					// Adding handling for timezone here.
 					if timeZone, ok := workingHours["timeZone"]; ok {
 						output += fmt.Sprintf("timezone = %q\n", timeZone)
 					}
@@ -85,7 +84,7 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 			}
 		}
 
-		// special cases mapping
+		// special cases mapping.
 		if resourceType == "zia_admin_users" && block == "admin_scope" {
 			output += "admin_scope {\n"
 			if structData["adminScopeType"] != nil {
@@ -95,7 +94,6 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 				output += "scope_entities {\n"
 				output += "id = ["
 				for i, v := range structData["adminScopeScopeEntities"].([]interface{}) {
-
 					m, ok := v.(map[string]interface{})
 					if !ok || m == nil || m["id"] == "" {
 						continue
@@ -116,7 +114,6 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 				output += "scope_group_member_entities={\n"
 				output += "id = ["
 				for i, v := range structData["adminScopescopeGroupMemberEntities"].([]interface{}) {
-
 					m, ok := v.(map[string]interface{})
 					if !ok || m == nil || m["id"] == "" {
 						continue
@@ -228,7 +225,7 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 
 			nestedBlockOutput := ""
 
-			// If the attribute we're looking at has further nesting, we'll
+			// If the attribute we're looking at has further nesting, we'll.
 			// recursively call nestBlocks.
 			if len(schemaBlock.NestedBlocks[block].Block.NestedBlocks) > 0 {
 				if s, ok := structData[apiBlock]; ok {
@@ -242,15 +239,15 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 						for _, nestedItem := range s {
 							parentID, exists := nestedItem.(map[string]interface{})["id"]
 							if !exists {
-								// if we fail to find an ID, we tag the current element with a uuid
+								// if we fail to find an ID, we tag the current element with a uuid.
 								log.Debugf("id not found for nestedItem %#v using uuid terraform_internal_id", nestedItem)
 								parentID = uuid.New().String()
 								nestedItem.(map[string]interface{})["terraform_internal_id"] = parentID
 							}
 
 							nestedBlockOutput += NestBlocks(resourceType, schemaBlock.NestedBlocks[block].Block, nestedItem.(map[string]interface{}), parentID.(string), indexedNestedBlocks)
-							// The indexedNestedBlocks maps helps us know which parent we're rendering the nested block for
-							// So we append the current child's output to it, for when we render it out later
+							// The indexedNestedBlocks maps helps us know which parent we're rendering the nested block for.
+							// So we append the current child's output to it, for when we render it out later.
 							indexedNestedBlocks[parentID.(string)] = append(indexedNestedBlocks[parentID.(string)], nestedBlockOutput)
 						}
 
@@ -263,7 +260,7 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 
 			switch attrStruct := structData[apiBlock].(type) {
 
-			// Case for if the inner block's attributes are a map of interfaces, in
+			// Case for if the inner block's attributes are a map of interfaces, in.
 			// which case we can directly add them to the config.
 			case map[string]interface{}:
 				if attrStruct != nil {
@@ -299,7 +296,7 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 					}
 				}
 
-			// Case for duplicated blocks that commonly end up as an array or list at
+			// Case for duplicated blocks that commonly end up as an array or list at.
 			// the API level.
 			case []interface{}:
 				for _, v := range attrStruct {
@@ -313,7 +310,7 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 						output += block + " {\n"
 						output += repeatedBlockOutput
 						if nestedBlockOutput != "" {
-							// We're processing the nested child blocks for currentId
+							// We're processing the nested child blocks for currentId.
 							currentID, exists := v.(map[string]interface{})["id"].(string)
 							if !exists {
 								currentID = v.(map[string]interface{})["terraform_internal_id"].(string)
@@ -322,20 +319,20 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 							if len(indexedNestedBlocks[currentID]) > 0 {
 
 								currentNestIdx := len(indexedNestedBlocks[currentID]) - 1
-								// Pull out the last nestedblock that we built for this parent
-								// We only need to render the last one because it holds every other all other nested blocks for this parent
+								// Pull out the last nestedblock that we built for this parent.
+								// We only need to render the last one because it holds every other all other nested blocks for this parent.
 								currentNest := indexedNestedBlocks[currentID][currentNestIdx]
 
 								for ID, nest := range indexedNestedBlocks {
 									if ID != currentID && len(nest) > 0 {
-										// Itereate over all other indexed nested blocks and remove anything from the current block
-										// that belongs to a different parent
+										// Itereate over all other indexed nested blocks and remove anything from the current block.
+										// that belongs to a different parent.
 										currentNest = strings.Replace(currentNest, nest[len(nest)-1], "", 1)
 									}
 								}
-								// currentNest is all that needs to be rendered for this parent
-								// re-index to make sure we capture the removal of the nested blocks that dont
-								// belong to this parent
+								// currentNest is all that needs to be rendered for this parent.
+								// re-index to make sure we capture the removal of the nested blocks that dont.
+								// belong to this parent.
 								indexedNestedBlocks[currentID][currentNestIdx] = currentNest
 								output += currentNest
 							}
@@ -354,9 +351,7 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 		} else {
 			log.Debugf("nested mode %q for %s not recognised", schemaBlock.NestedBlocks[block].NestingMode, block)
 		}
-
 	}
-
 	return output
 }
 
@@ -367,12 +362,12 @@ func WriteNestedBlock(resourceType string, attributes []string, schemaBlock *tfj
 		apiFieldName := MapTfFieldNameToAPI(resourceType, attrName)
 		ty := schemaBlock.Attributes[attrName].AttributeType
 
-		// Exclude specific computed attributes
+		// Exclude specific computed attributes.
 		if attrName == "id" || attrName == "appId" || attrName == "portal" || attrName == "hidden" || attrName == "certificate_name" {
 			continue
 		}
 
-		// Convert attributes to snake_case
+		// Convert attributes to snake_case.
 		snakeCaseAttrName := strcase.ToSnake(attrName)
 
 		switch {
@@ -393,23 +388,23 @@ func WriteNestedBlock(resourceType string, attributes []string, schemaBlock *tfj
 	return nestedBlockOutput
 }
 
-// WriteAttrLine outputs a line of HCL configuration with a configurable depth
+// WriteAttrLine outputs a line of HCL configuration with a configurable depth.
 // for known types.
 func WriteAttrLine(key string, value interface{}, usedInBlock bool) string {
-	// General handling for attributes that are returned as nil
+	// General handling for attributes that are returned as nil.
 	if value == nil {
 		return ""
 	}
 
 	if key == "id" {
-		// Attempt to convert the value to an integer if it's a float
+		// Attempt to convert the value to an integer if it's a float.
 		if floatValue, ok := value.(float64); ok {
-			// Convert to int64 to handle large IDs, then format as a string
+			// Convert to int64 to handle large IDs, then format as a string.
 			return fmt.Sprintf("%s = %d\n", key, int64(floatValue))
 		}
 	}
 
-	// Special handling for start_time and end_time for zpa_pra_approval_controller
+	// Special handling for start_time and end_time for zpa_pra_approval_controller.
 	if key == "start_time" || key == "end_time" {
 		if epochStr, ok := value.(string); ok {
 			epoch, err := strconv.ParseInt(epochStr, 10, 64)
@@ -419,14 +414,14 @@ func WriteAttrLine(key string, value interface{}, usedInBlock bool) string {
 		}
 	}
 
-	// Special handling for timezone within working_hours block
+	// Special handling for timezone within working_hours block.
 	if key == "timezone" {
 		if timeZone, ok := value.(string); ok && timeZone != "" {
 			return fmt.Sprintf("%s = %q\n", key, timeZone)
 		}
 	}
 
-	// Special handling for validity_start_time and validity_end_time
+	// Special handling for validity_start_time and validity_end_time.
 	if key == "validity_start_time" || key == "validity_end_time" {
 		if floatValue, ok := value.(float64); ok {
 			return fmt.Sprintf("%s = %q\n", key, conversion.EpochToRFC1123(int64(floatValue)))
@@ -489,9 +484,9 @@ func WriteAttrLine(key string, value interface{}, usedInBlock bool) string {
 		var op string
 		var mapLen = len(value.([]map[string]interface{}))
 		for i, item := range value.([]map[string]interface{}) {
-			// Use an empty key to prevent rendering the key
+			// Use an empty key to prevent rendering the key.
 			op = WriteAttrLine("", item, true)
-			// if condition handles adding new line for just the last element
+			// if condition handles adding new line for just the last element.
 			if i != mapLen-1 {
 				op = strings.TrimRight(op, "\n")
 			}
