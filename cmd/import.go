@@ -595,12 +595,20 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 			log.Fatal("ZPA client is not initialized")
 		}
 		zpaClient := api.ZPA.ServiceEdgeGroup
-		jsonPayload, _, err := serviceedgegroup.GetAll(zpaClient)
+		edgeGroups, _, err := serviceedgegroup.GetAll(zpaClient)
 		if err != nil {
 			log.Fatal(err)
 		}
-		m, _ := json.Marshal(jsonPayload)
-		resourceCount = len(jsonPayload)
+		for i, group := range edgeGroups {
+			if !group.GraceDistanceEnabled {
+				// Remove or nullify these attributes if grace_distance_enabled is false
+				edgeGroups[i].GraceDistanceEnabled = false // Assuming you can set this false for simplicity in output
+				edgeGroups[i].GraceDistanceValue = ""      // Making empty as we don't output if false
+				edgeGroups[i].GraceDistanceValueUnit = ""
+			}
+		}
+		resourceCount = len(edgeGroups)
+		m, _ := json.Marshal(edgeGroups)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zpa_lss_config_controller":
 		if api.ZPA == nil {
@@ -994,6 +1002,10 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		for _, rule := range rules {
 			if helpers.IsInList(rule.Name, []string{"Client Connector Traffic Direct", "ZPA Pool For Stray Traffic", "ZIA Inspected ZPA Apps", "Fallback mode of ZPA Forwarding"}) {
 				continue
+			}
+			// Process dest_countries to remove "COUNTRY_" prefix
+			for i, country := range rule.DestCountries {
+				rule.DestCountries[i] = strings.TrimPrefix(country, "COUNTRY_")
 			}
 			rulesFiltered = append(rulesFiltered, rule)
 		}
