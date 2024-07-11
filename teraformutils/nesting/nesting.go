@@ -308,7 +308,6 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 								currentID = v.(map[string]interface{})["terraform_internal_id"].(string)
 							}
 							if len(indexedNestedBlocks[currentID]) > 0 {
-
 								currentNestIdx := len(indexedNestedBlocks[currentID]) - 1
 								// Pull out the last nestedblock that we built for this parent.
 								// We only need to render the last one because it holds every other all other nested blocks for this parent.
@@ -327,18 +326,13 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 								indexedNestedBlocks[currentID][currentNestIdx] = currentNest
 								output += currentNest
 							}
-
 						}
-
 						output += "}\n"
 					}
-
 				}
-
 			default:
 				log.Debugf("unexpected attribute struct type %T for block %s", attrStruct, block)
 			}
-
 		} else {
 			log.Debugf("nested mode %q for %s not recognised", schemaBlock.NestedBlocks[block].NestingMode, block)
 		}
