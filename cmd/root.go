@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"text/tabwriter"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -38,6 +39,7 @@ var terraformInstallPath string
 var zpa_cloud, zpa_client_id, zpa_client_secret, zpa_customer_id string
 var zia_cloud, zia_username, zia_password, zia_api_key string
 var verbose, displayReleaseVersion bool
+var supportedResources string
 var api *Client
 var terraformImportCmdPrefix = "terraform import"
 var zpaProviderNamespace string
@@ -45,6 +47,56 @@ var zpaProviderNamespace string
 type Client struct {
 	ZPA *zpa.Client
 	ZIA *zia.Client
+}
+
+var allSupportedResources = []string{
+	"zpa_app_connector_group",
+	"zpa_application_server",
+	"zpa_application_segment",
+	"zpa_application_segment_browser_access",
+	"zpa_application_segment_inspection",
+	"zpa_application_segment_pra",
+	"zpa_cloud_browser_isolation_banner",
+	"zpa_cloud_browser_isolation_certificate",
+	"zpa_cloud_browser_isolation_external_profile",
+	"zpa_segment_group",
+	"zpa_server_group",
+	"zpa_policy_access_rule",
+	"zpa_policy_timeout_rule",
+	"zpa_policy_forwarding_rule",
+	"zpa_policy_inspection_rule",
+	"zpa_policy_isolation_rule",
+	"zpa_pra_approval_controller",
+	"zpa_pra_console_controller",
+	"zpa_pra_credential_controller",
+	"zpa_pra_portal_controller",
+	"zpa_provisioning_key",
+	"zpa_service_edge_group",
+	"zpa_lss_config_controller",
+	"zpa_inspection_custom_controls",
+	"zpa_microtenant_controller",
+	"zia_dlp_dictionaries",
+	"zia_dlp_engines",
+	"zia_dlp_notification_templates",
+	"zia_dlp_web_rules",
+	"zia_firewall_filtering_rule",
+	"zia_firewall_filtering_destination_groups",
+	"zia_firewall_filtering_ip_source_groups",
+	"zia_firewall_filtering_network_service",
+	"zia_firewall_filtering_network_service_groups",
+	"zia_firewall_filtering_network_application_groups",
+	"zia_traffic_forwarding_gre_tunnel",
+	"zia_traffic_forwarding_static_ip",
+	"zia_traffic_forwarding_vpn_credentials",
+	"zia_location_management",
+	"zia_url_categories",
+	"zia_url_filtering_rules",
+	"zia_rule_labels",
+	"zia_auth_settings_urls",
+	"zia_sandbox_behavioral_analysis",
+	"zia_security_settings",
+	"zia_forwarding_control_zpa_gateway",
+	"zia_forwarding_control_rule",
 }
 
 // rootCmd represents the base command when called without any subcommands
@@ -69,6 +121,11 @@ var rootCmd = &cobra.Command{
 		}
 	},
 	Run: func(cmd *cobra.Command, args []string) {
+		if supportedResources != "" {
+			listSupportedResources(supportedResources)
+			return
+		}
+
 		if len(args) > 0 {
 			fmt.Printf("Error: unrecognized command \"%s\"\n\n", args[0])
 			_ = cmd.Help()
@@ -154,6 +211,8 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&zpaProviderNamespace, "zia-provider-namespace", "", "Custom namespace for the ZIA provider")
 	_ = viper.BindPFlag("zia-provider-namespace", rootCmd.PersistentFlags().Lookup("zia-provider-namespace"))
 	_ = viper.BindEnv("zia-provider-namespace", "ZIA_PROVIDER_NAMESPACE")
+
+	rootCmd.PersistentFlags().StringVar(&supportedResources, "supported-resources", "", "List supported resources for ZPA or ZIA")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -206,4 +265,35 @@ func sharedPreRun(cmd *cobra.Command, args []string) {
 			api.ZIA = ziaClient
 		}
 	}
+}
+
+func listSupportedResources(prefix string) {
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.AlignRight|tabwriter.Debug)
+
+	// Define headers with centering
+	header1 := "Resource"
+	header2 := "Generate Supported"
+	header3 := "Import Supported"
+	width1 := 50
+	width2 := 18
+	width3 := 18
+
+	// Print table with double lined format and close the entire table
+	fmt.Fprintf(w, "╔%s╗\n", strings.Repeat("═", width1+width2+width3+10))
+	fmt.Fprintf(w, "║ %-*s │ %-*s │ %-*s   ║\n", width1, centerText(header1, width1), width2, centerText(header2, width2), width3, centerText(header3, width3))
+	fmt.Fprintf(w, "╠%s╣\n", strings.Repeat("═", width1+width2+width3+10))
+
+	for _, resource := range allSupportedResources {
+		if strings.HasPrefix(resource, prefix) {
+			fmt.Fprintf(w, "║ %-*s │ %-*s │ %-*s ║\n", width1, resource, width2, centerText("✅", width2), width3, centerText("✅", width3))
+		}
+	}
+	fmt.Fprintf(w, "╚%s╝\n", strings.Repeat("═", width1+width2+width3+10))
+
+	w.Flush()
+}
+
+func centerText(text string, width int) string {
+	padding := (width - len(text)) / 2
+	return fmt.Sprintf("%*s%s%*s", padding, "", text, padding, "")
 }

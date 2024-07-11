@@ -249,7 +249,12 @@ $ zscaler-terraformer import \
 
 Any resources not listed are currently not supported.
 
-Last updated July 9, 2024
+Last updated July 11, 2024
+
+Use the following command once the tool is installed to visualize the table of supported ZPA resources:
+```shell
+zscaler-terraformer --supported-resources="zpa"
+```
 
 | Resource | Resource Scope | Generate Supported | Import Supported |
 |----------|-----------|----------|----------|
@@ -260,6 +265,9 @@ Last updated July 9, 2024
 | [zpa_application_segment_browser_access](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_application_segment_browser_access) | application segment | ✅ | ✅ |
 | [zpa_application_segment_inspection](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_application_segment_inspection) | application segment | ✅ | ✅ |
 | [zpa_application_segment_pra](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_application_segment_pra) | application segment | ✅ | ✅ |
+| [zpa_cloud_browser_isolation_banner](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_cloud_browser_isolation_banner) | isolation | ✅ | ✅ |
+| [zpa_cloud_browser_isolation_certificate](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_cloud_browser_isolation_certificate) | isolation | ✅ | ✅ |
+| [zpa_cloud_browser_isolation_external_profile](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_cloud_browser_isolation_external_profile) | isolation | ✅ | ✅ |
 | [zpa_segment_group](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_segment_group) | group | ✅ | ✅ |
 | [zpa_server_group](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_server_group) | group | ✅ | ✅ |
 | [zpa_lss_config_controller](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_lss_config_controller) | lss | ✅ | ✅ |
@@ -280,7 +288,13 @@ Last updated July 9, 2024
 
 Any resources not listed are currently not supported.
 
-Last updated July 9, 2024
+Last updated July 11, 2024
+
+Use the following command once the tool is installed to visualize the table of supported ZIA resources:
+
+```shell
+zscaler-terraformer --supported-resources="zia"
+```
 
 | Resource | Resource Scope | Generate Supported | Import Supported |
 |----------|-----------|----------|----------|

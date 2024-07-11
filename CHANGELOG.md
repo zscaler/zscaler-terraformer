@@ -10,16 +10,23 @@
 ### Enhancements
 - [PR #213](https://github.com/zscaler/zscaler-terraformer/pull/213). The tool now creates a ``outputs.tf`` file containg the `id` export of each invidual exported resource.
 - [PR #213](https://github.com/zscaler/zscaler-terraformer/pull/213). The tool now displays a message when the resource import is successful.
+- [PR #213](https://github.com/zscaler/zscaler-terraformer/pull/213). The following new flag has been introduced `--supported-resources=`. When using the following syntax: `zscaler-terraformer --supported-resources="zpa"` or `zscaler-terraformer --supported-resources="zia"` a list of all current supported resources is displayed in table format.
 - [PR #213](https://github.com/zscaler/zscaler-terraformer/pull/213). The tool now displays a warning message when the imported resource contain attributes that may carry sensitive values i.e `passwords`. Notice that the value is not included in the HCL code for security reasons.
 - [PR #213](https://github.com/zscaler/zscaler-terraformer/pull/213). Re-introduced support for the import of the following resources:
     - `zpa_application_segment_browser_access`
     - `zpa_application_segment_inspection`
     - `zpa_application_segment_pra`
+
 - [PR #213](https://github.com/zscaler/zscaler-terraformer/pull/213). Introduced support for the import of the following ZPA Privileged Remote Access resources:
     - `zpa_pra_approval_controller`
     - `zpa_pra_console_controller`
     - `zpa_pra_credential_controller`
     - `zpa_pra_portal_controller`
+
+- [PR #213](https://github.com/zscaler/zscaler-terraformer/pull/213). Introduced support for the import of the following Cloud Browser Isolation resources:
+    - `zpa_cloud_browser_isolation_banner`
+    - `zpa_cloud_browser_isolation_certificate`
+    - `zpa_cloud_browser_isolation_external_profile`
 
 ### Bug Fixes
 - [PR #213](https://github.com/zscaler/zscaler-terraformer/pull/213). Fixed issues with credential with inline credential authentication.
