@@ -40,7 +40,7 @@ jobs:
       - uses: mislav/bump-homebrew-formula-action@v3
         with:
           formula-name: zscaler-terraformer
-          formula-path: Formula/zscaler-terraformer.rb
+          formula-path: formula/zscaler-terraformer.rb  # Corrected path
           homebrew-tap: zscaler/homebrew-tap
           tag-name: ${{ steps.extract-version.outputs.tag-name }}
           download-url: https://github.com/zscaler/zscaler-terraformer/archive/refs/tags/${{ steps.extract-version.outputs.tag-name }}.tar.gz
