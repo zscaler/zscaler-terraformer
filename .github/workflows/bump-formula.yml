@@ -34,17 +34,54 @@ jobs:
             echo "tag-name=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
           fi
 
-      - name: Debug Token
-        run: echo $GITHUB_TOKEN
+      - name: Fetch SHA256 checksums
+        id: fetch-sha256
+        run: |
+          VERSION=${{ steps.extract-version.outputs.tag-name }}
+          DARWIN_AMD64_SHA256=$(curl -sL https://github.com/zscaler/zscaler-terraformer/releases/download/$VERSION/zscaler-terraformer_${VERSION}_darwin_amd64.zip | sha256sum | awk '{ print $1 }')
+          DARWIN_ARM64_SHA256=$(curl -sL https://github.com/zscaler/zscaler-terraformer/releases/download/$VERSION/zscaler-terraformer_${VERSION}_darwin_arm64.zip | sha256sum | awk '{ print $1 }')
+          LINUX_AMD64_SHA256=$(curl -sL https://github.com/zscaler/zscaler-terraformer/releases/download/$VERSION/zscaler-terraformer_${VERSION}_linux_amd64.zip | sha256sum | awk '{ print $1 }')
+          LINUX_ARM_SHA256=$(curl -sL https://github.com/zscaler/zscaler-terraformer/releases/download/$VERSION/zscaler-terraformer_${VERSION}_linux_arm.zip | sha256sum | awk '{ print $1 }')
+          LINUX_ARM64_SHA256=$(curl -sL https://github.com/zscaler/zscaler-terraformer/releases/download/$VERSION/zscaler-terraformer_${VERSION}_linux_arm64.zip | sha256sum | awk '{ print $1 }')
 
-      - uses: mislav/bump-homebrew-formula-action@v3
-        with:
-          formula-name: zscaler-terraformer
-          formula-path: formula/zscaler-terraformer.rb  # Corrected path
-          homebrew-tap: zscaler/homebrew-tap
-          tag-name: ${{ steps.extract-version.outputs.tag-name }}
-          download-url: https://github.com/zscaler/zscaler-terraformer/archive/refs/tags/${{ steps.extract-version.outputs.tag-name }}.tar.gz
-          commit-message: |
-            Updates {{formulaName}} to {{version}}
+          echo "DARWIN_AMD64_SHA256=$DARWIN_AMD64_SHA256" >> $GITHUB_ENV
+          echo "DARWIN_ARM64_SHA256=$DARWIN_ARM64_SHA256" >> $GITHUB_ENV
+          echo "LINUX_AMD64_SHA256=$LINUX_AMD64_SHA256" >> $GITHUB_ENV
+          echo "LINUX_ARM_SHA256=$LINUX_ARM_SHA256" >> $GITHUB_ENV
+          echo "LINUX_ARM64_SHA256=$LINUX_ARM64_SHA256" >> $GITHUB_ENV
+
+      - name: Update formula
+        run: |
+          VERSION=${{ steps.extract-version.outputs.tag-name }}
+          DARWIN_AMD64_SHA256=${{ env.DARWIN_AMD64_SHA256 }}
+          DARWIN_ARM64_SHA256=${{ env.DARWIN_ARM64_SHA256 }}
+          LINUX_AMD64_SHA256=${{ env.LINUX_AMD64_SHA256 }}
+          LINUX_ARM_SHA256=${{ env.LINUX_ARM_SHA256 }}
+          LINUX_ARM64_SHA256=${{ env.LINUX_ARM64_SHA256 }}
+
+          sed -i "s|version \".*\"|version \"$VERSION\"|g" formula/zscaler-terraformer.rb
+          sed -i "s|url \".*darwin_amd64.zip\"|url \"https://github.com/zscaler/zscaler-terraformer/releases/download/$VERSION/zscaler-terraformer_${VERSION}_darwin_amd64.zip\"|g" formula/zscaler-terraformer.rb
+          sed -i "s|sha256 \".*\"|sha256 \"$DARWIN_AMD64_SHA256\"|g" formula/zscaler-terraformer.rb
+
+          sed -i "s|url \".*darwin_arm64.zip\"|url \"https://github.com/zscaler/zscaler-terraformer/releases/download/$VERSION/zscaler-terraformer_${VERSION}_darwin_arm64.zip\"|g" formula/zscaler-terraformer.rb
+          sed -i "s|sha256 \".*\"|sha256 \"$DARWIN_ARM64_SHA256\"|g" formula/zscaler-terraformer.rb
+
+          sed -i "s|url \".*linux_amd64.zip\"|url \"https://github.com/zscaler/zscaler-terraformer/releases/download/$VERSION/zscaler-terraformer_${VERSION}_linux_amd64.zip\"|g" formula/zscaler-terraformer.rb
+          sed -i "s|sha256 \".*\"|sha256 \"$LINUX_AMD64_SHA256\"|g" formula/zscaler-terraformer.rb
+
+          sed -i "s|url \".*linux_arm.zip\"|url \"https://github.com/zscaler/zscaler-terraformer/releases/download/$VERSION/zscaler-terraformer_${VERSION}_linux_arm.zip\"|g" formula/zscaler-terraformer.rb
+          sed -i "s|sha256 \".*\"|sha256 \"$LINUX_ARM_SHA256\"|g" formula/zscaler-terraformer.rb
+
+          sed -i "s|url \".*linux_arm64.zip\"|url \"https://github.com/zscaler/zscaler-terraformer/releases/download/$VERSION/zscaler-terraformer_${VERSION}_linux_arm64.zip\"|g" formula/zscaler-terraformer.rb
+          sed -i "s|sha256 \".*\"|sha256 \"$LINUX_ARM64_SHA256\"|g" formula/zscaler-terraformer.rb
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add formula/zscaler-terraformer.rb
+          git commit -m "Update zscaler-terraformer formula to version $VERSION"
+          git push
+
         env:
           COMMITTER_TOKEN: ${{ secrets.BUMP_CASK_TOKEN }}
