@@ -43,4 +43,4 @@ jobs:
           commit-message: |
             Updates {{formulaName}} to {{version}}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BUMP_CASK_TOKEN: ${{ secrets.BUMP_CASK_TOKEN }}
