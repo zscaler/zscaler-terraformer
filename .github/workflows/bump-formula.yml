@@ -1,0 +1,48 @@
+name: Bump Homebrew formula
+
+on:
+  release:
+    types: [released]
+  workflow_dispatch:
+    inputs:
+      tag-name:
+        description: 'The git tag name to bump the formula to (including the "v" prefix)'
+        required: true
+  repository_dispatch:
+    types: [update_homebrew]
+
+jobs:
+  homebrew:
+    name: Bump Homebrew formula
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Extract version
+        id: extract-version
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "tag-name=${{ github.event.inputs.tag-name }}" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event_name }}" == "repository_dispatch" ]]; then
+            echo "tag-name=${{ github.event.client_payload.tag_name }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag-name=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - uses: mislav/bump-homebrew-formula-action@v3
+        with:
+          formula-name: zscaler-terraformer
+          formula-path: Formula/zscaler-terraformer.rb
+          homebrew-tap: zscaler/homebrew-tap
+          tag-name: ${{ steps.extract-version.outputs.tag-name }}
+          download-url: https://github.com/zscaler/zscaler-terraformer/archive/refs/tags/${{ steps.extract-version.outputs.tag-name }}.tar.gz
+          commit-message: |
+            Updates {{formulaName}} to {{version}}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
