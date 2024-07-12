@@ -34,6 +34,11 @@ jobs:
             echo "tag-name=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
           fi
 
+      - name: Verify file path
+        run: |
+          echo "Listing contents of current directory"
+          ls -R
+
       - name: Fetch SHA256 checksums
         id: fetch-sha256
         run: |
@@ -82,6 +87,5 @@ jobs:
           git add formula/zscaler-terraformer.rb
           git commit -m "Update zscaler-terraformer formula to version $VERSION"
           git push
-
         env:
           COMMITTER_TOKEN: ${{ secrets.BUMP_CASK_TOKEN }}
