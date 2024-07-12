@@ -47,4 +47,4 @@ jobs:
           commit-message: |
             Updates {{formulaName}} to {{version}}
         env:
-          BUMP_CASK_TOKEN: ${{ secrets.BUMP_CASK_TOKEN }}
+          COMMITTER_TOKEN: ${{ secrets.BUMP_CASK_TOKEN }}
