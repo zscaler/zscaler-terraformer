@@ -8,12 +8,6 @@ on:
       tag-name:
         description: 'The git tag name to bump the formula to (including the "v" prefix)'
         required: true
-  repository_dispatch:
-    types: [update_homebrew]
-
-permissions:
-  contents: write
-  actions: write
 
 jobs:
   homebrew:
@@ -21,23 +15,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
       - name: Extract version
         id: extract-version
         run: |
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             echo "tag-name=${{ github.event.inputs.tag-name }}" >> $GITHUB_OUTPUT
-          elif [[ "${{ github.event_name }}" == "repository_dispatch" ]]; then
-            echo "tag-name=${{ github.event.client_payload.tag_name }}" >> $GITHUB_OUTPUT
           else
             echo "tag-name=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
           fi
-
-      - name: Verify file path
-        run: |
-          echo "Listing contents of current directory"
-          ls -R
 
       - name: Fetch SHA256 checksums
         id: fetch-sha256
@@ -55,23 +42,27 @@ jobs:
           echo "LINUX_ARM_SHA256=$LINUX_ARM_SHA256" >> $GITHUB_ENV
           echo "LINUX_ARM64_SHA256=$LINUX_ARM64_SHA256" >> $GITHUB_ENV
 
-      - name: Update formula
+      - name: Bump Homebrew formula
+        uses: mislav/bump-homebrew-formula-action@v3
+        with:
+          formula-name: zscaler-terraformer
+          formula-path: formula/zscaler-terraformer.rb
+          homebrew-tap: zscaler/homebrew-tap
+          tag-name: ${{ steps.extract-version.outputs.tag-name }}
+          download-url: https://github.com/zscaler/zscaler-terraformer/releases/download/${{ steps.extract-version.outputs.tag-name }}/zscaler-terraformer_${{ steps.extract-version.outputs.tag-name }}_darwin_amd64.zip
+          sha256: ${{ env.DARWIN_AMD64_SHA256 }}
+        env:
+          COMMITTER_TOKEN: ${{ secrets.BUMP_CASK_TOKEN }}
+
+      - name: Update remaining architectures
         run: |
           VERSION=${{ steps.extract-version.outputs.tag-name }}
-          DARWIN_AMD64_SHA256=${{ env.DARWIN_AMD64_SHA256 }}
           DARWIN_ARM64_SHA256=${{ env.DARWIN_ARM64_SHA256 }}
           LINUX_AMD64_SHA256=${{ env.LINUX_AMD64_SHA256 }}
           LINUX_ARM_SHA256=${{ env.LINUX_ARM_SHA256 }}
           LINUX_ARM64_SHA256=${{ env.LINUX_ARM64_SHA256 }}
 
           FORMULA_PATH="formula/zscaler-terraformer.rb"
-          if [[ ! -f "$FORMULA_PATH" ]]; then
-            FORMULA_PATH="formula/zscaler-terraformer.rb"
-          fi
-
-          sed -i "s|version \".*\"|version \"$VERSION\"|g" $FORMULA_PATH
-          sed -i "s|url \".*darwin_amd64.zip\"|url \"https://github.com/zscaler/zscaler-terraformer/releases/download/$VERSION/zscaler-terraformer_${VERSION}_darwin_amd64.zip\"|g" $FORMULA_PATH
-          sed -i "s|sha256 \".*\"|sha256 \"$DARWIN_AMD64_SHA256\"|g" $FORMULA_PATH
 
           sed -i "s|url \".*darwin_arm64.zip\"|url \"https://github.com/zscaler/zscaler-terraformer/releases/download/$VERSION/zscaler-terraformer_${VERSION}_darwin_arm64.zip\"|g" $FORMULA_PATH
           sed -i "s|sha256 \".*\"|sha256 \"$DARWIN_ARM64_SHA256\"|g" $FORMULA_PATH
@@ -89,8 +80,8 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add $FORMULA_PATH
+          git add formula/zscaler-terraformer.rb
           git commit -m "Update zscaler-terraformer formula to version $VERSION"
           git push
         env:
-          COMMITTER_TOKEN: ${{ secrets.BUMP_CASK_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.BUMP_CASK_TOKEN }}
