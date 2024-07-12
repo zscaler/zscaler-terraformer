@@ -11,13 +11,16 @@ on:
   repository_dispatch:
     types: [update_homebrew]
 
+permissions:
+  contents: write
+
 jobs:
   homebrew:
     name: Bump Homebrew formula
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Extract version
         id: extract-version
@@ -29,11 +32,6 @@ jobs:
           else
             echo "tag-name=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
           fi
-
-      - name: Set up Git
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - uses: mislav/bump-homebrew-formula-action@v3
         with:
