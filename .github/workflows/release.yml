@@ -1,4 +1,5 @@
 name: Release
+
 on:
   push:
     tags:
@@ -28,7 +29,6 @@ jobs:
         id: import_gpg
         uses: paultyng/ghaction-import-gpg@v2.1.0
         env:
-          # These secrets will need to be configured for the repository:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
@@ -40,9 +40,11 @@ jobs:
           args: release --clean
         env:
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
-          # GitHub sets this automatically
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ env.VERSION }}
+
+      - name: Debug Token
+        run: echo $GITHUB_TOKEN
 
       - name: Trigger Homebrew Update
         run: |

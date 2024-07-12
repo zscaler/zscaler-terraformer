@@ -33,6 +33,9 @@ jobs:
             echo "tag-name=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
           fi
 
+      - name: Debug Token
+        run: echo $GITHUB_TOKEN
+
       - uses: mislav/bump-homebrew-formula-action@v3
         with:
           formula-name: zscaler-terraformer
@@ -43,4 +46,4 @@ jobs:
           commit-message: |
             Updates {{formulaName}} to {{version}}
         env:
-          BUMP_CASK_TOKEN: ${{ secrets.BUMP_CASK_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
