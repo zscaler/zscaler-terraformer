@@ -64,27 +64,32 @@ jobs:
           LINUX_ARM_SHA256=${{ env.LINUX_ARM_SHA256 }}
           LINUX_ARM64_SHA256=${{ env.LINUX_ARM64_SHA256 }}
 
-          sed -i "s|version \".*\"|version \"$VERSION\"|g" formula/zscaler-terraformer.rb
-          sed -i "s|url \".*darwin_amd64.zip\"|url \"https://github.com/zscaler/zscaler-terraformer/releases/download/$VERSION/zscaler-terraformer_${VERSION}_darwin_amd64.zip\"|g" formula/zscaler-terraformer.rb
-          sed -i "s|sha256 \".*\"|sha256 \"$DARWIN_AMD64_SHA256\"|g" formula/zscaler-terraformer.rb
+          FORMULA_PATH="formula/zscaler-terraformer.rb"
+          if [[ ! -f "$FORMULA_PATH" ]]; then
+            FORMULA_PATH="Formula/zscaler-terraformer.rb"
+          fi
 
-          sed -i "s|url \".*darwin_arm64.zip\"|url \"https://github.com/zscaler/zscaler-terraformer/releases/download/$VERSION/zscaler-terraformer_${VERSION}_darwin_arm64.zip\"|g" formula/zscaler-terraformer.rb
-          sed -i "s|sha256 \".*\"|sha256 \"$DARWIN_ARM64_SHA256\"|g" formula/zscaler-terraformer.rb
+          sed -i "s|version \".*\"|version \"$VERSION\"|g" $FORMULA_PATH
+          sed -i "s|url \".*darwin_amd64.zip\"|url \"https://github.com/zscaler/zscaler-terraformer/releases/download/$VERSION/zscaler-terraformer_${VERSION}_darwin_amd64.zip\"|g" $FORMULA_PATH
+          sed -i "s|sha256 \".*\"|sha256 \"$DARWIN_AMD64_SHA256\"|g" $FORMULA_PATH
 
-          sed -i "s|url \".*linux_amd64.zip\"|url \"https://github.com/zscaler/zscaler-terraformer/releases/download/$VERSION/zscaler-terraformer_${VERSION}_linux_amd64.zip\"|g" formula/zscaler-terraformer.rb
-          sed -i "s|sha256 \".*\"|sha256 \"$LINUX_AMD64_SHA256\"|g" formula/zscaler-terraformer.rb
+          sed -i "s|url \".*darwin_arm64.zip\"|url \"https://github.com/zscaler/zscaler-terraformer/releases/download/$VERSION/zscaler-terraformer_${VERSION}_darwin_arm64.zip\"|g" $FORMULA_PATH
+          sed -i "s|sha256 \".*\"|sha256 \"$DARWIN_ARM64_SHA256\"|g" $FORMULA_PATH
 
-          sed -i "s|url \".*linux_arm.zip\"|url \"https://github.com/zscaler/zscaler-terraformer/releases/download/$VERSION/zscaler-terraformer_${VERSION}_linux_arm.zip\"|g" formula/zscaler-terraformer.rb
-          sed -i "s|sha256 \".*\"|sha256 \"$LINUX_ARM_SHA256\"|g" formula/zscaler-terraformer.rb
+          sed -i "s|url \".*linux_amd64.zip\"|url \"https://github.com/zscaler/zscaler-terraformer/releases/download/$VERSION/zscaler-terraformer_${VERSION}_linux_amd64.zip\"|g" $FORMULA_PATH
+          sed -i "s|sha256 \".*\"|sha256 \"$LINUX_AMD64_SHA256\"|g" $FORMULA_PATH
 
-          sed -i "s|url \".*linux_arm64.zip\"|url \"https://github.com/zscaler/zscaler-terraformer/releases/download/$VERSION/zscaler-terraformer_${VERSION}_linux_arm64.zip\"|g" formula/zscaler-terraformer.rb
-          sed -i "s|sha256 \".*\"|sha256 \"$LINUX_ARM64_SHA256\"|g" formula/zscaler-terraformer.rb
+          sed -i "s|url \".*linux_arm.zip\"|url \"https://github.com/zscaler/zscaler-terraformer/releases/download/$VERSION/zscaler-terraformer_${VERSION}_linux_arm.zip\"|g" $FORMULA_PATH
+          sed -i "s|sha256 \".*\"|sha256 \"$LINUX_ARM_SHA256\"|g" $FORMULA_PATH
+
+          sed -i "s|url \".*linux_arm64.zip\"|url \"https://github.com/zscaler/zscaler-terraformer/releases/download/$VERSION/zscaler-terraformer_${VERSION}_linux_arm64.zip\"|g" $FORMULA_PATH
+          sed -i "s|sha256 \".*\"|sha256 \"$LINUX_ARM64_SHA256\"|g" $FORMULA_PATH
 
       - name: Commit and push changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add formula/zscaler-terraformer.rb
+          git add $FORMULA_PATH
           git commit -m "Update zscaler-terraformer formula to version $VERSION"
           git push
         env:
