@@ -1,10 +1,10 @@
 # Changelog
 
-## 1.3.0 (July, 10 2024)
+## 1.3.0 (July, 11 2024)
 
 ### Notes
 
-- Release date: **(July, 10 2024)**
+- Release date: **(July, 11 2024)**
 - Supported Terraform version: **v1.x.x**
 
 ### Enhancements
