@@ -97,7 +97,7 @@ func GenerateOutputs(resourceType string, resourceID string, workingDir string) 
 	}
 
 	// Open the file in append mode or create it if it doesn't exist.
-	f, err := os.OpenFile(outputsFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	f, err := os.OpenFile(outputsFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
 	if err != nil {
 		log.Fatalf("failed to open outputs file: %s", err)
 	}
@@ -164,7 +164,7 @@ func RemoveTcpPortRangesFromState(stateFile string) {
 	}
 
 	// Write the modified state back to the file
-	if err := ioutil.WriteFile(stateFile, modifiedStateData, 0644); err != nil {
+	if err := ioutil.WriteFile(stateFile, modifiedStateData, 0600); err != nil {
 		log.Fatalf("failed to write modified state file: %s", err)
 	}
 }

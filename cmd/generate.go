@@ -266,7 +266,7 @@ func initTf(resourceType string) (tf *tfexec.Terraform, r *tfjson.Schema, workin
 	}
 	log.Debugf("initializing Terraform in %s", workingDir)
 	if _, err := os.Stat(workingDir); errors.Is(err, os.ErrNotExist) {
-		err := os.Mkdir(workingDir, os.ModePerm)
+		err := os.Mkdir(workingDir, 0750) // Set more restrictive permissions
 		if err != nil {
 			log.Fatal("failed creating dir:"+workingDir, err)
 		}
@@ -346,8 +346,18 @@ provider "%s" {
 	if err != nil {
 		log.Fatal("failed creating "+filename, err)
 	}
-	_, _ = f.WriteString(providerConfig)
-	f.Close()
+	// Write the provider configuration to the file
+	n, err := f.WriteString(providerConfig)
+	if err != nil {
+		log.Fatalf("failed writing to %s: %s", filename, err)
+	} else if n < len(providerConfig) {
+		log.Fatalf("incomplete write to %s: wrote %d of %d bytes", filename, n, len(providerConfig))
+	}
+
+	// Close the file and check for errors
+	if err := f.Close(); err != nil {
+		log.Fatalf("failed to close file %s: %s", filename, err)
+	}
 
 	// Initialize Terraform with the provider configuration
 	err = tf.Init(context.Background(), tfexec.Upgrade(true))

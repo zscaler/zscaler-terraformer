@@ -48,7 +48,9 @@ func main() {
 	log.SetOutput(TerraformerWriter{})
 
 	// Ensure the environment variable is set to disable caching
-	os.Setenv("ZSCALER_SDK_CACHE_DISABLED", "true")
+	if err := os.Setenv("ZSCALER_SDK_CACHE_DISABLED", "true"); err != nil {
+		log.Fatalf("Failed to set environment variable: %s", err)
+	}
 
 	// Execute the command with error handling
 	if err := cmd.Execute(); err != nil {

@@ -290,7 +290,10 @@ func listSupportedResources(prefix string) {
 	}
 	fmt.Fprintf(w, "╚%s╝\n", strings.Repeat("═", width1+width2+width3+10))
 
-	w.Flush()
+	// Check for errors when flushing data to output
+	if err := w.Flush(); err != nil {
+		log.Fatalf("Error flushing output: %v", err)
+	}
 }
 
 func centerText(text string, width int) string {
