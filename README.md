@@ -8,6 +8,7 @@
 
 # Zscaler Terraformer Tool
 
+[![GitHub release](https://img.shields.io/github/release/zscaler/zscaler-terraformer.svg)](https://github.com/zscaler/zscaler-terraformer/releases/)
 [![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/zscaler/zscaler-terraformer)](https://github.com/zscaler/zscaler-terraformer/blob/master/.go-version)
 [![Go Report Card](https://goreportcard.com/badge/github.com/zscaler/zscaler-terraformer)](https://goreportcard.com/report/github.com/zscaler/zscaler-terraformer)
 [![GitHub releases](https://img.shields.io/github/downloads/zscaler/zscaler-terraformer/total.svg)](https://GitHub.com/zscaler/zscaler-terraformer/releases/)
