@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.3.1 (August, 13 2024)
+
+### Notes
+
+- Release date: **(August, 13 2024)**
+- Supported Terraform version: **v1.x.x**
+
+### Bug Fixes
+- [PR #220](https://github.com/zscaler/zscaler-terraformer/pull/220). Fixed help menu options for more clarity
+- [PR #220](https://github.com/zscaler/zscaler-terraformer/pull/220). Implemented enhanced error handling
+
 ## 1.3.0 (July, 11 2024)
 
 ### Notes
