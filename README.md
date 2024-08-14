@@ -8,7 +8,6 @@
 
 # Zscaler Terraformer Tool
 
-[![tests](https://github.com/zscaler/zscaler-terraformer/actions/workflows/test.yaml/badge.svg)](https://github.com/zscaler/zscaler-terraformer/actions/workflows/test.yaml)
 [![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/zscaler/zscaler-terraformer)](https://github.com/zscaler/zscaler-terraformer/blob/master/.go-version)
 [![Go Report Card](https://goreportcard.com/badge/github.com/zscaler/zscaler-terraformer)](https://goreportcard.com/report/github.com/zscaler/zscaler-terraformer)
 [![Zscaler Community](https://img.shields.io/badge/zscaler-community-blue)](https://community.zscaler.com/)
