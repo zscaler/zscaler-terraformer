@@ -8,7 +8,6 @@
 
 # Zscaler Terraformer Tool
 
-[![tests](https://github.com/zscaler/zscaler-terraformer/actions/workflows/test.yaml/badge.svg)](https://github.com/zscaler/zscaler-terraformer/actions/workflows/test.yaml)
 [![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/zscaler/zscaler-terraformer)](https://github.com/zscaler/zscaler-terraformer/blob/master/.go-version)
 [![Go Report Card](https://goreportcard.com/badge/github.com/zscaler/zscaler-terraformer)](https://goreportcard.com/report/github.com/zscaler/zscaler-terraformer)
 [![Zscaler Community](https://img.shields.io/badge/zscaler-community-blue)](https://community.zscaler.com/)
@@ -212,6 +211,8 @@ $ zscaler-terraformer generate \
 
 ## Installation
 
+### Homebrew on MacOS
+
 If you use Homebrew on MacOS, you can run one of the following commands:
 
 ```bash
@@ -225,11 +226,24 @@ or
 brew tap zscaler/tap
 brew install --cask zscaler/tap/zscaler-terraformer
 ```
+### Windows - Chocolatey Package Manager
 
-If you use another OS, you will need to download the release directly from
-[GitHub Releases](https://github.com/zscaler/zscaler-terraformer/releases).
+If you want to run the tool on Windows, you can use Chocolatey package manager:
 
-In the future we plan on releasing versions for installation via MacPorts and Chocolatey for Windows systems.
+```pwsh
+choco install zscaler-terraformer
+```
+
+### Linux
+
+From releases you can execute the following commands:
+
+```shell
+curl -LO "https://github.com/zscaler/zscaler-terraformer/releases/download/$(curl -s https://api.github.com/repos/zscaler/zscaler-terraformer/releases/latest | grep tag_name | cut -d '"' -f 4)/zscaler-terraformer_1.3.0_linux_amd64.zip"
+unzip zscaler-terraformer_1.3.0_linux_amd64.zip
+chmod +x zscaler-terraformer
+sudo mv zscaler-terraformer /usr/local/bin
+```
 
 ## Importing with Terraform state
 

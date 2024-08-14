@@ -1046,7 +1046,10 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		log.Fatal(err)
 	}
 	generate(cmd, f, resourceType)
-	f.Close()
+	// Ensure the file is closed and check for errors when closing
+	if err := f.Close(); err != nil {
+		log.Fatalf("failed to close file: %v", err)
+	}
 
 	for _, data := range jsonStructData {
 		structData := data.(map[string]interface{})
