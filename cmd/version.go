@@ -57,7 +57,16 @@ var versionCmd = &cobra.Command{
 
 		latestVersion := getLatestReleaseVersion()
 		if cliVersion != latestVersion {
-			fmt.Printf("\nYour version of Zscaler-Terraformer is out of date! The latest version\nis %s. You can update by running the command\n\"brew upgrade zscaler/tap/zscaler-terraformer\"\nor download the new version from\nhttps://github.com/zscaler/zscaler-terraformer/releases\n", latestVersion)
+			fmt.Printf("\nYour version of Zscaler-Terraformer is out of date! The latest version\nis %s. You can update by running the command\n", latestVersion)
+
+			if runtime.GOOS == "windows" {
+				fmt.Println("\"choco upgrade zscaler-terraformer\"")
+			} else {
+				fmt.Println("\"brew upgrade zscaler/tap/zscaler-terraformer\"")
+			}
+
+			fmt.Println("or download the new version from")
+			fmt.Println("https://github.com/zscaler/zscaler-terraformer/releases")
 		}
 	},
 }
