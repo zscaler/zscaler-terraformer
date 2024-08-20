@@ -12,9 +12,19 @@ Track all Zscaler Terraformer Tool releases. New resources, features, and bug fi
 
 ---
 
-``Last updated: v1.3.1``
+``Last updated: v1.3.2``
 
 ---
+
+## 1.3.2 (August, 20 2024)
+
+### Notes
+
+- Release date: **(August, 13 2024)**
+- Supported Terraform version: **v1.x.x**
+
+### Enhancements
+- [PR #223](https://github.com/zscaler/zscaler-terraformer/pull/223). Added support to chocolatey package manager installation for Windows.
 
 ## 1.3.1 (August, 13 2024)
 
