@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.3.3 (August, xx 2024)
+
+### Notes
+
+- Release date: **(August, xx 2024)**
+- Supported Terraform version: **v1.x.x**
+
+### Enhancements
+- [PR #224](https://github.com/zscaler/zscaler-terraformer/pull/224). Fixed `supported-resources` flag emoji display for Windows.
+
 ## 1.3.2 (August, 20 2024)
 
 ### Notes
