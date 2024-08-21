@@ -24,6 +24,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"runtime"
 	"strings"
 	"text/tabwriter"
 
@@ -272,6 +273,12 @@ func sharedPreRun(cmd *cobra.Command, args []string) {
 func listSupportedResources(prefix string) {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.AlignRight|tabwriter.Debug)
 
+	// Determine the checkmark symbol based on the operating system
+	checkMark := "✅"
+	if runtime.GOOS == "windows" {
+		checkMark = "[Yes]"
+	}
+
 	// Define headers with centering
 	header1 := "Resource"
 	header2 := "Generate Supported"
@@ -287,11 +294,11 @@ func listSupportedResources(prefix string) {
 
 	for _, resource := range allSupportedResources {
 		if strings.HasPrefix(resource, prefix) {
-			fmt.Fprintf(w, "║ %-*s │ %-*s │ %-*s ║\n", width1, resource, width2, centerText("✅", width2), width3, centerText("✅", width3))
+			fmt.Fprintf(w, "║ %-*s │ %-*s │ %-*s ║\n", width1, resource, width2, centerText(checkMark, width2), width3, centerText(checkMark, width3))
 		}
 	}
 	fmt.Fprintf(w, "╚%s╝\n", strings.Repeat("═", width1+width2+width3+10))
-
+	fmt.Fprintf(w, "╚%s╝\n", strings.Repeat("═", width1+width2+width3+10))
 	// Check for errors when flushing data to output
 	if err := w.Flush(); err != nil {
 		log.Fatalf("Error flushing output: %v", err)

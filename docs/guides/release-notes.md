@@ -20,7 +20,7 @@ Track all Zscaler Terraformer Tool releases. New resources, features, and bug fi
 
 ### Notes
 
-- Release date: **(August, 13 2024)**
+- Release date: **(August, 20 2024)**
 - Supported Terraform version: **v1.x.x**
 
 ### Enhancements
