@@ -356,12 +356,6 @@ func ConvertAttributes(structData map[string]interface{}) {
 	}
 }
 
-// // Helper function to check if the error is related to the custom file hash feature being disabled
-// func IsCustomFileHashDisabledError(err error) bool {
-// 	const errorMsg = "Custom File Hash feature is not enabled for your org"
-// 	return strings.Contains(err.Error(), errorMsg)
-// }
-
 type ZIAAPIErrorResponse struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`
