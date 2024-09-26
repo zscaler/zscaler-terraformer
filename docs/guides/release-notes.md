@@ -24,7 +24,8 @@ Track all Zscaler Terraformer Tool releases. New resources, features, and bug fi
 - Supported Terraform version: **v1.x.x**
 
 ### Bug Fixes
-- [PR #227](https://github.com/zscaler/zscaler-terraformer/pull/220). Implemented dedicated ZIA License Error Handling to skip unlicensed features during import.
+- [PR #227](https://github.com/zscaler/zscaler-terraformer/pull/227). Implemented dedicated ZIA License Error Handling to skip unlicensed features during import.
+- [PR #227](https://github.com/zscaler/zscaler-terraformer/pull/227). Fixed ZIA resource `zia_dlp_web_rules` nested attributes: `auditor`, `icap_server` and `notification_template` to ensure proper data type import as `TypeSet` instead of `TypeList`.
 
 ## 1.3.2 (August, 20 2024)
 

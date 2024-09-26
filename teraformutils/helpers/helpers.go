@@ -41,6 +41,26 @@ func IsInList(item string, list []string) bool {
 	return false
 }
 
+// TypeSetBlock generates HCL for TypeSet attributes like notification_template, auditor, icap_server.
+func TypeSetBlock(blockName string, blockData interface{}) string {
+	output := blockName + " {\n"
+	switch blockData := blockData.(type) {
+	case map[string]interface{}:
+		if id, ok := blockData["id"].(float64); ok {
+			output += fmt.Sprintf("id = %d\n", int64(id))
+		}
+	case []interface{}:
+		// If it's an array, process each item.
+		for _, item := range blockData {
+			if itemMap, ok := item.(map[string]interface{}); ok {
+				output += TypeSetBlock(blockName, itemMap)
+			}
+		}
+	}
+	output += "}\n"
+	return output
+}
+
 func Strip(s string) string {
 	var result strings.Builder
 	for i := 0; i < len(s); i++ {
