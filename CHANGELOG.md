@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.3.3 (September, 26 2024)
+
+### Notes
+
+- Release date: **(September, 26 2024)**
+- Supported Terraform version: **v1.x.x**
+
+### Bug Fixes
+- [PR #227](https://github.com/zscaler/zscaler-terraformer/pull/220). Implemented dedicated ZIA License Error Handling to skip unlicensed features during import.
+
 ## 1.3.1 (August, 13 2024)
 
 ### Notes

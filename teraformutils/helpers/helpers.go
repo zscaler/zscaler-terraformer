@@ -355,3 +355,32 @@ func ConvertAttributes(structData map[string]interface{}) {
 		delete(structData, "regions")
 	}
 }
+
+// // Helper function to check if the error is related to the custom file hash feature being disabled
+// func IsCustomFileHashDisabledError(err error) bool {
+// 	const errorMsg = "Custom File Hash feature is not enabled for your org"
+// 	return strings.Contains(err.Error(), errorMsg)
+// }
+
+type ZIAAPIErrorResponse struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// Centralized function to handle specific ZIA error codes and messages
+func HandleZIAError(responseBody []byte) (bool, string) {
+	var ziaErr ZIAAPIErrorResponse
+	if jsonErr := json.Unmarshal(responseBody, &ziaErr); jsonErr == nil {
+		// Check for specific error codes and messages
+		switch ziaErr.Code {
+		case "INVALID_INPUT_ARGUMENT":
+			if strings.Contains(ziaErr.Message, "Custom File Hash feature is not enabled for your org") {
+				return true, "Custom File Hash feature is disabled, skipping import."
+			}
+		// Add other cases here if needed in the future
+		default:
+			return false, fmt.Sprintf("Unhandled ZIA error: %s - %s", ziaErr.Code, ziaErr.Message)
+		}
+	}
+	return false, ""
+}
