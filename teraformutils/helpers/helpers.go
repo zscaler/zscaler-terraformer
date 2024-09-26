@@ -389,7 +389,7 @@ func HandleZIAError(responseBody []byte) (bool, string) {
 		switch ziaErr.Code {
 		case "INVALID_INPUT_ARGUMENT":
 			if strings.Contains(ziaErr.Message, "Custom File Hash feature is not enabled for your org") {
-				return true, "Custom File Hash feature is disabled, skipping import."
+				return true, "Custom File Hash feature is disabled, skipping import"
 			}
 		// Add other cases here if needed in the future
 		default:
