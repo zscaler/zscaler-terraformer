@@ -41,6 +41,26 @@ func IsInList(item string, list []string) bool {
 	return false
 }
 
+// TypeSetBlock generates HCL for TypeSet attributes like notification_template, auditor, icap_server.
+func TypeSetBlock(blockName string, blockData interface{}) string {
+	output := blockName + " {\n"
+	switch blockData := blockData.(type) {
+	case map[string]interface{}:
+		if id, ok := blockData["id"].(float64); ok {
+			output += fmt.Sprintf("id = %d\n", int64(id))
+		}
+	case []interface{}:
+		// If it's an array, process each item.
+		for _, item := range blockData {
+			if itemMap, ok := item.(map[string]interface{}); ok {
+				output += TypeSetBlock(blockName, itemMap)
+			}
+		}
+	}
+	output += "}\n"
+	return output
+}
+
 func Strip(s string) string {
 	var result strings.Builder
 	for i := 0; i < len(s); i++ {
@@ -354,4 +374,24 @@ func ConvertAttributes(structData map[string]interface{}) {
 		structData["region_ids"] = regionIDs
 		delete(structData, "regions")
 	}
+}
+
+type ZIAAPIErrorResponse struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+func HandleZIAError(responseBody []byte) (bool, string) {
+	var ziaErr ZIAAPIErrorResponse
+	if jsonErr := json.Unmarshal(responseBody, &ziaErr); jsonErr == nil {
+		switch ziaErr.Code {
+		case "INVALID_INPUT_ARGUMENT":
+			if strings.Contains(ziaErr.Message, "Custom File Hash feature is not enabled for your org") {
+				return true, "Custom File Hash feature is disabled, skipping import"
+			}
+		default:
+			return false, fmt.Sprintf("Unhandled ZIA error: %s - %s", ziaErr.Code, ziaErr.Message)
+		}
+	}
+	return false, ""
 }

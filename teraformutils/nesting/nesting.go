@@ -53,12 +53,21 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 	for _, block := range sortedNestedBlocks {
 		apiBlock := MapTfFieldNameToAPI(resourceType, block)
 
-		// Skip 'applications' block for 'zpa_segment_group' resource.
+		// Skip 'applications' block for 'zpa_segment_group' and `zpa_server_group` resource.
 		if (resourceType == "zpa_segment_group" || resourceType == "zpa_server_group") && block == "applications" {
 			continue // This skips the current iteration of the loop.
 		}
 
 		if block == "tcp_port_ranges" || block == "udp_port_ranges" {
+			continue
+		}
+
+		// Special handling for zia_dlp_web_rules TypeSet blocks.
+		if helpers.IsInList(resourceType, []string{"zia_dlp_web_rules"}) && helpers.IsInList(block, []string{
+			"notification_template", "auditor", "icap_server",
+		}) {
+			// Use the new TypeSetBlock helper.
+			output += helpers.TypeSetBlock(block, structData[apiBlock])
 			continue
 		}
 
@@ -148,11 +157,6 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 			"source_ip_groups",
 		}) {
 			output += helpers.ListIdsIntBlock(block, structData[MapTfFieldNameToAPI(resourceType, block)])
-			continue
-		} else if helpers.IsInList(resourceType, []string{"zia_dlp_web_rules"}) && helpers.IsInList(block, []string{
-			"notification_template",
-		}) {
-			output += helpers.ListIdsIntBlockIDExtentionsSingle(block, structData[MapTfFieldNameToAPI(resourceType, block)])
 			continue
 		} else if helpers.IsInList(resourceType, []string{"zia_firewall_filtering_rule"}) && helpers.IsInList(block, []string{"dest_ip_groups", "nw_services",
 			"departments",

@@ -141,7 +141,7 @@ var importCommand = &cobra.Command{
 	PreRun: sharedPreRun,
 }
 
-type APIError struct {
+type ZPAAPIErrorResponse struct {
 	Params []string `json:"params"`
 	ID     string   `json:"id"`
 	Reason string   `json:"reason"`
@@ -150,7 +150,7 @@ type APIError struct {
 func isLicenseError(err error) (bool, string) {
 	const licenseErrorMsg = "authz.featureflag.permission.denied"
 	if strings.Contains(err.Error(), licenseErrorMsg) {
-		apiErr := &APIError{}
+		apiErr := &ZPAAPIErrorResponse{}
 		_ = json.Unmarshal([]byte(err.Error()), apiErr)
 		return true, apiErr.Reason
 	}
@@ -970,7 +970,16 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		ziaClient := api.ZIA.SandboxSettings
 		hashes, err := sandbox_settings.Get(ziaClient)
 		if err != nil {
-			log.Fatal(err)
+			// Handle the error response body and parse it for ZIA-specific errors
+			apiErrorResponse := err.Error() // Assuming error contains response
+			shouldSkip, message := helpers.HandleZIAError([]byte(apiErrorResponse))
+			if shouldSkip {
+				log.Printf("[WARN] Skipping resource import for %s: %s", resourceType, message)
+				return
+			}
+			// If not a handled error, log it and skip gracefully
+			log.Printf("[ERROR] error occurred while fetching resource %s: %v", resourceType, err)
+			return
 		}
 		jsonPayload := []*sandbox_settings.BaAdvancedSettings{hashes}
 		m, _ := json.Marshal(jsonPayload)

@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.3.3 (September, 26 2024)
+
+### Notes
+
+- Release date: **(September, 26 2024)**
+- Supported Terraform version: **v1.x.x**
+
+### Bug Fixes
+- [PR #227](https://github.com/zscaler/zscaler-terraformer/pull/227). Implemented dedicated ZIA License Error Handling to skip unlicensed features during import.
+- [PR #227](https://github.com/zscaler/zscaler-terraformer/pull/227). Fixed ZIA resource `zia_dlp_web_rules` nested attributes: `auditor`, `icap_server` and `notification_template` to ensure proper data type import as `TypeSet` instead of `TypeList`.
+
+## 1.3.2 (August, 20 2024)
+
+### Notes
+
+- Release date: **(August, 13 2024)**
+- Supported Terraform version: **v1.x.x**
+
+### Enhancements
+- [PR #223](https://github.com/zscaler/zscaler-terraformer/pull/223). Added support to chocolatey package manager installation for Windows.
+
 ## 1.3.1 (August, 13 2024)
 
 ### Notes

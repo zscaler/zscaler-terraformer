@@ -1142,11 +1142,20 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		ziaClient := api.ZIA.SandboxSettings
 		hashes, err := sandbox_settings.Get(ziaClient)
 		if err != nil {
-			log.Fatal(err)
+			// Handle the error response body and parse it for ZIA-specific errors
+			apiErrorResponse := err.Error() // Assuming error contains response
+			shouldSkip, message := helpers.HandleZIAError([]byte(apiErrorResponse))
+			if shouldSkip {
+				log.Printf("[WARN] Skipping resource import for %s: %s", resourceType, message)
+				return
+			}
+			// If not a handled error, log it and skip gracefully
+			log.Printf("[ERROR] error occurred while fetching resource %s: %v", resourceType, err)
+			return
 		}
 		jsonPayload := []*sandbox_settings.BaAdvancedSettings{hashes}
-		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
+		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_security_settings":
 		if api.ZIA == nil {
