@@ -64,10 +64,10 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/user_authentication_settings"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appconnectorgroup"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/applicationsegment"
+	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/applicationsegmentbrowseraccess"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/applicationsegmentinspection"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/applicationsegmentpra"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appservercontroller"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/browseraccess"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/cloudbrowserisolation/cbibannercontroller"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/cloudbrowserisolation/cbicertificatecontroller"
 	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/cloudbrowserisolation/cbiprofilecontroller"
@@ -466,7 +466,7 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 			log.Fatal("ZPA client is not initialized")
 		}
 		zpaClient := api.ZPA.BrowserAccess
-		jsonPayload, _, err := browseraccess.GetAll(zpaClient)
+		jsonPayload, _, err := applicationsegmentbrowseraccess.GetAll(zpaClient)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -1381,14 +1381,14 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 					output += "  rules {\n"
 					for key, value := range rule {
 						if key == "conditions" {
-							output += "    conditions {\n"
 							for _, condition := range value.([]interface{}) {
+								output += "    conditions {\n"
 								conditionMap := condition.(map[string]interface{})
 								for condKey, condValue := range conditionMap {
 									output += nesting.WriteAttrLine(condKey, condValue, false)
 								}
+								output += "    }\n" // Close each individual conditions block
 							}
-							output += "    }\n"
 						} else {
 							output += nesting.WriteAttrLine(key, value, false)
 						}
