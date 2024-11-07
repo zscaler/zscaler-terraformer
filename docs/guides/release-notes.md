@@ -12,9 +12,19 @@ Track all Zscaler Terraformer Tool releases. New resources, features, and bug fi
 
 ---
 
-``Last updated: v1.3.4``
+``Last updated: v1.3.5``
 
 ---
+
+## 1.3.5 (November, 7 2024)
+
+### Notes
+
+- Release date: **(November, 7  2024)**
+- Supported Terraform version: **v1.x.x**
+
+### Bug Fixes
+- [PR #233](https://github.com/zscaler/zscaler-terraformer/pull/233). Applied license error handling to all ZPA privileged remote access resources.
 
 ## 1.3.4 (November, 4 2024)
 
