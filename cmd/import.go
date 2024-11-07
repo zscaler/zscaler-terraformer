@@ -403,7 +403,13 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		zpaClient := api.ZPA.PRAApproval
 		jsonPayload, _, err := praapproval.GetAll(zpaClient)
 		if err != nil {
-			log.Fatal(err)
+			isLicErr, reason := isLicenseError(err)
+			// If it's a license error, log and continue, otherwise, terminate.
+			if isLicErr {
+				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+			} else {
+				log.Fatal(err)
+			}
 		}
 		m, _ := json.Marshal(jsonPayload)
 		resourceCount = len(jsonPayload)
@@ -415,7 +421,13 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		zpaClient := api.ZPA.PRAConsole
 		jsonPayload, _, err := praconsole.GetAll(zpaClient)
 		if err != nil {
-			log.Fatal(err)
+			isLicErr, reason := isLicenseError(err)
+			// If it's a license error, log and continue, otherwise, terminate.
+			if isLicErr {
+				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+			} else {
+				log.Fatal(err)
+			}
 		}
 		m, _ := json.Marshal(jsonPayload)
 		resourceCount = len(jsonPayload)
@@ -427,7 +439,13 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		zpaClient := api.ZPA.PRACredential
 		jsonPayload, _, err := pracredential.GetAll(zpaClient)
 		if err != nil {
-			log.Fatal(err)
+			isLicErr, reason := isLicenseError(err)
+			// If it's a license error, log and continue, otherwise, terminate.
+			if isLicErr {
+				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+			} else {
+				log.Fatal(err)
+			}
 		}
 		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
@@ -440,7 +458,13 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		zpaClient := api.ZPA.PRAPortal
 		jsonPayload, _, err := praportal.GetAll(zpaClient)
 		if err != nil {
-			log.Fatal(err)
+			isLicErr, reason := isLicenseError(err)
+			// If it's a license error, log and continue, otherwise, terminate.
+			if isLicErr {
+				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+			} else {
+				log.Fatal(err)
+			}
 		}
 		m, _ := json.Marshal(jsonPayload)
 		resourceCount = len(jsonPayload)
