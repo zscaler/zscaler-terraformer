@@ -400,9 +400,11 @@ func WriteAttrLine(key string, value interface{}, usedInBlock bool) string {
 	// Handle multiline strings with Heredoc
 	if strValue, ok := value.(string); ok {
 		if strings.Contains(strValue, "\n") {
-			// Use Heredoc syntax for multiline strings
-			return fmt.Sprintf("%s = <<EOT\n%s\nEOT\n", key, strValue)
+			// Use your existing formatHeredoc function
+			return fmt.Sprintf("%s = <<EOT\n%sEOT\n", key, helpers.FormatHeredoc(strValue))
 		}
+		// Use standard string formatting for single-line strings
+		return fmt.Sprintf("%s = %q\n", key, strValue)
 	}
 
 	if key == "id" {

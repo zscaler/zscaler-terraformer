@@ -42,27 +42,6 @@ func IsInList(item string, list []string) bool {
 }
 
 // TypeSetBlock generates HCL for TypeSet attributes like notification_template, auditor, icap_server.
-// func TypeSetBlock(blockName string, blockData interface{}) string {
-// 	output := blockName + " {\n"
-// 	switch blockData := blockData.(type) {
-// 	case map[string]interface{}:
-// 		if id, ok := blockData["id"].(float64); ok {
-// 			output += fmt.Sprintf("id = %d\n", int64(id))
-// 		}
-// 	case []interface{}:
-// 		// If it's an array, process each item.
-// 		for _, item := range blockData {
-// 			if itemMap, ok := item.(map[string]interface{}); ok {
-// 				output += TypeSetBlock(blockName, itemMap)
-// 			}
-// 		}
-// 	}
-// 	output += "}\n"
-// 	return output
-// }
-
-// TypeSetBlock generates HCL for TypeSet attributes like notification_template, auditor, icap_server.
-// TypeSetBlock generates HCL for TypeSet attributes like notification_template, auditor, icap_server.
 func TypeSetBlock(blockName string, blockData interface{}) string {
 	output := ""
 
@@ -420,4 +399,18 @@ func HandleZIAError(responseBody []byte) (bool, string) {
 		}
 	}
 	return false, ""
+}
+
+func FormatHeredoc(value string) string {
+	lines := strings.Split(value, "\n")
+	formatted := ""
+	for i, line := range lines {
+		trimmedLine := strings.TrimSpace(line)
+		if trimmedLine != "" {
+			formatted += fmt.Sprintf("%s\n", trimmedLine)
+		} else if i != len(lines)-1 {
+			formatted += "\n"
+		}
+	}
+	return formatted
 }
