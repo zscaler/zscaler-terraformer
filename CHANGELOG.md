@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.3.6 (January, 5 2025)
+
+### Notes
+
+- Release date: **(January, 5 2025)**
+- Supported Terraform version: **v1.x.x**
+
+### Bug Fixes
+- [PR #244](https://github.com/zscaler/zscaler-terraformer/pull/244). Fixed ZIA import resources for: `zia_dlp_web_rules` to exclude attributes `auditor`, `icap_server`, and `notification_template`, when not populated.
+- [PR #244](https://github.com/zscaler/zscaler-terraformer/pull/244). Fixed ZIA import resources for: `zia_firewall_filtering_rule` to reformat the attribute values `dest_countries` and `source_countries` during HCL generation.
+- [PR #244](https://github.com/zscaler/zscaler-terraformer/pull/244). Upgraded tool to GO SDK v2.74.2 to fix ZPA import resource `zpa_service_edge_group`.
+
 ## 1.3.5 (November, 7 2024)
 
 ### Notes
