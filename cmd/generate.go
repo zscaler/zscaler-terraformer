@@ -1069,35 +1069,6 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		jsonStructData = append(jsonStructData, subJsonStructData...)
 
 		resourceCount += subResourceCount
-		// case "zia_url_categories":
-		// 	if api.ZIA == nil {
-		// 		log.Fatal("ZIA client is not initialized")
-		// 	}
-		// 	ziaClient := api.ZIA.URLCategories
-		// 	list, err := urlcategories.GetAll(ziaClient)
-		// 	if err != nil {
-		// 		log.Fatal(err)
-		// 	}
-		// 	items := []urlcategories.URLCategory{}
-		// 	for _, i := range list {
-		// 		if i.SuperCategory == "USER_DEFINED" ||
-		// 			i.UrlsRetainingParentCategoryCount > 0 ||
-		// 			len(i.KeywordsRetainingParentCategory) > 0 ||
-		// 			len(i.Keywords) > 0 ||
-		// 			len(i.Urls) > 0 {
-		// 			items = append(items, i)
-		// 		}
-		// 	}
-		// 	for i := range items {
-		// 		details, err := urlcategories.Get(ziaClient, items[i].ID)
-		// 		if err != nil {
-		// 			continue
-		// 		}
-		// 		items[i] = *details
-		// 	}
-		// 	resourceCount = len(items)
-		// 	m, _ := json.Marshal(items)
-		// 	_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_url_categories":
 		if api.ZIA == nil {
 			log.Fatal("ZIA client is not initialized")
@@ -1122,12 +1093,6 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 			if err != nil {
 				continue
 			}
-
-			// Apply Heredoc formatting for multiline description
-			if strings.Contains(details.Description, "\n") {
-				details.Description = helpers.FormatHeredoc(details.Description)
-			}
-
 			items[i] = *details
 		}
 		resourceCount = len(items)
@@ -1447,17 +1412,3 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 
 	fmt.Fprint(writer, output)
 }
-
-// func FormatHeredoc(value string) string {
-// 	lines := strings.Split(value, "\n")
-// 	formatted := ""
-// 	for i, line := range lines {
-// 		trimmedLine := strings.TrimSpace(line)
-// 		if trimmedLine != "" {
-// 			formatted += fmt.Sprintf("%s\n", trimmedLine)
-// 		} else if i != len(lines)-1 {
-// 			formatted += "\n"
-// 		}
-// 	}
-// 	return formatted
-// }
