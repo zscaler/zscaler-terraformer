@@ -8,13 +8,13 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/hc-install v0.9.0
 	github.com/hashicorp/terraform-exec v0.21.0
-	github.com/hashicorp/terraform-json v0.24.0
+	github.com/hashicorp/terraform-json v0.23.0
 	github.com/iancoleman/strcase v0.3.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/viper v1.19.0
-	github.com/zclconf/go-cty v1.15.1
-	github.com/zscaler/zscaler-sdk-go/v2 v2.732.0
+	github.com/zclconf/go-cty v1.15.0
+	github.com/zscaler/zscaler-sdk-go/v2 v2.74.2
 )
 
 require (
@@ -33,7 +33,7 @@ require (
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/hashicorp/logutils v1.0.0 // indirect
 	github.com/hashicorp/terraform-plugin-log v0.9.0 // indirect
-	github.com/hashicorp/terraform-plugin-sdk/v2 v2.34.0 // indirect
+	github.com/hashicorp/terraform-plugin-sdk/v2 v2.35.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect

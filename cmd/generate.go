@@ -1098,6 +1098,7 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 		resourceCount = len(items)
 		m, _ := json.Marshal(items)
 		_ = json.Unmarshal(m, &jsonStructData)
+
 	case "zia_url_filtering_rules":
 		if api.ZIA == nil {
 			log.Fatal("ZIA client is not initialized")
@@ -1340,7 +1341,7 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 						}
 					} else if resourceType == "zia_dlp_notification_templates" && helpers.IsInList(attrName, []string{"subject", "plain_text_message", "html_message"}) {
 						valueStr := strings.ReplaceAll(value.(string), "$", "$$")
-						formattedValue := formatHeredoc(valueStr)
+						formattedValue := helpers.FormatHeredoc(valueStr)
 						switch attrName {
 						case "html_message", "plain_text_message":
 							output += fmt.Sprintf("  %s = <<-EOT\n%sEOT\n\n", attrName, formattedValue)
@@ -1410,18 +1411,4 @@ func generate(cmd *cobra.Command, writer io.Writer, resourceType string) {
 	}
 
 	fmt.Fprint(writer, output)
-}
-
-func formatHeredoc(value string) string {
-	lines := strings.Split(value, "\n")
-	formatted := ""
-	for i, line := range lines {
-		trimmedLine := strings.TrimSpace(line)
-		if trimmedLine != "" {
-			formatted += fmt.Sprintf("%s\n", trimmedLine)
-		} else if i != len(lines)-1 {
-			formatted += "\n"
-		}
-	}
-	return formatted
 }

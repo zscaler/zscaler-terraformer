@@ -66,8 +66,10 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 		if helpers.IsInList(resourceType, []string{"zia_dlp_web_rules"}) && helpers.IsInList(block, []string{
 			"notification_template", "auditor", "icap_server",
 		}) {
-			// Use the new TypeSetBlock helper.
-			output += helpers.TypeSetBlock(block, structData[apiBlock])
+			blockOutput := helpers.TypeSetBlock(block, structData[apiBlock])
+			if blockOutput != "" {
+				output += blockOutput
+			}
 			continue
 		}
 
@@ -384,6 +386,27 @@ func WriteAttrLine(key string, value interface{}, usedInBlock bool) string {
 		return ""
 	}
 
+	// Handle `dest_countries` and `source_countries` for `zia_firewall_filtering_rule`
+	if helpers.IsInList(key, []string{"dest_countries", "source_countries"}) {
+		if countryList, ok := value.([]string); ok {
+			// Strip the "COUNTRY_" prefix
+			for i, country := range countryList {
+				countryList[i] = strings.TrimPrefix(country, "COUNTRY_")
+			}
+			return fmt.Sprintf("%s = [%s]\n", key, formatList(countryList))
+		}
+	}
+
+	// Handle multiline strings with Heredoc
+	if strValue, ok := value.(string); ok {
+		if strings.Contains(strValue, "\n") {
+			// Use your existing formatHeredoc function
+			return fmt.Sprintf("%s = <<EOT\n%sEOT\n", key, helpers.FormatHeredoc(strValue))
+		}
+		// Use standard string formatting for single-line strings
+		return fmt.Sprintf("%s = %q\n", key, strValue)
+	}
+
 	if key == "id" {
 		// Attempt to convert the value to an integer if it's a float.
 		if floatValue, ok := value.(float64); ok {
@@ -524,4 +547,13 @@ func MapTfFieldNameToAPI(resourceType, fieldName string) string {
 	}
 	result := strcase.ToLowerCamel(fieldName)
 	return result
+}
+
+// Helper function to format a list of strings for HCL.
+func formatList(items []string) string {
+	quotedItems := make([]string, len(items))
+	for i, item := range items {
+		quotedItems[i] = fmt.Sprintf("%q", item)
+	}
+	return strings.Join(quotedItems, ", ")
 }
