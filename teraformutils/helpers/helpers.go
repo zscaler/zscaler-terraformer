@@ -42,22 +42,48 @@ func IsInList(item string, list []string) bool {
 }
 
 // TypeSetBlock generates HCL for TypeSet attributes like notification_template, auditor, icap_server.
+// func TypeSetBlock(blockName string, blockData interface{}) string {
+// 	output := blockName + " {\n"
+// 	switch blockData := blockData.(type) {
+// 	case map[string]interface{}:
+// 		if id, ok := blockData["id"].(float64); ok {
+// 			output += fmt.Sprintf("id = %d\n", int64(id))
+// 		}
+// 	case []interface{}:
+// 		// If it's an array, process each item.
+// 		for _, item := range blockData {
+// 			if itemMap, ok := item.(map[string]interface{}); ok {
+// 				output += TypeSetBlock(blockName, itemMap)
+// 			}
+// 		}
+// 	}
+// 	output += "}\n"
+// 	return output
+// }
+
+// TypeSetBlock generates HCL for TypeSet attributes like notification_template, auditor, icap_server.
+// TypeSetBlock generates HCL for TypeSet attributes like notification_template, auditor, icap_server.
 func TypeSetBlock(blockName string, blockData interface{}) string {
-	output := blockName + " {\n"
+	output := ""
+
 	switch blockData := blockData.(type) {
 	case map[string]interface{}:
-		if id, ok := blockData["id"].(float64); ok {
-			output += fmt.Sprintf("id = %d\n", int64(id))
+		// Check if the ID exists and is valid
+		if id, ok := blockData["id"].(float64); ok && id != 0 {
+			output += fmt.Sprintf("%s {\n  id = %d\n}\n", blockName, int64(id))
 		}
 	case []interface{}:
-		// If it's an array, process each item.
+		// Process each item in the array
 		for _, item := range blockData {
 			if itemMap, ok := item.(map[string]interface{}); ok {
-				output += TypeSetBlock(blockName, itemMap)
+				nestedBlock := TypeSetBlock(blockName, itemMap)
+				if nestedBlock != "" {
+					output += nestedBlock
+				}
 			}
 		}
 	}
-	output += "}\n"
+
 	return output
 }
 
