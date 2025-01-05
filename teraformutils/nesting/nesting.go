@@ -549,7 +549,7 @@ func MapTfFieldNameToAPI(resourceType, fieldName string) string {
 	return result
 }
 
-// Helper function to format a list of strings for HCL
+// Helper function to format a list of strings for HCL.
 func formatList(items []string) string {
 	quotedItems := make([]string, len(items))
 	for i, item := range items {
