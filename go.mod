@@ -7,7 +7,7 @@ toolchain go1.23.1
 require (
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/hc-install v0.9.1
-	github.com/hashicorp/terraform-exec v0.21.0
+	github.com/hashicorp/terraform-exec v0.22.0
 	github.com/hashicorp/terraform-json v0.24.0
 	github.com/iancoleman/strcase v0.3.0
 	github.com/sirupsen/logrus v1.9.3
