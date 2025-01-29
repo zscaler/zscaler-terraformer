@@ -1,27 +1,30 @@
-// Copyright (c) 2023 Zscaler Inc, <devrel@zscaler.com>
+/*
+Copyright (c) 2023 Zscaler Inc, <devrel@zscaler.com>
 
-//                             MIT License
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
+                            MIT License
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
 
 package cmd
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"os"
@@ -32,50 +35,59 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp/dlp_engines"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp/dlp_notification_templates"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp/dlp_web_rules"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/dlp/dlpdictionaries"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/filteringrules"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/ipdestinationgroups"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/ipsourcegroups"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkapplicationgroups"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkservicegroups"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/firewallpolicies/networkservices"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/forwarding_control_policy/forwarding_rules"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/forwarding_control_policy/zpa_gateways"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/location/locationmanagement"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/rule_labels"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/sandbox/sandbox_settings"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/security_policy_settings"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/gretunnels"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/staticips"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/trafficforwarding/vpncredentials"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/urlcategories"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/urlfilteringpolicies"
-	"github.com/zscaler/zscaler-sdk-go/v2/zia/services/user_authentication_settings"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appconnectorgroup"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/applicationsegment"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/applicationsegmentbrowseraccess"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/applicationsegmentinspection"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/applicationsegmentpra"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/appservercontroller"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/cloudbrowserisolation/cbibannercontroller"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/cloudbrowserisolation/cbicertificatecontroller"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/cloudbrowserisolation/cbiprofilecontroller"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/inspectioncontrol/inspection_custom_controls"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/lssconfigcontroller"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/microtenants"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/policysetcontroller"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/privilegedremoteaccess/praapproval"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/privilegedremoteaccess/praconsole"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/privilegedremoteaccess/pracredential"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/privilegedremoteaccess/praportal"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/provisioningkey"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/segmentgroup"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/servergroup"
-	"github.com/zscaler/zscaler-sdk-go/v2/zpa/services/serviceedgegroup"
-	"github.com/zscaler/zscaler-terraformer/teraformutils/helpers"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/advanced_settings"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/advancedthreatsettings"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/dlp/dlp_engines"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/dlp/dlp_notification_templates"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/dlp/dlp_web_rules"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/dlp/dlpdictionaries"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/end_user_notification"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/filetypecontrol"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/firewalldnscontrolpolicies"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/firewallipscontrolpolicies"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/firewallpolicies/filteringrules"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/firewallpolicies/ipdestinationgroups"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/firewallpolicies/ipsourcegroups"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/firewallpolicies/networkapplicationgroups"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/firewallpolicies/networkservicegroups"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/firewallpolicies/networkservices"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/forwarding_control_policy/forwarding_rules"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/forwarding_control_policy/zpa_gateways"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/location/locationmanagement"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/malware_protection"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/rule_labels"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/sandbox/sandbox_rules"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/sandbox/sandbox_settings"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/security_policy_settings"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/sslinspection"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/trafficforwarding/gretunnels"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/trafficforwarding/staticips"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/trafficforwarding/vpncredentials"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/urlcategories"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/urlfilteringpolicies"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/user_authentication_settings"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/appconnectorgroup"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/applicationsegment"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/applicationsegmentbrowseraccess"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/applicationsegmentinspection"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/applicationsegmentpra"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/appservercontroller"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/cloudbrowserisolation/cbibannercontroller"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/cloudbrowserisolation/cbicertificatecontroller"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/cloudbrowserisolation/cbiprofilecontroller"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/inspectioncontrol/inspection_custom_controls"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/lssconfigcontroller"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/microtenants"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/policysetcontroller"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/privilegedremoteaccess/praapproval"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/privilegedremoteaccess/praconsole"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/privilegedremoteaccess/pracredential"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/privilegedremoteaccess/praportal"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/provisioningkey"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/segmentgroup"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/servergroup"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/serviceedgegroup"
+	"github.com/zscaler/zscaler-terraformer/terraformutils/helpers"
 )
 
 // resourceImportStringFormats contains a mapping of the resource type to the
@@ -128,6 +140,21 @@ var resourceImportStringFormats = map[string]string{
 	"zia_auth_settings_urls":                            ":id",
 	"zia_security_settings":                             ":id",
 	"zia_sandbox_behavioral_analysis":                   ":id",
+	"zia_sandbox_rules":                                 ":id",
+	"zia_file_type_control_rules":                       ":id",
+	"zia_ssl_inspection_rules":                          ":id",
+	"zia_firewall_dns_rule":                             ":id",
+	"zia_firewall_ips_rule":                             ":id",
+	"zia_advanced_settings":                             ":id",
+	"zia_atp_malicious_urls":                            ":id",
+	"zia_atp_security_exceptions":                       ":id",
+	"zia_advanced_threat_settings":                      ":id",
+	"zia_atp_malware_inspection":                        ":id",
+	"zia_atp_malware_protocols":                         ":id",
+	"zia_atp_malware_settings":                          ":id",
+	"zia_atp_malware_policy":                            ":id",
+	"zia_url_filtering_and_cloud_app_settings":          ":id",
+	"zia_end_user_notification":                         ":id",
 }
 
 func init() {
@@ -183,7 +210,8 @@ func runImport() func(cmd *cobra.Command, args []string) {
 				if helpers.IsInList(resourceTyp, excludedResourcesTypes) {
 					continue
 				}
-				importResource(cmd, cmd.OutOrStdout(), resourceTyp, managedResourceTypes, includedSensitiveResources)
+				importResource(cmd.Context(), cmd, cmd.OutOrStdout(), resourceTyp, managedResourceTypes, includedSensitiveResources)
+
 			}
 			if len(managedResourceTypes) > 0 {
 				fmt.Println("\033[33mThe following resources are already managed by Terraform:\033[0m")
@@ -200,7 +228,8 @@ func runImport() func(cmd *cobra.Command, args []string) {
 			}
 			return
 		}
-		importResource(cmd, cmd.OutOrStdout(), resourceType_, managedResourceTypes, includedSensitiveResources)
+		importResource(cmd.Context(), cmd, cmd.OutOrStdout(), resourceType_, managedResourceTypes, includedSensitiveResources)
+
 		if len(managedResourceTypes) > 0 {
 			fmt.Println("\033[33mThe following resources are already managed by Terraform:\033[0m")
 			for resource := range managedResourceTypes {
@@ -216,16 +245,19 @@ func runImport() func(cmd *cobra.Command, args []string) {
 		}
 	}
 }
-func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, managedResourceTypes map[string]bool, includedSensitiveResources map[string]bool) {
+
+func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourceType string, managedResourceTypes map[string]bool, includedSensitiveResources map[string]bool) {
 	var jsonStructData []interface{}
 	resourceCount := 0
 	switch resourceType {
 	case "zpa_app_connector_group":
-		if api.ZPA == nil {
-			log.Fatal("ZPA client is not initialized")
+		if api.ZPAService == nil {
+			log.Fatal("ZPA service is not initialized")
 		}
-		zpaClient := api.ZPA.AppConnectorGroup
-		list, _, err := appconnectorgroup.GetAll(zpaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZPAService
+
+		list, _, err := appconnectorgroup.GetAll(ctx, service)
 		if err != nil {
 			isLicErr, reason := isLicenseError(err)
 			// If it's a license error, log and continue, otherwise, terminate.
@@ -246,11 +278,13 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zpa_application_server":
-		if api.ZPA == nil {
-			log.Fatal("ZPA client is not initialized")
+		if api.ZPAService == nil {
+			log.Fatal("ZPA service is not initialized")
 		}
-		zpaClient := api.ZPA.AppServerController
-		jsonPayload, _, err := appservercontroller.GetAll(zpaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZPAService
+
+		jsonPayload, _, err := appservercontroller.GetAll(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -258,11 +292,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zpa_application_segment":
-		if api.ZPA == nil {
-			log.Fatal("ZPA client is not initialized")
+		if api.ZPAService == nil {
+			log.Fatal("ZPA service is not initialized")
 		}
-		zpaClient := api.ZPA.ApplicationSegment
-		jsonPayload, _, err := applicationsegment.GetAll(zpaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZPAService
+		jsonPayload, _, err := applicationsegment.GetAll(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -275,11 +310,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		}
 		resourceCount = len(jsonStructData)
 	case "zpa_application_segment_browser_access":
-		if api.ZPA == nil {
-			log.Fatal("ZPA client is not initialized")
+		if api.ZPAService == nil {
+			log.Fatal("ZPA service is not initialized")
 		}
-		zpaClient := api.ZPA.BrowserAccess
-		jsonPayload, _, err := applicationsegmentbrowseraccess.GetAll(zpaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZPAService
+		jsonPayload, _, err := applicationsegmentbrowseraccess.GetAll(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -292,11 +328,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		}
 		resourceCount = len(jsonStructData)
 	case "zpa_application_segment_inspection":
-		if api.ZPA == nil {
-			log.Fatal("ZPA client is not initialized")
+		if api.ZPAService == nil {
+			log.Fatal("ZPA service is not initialized")
 		}
-		zpaClient := api.ZPA.ApplicationSegmentInspection
-		jsonPayload, _, err := applicationsegmentinspection.GetAll(zpaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZPAService
+		jsonPayload, _, err := applicationsegmentinspection.GetAll(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -304,11 +341,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zpa_application_segment_pra":
-		if api.ZPA == nil {
-			log.Fatal("ZPA client is not initialized")
+		if api.ZPAService == nil {
+			log.Fatal("ZPA service is not initialized")
 		}
-		zpaClient := api.ZPA.ApplicationSegmentPRA
-		jsonPayload, _, err := applicationsegmentpra.GetAll(zpaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZPAService
+		jsonPayload, _, err := applicationsegmentpra.GetAll(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -316,18 +354,19 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zpa_cloud_browser_isolation_external_profile":
-		if api.ZPA == nil {
-			log.Fatal("ZPA client is not initialized")
+		if api.ZPAService == nil {
+			log.Fatal("ZPA service is not initialized")
 		}
-		zpaClient := api.ZPA.CbiExternalProfile
+		// EXACTLY like the TF pattern:
+		service := api.ZPAService
 
-		allProfiles, _, err := cbiprofilecontroller.GetAll(zpaClient)
+		allProfiles, _, err := cbiprofilecontroller.GetAll(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
 
 		for _, profile := range allProfiles {
-			profileDetails, _, err := cbiprofilecontroller.GetByNameOrID(zpaClient, profile.ID)
+			profileDetails, _, err := cbiprofilecontroller.GetByNameOrID(ctx, service, profile.ID)
 			if err != nil {
 				log.Printf("error retrieving profile %s: %v", profile.ID, err)
 				continue
@@ -341,13 +380,14 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 
 		resourceCount = len(jsonStructData)
 	case "zpa_cloud_browser_isolation_banner":
-		if api.ZPA == nil {
-			log.Fatal("ZPA client is not initialized")
+		if api.ZPAService == nil {
+			log.Fatal("ZPA service is not initialized")
 		}
-		zpaClient := api.ZPA.CbiBanner
+		// EXACTLY like the TF pattern:
+		service := api.ZPAService
 
 		// Retrieve all resources using GetAll
-		allBanners, _, err := cbibannercontroller.GetAll(zpaClient)
+		allBanners, _, err := cbibannercontroller.GetAll(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -355,7 +395,7 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		// Collect the payload data
 		for _, banner := range allBanners {
 			// Use the ID or name to get the full details of the banner
-			bannerDetails, _, err := cbibannercontroller.GetByNameOrID(zpaClient, banner.ID)
+			bannerDetails, _, err := cbibannercontroller.GetByNameOrID(ctx, service, banner.ID)
 			if err != nil {
 				log.Printf("error retrieving banner %s: %v", banner.ID, err)
 				continue
@@ -368,13 +408,14 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 
 		resourceCount = len(jsonStructData)
 	case "zpa_cloud_browser_isolation_certificate":
-		if api.ZPA == nil {
-			log.Fatal("ZPA client is not initialized")
+		if api.ZPAService == nil {
+			log.Fatal("ZPA service is not initialized")
 		}
-		zpaClient := api.ZPA.CbiCertificate
+		// EXACTLY like the TF pattern:
+		service := api.ZPAService
 
 		// Retrieve all resources using GetAll
-		allCerts, _, err := cbicertificatecontroller.GetAll(zpaClient)
+		allCerts, _, err := cbicertificatecontroller.GetAll(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -384,7 +425,7 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 			if certificate.Name == "Zscaler Root Certificate" {
 				continue
 			}
-			certDetails, _, err := cbicertificatecontroller.GetByNameOrID(zpaClient, certificate.ID)
+			certDetails, _, err := cbicertificatecontroller.GetByNameOrID(ctx, service, certificate.ID)
 			if err != nil {
 				log.Printf("error retrieving certificate %s: %v", certificate.ID, err)
 				continue
@@ -397,11 +438,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 
 		resourceCount = len(jsonStructData)
 	case "zpa_pra_approval_controller":
-		if api.ZPA == nil {
-			log.Fatal("ZPA client is not initialized")
+		if api.ZPAService == nil {
+			log.Fatal("ZPA service is not initialized")
 		}
-		zpaClient := api.ZPA.PRAApproval
-		jsonPayload, _, err := praapproval.GetAll(zpaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZPAService
+		jsonPayload, _, err := praapproval.GetAll(ctx, service)
 		if err != nil {
 			isLicErr, reason := isLicenseError(err)
 			// If it's a license error, log and continue, otherwise, terminate.
@@ -415,11 +457,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zpa_pra_console_controller":
-		if api.ZPA == nil {
-			log.Fatal("ZPA client is not initialized")
+		if api.ZPAService == nil {
+			log.Fatal("ZPA service is not initialized")
 		}
-		zpaClient := api.ZPA.PRAConsole
-		jsonPayload, _, err := praconsole.GetAll(zpaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZPAService
+		jsonPayload, _, err := praconsole.GetAll(ctx, service)
 		if err != nil {
 			isLicErr, reason := isLicenseError(err)
 			// If it's a license error, log and continue, otherwise, terminate.
@@ -433,11 +476,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zpa_pra_credential_controller":
-		if api.ZPA == nil {
-			log.Fatal("ZPA client is not initialized")
+		if api.ZPAService == nil {
+			log.Fatal("ZPA service is not initialized")
 		}
-		zpaClient := api.ZPA.PRACredential
-		jsonPayload, _, err := pracredential.GetAll(zpaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZPAService
+		jsonPayload, _, err := pracredential.GetAll(ctx, service)
 		if err != nil {
 			isLicErr, reason := isLicenseError(err)
 			// If it's a license error, log and continue, otherwise, terminate.
@@ -452,11 +496,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		_ = json.Unmarshal(m, &jsonStructData)
 		includedSensitiveResources[resourceType] = true
 	case "zpa_pra_portal_controller":
-		if api.ZPA == nil {
-			log.Fatal("ZPA client is not initialized")
+		if api.ZPAService == nil {
+			log.Fatal("ZPA service is not initialized")
 		}
-		zpaClient := api.ZPA.PRAPortal
-		jsonPayload, _, err := praportal.GetAll(zpaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZPAService
+		jsonPayload, _, err := praportal.GetAll(ctx, service)
 		if err != nil {
 			isLicErr, reason := isLicenseError(err)
 			// If it's a license error, log and continue, otherwise, terminate.
@@ -470,11 +515,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zpa_segment_group":
-		if api.ZPA == nil {
-			log.Fatal("ZPA client is not initialized")
+		if api.ZPAService == nil {
+			log.Fatal("ZPA service is not initialized")
 		}
-		zpaClient := api.ZPA.SegmentGroup
-		list, _, err := segmentgroup.GetAll(zpaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZPAService
+		list, _, err := segmentgroup.GetAll(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -489,11 +535,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zpa_server_group":
-		if api.ZPA == nil {
-			log.Fatal("ZPA client is not initialized")
+		if api.ZPAService == nil {
+			log.Fatal("ZPA service is not initialized")
 		}
-		zpaClient := api.ZPA.ServerGroup
-		list, _, err := servergroup.GetAll(zpaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZPAService
+		list, _, err := servergroup.GetAll(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -508,11 +555,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zpa_policy_access_rule":
-		if api.ZPA == nil {
-			log.Fatal("ZPA client is not initialized")
+		if api.ZPAService == nil {
+			log.Fatal("ZPA service is not initialized")
 		}
-		zpaClient := api.ZPA.PolicySetController
-		list, _, err := policysetcontroller.GetAllByType(zpaClient, "ACCESS_POLICY")
+		// EXACTLY like the TF pattern:
+		service := api.ZPAService
+		list, _, err := policysetcontroller.GetAllByType(ctx, service, "ACCESS_POLICY")
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -527,11 +575,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zpa_policy_timeout_rule":
-		if api.ZPA == nil {
-			log.Fatal("ZPA client is not initialized")
+		if api.ZPAService == nil {
+			log.Fatal("ZPA service is not initialized")
 		}
-		zpaClient := api.ZPA.PolicySetController
-		list, _, err := policysetcontroller.GetAllByType(zpaClient, "TIMEOUT_POLICY")
+		// EXACTLY like the TF pattern:
+		service := api.ZPAService
+		list, _, err := policysetcontroller.GetAllByType(ctx, service, "TIMEOUT_POLICY")
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -546,11 +595,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zpa_policy_forwarding_rule":
-		if api.ZPA == nil {
-			log.Fatal("ZPA client is not initialized")
+		if api.ZPAService == nil {
+			log.Fatal("ZPA service is not initialized")
 		}
-		zpaClient := api.ZPA.PolicySetController
-		list, _, err := policysetcontroller.GetAllByType(zpaClient, "CLIENT_FORWARDING_POLICY")
+		// EXACTLY like the TF pattern:
+		service := api.ZPAService
+		list, _, err := policysetcontroller.GetAllByType(ctx, service, "CLIENT_FORWARDING_POLICY")
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -565,11 +615,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zpa_policy_inspection_rule":
-		if api.ZPA == nil {
-			log.Fatal("ZPA client is not initialized")
+		if api.ZPAService == nil {
+			log.Fatal("ZPA service is not initialized")
 		}
-		zpaClient := api.ZPA.PolicySetController
-		list, _, err := policysetcontroller.GetAllByType(zpaClient, "INSPECTION_POLICY")
+		// EXACTLY like the TF pattern:
+		service := api.ZPAService
+		list, _, err := policysetcontroller.GetAllByType(ctx, service, "INSPECTION_POLICY")
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -584,11 +635,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zpa_policy_isolation_rule":
-		if api.ZPA == nil {
-			log.Fatal("ZPA client is not initialized")
+		if api.ZPAService == nil {
+			log.Fatal("ZPA service is not initialized")
 		}
-		zpaClient := api.ZPA.PolicySetController
-		list, _, err := policysetcontroller.GetAllByType(zpaClient, "ISOLATION_POLICY")
+		// EXACTLY like the TF pattern:
+		service := api.ZPAService
+		list, _, err := policysetcontroller.GetAllByType(ctx, service, "ISOLATION_POLICY")
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -603,11 +655,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zpa_provisioning_key":
-		if api.ZPA == nil {
-			log.Fatal("ZPA client is not initialized")
+		if api.ZPAService == nil {
+			log.Fatal("ZPA service is not initialized")
 		}
-		zpaClient := api.ZPA.ProvisioningKey
-		jsonPayload, err := provisioningkey.GetAll(zpaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZPAService
+		jsonPayload, err := provisioningkey.GetAll(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -615,11 +668,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zpa_service_edge_group":
-		if api.ZPA == nil {
-			log.Fatal("ZPA client is not initialized")
+		if api.ZPAService == nil {
+			log.Fatal("ZPA service is not initialized")
 		}
-		zpaClient := api.ZPA.ServiceEdgeGroup
-		edgeGroups, _, err := serviceedgegroup.GetAll(zpaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZPAService
+		edgeGroups, _, err := serviceedgegroup.GetAll(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -635,11 +689,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		m, _ := json.Marshal(edgeGroups)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zpa_lss_config_controller":
-		if api.ZPA == nil {
-			log.Fatal("ZPA client is not initialized")
+		if api.ZPAService == nil {
+			log.Fatal("ZPA service is not initialized")
 		}
-		zpaClient := api.ZPA.LSSConfigController
-		jsonPayload, _, err := lssconfigcontroller.GetAll(zpaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZPAService
+		jsonPayload, _, err := lssconfigcontroller.GetAll(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -647,11 +702,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zpa_inspection_custom_controls":
-		if api.ZPA == nil {
-			log.Fatal("ZPA client is not initialized")
+		if api.ZPAService == nil {
+			log.Fatal("ZPA service is not initialized")
 		}
-		zpaClient := api.ZPA.InspectionCustomControls
-		jsonPayload, _, err := inspection_custom_controls.GetAll(zpaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZPAService
+		jsonPayload, _, err := inspection_custom_controls.GetAll(ctx, service)
 		if err != nil {
 			isLicErr, reason := isLicenseError(err)
 			// If it's a license error, log and continue, otherwise, terminate.
@@ -665,11 +721,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zpa_microtenant_controller":
-		if api.ZPA == nil {
-			log.Fatal("ZPA client is not initialized")
+		if api.ZPAService == nil {
+			log.Fatal("ZPA service is not initialized")
 		}
-		zpaClient := api.ZPA.MicroTenants
-		jsonPayload, _, err := microtenants.GetAll(zpaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZPAService
+		jsonPayload, _, err := microtenants.GetAll(ctx, service)
 		if err != nil {
 			isLicErr, reason := isLicenseError(err)
 			// If it's a license error, log and continue, otherwise, terminate.
@@ -689,11 +746,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(filteredPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_dlp_dictionaries":
-		if api.ZIA == nil {
-			log.Fatal("ZIA client is not initialized")
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
 		}
-		ziaClient := api.ZIA.DLPDictionaries
-		list, err := dlpdictionaries.GetAll(ziaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		list, err := dlpdictionaries.GetAll(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -708,11 +766,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_dlp_engines":
-		if api.ZIA == nil {
-			log.Fatal("ZIA client is not initialized")
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
 		}
-		ziaClient := api.ZIA.DLPEngines
-		list, err := dlp_engines.GetAll(ziaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		list, err := dlp_engines.GetAll(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -727,11 +786,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_dlp_notification_templates":
-		if api.ZIA == nil {
-			log.Fatal("ZIA client is not initialized")
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
 		}
-		ziaClient := api.ZIA.DLPNotificationTemplates
-		jsonPayload, err := dlp_notification_templates.GetAll(ziaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		jsonPayload, err := dlp_notification_templates.GetAll(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -739,11 +799,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_dlp_web_rules":
-		if api.ZIA == nil {
-			log.Fatal("ZIA client is not initialized")
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
 		}
-		ziaClient := api.ZIA.DLPWebRules
-		jsonPayload, err := dlp_web_rules.GetAll(ziaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		jsonPayload, err := dlp_web_rules.GetAll(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -751,11 +812,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_firewall_filtering_rule":
-		if api.ZIA == nil {
-			log.Fatal("ZIA client is not initialized")
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
 		}
-		ziaClient := api.ZIA.FilteringRules
-		rules, err := filteringrules.GetAll(ziaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		rules, err := filteringrules.GetAll(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -770,11 +832,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(rulesFiltered)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_firewall_filtering_destination_groups":
-		if api.ZIA == nil {
-			log.Fatal("ZIA client is not initialized")
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
 		}
-		ziaClient := api.ZIA.IPDestinationGroups
-		groups, err := ipdestinationgroups.GetAll(ziaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		groups, err := ipdestinationgroups.GetAll(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -789,11 +852,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(groupsFiltered)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_firewall_filtering_ip_source_groups":
-		if api.ZIA == nil {
-			log.Fatal("ZIA client is not initialized")
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
 		}
-		ziaClient := api.ZIA.IPSourceGroups
-		groups, err := ipsourcegroups.GetAll(ziaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		groups, err := ipsourcegroups.GetAll(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -808,11 +872,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(groupsFiltered)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_firewall_filtering_network_service":
-		if api.ZIA == nil {
-			log.Fatal("ZIA client is not initialized")
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
 		}
-		ziaClient := api.ZIA.NetworkServices
-		services, err := networkservices.GetAllNetworkServices(ziaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		services, err := networkservices.GetAllNetworkServices(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -827,11 +892,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(servicesFiltered)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_firewall_filtering_network_service_groups":
-		if api.ZIA == nil {
-			log.Fatal("ZIA client is not initialized")
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
 		}
-		ziaClient := api.ZIA.NetworkServiceGroups
-		jsonPayload, err := networkservicegroups.GetAllNetworkServiceGroups(ziaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		jsonPayload, err := networkservicegroups.GetAllNetworkServiceGroups(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -839,11 +905,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_firewall_filtering_network_application_groups":
-		if api.ZIA == nil {
-			log.Fatal("ZIA client is not initialized")
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
 		}
-		ziaClient := api.ZIA.NetworkApplicationGroups
-		groups, err := networkapplicationgroups.GetAllNetworkApplicationGroups(ziaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		groups, err := networkapplicationgroups.GetAllNetworkApplicationGroups(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -858,11 +925,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(groupsFiltered)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_traffic_forwarding_gre_tunnel":
-		if api.ZIA == nil {
-			log.Fatal("ZIA client is not initialized")
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
 		}
-		ziaClient := api.ZIA.GRETunnels
-		jsonPayload, err := gretunnels.GetAll(ziaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		jsonPayload, err := gretunnels.GetAll(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -870,11 +938,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_traffic_forwarding_static_ip":
-		if api.ZIA == nil {
-			log.Fatal("ZIA client is not initialized")
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
 		}
-		ziaClient := api.ZIA.StaticIPs
-		jsonPayload, err := staticips.GetAll(ziaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		jsonPayload, err := staticips.GetAll(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -882,11 +951,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_traffic_forwarding_vpn_credentials":
-		if api.ZIA == nil {
-			log.Fatal("ZIA client is not initialized")
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
 		}
-		ziaClient := api.ZIA.VPNCredentials
-		jsonPayload, err := vpncredentials.GetAll(ziaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		jsonPayload, err := vpncredentials.GetAll(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -894,12 +964,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_location_management":
-		if api.ZIA == nil {
-			log.Fatal("ZIA client is not initialized")
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
 		}
-		ziaClient := api.ZIA.LocationManagement
-		// Get all parent locations
-		jsonPayload, err := locationmanagement.GetAll(ziaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		jsonPayload, err := locationmanagement.GetAll(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -908,7 +978,7 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		_ = json.Unmarshal(m, &jsonStructData)
 
 		// Get all sublocations
-		sublocationsPayload, err := locationmanagement.GetAllSublocations(ziaClient)
+		sublocationsPayload, err := locationmanagement.GetAllSublocations(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -922,11 +992,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 
 		resourceCount += subResourceCount
 	case "zia_url_categories":
-		if api.ZIA == nil {
-			log.Fatal("ZIA client is not initialized")
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
 		}
-		ziaClient := api.ZIA.URLCategories
-		list, err := urlcategories.GetAll(ziaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		list, err := urlcategories.GetAll(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -941,7 +1012,7 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 			}
 		}
 		for i := range items {
-			details, err := urlcategories.Get(ziaClient, items[i].ID)
+			details, err := urlcategories.Get(ctx, service, items[i].ID)
 			if err != nil {
 				continue
 			}
@@ -951,11 +1022,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(items)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_url_filtering_rules":
-		if api.ZIA == nil {
-			log.Fatal("ZIA client is not initialized")
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
 		}
-		ziaClient := api.ZIA.URLFilteringPolicies
-		jsonPayload, err := urlfilteringpolicies.GetAll(ziaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		jsonPayload, err := urlfilteringpolicies.GetAll(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -963,11 +1035,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_rule_labels":
-		if api.ZIA == nil {
-			log.Fatal("ZIA client is not initialized")
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
 		}
-		ziaClient := api.ZIA.RuleLabels
-		jsonPayload, err := rule_labels.GetAll(ziaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		jsonPayload, err := rule_labels.GetAll(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -975,11 +1048,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_auth_settings_urls":
-		if api.ZIA == nil {
-			log.Fatal("ZIA client is not initialized")
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
 		}
-		ziaClient := api.ZIA.UserAuthenticationSettings
-		exemptedUrls, err := user_authentication_settings.Get(ziaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		exemptedUrls, err := user_authentication_settings.Get(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -988,11 +1062,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_sandbox_behavioral_analysis":
-		if api.ZIA == nil {
-			log.Fatal("ZIA client is not initialized")
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
 		}
-		ziaClient := api.ZIA.SandboxSettings
-		hashes, err := sandbox_settings.Get(ziaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		hashes, err := sandbox_settings.Get(ctx, service)
 		if err != nil {
 			// Handle the error response body and parse it for ZIA-specific errors
 			apiErrorResponse := err.Error() // Assuming error contains response
@@ -1010,11 +1085,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_security_settings":
-		if api.ZIA == nil {
-			log.Fatal("ZIA client is not initialized")
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
 		}
-		ziaClient := api.ZIA.SecurityPolicySettings
-		urls, err := security_policy_settings.GetListUrls(ziaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		urls, err := security_policy_settings.GetListUrls(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -1023,11 +1099,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_forwarding_control_rule":
-		if api.ZIA == nil {
-			log.Fatal("ZIA client is not initialized")
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
 		}
-		ziaClient := api.ZIA.ForwardingRules
-		rules, err := forwarding_rules.GetAll(ziaClient)
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		rules, err := forwarding_rules.GetAll(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -1046,11 +1123,12 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		resourceCount = len(rulesFiltered)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_forwarding_control_zpa_gateway":
-		if api.ZIA == nil {
-			log.Fatal("ZIA client is not initialized")
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
 		}
-		ziaClient := api.ZIA.ZpaGateways
-		gws, err := ziaClient.GetAll()
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		gws, err := zpa_gateways.GetAll(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -1064,6 +1142,289 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 		m, _ := json.Marshal(gwsFiltered)
 		resourceCount = len(gwsFiltered)
 		_ = json.Unmarshal(m, &jsonStructData)
+	case "zia_sandbox_rules":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		jsonPayload, err := sandbox_rules.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zia_ssl_inspection_rules":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		rules, err := sslinspection.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		rulesFiltered := []sslinspection.SSLInspectionRules{}
+		for _, rule := range rules {
+			if helpers.IsInList(rule.Name, []string{
+				"Office365 Inspection", "Zscaler Recommended Exemptions", "Inspect Remote Users",
+				"Office 365 One Click", "UCaaS One Click", "Default SSL Inspection Rule"}) {
+				continue
+			}
+			rulesFiltered = append(rulesFiltered, rule)
+		}
+		resourceCount = len(rulesFiltered)
+		m, _ := json.Marshal(rulesFiltered)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zia_file_type_control_rules":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		jsonPayload, err := filetypecontrol.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zia_firewall_ips_rule":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		rules, err := firewallipscontrolpolicies.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		rulesFiltered := []firewallipscontrolpolicies.FirewallIPSRules{}
+		for _, rule := range rules {
+			if helpers.IsInList(rule.Name, []string{"Default Cloud IPS Rule"}) {
+				continue
+			}
+			rulesFiltered = append(rulesFiltered, rule)
+		}
+		resourceCount = len(rulesFiltered)
+		m, _ := json.Marshal(rulesFiltered)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zia_firewall_dns_rule":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		rules, err := firewalldnscontrolpolicies.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		rulesFiltered := []firewalldnscontrolpolicies.FirewallDNSRules{}
+		for _, rule := range rules {
+			if helpers.IsInList(rule.Name, []string{"ZPA Resolver for Road Warrior",
+				"ZPA Resolver for Locations", "Critical risk DNS categories", "Critical risk DNS tunnels",
+				"High risk DNS categories", "High risk DNS tunnels", "Risky DNS categories",
+				"Risky DNS tunnels", "Office 365 One Click Rule", "Block DNS Tunnels",
+				"Block Filesharing DNS", "Block Gaming DNS", "UCaaS One Click Rule",
+				"Fallback ZPA Resolver for Locations", "Fallback ZPA Resolver for Road Warrior", "Unknown DNS Traffic",
+				"Default Firewall DNS Rule"}) {
+				continue
+			}
+			rulesFiltered = append(rulesFiltered, rule)
+		}
+		resourceCount = len(rulesFiltered)
+		m, _ := json.Marshal(rulesFiltered)
+		_ = json.Unmarshal(m, &jsonStructData)
+
+	case "zia_advanced_settings":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		advSettings, err := advanced_settings.GetAdvancedSettings(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		jsonPayload := []*advanced_settings.AdvancedSettings{advSettings}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+		// Force the "id" to be "advanced_settings"
+		if len(jsonStructData) > 0 {
+			dataMap := jsonStructData[0].(map[string]interface{})
+			dataMap["id"] = "advanced_settings"
+		}
+
+	case "zia_atp_malicious_urls":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		urls, err := advancedthreatsettings.GetMaliciousURLs(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		jsonPayload := []*advancedthreatsettings.MaliciousURLs{urls}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+		if len(jsonStructData) > 0 {
+			dataMap := jsonStructData[0].(map[string]interface{})
+			dataMap["id"] = "all_urls"
+		}
+
+	case "zia_atp_security_exceptions":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		urls, err := advancedthreatsettings.GetSecurityExceptions(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		jsonPayload := []*advancedthreatsettings.SecurityExceptions{urls}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+		if len(jsonStructData) > 0 {
+			dataMap := jsonStructData[0].(map[string]interface{})
+			dataMap["id"] = "bypass_url"
+		}
+
+	case "zia_advanced_threat_settings":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		urls, err := advancedthreatsettings.GetAdvancedThreatSettings(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		jsonPayload := []*advancedthreatsettings.AdvancedThreatSettings{urls}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+		if len(jsonStructData) > 0 {
+			dataMap := jsonStructData[0].(map[string]interface{})
+			dataMap["id"] = "advanced_threat_settings"
+		}
+
+	case "zia_atp_malware_inspection":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		urls, err := malware_protection.GetATPMalwareInspection(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		jsonPayload := []*malware_protection.ATPMalwareInspection{urls}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+		if len(jsonStructData) > 0 {
+			dataMap := jsonStructData[0].(map[string]interface{})
+			dataMap["id"] = "inspection"
+		}
+
+	case "zia_atp_malware_protocols":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		urls, err := malware_protection.GetATPMalwareProtocols(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		jsonPayload := []*malware_protection.ATPMalwareProtocols{urls}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+		if len(jsonStructData) > 0 {
+			dataMap := jsonStructData[0].(map[string]interface{})
+			dataMap["id"] = "protocol"
+		}
+
+	case "zia_atp_malware_settings":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		urls, err := malware_protection.GetATPMalwareSettings(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		jsonPayload := []*malware_protection.MalwareSettings{urls}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+		if len(jsonStructData) > 0 {
+			dataMap := jsonStructData[0].(map[string]interface{})
+			dataMap["id"] = "malware_settings"
+		}
+
+	case "zia_atp_malware_policy":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		urls, err := malware_protection.GetATPMalwarePolicy(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		jsonPayload := []*malware_protection.MalwarePolicy{urls}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+		if len(jsonStructData) > 0 {
+			dataMap := jsonStructData[0].(map[string]interface{})
+			dataMap["id"] = "policy"
+		}
+	case "zia_url_filtering_and_cloud_app_settings":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		urls, err := urlfilteringpolicies.GetUrlAndAppSettings(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		jsonPayload := []*urlfilteringpolicies.URLAdvancedPolicySettings{urls}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+		if len(jsonStructData) > 0 {
+			dataMap := jsonStructData[0].(map[string]interface{})
+			dataMap["id"] = "app_setting"
+		}
+	case "zia_end_user_notification":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		notification, err := end_user_notification.GetUserNotificationSettings(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		jsonPayload := []*end_user_notification.UserNotificationSettings{notification}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+		if len(jsonStructData) > 0 {
+			dataMap := jsonStructData[0].(map[string]interface{})
+			dataMap["id"] = "enduser_notification"
+		}
 	default:
 		log.Printf("%q is not yet supported for state import", resourceType)
 		return
@@ -1078,7 +1439,7 @@ func importResource(cmd *cobra.Command, writer io.Writer, resourceType string, m
 	if err != nil {
 		log.Fatal(err)
 	}
-	generate(cmd, f, resourceType)
+	generate(ctx, cmd, f, resourceType)
 	// Ensure the file is closed and check for errors when closing
 	if err := f.Close(); err != nil {
 		log.Fatalf("failed to close file: %v", err)
