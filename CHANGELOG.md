@@ -1,5 +1,40 @@
 # Changelog
 
+## 2.0.0 (January, 29 2025) - BREAKING CHANGES
+
+### Notes
+
+- Release date: **(January, 29 2025)**
+- Supported Terraform version: **v1.x**
+
+#### Enhancements - Zscaler OneAPI Support
+
+[PR #252](https://github.com/zscaler/zscaler-terraformer/pull/252): The ZIA Terraform Provider now offers support for [OneAPI](https://help.zscaler.com/oneapi/understanding-oneapi) Oauth2 authentication through [Zidentity](https://help.zscaler.com/zidentity/what-zidentity).
+
+**NOTE** As of version v2.0.0, Zscaler-Terraformer offers backwards compatibility to the Zscaler legacy API framework. This is the recommended authentication method for organizations whose tenants are still not migrated to [Zidentity](https://help.zscaler.com/zidentity/what-zidentity).
+
+**NOTE** Notice that OneAPI and Zidentity is NOT currently supported for the following ZIA and ZPA clouds respectively: `zscalergov` and `zscalerten` or `GOV` and `GOVUS`. Refer to the [Legacy API Framework](#legacy-api-framework) for more information on how authenticate to these environments
+
+### NEW - RESOURCES, DATA SOURCES
+
+[PR #252](https://github.com/zscaler/zscaler-terraformer/pull/252): The following new resources and data sources have been introduced:
+
+- Added resource ``zia_sandbox_rules`` [PR #252](https://github.com/zscaler/zscaler-terraformer/pull/252) :rocket: - Manage Sandbox Rules
+- Added resource ``zia_firewall_dns_rule``[PR #252](https://github.com/zscaler/zscaler-terraformer/pull/252) :rocket: - Manage Cloud Firewall DNS Rules
+- Added resource ``zia_firewall_ips_rule`` [PR #252](https://github.com/zscaler/zscaler-terraformer/pull/252) :rocket: - Manage Cloud Firewall IPS Rules
+- Added resource ``zia_file_type_control_rules`` [PR #252](https://github.com/zscaler/zscaler-terraformer/pull/252) :rocket: - Manage File Type Control Rules
+- Added resource ``zia_advanced_threat_settings`` [PR #252](https://github.com/zscaler/zscaler-terraformer/pull/252) :rocket: - Manages advanced threat configuration settings
+- Added resource ``zia_atp_malicious_urls`` [PR #252](https://github.com/zscaler/zscaler-terraformer/pull/252) :rocket: - Manages malicious URLs added to the denylist in ATP policy
+- Added resource ``zia_atp_security_exceptions`` [PR #252](https://github.com/zscaler/zscaler-terraformer/pull/252) :rocket: - Manages Security Exceptions (URL Bypass List) for the ATP policy
+- Added resource ``zia_advanced_settings`` [PR #252](https://github.com/zscaler/zscaler-terraformer/pull/252) :rocket: - Manages Advanced Settings configuration. [Configuring Advanced Settings](https://help.zscaler.com/zia/configuring-advanced-settings)
+- Added resource ``zia_atp_malware_inspection`` [PR #252](https://github.com/zscaler/zscaler-terraformer/pull/252) :rocket: - Manages Advanced Threat Protection Malware Inspection configuration. [Malware Protection](https://help.zscaler.com/zia/policies/malware-protection)
+- Added resource ``zia_atp_malware_protocols`` [PR #252](https://github.com/zscaler/zscaler-terraformer/pull/252) :rocket: - Manages Advanced Threat Protection Malware Protocols configuration. [Malware Protection](https://help.zscaler.com/zia/policies/malware-protection)
+- Added and resource ``zia_atp_malware_settings`` [PR #252](https://github.com/zscaler/zscaler-terraformer/pull/252) :rocket: - Manages Advanced Threat Protection Malware Settings. [Malware Protection](https://help.zscaler.com/zia/policies/malware-protection)
+- Added and resource ``zia_atp_malware_policy`` [PR #252](https://github.com/zscaler/zscaler-terraformer/pull/252) :rocket: - Manages Advanced Threat Protection Malware Policy. [Malware Protection](https://help.zscaler.com/zia/policies/malware-protection)
+- Added resource ``zia_end_user_notification`` [PR #252](https://github.com/zscaler/zscaler-terraformer/pull/252) :rocket: - Retrieves information of browser-based end user notification (EUN) configuration details.[Understanding Browser-Based End User Notifications](https://help.zscaler.com/zia/understanding-browser-based-end-user-notifications)
+- Added resource ``zia_url_filtering_and_cloud_app_settings`` [PR #252](https://github.com/zscaler/zscaler-terraformer/pull/252) :rocket: - Manages the URL and Cloud App Control advanced policy settings.[Configuring Advanced Policy Settings](https://help.zscaler.com/zia/configuring-advanced-policy-settings)
+- Added resource ``zia_ssl_inspection_rules`` [PR #252](https://github.com/zscaler/zscaler-terraformer/pull/252) :rocket: - Manages SSL Inspection Rules.
+
 ## 1.3.6 (January, 5 2025)
 
 ### Notes

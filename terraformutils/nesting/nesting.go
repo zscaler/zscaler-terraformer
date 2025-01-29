@@ -163,7 +163,7 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 			}
 			output += "}\n"
 			continue
-		} else if helpers.IsInList(resourceType, []string{"zia_firewall_filtering_network_service_groups", "zia_firewall_filtering_rule", "zia_url_filtering_rules", "zia_dlp_web_rules", "zia_ssl_inspection_rules", "zia_firewall_dns_rule", "zia_firewall_ips_rule", "zia_file_type_control_rules", "zia_cloud_app_control_rule"}) && helpers.IsInList(block, []string{"departments",
+		} else if helpers.IsInList(resourceType, []string{"zia_firewall_filtering_network_service_groups", "zia_firewall_filtering_rule", "zia_url_filtering_rules", "zia_dlp_web_rules", "zia_ssl_inspection_rules", "zia_firewall_dns_rule", "zia_firewall_ips_rule", "zia_file_type_control_rules"}) && helpers.IsInList(block, []string{"departments",
 			"groups",
 			"locations",
 			"dlp_engines",

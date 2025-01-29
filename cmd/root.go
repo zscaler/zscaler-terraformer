@@ -130,10 +130,10 @@ var allSupportedResources = []string{
 	"zia_firewall_dns_rule",
 	"zia_firewall_ips_rule",
 	"zia_advanced_settings",
+	"zia_advanced_threat_settings",
 	"zia_atp_malicious_urls",
 	"zia_end_user_notification",
 	"zia_url_filtering_and_cloud_app_settings",
-	"zia_cloud_app_control_rule",
 }
 
 // rootCmd represents the base command when called without any subcommands.

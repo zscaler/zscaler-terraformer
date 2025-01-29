@@ -165,7 +165,6 @@ var allGeneratableResources = []string{
 	"zia_atp_malicious_urls",
 	"zia_url_filtering_and_cloud_app_settings",
 	"zia_end_user_notification",
-	"zia_cloud_app_control_rule",
 }
 
 func init() {
@@ -1379,19 +1378,6 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		}
 		resourceCount = len(gwsFiltered)
 		m, _ := json.Marshal(gwsFiltered)
-		_ = json.Unmarshal(m, &jsonStructData)
-	case "zia_cloud_app_control_rule":
-		if api.ZIAService == nil {
-			log.Fatal("ZIA service is not initialized")
-		}
-		// EXACTLY like the TF pattern:
-		service := api.ZIAService
-		jsonPayload, err := cloudappcontrol.GetByRuleType(ctx, service)
-		if err != nil {
-			log.Fatal(err)
-		}
-		resourceCount = len(jsonPayload)
-		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_sandbox_rules":
 		if api.ZIAService == nil {
