@@ -233,7 +233,7 @@ func zscalerSDKV2Client(c *Config) (*zscaler.Service, error) {
 	if c.httpProxy != "" {
 		parsedURL, err := url.Parse(c.httpProxy)
 		if err != nil {
-			return nil, fmt.Errorf("invalid proxy URL: %v", err)
+			return nil, fmt.Errorf("invalid proxy URL: %w", err)
 		}
 		setters = append(setters, zia.WithProxyHost(parsedURL.Hostname()))
 
@@ -243,7 +243,7 @@ func zscalerSDKV2Client(c *Config) (*zscaler.Service, error) {
 		}
 		port64, err := strconv.ParseInt(sPort, 10, 32)
 		if err != nil {
-			return nil, fmt.Errorf("invalid proxy port: %v", err)
+			return nil, fmt.Errorf("invalid proxy port: %w", err)
 		}
 		if port64 < 1 || port64 > 65535 {
 			return nil, fmt.Errorf("invalid port number: must be between 1 and 65535, got: %d", port64)
@@ -253,14 +253,14 @@ func zscalerSDKV2Client(c *Config) (*zscaler.Service, error) {
 
 	ziaCfg, err := zia.NewConfiguration(setters...)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create ZIA V2 configuration: %v", err)
+		return nil, fmt.Errorf("failed to create ZIA V2 configuration: %w", err)
 	}
 	ziaCfg.UserAgent = customUserAgent
 
 	// Now wrap it in a zscaler.Service so usage is uniform.
 	wrappedV2Client, err := zscaler.NewLegacyZiaClient(ziaCfg)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create legacy ZIA client: %v", err)
+		return nil, fmt.Errorf("failed to create legacy ZIA client: %w", err)
 	}
 
 	log.Println("[INFO] Successfully initialized ZIA V2 client")
@@ -283,7 +283,7 @@ func zscalerSDKV3Client(c *Config) (*zscaler.Client, error) {
 	if c.httpProxy != "" {
 		parsedURL, err := url.Parse(c.httpProxy)
 		if err != nil {
-			return nil, fmt.Errorf("invalid proxy URL: %v", err)
+			return nil, fmt.Errorf("invalid proxy URL: %w", err)
 		}
 		setters = append(setters, zscaler.WithProxyHost(parsedURL.Hostname()))
 
@@ -293,7 +293,7 @@ func zscalerSDKV3Client(c *Config) (*zscaler.Client, error) {
 		}
 		port64, err := strconv.ParseInt(sPort, 10, 32)
 		if err != nil {
-			return nil, fmt.Errorf("invalid proxy port: %v", err)
+			return nil, fmt.Errorf("invalid proxy port: %w", err)
 		}
 		if port64 < 1 || port64 > 65535 {
 			return nil, fmt.Errorf("invalid port number: %d", port64)
@@ -333,14 +333,14 @@ func zscalerSDKV3Client(c *Config) (*zscaler.Client, error) {
 
 	conf, err := zscaler.NewConfiguration(setters...)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create V3 configuration: %v", err)
+		return nil, fmt.Errorf("failed to create V3 configuration: %w", err)
 	}
 	conf.UserAgent = customUserAgent
 
 	// Build the client.
 	v3Client, err := zscaler.NewOneAPIClient(conf)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create Zscaler OneAPI client: %v", err)
+		return nil, fmt.Errorf("failed to create Zscaler OneAPI client: %w", err)
 	}
 
 	log.Println("[INFO] Successfully initialized ZIA V3 client")

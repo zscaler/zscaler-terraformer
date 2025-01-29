@@ -40,7 +40,7 @@ import (
 var log = logrus.New()
 var terraformInstallPath string
 
-// ONEAPI Fields
+// ONEAPI Fields.
 var oneAPIClientID string      // required
 var oneAPIClientSecret string  // required
 var oneAPIVanityDomain string  // required
@@ -48,14 +48,14 @@ var oneAPICustomerID string    // optional
 var oneAPIMicrotenantID string // optional
 var oneAPICloud string         // optional
 
-// ZPA Legacy Fields
+// ZPA Legacy Fields.
 var zpaClientID string      // required
 var zpaClientSecret string  // required
 var zpaCustomerID string    // required
 var zpaMicrotenantID string // optional
 var zpaCloud string         // optional
 
-// ZIA Legacy Fields
+// ZIA Legacy Fields.
 var ziaUsername string // required
 var ziaPassword string // required
 var ziaAPIKey string   // required
@@ -335,24 +335,44 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(&displayReleaseVersion, "version", "", false, "Display the release version")
 
 	rootCmd.PersistentFlags().StringVar(&terraformInstallPath, "terraform-install-path", ".", "Path to the default Terraform installation")
-	viper.BindPFlag("terraform-install-path", rootCmd.PersistentFlags().Lookup("terraform-install-path"))
-	viper.BindEnv("terraform-install-path", "ZSCALER_TERRAFORM_INSTALL_PATH")
+	if err := viper.BindPFlag("terraform-install-path", rootCmd.PersistentFlags().Lookup("terraform-install-path")); err != nil {
+		log.Fatalf("failed to bind flag: %v", err)
+	}
+	if err := viper.BindEnv("terraform-install-path", "ZSCALER_TERRAFORM_INSTALL_PATH"); err != nil {
+		log.Fatalf("failed to bind env: %v", err)
+	}
 
 	rootCmd.PersistentFlags().StringVar(&terraformInstallPath, "zpa-terraform-install-path", ".", "Path to the ZPA Terraform installation")
-	viper.BindPFlag("zpa-terraform-install-path", rootCmd.PersistentFlags().Lookup("zpa-terraform-install-path"))
-	viper.BindEnv("zpa-terraform-install-path", "ZSCALER_ZPA_TERRAFORM_INSTALL_PATH")
+	if err := viper.BindPFlag("zpa-terraform-install-path", rootCmd.PersistentFlags().Lookup("zpa-terraform-install-path")); err != nil {
+		log.Fatalf("failed to bind flag: %v", err)
+	}
+	if err := viper.BindEnv("zpa-terraform-install-path", "ZSCALER_ZPA_TERRAFORM_INSTALL_PATH"); err != nil {
+		log.Fatalf("failed to bind env: %v", err)
+	}
 
 	rootCmd.PersistentFlags().StringVar(&terraformInstallPath, "zia-terraform-install-path", ".", "Path to the ZIA Terraform installation")
-	viper.BindPFlag("zia-terraform-install-path", rootCmd.PersistentFlags().Lookup("zia-terraform-install-path"))
-	viper.BindEnv("zia-terraform-install-path", "ZSCALER_ZIA_TERRAFORM_INSTALL_PATH")
+	if err := viper.BindPFlag("zia-terraform-install-path", rootCmd.PersistentFlags().Lookup("zia-terraform-install-path")); err != nil {
+		log.Fatalf("failed to bind flag: %v", err)
+	}
+	if err := viper.BindEnv("zia-terraform-install-path", "ZSCALER_ZIA_TERRAFORM_INSTALL_PATH"); err != nil {
+		log.Fatalf("failed to bind env: %v", err)
+	}
 
 	rootCmd.PersistentFlags().StringVar(&zpaProviderNamespace, "zpa-provider-namespace", "", "Custom namespace for the ZPA provider")
-	viper.BindPFlag("zpa-provider-namespace", rootCmd.PersistentFlags().Lookup("zpa-provider-namespace"))
-	viper.BindEnv("zpa-provider-namespace", "ZPA_PROVIDER_NAMESPACE")
+	if err := viper.BindPFlag("zpa-provider-namespace", rootCmd.PersistentFlags().Lookup("zpa-provider-namespace")); err != nil {
+		log.Fatalf("failed to bind flag: %v", err)
+	}
+	if err := viper.BindEnv("zpa-provider-namespace", "ZPA_PROVIDER_NAMESPACE"); err != nil {
+		log.Fatalf("failed to bind env: %v", err)
+	}
 
 	rootCmd.PersistentFlags().StringVar(&ziaProviderNamespace, "zia-provider-namespace", "", "Custom namespace for the ZIA provider")
-	viper.BindPFlag("zia-provider-namespace", rootCmd.PersistentFlags().Lookup("zia-provider-namespace"))
-	viper.BindEnv("zia-provider-namespace", "ZIA_PROVIDER_NAMESPACE")
+	if err := viper.BindPFlag("zia-provider-namespace", rootCmd.PersistentFlags().Lookup("zia-provider-namespace")); err != nil {
+		log.Fatalf("failed to bind flag: %v", err)
+	}
+	if err := viper.BindEnv("zia-provider-namespace", "ZIA_PROVIDER_NAMESPACE"); err != nil {
+		log.Fatalf("failed to bind env: %v", err)
+	}
 }
 
 func initConfig() {
