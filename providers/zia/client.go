@@ -40,7 +40,7 @@ import (
 )
 
 // Client is the high-level client returned by NewClient().
-// We only keep one Service pointer, and at runtime
+// We only keep one Service pointer, and at runtime.
 // it will be backed by either the legacy (V2) client or the new (V3) client.
 type Client struct {
 	Service *zscaler.Service
@@ -51,14 +51,14 @@ type Client struct {
 type Config struct {
 	useLegacyClient bool
 
-	// V3 fields (OneAPI)
+	// V3 fields (OneAPI).
 	clientID     string
 	clientSecret string
 	privateKey   string
 	vanityDomain string
 	cloud        string
 
-	// V2 fields (Legacy)
+	// V2 fields (Legacy).
 	Username   string
 	Password   string
 	APIKey     string
@@ -69,14 +69,11 @@ type Config struct {
 	retryCount     int
 }
 
-// NewClient is the main entry point: it reads config (from viper/env)
+// NewClient is the main entry point: it reads config (from viper/env).
 // and initializes the appropriate client (V2 or V3).
 func NewClient() (*Client, error) {
 	// Build up our internal config object from environment variables, viper, etc.
-	cfg, err := newConfigFromEnv()
-	if err != nil {
-		return nil, fmt.Errorf("failed to load config: %w", err)
-	}
+	cfg := newConfigFromEnv() // No error returned now.
 
 	var svc *zscaler.Service
 
@@ -86,7 +83,7 @@ func NewClient() (*Client, error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed to initialize V2 client: %w", err)
 		}
-		// Wrap the underlying client in zscaler.Service so usage is consistent
+		// Wrap the underlying client in zscaler.Service so usage is consistent.
 		svc = zscaler.NewService(legacySvc.Client, nil)
 	} else {
 		logrus.Infof("[INFO] Initializing V3 client...")
@@ -94,7 +91,7 @@ func NewClient() (*Client, error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed to initialize V3 client: %w", err)
 		}
-		// Wrap the underlying client in zscaler.Service so usage is consistent
+		// Wrap the underlying client in zscaler.Service so usage is consistent.
 		svc = zscaler.NewService(v3Client, nil)
 	}
 
@@ -105,18 +102,18 @@ func NewClient() (*Client, error) {
 
 // newConfigFromEnv populates the Config struct by pulling values from viper or environment variables.
 // Feel free to adapt for your own convention or for direct environment usage.
-func newConfigFromEnv() (*Config, error) {
-	// Optionally ensure viper is reading environment variables
+func newConfigFromEnv() *Config {
+	// Optionally ensure viper is reading environment variables.
 	viper.AutomaticEnv()
 
-	// The parameter or env var controlling legacy usage
+	// The parameter or env var controlling legacy usage.
 	useLegacyClient := viper.GetBool("use_legacy_client")
 	// Also check ZSCALER_USE_LEGACY_CLIENT
 	if os.Getenv("ZSCALER_USE_LEGACY_CLIENT") != "" {
 		useLegacyClient = strings.EqualFold(os.Getenv("ZSCALER_USE_LEGACY_CLIENT"), "true")
 	}
 
-	// For the new OneAPI
+	// For the new OneAPI.
 	clientID := viper.GetString("client_id")
 	if clientID == "" && os.Getenv("ZSCALER_CLIENT_ID") != "" {
 		clientID = os.Getenv("ZSCALER_CLIENT_ID")
@@ -142,7 +139,7 @@ func newConfigFromEnv() (*Config, error) {
 		cloud = os.Getenv("ZSCALER_CLOUD")
 	}
 
-	// For the legacy V2 approach
+	// For the legacy V2 approach.
 	Username := viper.GetString("username")
 	if Username == "" && os.Getenv("ZIA_USERNAME") != "" {
 		Username = os.Getenv("ZIA_USERNAME")
@@ -170,7 +167,6 @@ func newConfigFromEnv() (*Config, error) {
 
 	retryCount := viper.GetInt("zscaler_retry_count")
 	if retryCount == 0 {
-		// fallback to environment or a default
 		if val := os.Getenv("ZSCALER_RETRY_COUNT"); val != "" {
 			if converted, err := strconv.Atoi(val); err == nil {
 				retryCount = converted
@@ -183,7 +179,7 @@ func newConfigFromEnv() (*Config, error) {
 
 	requestTimeout := viper.GetInt("zscaler_request_timeout")
 	if requestTimeout == 0 {
-		// fallback or set default
+		// fallback or set default.
 		if val := os.Getenv("ZSCALER_REQUEST_TIMEOUT"); val != "" {
 			if converted, err := strconv.Atoi(val); err == nil {
 				requestTimeout = converted
@@ -191,18 +187,18 @@ func newConfigFromEnv() (*Config, error) {
 		}
 	}
 
-	// Build the config struct
+	// Build the config struct.
 	config := &Config{
 		useLegacyClient: useLegacyClient,
 
-		// V3 fields
+		// V3 fields.
 		clientID:     clientID,
 		clientSecret: clientSecret,
 		privateKey:   privateKey,
 		vanityDomain: vanityDomain,
 		cloud:        cloud,
 
-		// V2 fields
+		// V2 fields.
 		Username:   Username,
 		Password:   Password,
 		APIKey:     APIKey,
@@ -213,15 +209,15 @@ func newConfigFromEnv() (*Config, error) {
 		requestTimeout: requestTimeout,
 	}
 
-	return config, nil
+	return config
 }
 
-// zscalerSDKV2Client initializes the legacy ZIA client (V2)
+// zscalerSDKV2Client initializes the legacy ZIA client (V2).
 func zscalerSDKV2Client(c *Config) (*zscaler.Service, error) {
-	// You can set a custom user agent if desired
+	// You can set a custom user agent if desired.
 	customUserAgent := "(Terraformer Legacy) ZIA"
 
-	// Start building config setters for the V2 zia library
+	// Start building config setters for the V2 zia library.
 	setters := []zia.ConfigSetter{
 		zia.WithCache(false),
 		zia.WithHttpClientPtr(http.DefaultClient),
@@ -233,7 +229,7 @@ func zscalerSDKV2Client(c *Config) (*zscaler.Service, error) {
 		zia.WithZiaCloud(c.ZIABaseURL),
 	}
 
-	// Proxy?
+	// Proxy.
 	if c.httpProxy != "" {
 		parsedURL, err := url.Parse(c.httpProxy)
 		if err != nil {
@@ -261,7 +257,7 @@ func zscalerSDKV2Client(c *Config) (*zscaler.Service, error) {
 	}
 	ziaCfg.UserAgent = customUserAgent
 
-	// Now wrap it in a zscaler.Service so usage is uniform
+	// Now wrap it in a zscaler.Service so usage is uniform.
 	wrappedV2Client, err := zscaler.NewLegacyZiaClient(ziaCfg)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create legacy ZIA client: %v", err)
@@ -271,7 +267,7 @@ func zscalerSDKV2Client(c *Config) (*zscaler.Service, error) {
 	return wrappedV2Client, nil
 }
 
-// zscalerSDKV3Client initializes the new OneAPI-based Zscaler client
+// zscalerSDKV3Client initializes the new OneAPI-based Zscaler client.
 func zscalerSDKV3Client(c *Config) (*zscaler.Client, error) {
 	customUserAgent := "(Terraformer V3) ZIA"
 
@@ -280,10 +276,10 @@ func zscalerSDKV3Client(c *Config) (*zscaler.Client, error) {
 		zscaler.WithHttpClientPtr(http.DefaultClient),
 		zscaler.WithRateLimitMaxRetries(int32(c.retryCount)),
 		zscaler.WithRequestTimeout(time.Duration(c.requestTimeout) * time.Second),
-		// we’ll override user agent later
+		// we’ll override user agent later.
 	}
 
-	// Proxy?
+	// Proxy.
 	if c.httpProxy != "" {
 		parsedURL, err := url.Parse(c.httpProxy)
 		if err != nil {
@@ -305,9 +301,9 @@ func zscalerSDKV3Client(c *Config) (*zscaler.Client, error) {
 		setters = append(setters, zscaler.WithProxyPort(int32(port64)))
 	}
 
-	// Check which auth method we have:
-	// 1) clientID + clientSecret + vanityDomain + customerID
-	// 2) clientID + privateKey + vanityDomain + customerID
+	// Check which auth method we have.
+	// 1) clientID + clientSecret + vanityDomain + customerID.
+	// 2) clientID + privateKey + vanityDomain + customerID.
 	switch {
 	case c.clientID != "" && c.clientSecret != "" && c.vanityDomain != "":
 		setters = append(setters,
@@ -341,12 +337,12 @@ func zscalerSDKV3Client(c *Config) (*zscaler.Client, error) {
 	}
 	conf.UserAgent = customUserAgent
 
-	// Build the client
+	// Build the client.
 	v3Client, err := zscaler.NewOneAPIClient(conf)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create Zscaler OneAPI client: %v", err)
 	}
 
 	log.Println("[INFO] Successfully initialized ZIA V3 client")
-	return v3Client.Client, nil // returns *zscaler.Client
+	return v3Client.Client, nil
 }

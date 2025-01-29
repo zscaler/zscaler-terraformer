@@ -187,77 +187,141 @@ func init() {
 	// OneAPI flags (V3)
 	// -----------------------
 	rootCmd.PersistentFlags().StringVar(&oneAPIClientID, "client_id", "", "OneAPI client_id (required in V3 mode)")
-	viper.BindPFlag("client_id", rootCmd.PersistentFlags().Lookup("client_id"))
-	viper.BindEnv("client_id", "ZSCALER_CLIENT_ID")
+	if err := viper.BindPFlag("client_id", rootCmd.PersistentFlags().Lookup("client_id")); err != nil {
+		log.Fatalf("failed to bind flag: %v", err)
+	}
+	if err := viper.BindEnv("client_id", "ZSCALER_CLIENT_ID"); err != nil {
+		log.Fatalf("failed to bind env: %v", err)
+	}
 
 	rootCmd.PersistentFlags().StringVar(&oneAPIClientSecret, "client_secret", "", "OneAPI client_secret (required in V3 mode)")
-	viper.BindPFlag("client_secret", rootCmd.PersistentFlags().Lookup("client_secret"))
-	viper.BindEnv("client_secret", "ZSCALER_CLIENT_SECRET")
+	if err := viper.BindPFlag("client_secret", rootCmd.PersistentFlags().Lookup("client_secret")); err != nil {
+		log.Fatalf("failed to bind flag: %v", err)
+	}
+	if err := viper.BindEnv("client_secret", "ZSCALER_CLIENT_SECRET"); err != nil {
+		log.Fatalf("failed to bind env: %v", err)
+	}
 
 	rootCmd.PersistentFlags().StringVar(&oneAPIVanityDomain, "vanity_domain", "", "OneAPI vanity_domain (required in V3 mode)")
-	viper.BindPFlag("vanity_domain", rootCmd.PersistentFlags().Lookup("vanity_domain"))
-	viper.BindEnv("vanity_domain", "ZSCALER_VANITY_DOMAIN")
+	if err := viper.BindPFlag("vanity_domain", rootCmd.PersistentFlags().Lookup("vanity_domain")); err != nil {
+		log.Fatalf("failed to bind flag: %v", err)
+	}
+	if err := viper.BindEnv("vanity_domain", "ZSCALER_VANITY_DOMAIN"); err != nil {
+		log.Fatalf("failed to bind env: %v", err)
+	}
 
 	rootCmd.PersistentFlags().StringVar(&oneAPICustomerID, "customer_id", "", "OneAPI optional customer_id")
-	viper.BindPFlag("customer_id", rootCmd.PersistentFlags().Lookup("customer_id"))
-	viper.BindEnv("customer_id", "ZPA_CUSTOMER_ID")
+	if err := viper.BindPFlag("customer_id", rootCmd.PersistentFlags().Lookup("customer_id")); err != nil {
+		log.Fatalf("failed to bind flag: %v", err)
+	}
+	if err := viper.BindEnv("customer_id", "ZPA_CUSTOMER_ID"); err != nil {
+		log.Fatalf("failed to bind env: %v", err)
+	}
 
 	rootCmd.PersistentFlags().StringVar(&oneAPIMicrotenantID, "microtenant_id", "", "OneAPI optional microtenant_id")
-	viper.BindPFlag("microtenant_id", rootCmd.PersistentFlags().Lookup("microtenant_id"))
-	viper.BindEnv("microtenant_id", "ZPA_MICROTENANT_ID")
+	if err := viper.BindPFlag("microtenant_id", rootCmd.PersistentFlags().Lookup("microtenant_id")); err != nil {
+		log.Fatalf("failed to bind flag: %v", err)
+	}
+	if err := viper.BindEnv("microtenant_id", "ZPA_MICROTENANT_ID"); err != nil {
+		log.Fatalf("failed to bind env: %v", err)
+	}
 
 	rootCmd.PersistentFlags().StringVar(&oneAPICloud, "zscaler_cloud", "", "OneAPI optional zscaler_cloud (e.g. PRODUCTION)")
-	viper.BindPFlag("zscaler_cloud", rootCmd.PersistentFlags().Lookup("zscaler_cloud"))
-	viper.BindEnv("zscaler_cloud", "ZSCALER_CLOUD")
+	if err := viper.BindPFlag("zscaler_cloud", rootCmd.PersistentFlags().Lookup("zscaler_cloud")); err != nil {
+		log.Fatalf("failed to bind flag: %v", err)
+	}
+	if err := viper.BindEnv("zscaler_cloud", "ZSCALER_CLOUD"); err != nil {
+		log.Fatalf("failed to bind env: %v", err)
+	}
 
 	// -----------------------
 	// ZPA Legacy flags (V2)
 	// -----------------------
 	rootCmd.PersistentFlags().StringVar(&zpaClientID, "zpa_client_id", "", "ZPA legacy client ID (required if using legacy mode for ZPA resources)")
-	viper.BindPFlag("zpa_client_id", rootCmd.PersistentFlags().Lookup("zpa_client_id"))
-	viper.BindEnv("zpa_client_id", "ZPA_CLIENT_ID")
+	if err := viper.BindPFlag("zpa_client_id", rootCmd.PersistentFlags().Lookup("zpa_client_id")); err != nil {
+		log.Fatalf("failed to bind flag: %v", err)
+	}
+	if err := viper.BindEnv("zpa_client_id", "ZPA_CLIENT_ID"); err != nil {
+		log.Fatalf("failed to bind env: %v", err)
+	}
 
 	rootCmd.PersistentFlags().StringVar(&zpaClientSecret, "zpa_client_secret", "", "ZPA legacy client secret")
-	viper.BindPFlag("zpa_client_secret", rootCmd.PersistentFlags().Lookup("zpa_client_secret"))
-	viper.BindEnv("zpa_client_secret", "ZPA_CLIENT_SECRET")
+	if err := viper.BindPFlag("zpa_client_secret", rootCmd.PersistentFlags().Lookup("zpa_client_secret")); err != nil {
+		log.Fatalf("failed to bind flag: %v", err)
+	}
+	if err := viper.BindEnv("zpa_client_secret", "ZPA_CLIENT_SECRET"); err != nil {
+		log.Fatalf("failed to bind env: %v", err)
+	}
 
 	rootCmd.PersistentFlags().StringVar(&zpaCustomerID, "zpa_customer_id", "", "ZPA legacy customer ID")
-	viper.BindPFlag("zpa_customer_id", rootCmd.PersistentFlags().Lookup("zpa_customer_id"))
-	viper.BindEnv("zpa_customer_id", "ZPA_CUSTOMER_ID")
+	if err := viper.BindPFlag("zpa_customer_id", rootCmd.PersistentFlags().Lookup("zpa_customer_id")); err != nil {
+		log.Fatalf("failed to bind flag: %v", err)
+	}
+	if err := viper.BindEnv("zpa_customer_id", "ZPA_CUSTOMER_ID"); err != nil {
+		log.Fatalf("failed to bind env: %v", err)
+	}
 
 	rootCmd.PersistentFlags().StringVar(&zpaMicrotenantID, "zpa_microtenant_id", "", "ZPA legacy microtenant_id (optional)")
-	viper.BindPFlag("zpa_microtenant_id", rootCmd.PersistentFlags().Lookup("zpa_microtenant_id"))
-	viper.BindEnv("zpa_microtenant_id", "ZPA_MICROTENANT_ID")
+	if err := viper.BindPFlag("zpa_microtenant_id", rootCmd.PersistentFlags().Lookup("zpa_microtenant_id")); err != nil {
+		log.Fatalf("failed to bind flag: %v", err)
+	}
+	if err := viper.BindEnv("zpa_microtenant_id", "ZPA_MICROTENANT_ID"); err != nil {
+		log.Fatalf("failed to bind env: %v", err)
+	}
 
 	rootCmd.PersistentFlags().StringVar(&zpaCloud, "zpa_cloud", "", "ZPA Cloud environment (optional, e.g. PRODUCTION)")
-	viper.BindPFlag("zpa_cloud", rootCmd.PersistentFlags().Lookup("zpa_cloud"))
-	viper.BindEnv("zpa_cloud", "ZPA_CLOUD")
+	if err := viper.BindPFlag("zpa_cloud", rootCmd.PersistentFlags().Lookup("zpa_cloud")); err != nil {
+		log.Fatalf("failed to bind flag: %v", err)
+	}
+	if err := viper.BindEnv("zpa_cloud", "ZPA_CLOUD"); err != nil {
+		log.Fatalf("failed to bind env: %v", err)
+	}
 
 	// -----------------------
 	// ZIA Legacy flags (V2)
 	// -----------------------
 	rootCmd.PersistentFlags().StringVar(&ziaUsername, "zia_username", "", "ZIA legacy username (required if using legacy mode for ZIA resources)")
-	viper.BindPFlag("zia_username", rootCmd.PersistentFlags().Lookup("zia_username"))
-	viper.BindEnv("zia_username", "ZIA_USERNAME")
+	if err := viper.BindPFlag("zia_username", rootCmd.PersistentFlags().Lookup("zia_username")); err != nil {
+		log.Fatalf("failed to bind flag: %v", err)
+	}
+	if err := viper.BindEnv("zia_username", "ZIA_USERNAME"); err != nil {
+		log.Fatalf("failed to bind env: %v", err)
+	}
 
 	rootCmd.PersistentFlags().StringVar(&ziaPassword, "zia_password", "", "ZIA legacy password (required)")
-	viper.BindPFlag("zia_password", rootCmd.PersistentFlags().Lookup("zia_password"))
-	viper.BindEnv("zia_password", "ZIA_PASSWORD")
+	if err := viper.BindPFlag("zia_password", rootCmd.PersistentFlags().Lookup("zia_password")); err != nil {
+		log.Fatalf("failed to bind flag: %v", err)
+	}
+	if err := viper.BindEnv("zia_password", "ZIA_PASSWORD"); err != nil {
+		log.Fatalf("failed to bind env: %v", err)
+	}
 
 	rootCmd.PersistentFlags().StringVar(&ziaAPIKey, "zia_api_key", "", "ZIA legacy api_key (required)")
-	viper.BindPFlag("zia_api_key", rootCmd.PersistentFlags().Lookup("zia_api_key"))
-	viper.BindEnv("zia_api_key", "ZIA_API_KEY")
+	if err := viper.BindPFlag("zia_api_key", rootCmd.PersistentFlags().Lookup("zia_api_key")); err != nil {
+		log.Fatalf("failed to bind flag: %v", err)
+	}
+	if err := viper.BindEnv("zia_api_key", "ZIA_API_KEY"); err != nil {
+		log.Fatalf("failed to bind env: %v", err)
+	}
 
 	rootCmd.PersistentFlags().StringVar(&ziaCloud, "zia_cloud", "", "ZIA Cloud environment (required for ZIA legacy, e.g. zscalerthree)")
-	viper.BindPFlag("zia_cloud", rootCmd.PersistentFlags().Lookup("zia_cloud"))
-	viper.BindEnv("zia_cloud", "ZIA_CLOUD")
+	if err := viper.BindPFlag("zia_cloud", rootCmd.PersistentFlags().Lookup("zia_cloud")); err != nil {
+		log.Fatalf("failed to bind flag: %v", err)
+	}
+	if err := viper.BindEnv("zia_cloud", "ZIA_CLOUD"); err != nil {
+		log.Fatalf("failed to bind env: %v", err)
+	}
 
 	// -----------------------
 	// Global toggle
 	// -----------------------
 	rootCmd.PersistentFlags().BoolVar(&useLegacyClient, "use_legacy_client", false, "Enable Legacy Mode (true/false)")
-	viper.BindPFlag("use_legacy_client", rootCmd.PersistentFlags().Lookup("use_legacy_client"))
-	viper.BindEnv("use_legacy_client", "ZSCALER_USE_LEGACY_CLIENT")
+	if err := viper.BindPFlag("use_legacy_client", rootCmd.PersistentFlags().Lookup("use_legacy_client")); err != nil {
+		log.Fatalf("failed to bind flag: %v", err)
+	}
+	if err := viper.BindEnv("use_legacy_client", "ZSCALER_USE_LEGACY_CLIENT"); err != nil {
+		log.Fatalf("failed to bind env: %v", err)
+	}
 
 	// -----------------------
 	// Additional flags

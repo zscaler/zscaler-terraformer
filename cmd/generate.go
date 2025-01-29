@@ -352,7 +352,6 @@ provider "%s" {
 			os.Getenv("ZSCALER_VANITY_DOMAIN") == "" &&
 			os.Getenv("ZSCALER_CLOUD") == "" &&
 			os.Getenv("ZPA_MICROTENANT_ID") == "" {
-
 			// [4.1] If use_legacy_client == "true", write the legacy block
 			if strings.EqualFold(useLegacy, "true") {
 				if zpaClientID != "" && zpaClientSecret != "" && zpaCustomerID != "" && zpaCloud != "" {
@@ -364,7 +363,6 @@ provider "%s" {
   use_legacy_client   = true
 `, zpaClientID, zpaClientSecret, zpaCustomerID, zpaCloud)
 				}
-
 			} else {
 				// [4.2] OneAPI scenario for ZPA
 				// For example, we do "client_id, client_secret/private_key, vanity_domain, customer_id, microtenant_id, zscaler_cloud"
@@ -421,7 +419,6 @@ provider "%s" {
 			os.Getenv("ZSCALER_VANITY_DOMAIN") == "" &&
 			os.Getenv("ZSCALER_CLOUD") == "" &&
 			os.Getenv("ZSCALER_USE_LEGACY_CLIENT") == "" {
-
 			if strings.EqualFold(useLegacy, "true") {
 				// Legacy V2 for ZIA
 				if ziaUsername != "" && ziaPassword != "" && ziaApiKey != "" && ziaCloud != "" {
