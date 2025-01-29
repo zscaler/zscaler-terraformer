@@ -87,7 +87,7 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/segmentgroup"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/servergroup"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/serviceedgegroup"
-	"github.com/zscaler/zscaler-terraformer/terraformutils/helpers"
+	"github.com/zscaler/zscaler-terraformer/v2/terraformutils/helpers"
 )
 
 // resourceImportStringFormats contains a mapping of the resource type to the

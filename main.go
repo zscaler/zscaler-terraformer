@@ -27,7 +27,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/zscaler/zscaler-terraformer/cmd"
+	"github.com/zscaler/zscaler-terraformer/v2/cmd"
 )
 
 // TerraformerWriter is a custom writer to filter log messages.
@@ -46,11 +46,6 @@ func (t TerraformerWriter) Write(p []byte) (n int, err error) {
 func main() {
 	// Set the custom writer for log output
 	log.SetOutput(TerraformerWriter{})
-
-	// Ensure the environment variable is set to disable caching
-	if err := os.Setenv("ZSCALER_SDK_CACHE_DISABLED", "true"); err != nil {
-		log.Fatalf("Failed to set environment variable: %s", err)
-	}
 
 	// Execute the command with error handling
 	if err := cmd.Execute(); err != nil {

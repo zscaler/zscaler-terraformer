@@ -33,8 +33,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler"
-	zia "github.com/zscaler/zscaler-terraformer/providers/zia"
-	zpa "github.com/zscaler/zscaler-terraformer/providers/zpa"
+	zia "github.com/zscaler/zscaler-terraformer/v2/providers/zia"
+	zpa "github.com/zscaler/zscaler-terraformer/v2/providers/zpa"
 )
 
 var log = logrus.New()

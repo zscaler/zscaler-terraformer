@@ -32,8 +32,8 @@ import (
 	"github.com/iancoleman/strcase"
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
-	"github.com/zscaler/zscaler-terraformer/terraformutils/conversion"
-	"github.com/zscaler/zscaler-terraformer/terraformutils/helpers"
+	"github.com/zscaler/zscaler-terraformer/v2/terraformutils/conversion"
+	"github.com/zscaler/zscaler-terraformer/v2/terraformutils/helpers"
 )
 
 var log = logrus.New()

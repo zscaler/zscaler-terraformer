@@ -94,9 +94,9 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/segmentgroup"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/servergroup"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/serviceedgegroup"
-	"github.com/zscaler/zscaler-terraformer/terraformutils/conversion"
-	"github.com/zscaler/zscaler-terraformer/terraformutils/helpers"
-	"github.com/zscaler/zscaler-terraformer/terraformutils/nesting"
+	"github.com/zscaler/zscaler-terraformer/v2/terraformutils/conversion"
+	"github.com/zscaler/zscaler-terraformer/v2/terraformutils/helpers"
+	"github.com/zscaler/zscaler-terraformer/v2/terraformutils/nesting"
 )
 
 var allGeneratableResources = []string{

@@ -1,4 +1,4 @@
-module github.com/zscaler/zscaler-terraformer
+module github.com/zscaler/zscaler-terraformer/v2
 
 go 1.22.0
 
