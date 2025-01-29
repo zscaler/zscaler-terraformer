@@ -414,13 +414,13 @@ func initConfig() {
 	ziaCloud = viper.GetString("zia_cloud")
 
 	// Debug logs of what we got
-	log.Debugf("use_legacy_client=%v", useLegacyClient)
-	log.Debugf("[ONEAPI] client_id=%s, client_secret=%s, vanity_domain=%s, customer_id=%s, microtenant_id=%s, zscaler_cloud=%s",
-		oneAPIClientID, oneAPIClientSecret, oneAPIVanityDomain, oneAPICustomerID, oneAPIMicrotenantID, oneAPICloud)
-	log.Debugf("[ZPA Legacy] zpa_client_id=%s, zpa_client_secret=%s, zpa_customer_id=%s, zpa_microtenant_id=%s, zpa_cloud=%s",
-		zpaClientID, zpaClientSecret, zpaCustomerID, zpaMicrotenantID, zpaCloud)
-	log.Debugf("[ZIA Legacy] zia_username=%s, zia_password=%s, zia_api_key=%s, zia_cloud=%s",
-		ziaUsername, ziaPassword, ziaAPIKey, ziaCloud)
+	// log.Debugf("use_legacy_client=%v", useLegacyClient)
+	// log.Debugf("[ONEAPI] client_id=%s, client_secret=%s, vanity_domain=%s, customer_id=%s, microtenant_id=%s, zscaler_cloud=%s",
+	// 	oneAPIClientID, oneAPIClientSecret, oneAPIVanityDomain, oneAPICustomerID, oneAPIMicrotenantID, oneAPICloud)
+	// log.Debugf("[ZPA Legacy] zpa_client_id=%s, zpa_client_secret=%s, zpa_customer_id=%s, zpa_microtenant_id=%s, zpa_cloud=%s",
+	// 	zpaClientID, zpaClientSecret, zpaCustomerID, zpaMicrotenantID, zpaCloud)
+	// log.Debugf("[ZIA Legacy] zia_username=%s, zia_password=%s, zia_api_key=%s, zia_cloud=%s",
+	// 	ziaUsername, ziaPassword, ziaAPIKey, ziaCloud)
 
 	log.Debug("[INFO] initConfig success (no validation).")
 
