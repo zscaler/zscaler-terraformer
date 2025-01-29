@@ -32,11 +32,21 @@ import (
 	"github.com/iancoleman/strcase"
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
-	"github.com/zscaler/zscaler-terraformer/teraformutils/conversion"
-	"github.com/zscaler/zscaler-terraformer/teraformutils/helpers"
+	"github.com/zscaler/zscaler-terraformer/terraformutils/conversion"
+	"github.com/zscaler/zscaler-terraformer/terraformutils/helpers"
 )
 
 var log = logrus.New()
+
+var noSkipIDBlocks = map[string]map[string]bool{
+	"zia_firewall_dns_rule": {
+		"dns_gateway": true,
+	},
+	"zia_ssl_inspection_rules": {
+		"ssl_interception_cert": true,
+	},
+	// Add more resource->block combos here as needed
+}
 
 // nestBlocks takes a schema and generates all of the appropriate nesting of any.
 // top-level blocks as well as nested lists or sets.
@@ -94,7 +104,17 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 				continue
 			}
 		}
-
+		if blockMap, ok := noSkipIDBlocks[resourceType]; ok {
+			if blockMap[block] {
+				// This block is one of the "edge cases" that need the ID.
+				blockData, ok := structData[MapTfFieldNameToAPI(resourceType, block)]
+				if ok {
+					output += writeBlockNoSkipID(resourceType, block, blockData, schemaBlock.NestedBlocks[block].Block)
+				}
+				// Skip the normal logic (don’t call WriteNestedBlock).
+				continue
+			}
+		}
 		// special cases mapping.
 		if resourceType == "zia_admin_users" && block == "admin_scope" {
 			output += "admin_scope {\n"
@@ -143,7 +163,7 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 			}
 			output += "}\n"
 			continue
-		} else if helpers.IsInList(resourceType, []string{"zia_firewall_filtering_network_service_groups", "zia_firewall_filtering_rule", "zia_url_filtering_rules", "zia_dlp_web_rules"}) && helpers.IsInList(block, []string{"departments",
+		} else if helpers.IsInList(resourceType, []string{"zia_firewall_filtering_network_service_groups", "zia_firewall_filtering_rule", "zia_url_filtering_rules", "zia_dlp_web_rules", "zia_ssl_inspection_rules", "zia_firewall_dns_rule", "zia_firewall_ips_rule", "zia_file_type_control_rules", "zia_cloud_app_control_rule"}) && helpers.IsInList(block, []string{"departments",
 			"groups",
 			"locations",
 			"dlp_engines",
@@ -157,6 +177,7 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 			"override_users",
 			"device_groups",
 			"source_ip_groups",
+			"proxy_gateways",
 		}) {
 			output += helpers.ListIdsIntBlock(block, structData[MapTfFieldNameToAPI(resourceType, block)])
 			continue
@@ -381,6 +402,7 @@ func WriteNestedBlock(resourceType string, attributes []string, schemaBlock *tfj
 // WriteAttrLine outputs a line of HCL configuration with a configurable depth.
 // for known types.
 func WriteAttrLine(key string, value interface{}, usedInBlock bool) string {
+
 	// General handling for attributes that are returned as nil.
 	if value == nil {
 		return ""
@@ -536,17 +558,19 @@ func WriteAttrLine(key string, value interface{}, usedInBlock bool) string {
 	return ""
 }
 
-// Probably can be deprecated. Need to evaluate.
 func MapTfFieldNameToAPI(resourceType, fieldName string) string {
-	switch resourceType {
-	case "zia_admin_users":
-		switch fieldName {
-		case "username":
-			return "userName"
-		}
+	// Handle special cases for "TLS"
+	if fieldName == "min_client_tls_version" {
+		return "minClientTLSVersion"
 	}
-	result := strcase.ToLowerCamel(fieldName)
-	return result
+	if fieldName == "min_server_tls_version" {
+		return "minServerTLSVersion"
+	}
+	if fieldName == "min_tls_version" {
+		return "minTLSVersion"
+	}
+	// Fallback
+	return strcase.ToLowerCamel(fieldName)
 }
 
 // Helper function to format a list of strings for HCL.
@@ -556,4 +580,53 @@ func formatList(items []string) string {
 		quotedItems[i] = fmt.Sprintf("%q", item)
 	}
 	return strings.Join(quotedItems, ", ")
+}
+
+func writeBlockNoSkipID(resourceType, blockName string, data interface{}, blockSchema *tfjson.SchemaBlock) string {
+	// If the API always returns a single map for this nested block,
+	// we cast to map[string]interface{} here.
+	mapData, ok := data.(map[string]interface{})
+	if !ok || mapData == nil {
+		return ""
+	}
+
+	// Gather the attributes from blockSchema (including "id").
+	sortedAttrs := make([]string, 0, len(blockSchema.Attributes))
+	for attr := range blockSchema.Attributes {
+		sortedAttrs = append(sortedAttrs, attr)
+	}
+	sort.Strings(sortedAttrs)
+
+	nestedOutput := ""
+	for _, attrName := range sortedAttrs {
+		// We do NOT skip "id" or anything else here—no "if attrName == 'id' { continue }"
+
+		// Convert the schema attribute name to snake_case for HCL
+		tfName := strcase.ToSnake(attrName)
+
+		// Convert from Terraform field name -> actual key in map
+		// This is the same logic you had:
+		apiFieldName := MapTfFieldNameToAPI(resourceType, attrName)
+
+		// Grab the value from the JSON data
+		value := mapData[apiFieldName]
+		if value == nil {
+			continue
+		}
+
+		ty := blockSchema.Attributes[attrName].AttributeType
+		switch {
+		case ty.IsPrimitiveType():
+			nestedOutput += WriteAttrLine(tfName, value, false)
+		case ty.IsListType(), ty.IsSetType(), ty.IsMapType():
+			nestedOutput += WriteAttrLine(tfName, value, true)
+		}
+	}
+
+	if nestedOutput == "" {
+		return ""
+	}
+
+	// Return it in block form
+	return fmt.Sprintf("%s {\n%s}\n", blockName, nestedOutput)
 }

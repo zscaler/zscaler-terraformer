@@ -1,23 +1,25 @@
-// Copyright (c) 2023 Zscaler Inc, <devrel@zscaler.com>
+/*
+Copyright (c) 2023 Zscaler Inc, <devrel@zscaler.com>
 
-//                             MIT License
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
+                            MIT License
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
 
 package cmd
 
@@ -30,23 +32,48 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/zscaler/zscaler-terraformer/providers/zia"
-	"github.com/zscaler/zscaler-terraformer/providers/zpa"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler"
+	zia "github.com/zscaler/zscaler-terraformer/providers/zia"
+	zpa "github.com/zscaler/zscaler-terraformer/providers/zpa"
 )
 
 var log = logrus.New()
 var terraformInstallPath string
-var zpa_cloud, zpa_client_id, zpa_client_secret, zpa_customer_id string
-var zia_cloud, zia_username, zia_password, zia_api_key string
+
+// ONEAPI Fields
+var oneAPIClientID string      // required
+var oneAPIClientSecret string  // required
+var oneAPIVanityDomain string  // required
+var oneAPICustomerID string    // optional
+var oneAPIMicrotenantID string // optional
+var oneAPICloud string         // optional
+
+// ZPA Legacy Fields
+var zpaClientID string      // required
+var zpaClientSecret string  // required
+var zpaCustomerID string    // required
+var zpaMicrotenantID string // optional
+var zpaCloud string         // optional
+
+// ZIA Legacy Fields
+var ziaUsername string // required
+var ziaPassword string // required
+var ziaAPIKey string   // required
+var ziaCloud string    // required
+
+var useLegacyClient bool
 var verbose, displayReleaseVersion bool
 var supportedResources string
+
+var resourceType_, resources, excludedResources string
+
 var api *Client
 var terraformImportCmdPrefix = "terraform import"
-var zpaProviderNamespace string
+var zpaProviderNamespace, ziaProviderNamespace string
 
 type Client struct {
-	ZPA *zpa.Client
-	ZIA *zia.Client
+	ZPAService *zscaler.Service
+	ZIAService *zscaler.Service
 }
 
 var allSupportedResources = []string{
@@ -97,6 +124,16 @@ var allSupportedResources = []string{
 	"zia_security_settings",
 	"zia_forwarding_control_zpa_gateway",
 	"zia_forwarding_control_rule",
+	"zia_sandbox_rules",
+	"zia_file_type_control_rules",
+	"zia_ssl_inspection_rules",
+	"zia_firewall_dns_rule",
+	"zia_firewall_ips_rule",
+	"zia_advanced_settings",
+	"zia_atp_malicious_urls",
+	"zia_end_user_notification",
+	"zia_url_filtering_and_cloud_app_settings",
+	"zia_cloud_app_control_rule",
 }
 
 // rootCmd represents the base command when called without any subcommands.
@@ -146,105 +183,190 @@ func Execute() error {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	// Define flags and configuration settings.
-	// ZPA API credentials
-	rootCmd.PersistentFlags().StringVarP(&zpa_client_id, "zpa_client_id", "", "", "ZPA client ID")
-	_ = viper.BindPFlag("zpa_client_id", rootCmd.PersistentFlags().Lookup("zpa_client_id"))
-	_ = viper.BindEnv("zpa_client_id", "ZPA_CLIENT_ID")
+	// -----------------------
+	// OneAPI flags (V3)
+	// -----------------------
+	rootCmd.PersistentFlags().StringVar(&oneAPIClientID, "client_id", "", "OneAPI client_id (required in V3 mode)")
+	viper.BindPFlag("client_id", rootCmd.PersistentFlags().Lookup("client_id"))
+	viper.BindEnv("client_id", "ZSCALER_CLIENT_ID")
 
-	rootCmd.PersistentFlags().StringVarP(&zpa_client_secret, "zpa_client_secret", "", "", "ZPA client secret")
-	_ = viper.BindPFlag("zpa_client_secret", rootCmd.PersistentFlags().Lookup("zpa_client_secret"))
-	_ = viper.BindEnv("zpa_client_secret", "ZPA_CLIENT_SECRET")
+	rootCmd.PersistentFlags().StringVar(&oneAPIClientSecret, "client_secret", "", "OneAPI client_secret (required in V3 mode)")
+	viper.BindPFlag("client_secret", rootCmd.PersistentFlags().Lookup("client_secret"))
+	viper.BindEnv("client_secret", "ZSCALER_CLIENT_SECRET")
 
-	rootCmd.PersistentFlags().StringVarP(&zpa_customer_id, "zpa_customer_id", "", "", "ZPA Customer ID")
-	_ = viper.BindPFlag("zpa_customer_id", rootCmd.PersistentFlags().Lookup("zpa_customer_id"))
-	_ = viper.BindEnv("zpa_customer_id", "ZPA_CUSTOMER_ID")
+	rootCmd.PersistentFlags().StringVar(&oneAPIVanityDomain, "vanity_domain", "", "OneAPI vanity_domain (required in V3 mode)")
+	viper.BindPFlag("vanity_domain", rootCmd.PersistentFlags().Lookup("vanity_domain"))
+	viper.BindEnv("vanity_domain", "ZSCALER_VANITY_DOMAIN")
 
-	rootCmd.PersistentFlags().StringVarP(&zpa_cloud, "zpa_cloud", "", "", "ZPA Cloud (BETA, GOV, GOVUS, PRODUCTION, ZPATWO)")
-	_ = viper.BindPFlag("zpa_cloud", rootCmd.PersistentFlags().Lookup("zpa_cloud"))
-	_ = viper.BindEnv("zpa_cloud", "ZPA_CLOUD")
+	rootCmd.PersistentFlags().StringVar(&oneAPICustomerID, "customer_id", "", "OneAPI optional customer_id")
+	viper.BindPFlag("customer_id", rootCmd.PersistentFlags().Lookup("customer_id"))
+	viper.BindEnv("customer_id", "ZPA_CUSTOMER_ID")
 
-	// ZIA API credentials
-	rootCmd.PersistentFlags().StringVarP(&zia_username, "zia_username", "", "", "ZIA username")
-	_ = viper.BindPFlag("zia_username", rootCmd.PersistentFlags().Lookup("zia_username"))
-	_ = viper.BindEnv("zia_username", "ZIA_USERNAME")
+	rootCmd.PersistentFlags().StringVar(&oneAPIMicrotenantID, "microtenant_id", "", "OneAPI optional microtenant_id")
+	viper.BindPFlag("microtenant_id", rootCmd.PersistentFlags().Lookup("microtenant_id"))
+	viper.BindEnv("microtenant_id", "ZPA_MICROTENANT_ID")
 
-	rootCmd.PersistentFlags().StringVarP(&zia_password, "zia_password", "", "", "ZIA password")
-	_ = viper.BindPFlag("zia_password", rootCmd.PersistentFlags().Lookup("zia_password"))
-	_ = viper.BindEnv("zia_password", "ZIA_PASSWORD")
+	rootCmd.PersistentFlags().StringVar(&oneAPICloud, "zscaler_cloud", "", "OneAPI optional zscaler_cloud (e.g. PRODUCTION)")
+	viper.BindPFlag("zscaler_cloud", rootCmd.PersistentFlags().Lookup("zscaler_cloud"))
+	viper.BindEnv("zscaler_cloud", "ZSCALER_CLOUD")
 
-	rootCmd.PersistentFlags().StringVarP(&zia_api_key, "zia_api_key", "", "", "ZIA API Key")
-	_ = viper.BindPFlag("zia_api_key", rootCmd.PersistentFlags().Lookup("zia_api_key"))
-	_ = viper.BindEnv("zia_api_key", "ZIA_API_KEY")
+	// -----------------------
+	// ZPA Legacy flags (V2)
+	// -----------------------
+	rootCmd.PersistentFlags().StringVar(&zpaClientID, "zpa_client_id", "", "ZPA legacy client ID (required if using legacy mode for ZPA resources)")
+	viper.BindPFlag("zpa_client_id", rootCmd.PersistentFlags().Lookup("zpa_client_id"))
+	viper.BindEnv("zpa_client_id", "ZPA_CLIENT_ID")
 
-	rootCmd.PersistentFlags().StringVarP(&zia_cloud, "zia_cloud", "", "", "ZIA Cloud (i.e zscalerthree)")
-	_ = viper.BindPFlag("zia_cloud", rootCmd.PersistentFlags().Lookup("zia_cloud"))
-	_ = viper.BindEnv("zia_cloud", "ZIA_CLOUD")
+	rootCmd.PersistentFlags().StringVar(&zpaClientSecret, "zpa_client_secret", "", "ZPA legacy client secret")
+	viper.BindPFlag("zpa_client_secret", rootCmd.PersistentFlags().Lookup("zpa_client_secret"))
+	viper.BindEnv("zpa_client_secret", "ZPA_CLIENT_SECRET")
 
+	rootCmd.PersistentFlags().StringVar(&zpaCustomerID, "zpa_customer_id", "", "ZPA legacy customer ID")
+	viper.BindPFlag("zpa_customer_id", rootCmd.PersistentFlags().Lookup("zpa_customer_id"))
+	viper.BindEnv("zpa_customer_id", "ZPA_CUSTOMER_ID")
+
+	rootCmd.PersistentFlags().StringVar(&zpaMicrotenantID, "zpa_microtenant_id", "", "ZPA legacy microtenant_id (optional)")
+	viper.BindPFlag("zpa_microtenant_id", rootCmd.PersistentFlags().Lookup("zpa_microtenant_id"))
+	viper.BindEnv("zpa_microtenant_id", "ZPA_MICROTENANT_ID")
+
+	rootCmd.PersistentFlags().StringVar(&zpaCloud, "zpa_cloud", "", "ZPA Cloud environment (optional, e.g. PRODUCTION)")
+	viper.BindPFlag("zpa_cloud", rootCmd.PersistentFlags().Lookup("zpa_cloud"))
+	viper.BindEnv("zpa_cloud", "ZPA_CLOUD")
+
+	// -----------------------
+	// ZIA Legacy flags (V2)
+	// -----------------------
+	rootCmd.PersistentFlags().StringVar(&ziaUsername, "zia_username", "", "ZIA legacy username (required if using legacy mode for ZIA resources)")
+	viper.BindPFlag("zia_username", rootCmd.PersistentFlags().Lookup("zia_username"))
+	viper.BindEnv("zia_username", "ZIA_USERNAME")
+
+	rootCmd.PersistentFlags().StringVar(&ziaPassword, "zia_password", "", "ZIA legacy password (required)")
+	viper.BindPFlag("zia_password", rootCmd.PersistentFlags().Lookup("zia_password"))
+	viper.BindEnv("zia_password", "ZIA_PASSWORD")
+
+	rootCmd.PersistentFlags().StringVar(&ziaAPIKey, "zia_api_key", "", "ZIA legacy api_key (required)")
+	viper.BindPFlag("zia_api_key", rootCmd.PersistentFlags().Lookup("zia_api_key"))
+	viper.BindEnv("zia_api_key", "ZIA_API_KEY")
+
+	rootCmd.PersistentFlags().StringVar(&ziaCloud, "zia_cloud", "", "ZIA Cloud environment (required for ZIA legacy, e.g. zscalerthree)")
+	viper.BindPFlag("zia_cloud", rootCmd.PersistentFlags().Lookup("zia_cloud"))
+	viper.BindEnv("zia_cloud", "ZIA_CLOUD")
+
+	// -----------------------
+	// Global toggle
+	// -----------------------
+	rootCmd.PersistentFlags().BoolVar(&useLegacyClient, "use_legacy_client", false, "Enable Legacy Mode (true/false)")
+	viper.BindPFlag("use_legacy_client", rootCmd.PersistentFlags().Lookup("use_legacy_client"))
+	viper.BindEnv("use_legacy_client", "ZSCALER_USE_LEGACY_CLIENT")
+
+	// -----------------------
+	// Additional flags
+	// -----------------------
 	rootCmd.PersistentFlags().StringVar(&excludedResources, "exclude", "", "Which resources you wish to exclude")
-
 	rootCmd.PersistentFlags().StringVar(&resourceType_, "resource-type", "", "Which resource you wish to generate")
-
 	rootCmd.PersistentFlags().StringVar(&resources, "resources", "", "Which resources you wish to import")
-
 	rootCmd.PersistentFlags().BoolP("help", "h", false, "Show help for zscaler-terraformer")
-
 	rootCmd.PersistentFlags().StringVar(&supportedResources, "supported-resources", "", "List supported resources for ZPA or ZIA")
-
-	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Specify verbose output (same as setting log level to debug)")
-
+	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose debug output")
 	rootCmd.PersistentFlags().BoolVarP(&displayReleaseVersion, "version", "", false, "Display the release version")
 
 	rootCmd.PersistentFlags().StringVar(&terraformInstallPath, "terraform-install-path", ".", "Path to the default Terraform installation")
-	_ = viper.BindPFlag("terraform-install-path", rootCmd.PersistentFlags().Lookup("terraform-install-path"))
-	_ = viper.BindEnv("terraform-install-path", "ZSCALER_TERRAFORM_INSTALL_PATH")
+	viper.BindPFlag("terraform-install-path", rootCmd.PersistentFlags().Lookup("terraform-install-path"))
+	viper.BindEnv("terraform-install-path", "ZSCALER_TERRAFORM_INSTALL_PATH")
 
 	rootCmd.PersistentFlags().StringVar(&terraformInstallPath, "zpa-terraform-install-path", ".", "Path to the ZPA Terraform installation")
-	_ = viper.BindPFlag("zpa-terraform-install-path", rootCmd.PersistentFlags().Lookup("zpa-terraform-install-path"))
-	_ = viper.BindEnv("zpa-terraform-install-path", "ZSCALER_ZPA_TERRAFORM_INSTALL_PATH")
+	viper.BindPFlag("zpa-terraform-install-path", rootCmd.PersistentFlags().Lookup("zpa-terraform-install-path"))
+	viper.BindEnv("zpa-terraform-install-path", "ZSCALER_ZPA_TERRAFORM_INSTALL_PATH")
 
 	rootCmd.PersistentFlags().StringVar(&terraformInstallPath, "zia-terraform-install-path", ".", "Path to the ZIA Terraform installation")
-	_ = viper.BindPFlag("zia-terraform-install-path", rootCmd.PersistentFlags().Lookup("zia-terraform-install-path"))
-	_ = viper.BindEnv("zia-terraform-install-path", "ZSCALER_ZIA_TERRAFORM_INSTALL_PATH")
+	viper.BindPFlag("zia-terraform-install-path", rootCmd.PersistentFlags().Lookup("zia-terraform-install-path"))
+	viper.BindEnv("zia-terraform-install-path", "ZSCALER_ZIA_TERRAFORM_INSTALL_PATH")
 
 	rootCmd.PersistentFlags().StringVar(&zpaProviderNamespace, "zpa-provider-namespace", "", "Custom namespace for the ZPA provider")
-	_ = viper.BindPFlag("zpa-provider-namespace", rootCmd.PersistentFlags().Lookup("zpa-provider-namespace"))
-	_ = viper.BindEnv("zpa-provider-namespace", "ZPA_PROVIDER_NAMESPACE")
+	viper.BindPFlag("zpa-provider-namespace", rootCmd.PersistentFlags().Lookup("zpa-provider-namespace"))
+	viper.BindEnv("zpa-provider-namespace", "ZPA_PROVIDER_NAMESPACE")
 
-	rootCmd.PersistentFlags().StringVar(&zpaProviderNamespace, "zia-provider-namespace", "", "Custom namespace for the ZIA provider")
-	_ = viper.BindPFlag("zia-provider-namespace", rootCmd.PersistentFlags().Lookup("zia-provider-namespace"))
-	_ = viper.BindEnv("zia-provider-namespace", "ZIA_PROVIDER_NAMESPACE")
-
+	rootCmd.PersistentFlags().StringVar(&ziaProviderNamespace, "zia-provider-namespace", "", "Custom namespace for the ZIA provider")
+	viper.BindPFlag("zia-provider-namespace", rootCmd.PersistentFlags().Lookup("zia-provider-namespace"))
+	viper.BindEnv("zia-provider-namespace", "ZIA_PROVIDER_NAMESPACE")
 }
 
-// initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	viper.AutomaticEnv() // read in environment variables that match
-	viper.SetEnvPrefix("")
+	viper.AutomaticEnv()   // read environment variables if set
+	viper.SetEnvPrefix("") // optional prefix, can be removed if undesired
 
-	// Ensure ZSCALER_SDK_CACHE_DISABLED is set to true
-	err := os.Setenv("ZSCALER_SDK_CACHE_DISABLED", "true")
-	if err != nil {
-		log.Fatalf("failed to set environment variable ZSCALER_SDK_CACHE_DISABLED: %v", err)
-	}
-
+	// Set log level
 	var cfgLogLevel = logrus.InfoLevel
-
 	if verbose {
 		cfgLogLevel = logrus.DebugLevel
 	}
-
 	log.SetLevel(cfgLogLevel)
 
-	// Debugging statements to verify the values
-	log.Debug("ZPA Client ID:", viper.GetString("zpa_client_id"))
-	log.Debug("ZPA Client Secret:", viper.GetString("zpa_client_secret"))
-	log.Debug("ZPA Customer ID:", viper.GetString("zpa_customer_id"))
-	log.Debug("ZPA Cloud:", viper.GetString("zpa_cloud"))
-	log.Debug("ZIA Username:", viper.GetString("zia_username"))
-	log.Debug("ZIA Password:", viper.GetString("zia_password"))
-	log.Debug("ZIA API Key:", viper.GetString("zia_api_key"))
-	log.Debug("ZIA Cloud:", viper.GetString("zia_cloud"))
+	// Read the toggle
+	useLegacyClient = viper.GetBool("use_legacy_client")
+
+	// -----------------------
+	// Read the CLI or env values into our global variables
+	// -----------------------
+	// OneAPI
+	oneAPIClientID = viper.GetString("client_id")
+	oneAPIClientSecret = viper.GetString("client_secret")
+	oneAPIVanityDomain = viper.GetString("vanity_domain")
+	oneAPICustomerID = viper.GetString("customer_id")
+	oneAPIMicrotenantID = viper.GetString("microtenant_id")
+	oneAPICloud = viper.GetString("zscaler_cloud")
+
+	// ZPA legacy
+	zpaClientID = viper.GetString("zpa_client_id")
+	zpaClientSecret = viper.GetString("zpa_client_secret")
+	zpaCustomerID = viper.GetString("zpa_customer_id")
+	zpaMicrotenantID = viper.GetString("zpa_microtenant_id")
+	zpaCloud = viper.GetString("zpa_cloud")
+
+	// ZIA legacy
+	ziaUsername = viper.GetString("zia_username")
+	ziaPassword = viper.GetString("zia_password")
+	ziaAPIKey = viper.GetString("zia_api_key")
+	ziaCloud = viper.GetString("zia_cloud")
+
+	// Debug logs of what we got
+	log.Debugf("use_legacy_client=%v", useLegacyClient)
+	log.Debugf("[ONEAPI] client_id=%s, client_secret=%s, vanity_domain=%s, customer_id=%s, microtenant_id=%s, zscaler_cloud=%s",
+		oneAPIClientID, oneAPIClientSecret, oneAPIVanityDomain, oneAPICustomerID, oneAPIMicrotenantID, oneAPICloud)
+	log.Debugf("[ZPA Legacy] zpa_client_id=%s, zpa_client_secret=%s, zpa_customer_id=%s, zpa_microtenant_id=%s, zpa_cloud=%s",
+		zpaClientID, zpaClientSecret, zpaCustomerID, zpaMicrotenantID, zpaCloud)
+	log.Debugf("[ZIA Legacy] zia_username=%s, zia_password=%s, zia_api_key=%s, zia_cloud=%s",
+		ziaUsername, ziaPassword, ziaAPIKey, ziaCloud)
+
+	log.Debug("[INFO] initConfig success (no validation).")
+
+	// ----------------------------------------------------
+	// FIX: Bridge the values from these top-level variables
+	// into the EXACT viper keys that the providers use.
+	// ----------------------------------------------------
+	// For OneAPI in providers/zpa/client.go or providers/zia/client.go:
+	viper.Set("client_id", oneAPIClientID)
+	viper.Set("client_secret", oneAPIClientSecret)
+	viper.Set("vanity_domain", oneAPIVanityDomain)
+	viper.Set("customer_id", oneAPICustomerID)
+	viper.Set("microtenant_id", oneAPIMicrotenantID)
+	viper.Set("zscaler_cloud", oneAPICloud)
+
+	// For ZPA Legacy in providers/zpa/client.go:
+	viper.Set("zpa_client_id", zpaClientID)
+	viper.Set("zpa_client_secret", zpaClientSecret)
+	viper.Set("zpa_customer_id", zpaCustomerID)
+	viper.Set("zpa_microtenant_id", zpaMicrotenantID)
+	viper.Set("zpa_cloud", zpaCloud)
+
+	// For ZIA Legacy (providers/zia/client.go or similar):
+	viper.Set("username", ziaUsername) // your code calls viper.GetString("username")
+	viper.Set("password", ziaPassword)
+	viper.Set("api_key", ziaAPIKey)
+	viper.Set("zia_cloud", ziaCloud) // some code calls viper.GetString("zia_cloud")
+
+	// Also set the legacy toggle for the second layer:
+	viper.Set("use_legacy_client", useLegacyClient)
 }
 
 func sharedPreRun(cmd *cobra.Command, args []string) {
@@ -252,27 +374,38 @@ func sharedPreRun(cmd *cobra.Command, args []string) {
 		if api == nil {
 			api = &Client{}
 		}
-		if strings.HasPrefix(resourceType_, "zpa_") || strings.Contains(resources, "zpa_") || resources == "*" || resources == "zpa" {
-			zpaClient, err := zpa.NewClient()
+		if wantsZPA(resourceType_, resources) {
+			zpaCli, err := zpa.NewClient()
 			if err != nil {
 				log.Fatal("failed to initialize ZPA client:", err)
 			}
-			api.ZPA = zpaClient
+			api.ZPAService = zpaCli.Service
 		}
-		if strings.HasPrefix(resourceType_, "zia_") || strings.Contains(resources, "zia_") || resources == "*" || resources == "zia" {
-			ziaClient, err := zia.NewClient()
+		if wantsZIA(resourceType_, resources) {
+			ziaCli, err := zia.NewClient()
 			if err != nil {
 				log.Fatal("failed to initialize ZIA client:", err)
 			}
-			api.ZIA = ziaClient
+			api.ZIAService = ziaCli.Service
 		}
 	}
+}
+
+func wantsZPA(rt, rs string) bool {
+	return strings.HasPrefix(rt, "zpa_") ||
+		strings.Contains(rs, "zpa_") ||
+		rs == "*" || rs == "zpa"
+}
+
+func wantsZIA(rt, rs string) bool {
+	return strings.HasPrefix(rt, "zia_") ||
+		strings.Contains(rs, "zia_") ||
+		rs == "*" || rs == "zia"
 }
 
 func listSupportedResources(prefix string) {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.AlignRight|tabwriter.Debug)
 
-	// Define headers with centering
 	header1 := "Resource"
 	header2 := "Generate Supported"
 	header3 := "Import Supported"
@@ -280,19 +413,23 @@ func listSupportedResources(prefix string) {
 	width2 := 18
 	width3 := 18
 
-	// Print table with double lined format and close the entire table
 	fmt.Fprintf(w, "╔%s╗\n", strings.Repeat("═", width1+width2+width3+10))
-	fmt.Fprintf(w, "║ %-*s │ %-*s │ %-*s   ║\n", width1, centerText(header1, width1), width2, centerText(header2, width2), width3, centerText(header3, width3))
+	fmt.Fprintf(w, "║ %-*s │ %-*s │ %-*s   ║\n",
+		width1, centerText(header1, width1),
+		width2, centerText(header2, width2),
+		width3, centerText(header3, width3))
 	fmt.Fprintf(w, "╠%s╣\n", strings.Repeat("═", width1+width2+width3+10))
 
 	for _, resource := range allSupportedResources {
 		if strings.HasPrefix(resource, prefix) {
-			fmt.Fprintf(w, "║ %-*s │ %-*s │ %-*s ║\n", width1, resource, width2, centerText("✅", width2), width3, centerText("✅", width3))
+			fmt.Fprintf(w, "║ %-*s │ %-*s │ %-*s ║\n",
+				width1, resource,
+				width2, centerText("✅", width2),
+				width3, centerText("✅", width3))
 		}
 	}
 	fmt.Fprintf(w, "╚%s╝\n", strings.Repeat("═", width1+width2+width3+10))
 
-	// Check for errors when flushing data to output
 	if err := w.Flush(); err != nil {
 		log.Fatalf("Error flushing output: %v", err)
 	}
