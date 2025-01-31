@@ -1126,7 +1126,6 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		if api.ZIAService == nil {
 			log.Fatal("ZIA service is not initialized")
 		}
-		// EXACTLY like the TF pattern:
 		service := api.ZIAService
 		gws, err := zpa_gateways.GetAll(ctx, service)
 		if err != nil {
@@ -1137,10 +1136,12 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 			if helpers.IsInList(gw.Name, []string{"Auto ZPA Gateway"}) {
 				continue
 			}
+			// Ensure type is always "ZPA"
+			gw.Type = "ZPA"
 			gwsFiltered = append(gwsFiltered, gw)
 		}
-		m, _ := json.Marshal(gwsFiltered)
 		resourceCount = len(gwsFiltered)
+		m, _ := json.Marshal(gwsFiltered)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_sandbox_rules":
 		if api.ZIAService == nil {

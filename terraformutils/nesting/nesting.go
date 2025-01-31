@@ -39,6 +39,9 @@ import (
 var log = logrus.New()
 
 var noSkipIDBlocks = map[string]map[string]bool{
+	"zia_forwarding_control_rule": {
+		"zpa_gateway": true,
+	},
 	"zia_firewall_dns_rule": {
 		"dns_gateway": true,
 	},
