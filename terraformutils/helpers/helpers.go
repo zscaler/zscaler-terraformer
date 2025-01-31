@@ -419,7 +419,9 @@ func FormatHeredoc(value string) string {
 	for i, line := range lines {
 		trimmedLine := strings.TrimSpace(line)
 		if trimmedLine != "" {
-			formatted += fmt.Sprintf("%s\n", trimmedLine)
+			// Escape `$` to `$$` to prevent Terraform interpretation issues
+			escapedLine := strings.ReplaceAll(trimmedLine, "$", "$$")
+			formatted += fmt.Sprintf("%s\n", escapedLine)
 		} else if i != len(lines)-1 {
 			formatted += "\n"
 		}

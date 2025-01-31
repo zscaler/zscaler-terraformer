@@ -12,10 +12,22 @@ Track all Zscaler Terraformer Tool releases. New resources, features, and bug fi
 
 ---
 
-``Last updated: v2.0.0``
+``Last updated: v2.0.1``
 
 ---
 
+## 2.0.1 (January, 31 2025)
+
+### Notes
+
+- Release date: **(January, 31 2025)**
+- Supported Terraform version: **v1.x.x**
+
+### Bug Fixes
+- [PR #257](https://github.com/zscaler/zscaler-terraformer/pull/257). Fixed ZIA import resource for `zia_dlp_notification_templates` due to heredoc missformatting. - [Issue #253](https://github.com/zscaler/zscaler-terraformer/issues/253)
+- [PR #257](https://github.com/zscaler/zscaler-terraformer/pull/257). Fixed ZIA import resource for `zia_end_user_notification` due to heredoc missformatting and attribute validation issue. - [Issue #254](https://github.com/zscaler/zscaler-terraformer/issues/254)
+- [PR #257](https://github.com/zscaler/zscaler-terraformer/pull/257). Fixed ZIA import resources for: `zia_forwarding_control_rule` due to missing attribute `id` within the `zpa_gateway` block. - [Issue #255](https://github.com/zscaler/zscaler-terraformer/issues/255)
+- [PR #257](https://github.com/zscaler/zscaler-terraformer/pull/257). Fixed ZIA import resources for: `zia_forwarding_control_zpa_gateway` due to missing attribute `type`. - [Issue #256](https://github.com/zscaler/zscaler-terraformer/issues/256)
 
 ## 2.0.0 (January, 29 2025) - BREAKING CHANGES
 

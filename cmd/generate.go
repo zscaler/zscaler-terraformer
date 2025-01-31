@@ -1360,7 +1360,6 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		if api.ZIAService == nil {
 			log.Fatal("ZIA service is not initialized")
 		}
-		// EXACTLY like the TF pattern:
 		service := api.ZIAService
 		gws, err := zpa_gateways.GetAll(ctx, service)
 		if err != nil {
@@ -1371,6 +1370,8 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 			if helpers.IsInList(gw.Name, []string{"Auto ZPA Gateway"}) {
 				continue
 			}
+			// Ensure type is always "ZPA"
+			gw.Type = "ZPA"
 			gwsFiltered = append(gwsFiltered, gw)
 		}
 		resourceCount = len(gwsFiltered)
@@ -1470,21 +1471,6 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		resourceCount = len(rulesFiltered)
 		m, _ := json.Marshal(rulesFiltered)
 		_ = json.Unmarshal(m, &jsonStructData)
-
-		// case "zia_advanced_settings":
-		// 	if api.ZIAService == nil {
-		// 		log.Fatal("ZIA service is not initialized")
-		// 	}
-		// 	// EXACTLY like the TF pattern:
-		// 	service := api.ZIAService
-		// 	advSettings, err := advanced_settings.GetAdvancedSettings(ctx, service)
-		// 	if err != nil {
-		// 		log.Fatal(err)
-		// 	}
-		// 	jsonPayload := []*advanced_settings.AdvancedSettings{advSettings}
-		// 	resourceCount = len(jsonPayload)
-		// 	m, _ := json.Marshal(jsonPayload)
-		// 	_ = json.Unmarshal(m, &jsonStructData)
 
 	case "zia_advanced_settings":
 		if api.ZIAService == nil {
@@ -1722,6 +1708,27 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 				continue
 			}
 
+			// Ensure proper Heredoc formatting for multi-line string attributes
+			if attrName == "quarantine_custom_notification_text" {
+				value := structData[apiAttrName]
+				if value != nil {
+					valueStr := strings.TrimSpace(value.(string))
+					formattedValue := helpers.FormatHeredoc(valueStr)
+					output += fmt.Sprintf("  %s = <<-EOT\n%s\nEOT\n\n", attrName, formattedValue)
+					continue
+				}
+			}
+
+			// Ensure proper Heredoc formatting for multi-line string attributes
+			if attrName == "plain_text_message" || attrName == "html_message" || attrName == "subject" {
+				value := structData[apiAttrName]
+				if value != nil {
+					valueStr := strings.TrimSpace(value.(string))
+					formattedValue := helpers.FormatHeredoc(valueStr) // Use the updated helper function
+					output += fmt.Sprintf("  %s = <<-EOT\n%s\nEOT\n\n", attrName, formattedValue)
+					continue
+				}
+			}
 			ty := r.Block.Attributes[attrName].AttributeType
 
 			// (A) ADD THIS BLOCK:
@@ -1811,15 +1818,6 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 					} else if resourceType == "zia_url_filtering_rules" && (attrName == "validity_start_time" || attrName == "validity_end_time") {
 						if strValue, ok := value.(string); ok {
 							value = strValue
-						}
-					} else if resourceType == "zia_dlp_notification_templates" && helpers.IsInList(attrName, []string{"subject", "plain_text_message", "html_message"}) {
-						valueStr := strings.ReplaceAll(value.(string), "$", "$$")
-						formattedValue := helpers.FormatHeredoc(valueStr)
-						switch attrName {
-						case "html_message", "plain_text_message":
-							output += fmt.Sprintf("  %s = <<-EOT\n%sEOT\n\n", attrName, formattedValue)
-						case "subject":
-							output += fmt.Sprintf("  %s = <<-EOT\n%sEOT\n", attrName, formattedValue)
 						}
 					}
 					output += nesting.WriteAttrLine(attrName, value, false)
