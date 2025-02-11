@@ -1047,20 +1047,25 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		m, _ := json.Marshal(jsonPayload)
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
+
 	case "zia_auth_settings_urls":
 		if api.ZIAService == nil {
 			log.Fatal("ZIA service is not initialized")
 		}
 		// EXACTLY like the TF pattern:
 		service := api.ZIAService
-		exemptedUrls, err := user_authentication_settings.Get(ctx, service)
+		urls, err := user_authentication_settings.Get(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
-		jsonPayload := []*user_authentication_settings.ExemptedUrls{exemptedUrls}
-		m, _ := json.Marshal(jsonPayload)
+		jsonPayload := []*user_authentication_settings.ExemptedUrls{urls}
 		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
+		if len(jsonStructData) > 0 {
+			dataMap := jsonStructData[0].(map[string]interface{})
+			dataMap["id"] = "all_urls"
+		}
 	case "zia_sandbox_behavioral_analysis":
 		if api.ZIAService == nil {
 			log.Fatal("ZIA service is not initialized")
@@ -1081,9 +1086,13 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 			return
 		}
 		jsonPayload := []*sandbox_settings.BaAdvancedSettings{hashes}
-		m, _ := json.Marshal(jsonPayload)
 		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
+		if len(jsonStructData) > 0 {
+			dataMap := jsonStructData[0].(map[string]interface{})
+			dataMap["id"] = "sandbox_settings"
+		}
 	case "zia_security_settings":
 		if api.ZIAService == nil {
 			log.Fatal("ZIA service is not initialized")
@@ -1095,9 +1104,13 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 			log.Fatal(err)
 		}
 		jsonPayload := []*security_policy_settings.ListUrls{urls}
-		m, _ := json.Marshal(jsonPayload)
 		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
+		if len(jsonStructData) > 0 {
+			dataMap := jsonStructData[0].(map[string]interface{})
+			dataMap["id"] = "all_urls"
+		}
 	case "zia_forwarding_control_rule":
 		if api.ZIAService == nil {
 			log.Fatal("ZIA service is not initialized")

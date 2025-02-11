@@ -1,5 +1,21 @@
 # Changelog
 
+## 2.0.2 (February, 10 2025)
+
+### Notes
+
+- Release date: **(February, 10 2025)**
+- Supported Terraform version: **v1.x.x**
+
+### Bug Fixes
+- [PR #259](https://github.com/zscaler/zscaler-terraformer/pull/259). Fixed `zia_url_filtering_rules` to auto-set the attribute `url_categories` to `ANY` whenever it's emtpy.
+- [PR #259](https://github.com/zscaler/zscaler-terraformer/pull/259). Implemented edge case handling for the resource `zia_advanced_threat_settings` due to API camelCase return issue.
+- [PR #259](https://github.com/zscaler/zscaler-terraformer/pull/259). Fixed the custom ID for the following resources:
+  - `zia_auth_settings_urls`
+  - `zia_sandbox_behavioral_analysis`
+  - `zia_security_settings`
+  - `zia_advanced_threat_settings`
+
 ## 2.0.1 (January, 31 2025)
 
 ### Notes

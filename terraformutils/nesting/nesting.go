@@ -66,6 +66,26 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 	for _, block := range sortedNestedBlocks {
 		apiBlock := MapTfFieldNameToAPI(resourceType, block)
 
+		if resourceType == "zia_url_filtering_rules" && block == "cbi_profile" {
+			// We look up the raw `cbiProfile` data that the API returns:
+			cbiData, _ := structData["cbiProfile"].(map[string]interface{})
+
+			// If it's either missing or has none of the three relevant attributes, skip writing the block:
+			if cbiData == nil {
+				// No cbiProfile at all => skip
+				continue
+			}
+
+			// Check if the 3 attributes ("id", "name", "url") are empty or nil
+			idVal, _ := cbiData["id"].(string)
+			nameVal, _ := cbiData["name"].(string)
+			urlVal, _ := cbiData["url"].(string)
+
+			// If all three are empty, skip:
+			if idVal == "" && nameVal == "" && urlVal == "" {
+				continue
+			}
+		}
 		// Skip 'applications' block for 'zpa_segment_group' and `zpa_server_group` resource.
 		if (resourceType == "zpa_segment_group" || resourceType == "zpa_server_group") && block == "applications" {
 			continue // This skips the current iteration of the loop.
@@ -412,7 +432,7 @@ func WriteAttrLine(key string, value interface{}, usedInBlock bool) string {
 	}
 
 	// Handle `dest_countries` and `source_countries` for `zia_firewall_filtering_rule`
-	if helpers.IsInList(key, []string{"dest_countries", "source_countries"}) {
+	if helpers.IsInList(key, []string{"dest_countries", "source_countries", "blocked_countries"}) {
 		if countryList, ok := value.([]string); ok {
 			// Strip the "COUNTRY_" prefix
 			for i, country := range countryList {
@@ -562,6 +582,19 @@ func WriteAttrLine(key string, value interface{}, usedInBlock bool) string {
 }
 
 func MapTfFieldNameToAPI(resourceType, fieldName string) string {
+	if resourceType == "zia_advanced_threat_settings" {
+		switch fieldName {
+		case "web_spam_blocked":
+			return "webspamBlocked" // EXACT match for API
+		case "web_spam_capture":
+			return "webspamCapture"
+		case "activex_blocked":
+			return "activeXBlocked"
+		case "activex_capture":
+			return "activeXCapture"
+			// add more special cases if needed...
+		}
+	}
 	// Handle special cases for "TLS"
 	if fieldName == "min_client_tls_version" {
 		return "minClientTLSVersion"
