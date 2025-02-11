@@ -217,7 +217,7 @@ func buildResourceName(resourceType string, structData map[string]interface{}) s
 	var shortUUID string
 
 	// For resources that typically lack a unique identifier, generate a short UUID.
-	resourcesRequiringShortID := []string{"zia_sandbox_behavioral_analysis", "zia_security_settings", "zia_auth_settings_urls"}
+	resourcesRequiringShortID := []string{}
 	if helpers.IsInList(resourceType, resourcesRequiringShortID) {
 		// Generate a UUID and use the first 8 characters.
 		shortUUID = uuid.New().String()[:8]
@@ -1287,14 +1287,18 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		}
 		// EXACTLY like the TF pattern:
 		service := api.ZIAService
-		exemptedUrls, err := user_authentication_settings.Get(ctx, service)
+		urls, err := user_authentication_settings.Get(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
-		jsonPayload := []*user_authentication_settings.ExemptedUrls{exemptedUrls}
+		jsonPayload := []*user_authentication_settings.ExemptedUrls{urls}
 		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
+		if len(jsonStructData) > 0 {
+			dataMap := jsonStructData[0].(map[string]interface{})
+			dataMap["id"] = "all_urls"
+		}
 	case "zia_sandbox_behavioral_analysis":
 		if api.ZIAService == nil {
 			log.Fatal("ZIA service is not initialized")
@@ -1315,9 +1319,13 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 			return
 		}
 		jsonPayload := []*sandbox_settings.BaAdvancedSettings{hashes}
-		m, _ := json.Marshal(jsonPayload)
 		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
+		if len(jsonStructData) > 0 {
+			dataMap := jsonStructData[0].(map[string]interface{})
+			dataMap["id"] = "sandbox_settings"
+		}
 	case "zia_security_settings":
 		if api.ZIAService == nil {
 			log.Fatal("ZIA service is not initialized")
@@ -1332,6 +1340,10 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
+		if len(jsonStructData) > 0 {
+			dataMap := jsonStructData[0].(map[string]interface{})
+			dataMap["id"] = "all_urls"
+		}
 	case "zia_forwarding_control_rule":
 		if api.ZIAService == nil {
 			log.Fatal("ZIA service is not initialized")
@@ -1529,7 +1541,6 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 			dataMap := jsonStructData[0].(map[string]interface{})
 			dataMap["id"] = "bypass_url"
 		}
-
 	case "zia_advanced_threat_settings":
 		if api.ZIAService == nil {
 			log.Fatal("ZIA service is not initialized")
@@ -1730,7 +1741,26 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 				}
 			}
 			ty := r.Block.Attributes[attrName].AttributeType
-
+			// If this attribute is "url_categories" and empty/missing, set to ANY
+			if attrName == "url_categories" {
+				raw := structData[apiAttrName]
+				if raw == nil {
+					// Not present? Force to ANY
+					structData[apiAttrName] = []string{"ANY"}
+				} else {
+					// Convert raw to check emptiness
+					switch val := raw.(type) {
+					case []string:
+						if len(val) == 0 {
+							structData[apiAttrName] = []string{"ANY"}
+						}
+					case []interface{}:
+						if len(val) == 0 {
+							structData[apiAttrName] = []string{"ANY"}
+						}
+					}
+				}
+			}
 			// (A) ADD THIS BLOCK:
 			// If this attribute is a boolean in the schema, but structData doesn’t have it at all,
 			// default it to false so WriteAttrLine will print “= false”.
