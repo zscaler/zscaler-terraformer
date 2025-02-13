@@ -12,10 +12,23 @@ Track all Zscaler Terraformer Tool releases. New resources, features, and bug fi
 
 ---
 
-``Last updated: v2.0.2``
+``Last updated: v2.0.3``
 
 ---
 
+## 2.0.3 (February, 12 2025)
+
+### Notes
+
+- Release date: **(February, 10 2025)**
+- Supported Terraform version: **v1.x.x**
+
+### Bug Fixes
+- [PR #260](https://github.com/zscaler/zscaler-terraformer/pull/260). Fixed ZIA `zia_ssl_inspection_rules` edge case attributes.
+    - `show_eun`
+    - `show_eunatp`
+    **NOTE** The attribute `url_categories` is set in the HCL even when empty with the value of `ANY`. This will cause a drift; however, you can safely ignore it.
+    
 ## 2.0.2 (February, 10 2025)
 
 ### Notes
