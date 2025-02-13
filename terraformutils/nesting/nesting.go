@@ -605,6 +605,12 @@ func MapTfFieldNameToAPI(resourceType, fieldName string) string {
 	if fieldName == "min_tls_version" {
 		return "minTLSVersion"
 	}
+	if fieldName == "show_eun" {
+		return "showEUN"
+	}
+	if fieldName == "show_eunatp" {
+		return "showEUNATP"
+	}
 	// Fallback
 	return strcase.ToLowerCamel(fieldName)
 }
