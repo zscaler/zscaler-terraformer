@@ -387,8 +387,11 @@ choco install zscaler-terraformer
 From releases you can execute the following commands:
 
 ```shell
-curl -LO "https://github.com/zscaler/zscaler-terraformer/releases/download/$(curl -s https://api.github.com/repos/zscaler/zscaler-terraformer/releases/latest | grep tag_name | cut -d '"' -f 4)/zscaler-terraformer_1.3.0_linux_amd64.zip"
-unzip zscaler-terraformer_1.3.0_linux_amd64.zip
+LATEST_TAG=$(curl -s https://api.github.com/repos/zscaler/zscaler-terraformer/releases/latest | grep '"tag_name":' | cut -d '"' -f 4)
+LATEST_VERSION=$(echo "$LATEST_TAG" | sed 's/v//')
+ZIP_FILE="zscaler-terraformer_${LATEST_VERSION}_linux_amd64.zip"
+curl -LO "https://github.com/zscaler/zscaler-terraformer/releases/download/${LATEST_TAG}/${ZIP_FILE}"
+unzip "$ZIP_FILE"
 chmod +x zscaler-terraformer
 sudo mv zscaler-terraformer /usr/local/bin
 ```
