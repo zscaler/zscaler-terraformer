@@ -34,8 +34,8 @@ github.com/go-git/go-billy/v5 v5.6.0 h1:w2hPNtoehvJIxR00Vb4xX94qHQi/ApZfX+nBE2Cj
 github.com/go-git/go-billy/v5 v5.6.0/go.mod h1:sFDq7xD3fn3E0GOwUSZqHo9lrkmx8xJhA0ZrfvjBRGM=
 github.com/go-git/go-git/v5 v5.13.0 h1:vLn5wlGIh/X78El6r3Jr+30W16Blk0CTcxTYcYPWi5E=
 github.com/go-git/go-git/v5 v5.13.0/go.mod h1:Wjo7/JyVKtQgUNdXYXIepzWfJQkUEIGvkvVkiXRR/zw=
-github.com/go-jose/go-jose/v3 v3.0.3 h1:fFKWeig/irsp7XD2zBxvnmA/XaRWp5V3CBsZXJF7G7k=
-github.com/go-jose/go-jose/v3 v3.0.3/go.mod h1:5b+7YgP7ZICgJDBdfjZaIt+H/9L9T/YQrVfLAMboGkQ=
+github.com/go-jose/go-jose/v3 v3.0.4 h1:Wp5HA7bLQcKnf6YYao/4kpRpVMp/yf6+pJKV8WFSaNY=
+github.com/go-jose/go-jose/v3 v3.0.4/go.mod h1:5b+7YgP7ZICgJDBdfjZaIt+H/9L9T/YQrVfLAMboGkQ=
 github.com/golang-jwt/jwt/v5 v5.2.1 h1:OuVbFODueb089Lh128TAcimifWaLhJwVflnrgM17wHk=
 github.com/golang-jwt/jwt/v5 v5.2.1/go.mod h1:pqrtFR0X4osieyHYxtmOUWsAWrfe1Q5UVIyoH402zdk=
 github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da h1:oI5xCqsCo564l8iNU+DwB5epxmsaqB+rhGL0m5jtYqE=
