@@ -1395,12 +1395,19 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		}
 		// EXACTLY like the TF pattern:
 		service := api.ZIAService
-		jsonPayload, err := sandbox_rules.GetAll(ctx, service)
+		rules, err := sandbox_rules.GetAll(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
-		resourceCount = len(jsonPayload)
-		m, _ := json.Marshal(jsonPayload)
+		rulesFiltered := []sandbox_rules.SandboxRules{}
+		for _, rule := range rules {
+			if helpers.IsInList(rule.Name, []string{"Default BA Rule"}) {
+				continue
+			}
+			rulesFiltered = append(rulesFiltered, rule)
+		}
+		resourceCount = len(rulesFiltered)
+		m, _ := json.Marshal(rulesFiltered)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_ssl_inspection_rules":
 		if api.ZIAService == nil {
