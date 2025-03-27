@@ -43,11 +43,14 @@ TFPROVIDERLINT = tfproviderlint
 STATICCHECK = staticcheck
 BINARY_NAME = zscaler-terraformer
 
+# Fully qualified variable for use with ldflags
+LD_FLAGS=-ldflags="-X github.com/zscaler/zscaler-terraformer/cmd.versionString=$(VERSION)"
+
 build:
 	@go build \
 		-gcflags=all=-trimpath=$(GOPATH) \
 		-asmflags=all=-trimpath=$(GOPATH) \
-		-ldflags="-X main.versionString=$(VERSION)" \
+		$(LD_FLAGS) \
 		-o $(BINARY_NAME) main.go
 
 install: GOOS=$(shell go env GOOS)
@@ -64,7 +67,7 @@ install:
 	@go build \
 		-gcflags=all=-trimpath=$(GOPATH) \
 		-asmflags=all=-trimpath=$(GOPATH) \
-		-ldflags="-X main.versionString=$(VERSION)" \
+		$(LD_FLAGS) \
 		-o $(DESTINATION)/$(BINARY_NAME) main.go
 
 build_all:
@@ -129,4 +132,8 @@ tools-update:
 validate-tf:
 	@bash scripts/validate-tf.sh
 
-.PHONY: build test fmt validate-tf vendor-status vet fmt fmtcheck errcheck tools vendor-status
+print-version:
+	@echo "VERSION = $(VERSION)"
+	@echo "LD_FLAGS = $(LD_FLAGS)"
+
+.PHONY: build install build_all test_zpa test_zia vet imports fmt fmtcheck errcheck lint tools tools-update validate-tf

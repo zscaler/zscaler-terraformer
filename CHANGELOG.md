@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.0.4 (March, 26 2025)
+
+### Notes
+
+- Release date: **(March, 26 2025)**
+- Supported Terraform version: **v1.x.x**
+
+### Bug Fixes
+- [PR #271](https://github.com/zscaler/zscaler-terraformer/pull/271). Fixed ZIA `zia_sandbox_rules` resource to exclude the import of default rule.
+- [PR #271](https://github.com/zscaler/zscaler-terraformer/pull/271). Fixed version display information.
+
 ## 2.0.3 (February, 12 2025)
 
 ### Notes

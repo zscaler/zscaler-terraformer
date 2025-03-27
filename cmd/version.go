@@ -73,18 +73,24 @@ var versionCmd = &cobra.Command{
 
 func getCLIVersion() string {
 	if versionString == "dev" {
+		// Attempt to get a tag name from Git
 		gitDescribe := exec.Command("git", "describe", "--tags", "--abbrev=0")
 		gitDescribeStdout, err := gitDescribe.Output()
 		if err != nil {
-			log.Error("failed to exec to `git`")
+			// If we fail, just keep it "dev"
+			return versionString
 		}
 
+		// Attempt to get the short commit SHA
 		gitSha := exec.Command("git", "rev-parse", "--short=12", "HEAD")
 		gitShaStdout, err := gitSha.Output()
 		if err != nil {
-			log.Error("failed to exec to `git`")
+			// If we fail here, just return e.g. "v1.2.3-dev"
+			return strings.TrimSpace(string(gitDescribeStdout)) + "-" + versionString
 		}
-		versionString = strings.TrimSpace(string(gitDescribeStdout)) + "-" + versionString + "+" + strings.TrimSpace(string(gitShaStdout))
+
+		versionString = strings.TrimSpace(string(gitDescribeStdout)) +
+			"-dev+" + strings.TrimSpace(string(gitShaStdout))
 	}
 	return versionString
 }
