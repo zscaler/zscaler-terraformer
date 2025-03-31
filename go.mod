@@ -2,6 +2,8 @@ module github.com/zscaler/zscaler-terraformer/v2
 
 go 1.23.1
 
+toolchain go1.24.1
+
 require (
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/terraform-exec v0.22.0
@@ -11,7 +13,7 @@ require (
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/viper v1.19.0
 	github.com/zclconf/go-cty v1.16.2
-	github.com/zscaler/zscaler-sdk-go/v3 v3.1.12
+	github.com/zscaler/zscaler-sdk-go/v3 v3.1.13
 )
 
 require (
