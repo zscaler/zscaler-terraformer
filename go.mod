@@ -2,13 +2,15 @@ module github.com/zscaler/zscaler-terraformer/v2
 
 go 1.23.1
 
+toolchain go1.24.1
+
 require (
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/terraform-exec v0.22.0
 	github.com/hashicorp/terraform-json v0.24.0
 	github.com/iancoleman/strcase v0.3.0
 	github.com/sirupsen/logrus v1.9.3
-	github.com/spf13/cobra v1.8.1
+	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.19.0
 	github.com/zclconf/go-cty v1.16.2
 	github.com/zscaler/zscaler-sdk-go/v3 v3.1.12
@@ -44,7 +46,7 @@ require (
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/spf13/afero v1.11.0 // indirect
 	github.com/spf13/cast v1.6.0 // indirect
-	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/crypto v0.33.0 // indirect
