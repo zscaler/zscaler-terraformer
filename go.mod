@@ -10,7 +10,7 @@ require (
 	github.com/hashicorp/terraform-json v0.24.0
 	github.com/iancoleman/strcase v0.3.0
 	github.com/sirupsen/logrus v1.9.3
-	github.com/spf13/cobra v1.8.1
+	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.20.1
 	github.com/zclconf/go-cty v1.16.2
 	github.com/zscaler/zscaler-sdk-go/v3 v3.1.12
