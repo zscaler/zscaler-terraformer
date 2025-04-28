@@ -13,7 +13,7 @@ require (
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.20.1
 	github.com/zclconf/go-cty v1.16.2
-	github.com/zscaler/zscaler-sdk-go/v3 v3.1.12
+	github.com/zscaler/zscaler-sdk-go/v3 v3.2.4
 )
 
 require (
@@ -48,6 +48,6 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/crypto v0.35.0 // indirect
 	golang.org/x/sys v0.30.0 // indirect
-	golang.org/x/text v0.23.0 // indirect
+	golang.org/x/text v0.24.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
