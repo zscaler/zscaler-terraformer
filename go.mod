@@ -13,7 +13,7 @@ require (
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.20.1
 	github.com/zclconf/go-cty v1.16.2
-	github.com/zscaler/zscaler-sdk-go/v3 v3.2.4
+	github.com/zscaler/zscaler-sdk-go/v3 v3.3.0
 )
 
 require (
