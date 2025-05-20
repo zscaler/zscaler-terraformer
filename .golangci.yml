@@ -4,11 +4,9 @@ run:
   timeout: 5m
   issues-exit-code: 1
   tests: true
-  skip-dirs-use-default: true
   modules-download-mode: readonly
 
 linters:
-  disable-all: true
   enable:
     # - bodyclose    # ensure HTTP response bodies are successfully closed.
     - contextcheck # check we are passing context an inherited context.
@@ -22,6 +20,3 @@ linters:
     - tparallel    # detects inappropriate usage of t.Parallel() method in your Go test codes.
     - unparam      # reports unused function parameters.
     - whitespace   # detection of leading and trailing whitespace.
-
-output:
-  format: colored-line-number
