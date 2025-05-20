@@ -27,4 +27,4 @@ jobs:
           version: v2.1.6
           only-new-issues: true
           skip-cache: true
-          args: --reporter=basic
+          args: --reporter=github-actions
