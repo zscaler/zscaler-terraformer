@@ -1505,7 +1505,6 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
-		// Force the "id" to be "advanced_settings"
 		if len(jsonStructData) > 0 {
 			dataMap := jsonStructData[0].(map[string]interface{})
 			dataMap["id"] = "advanced_settings"

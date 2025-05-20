@@ -247,6 +247,12 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 		} else if helpers.IsInList(resourceType, []string{"zpa_policy_access_rule"}) && block == "app_server_groups" {
 			output += helpers.ListIdsStringBlock(block, structData["appServerGroups"])
 			continue
+		} else if helpers.IsInList(resourceType, []string{"zpa_server_group", "zpa_policy_access_rule_v2"}) && block == "app_connector_groups" {
+			output += helpers.ListIdsStringBlock(block, structData["appConnectorGroups"])
+			continue
+		} else if helpers.IsInList(resourceType, []string{"zpa_policy_access_rule_v2"}) && block == "app_server_groups" {
+			output += helpers.ListIdsStringBlock(block, structData["appServerGroups"])
+			continue
 		} else if helpers.IsInList(resourceType, []string{"zpa_service_edge_group"}) && helpers.IsInList(block, []string{"service_edges", "trusted_networks"}) {
 			output += helpers.ListIdsStringBlock(block, structData[apiBlock])
 			continue
@@ -581,6 +587,7 @@ func WriteAttrLine(key string, value interface{}, usedInBlock bool) string {
 	return ""
 }
 
+// IMPLEMENTING THIS AS A WORKAROUND TO HANDLE NON-STANDARD CAMEL-CASE ATTRIBUITES
 func MapTfFieldNameToAPI(resourceType, fieldName string) string {
 	if resourceType == "zia_advanced_threat_settings" {
 		switch fieldName {
@@ -595,6 +602,79 @@ func MapTfFieldNameToAPI(resourceType, fieldName string) string {
 			// add more special cases if needed...
 		}
 	}
+	if resourceType == "zia_advanced_settings" {
+		switch fieldName {
+		case "http_range_header_remove_url_categories":
+			return "httpRangeHeaderRemoveUrlCategories"
+		case "enable_dns_resolution_on_transparent_proxy":
+			return "enableDnsResolutionOnTransparentProxy"
+		case "enable_ipv6_dns_resolution_on_transparent_proxy":
+			return "enableIPv6DnsResolutionOnTransparentProxy"
+		case "enable_ipv6_dns_optimization_on_all_transparent_proxy":
+			return "enableIPv6DnsOptimizationOnAllTransparentProxy"
+		case "enable_evaluate_policy_on_global_ssl_bypass":
+			return "enableEvaluatePolicyOnGlobalSSLBypass"
+		case "dns_resolution_on_transparent_proxy_exempt_url_categories":
+			return "dnsResolutionOnTransparentProxyExemptUrlCategories"
+		case "dns_resolution_on_transparent_proxy_ipv6_exempt_url_categories":
+			return "dnsResolutionOnTransparentProxyIPv6ExemptUrlCategories"
+		case "dns_resolution_on_transparent_proxy_exempt_urls":
+			return "dnsResolutionOnTransparentProxyExemptUrls"
+		case "dns_resolution_on_transparent_proxy_exempt_apps":
+			return "dnsResolutionOnTransparentProxyExemptApps"
+		case "dns_resolution_on_transparent_proxy_ipv6_exempt_apps":
+			return "dnsResolutionOnTransparentProxyIPv6ExemptApps"
+		case "dns_resolution_on_transparent_proxy_url_categories":
+			return "dnsResolutionOnTransparentProxyUrlCategories"
+		case "dns_resolution_on_transparent_proxy_ipv6_url_categories":
+			return "dnsResolutionOnTransparentProxyIPv6UrlCategories"
+		case "dns_resolution_on_transparent_proxy_urls":
+			return "dnsResolutionOnTransparentProxyUrls"
+		case "dns_resolution_on_transparent_proxy_apps":
+			return "dnsResolutionOnTransparentProxyApps"
+		case "dns_resolution_on_transparent_proxy_ipv6_apps":
+			return "dnsResolutionOnTransparentProxyIPv6Apps"
+		case "log_internal_ip":
+			return "logInternalIp"
+		case "enforce_surrogate_ip_for_windows_app":
+			return "enforceSurrogateIpForWindowsApp"
+		case "track_http_tunnel_on_http_ports":
+			return "trackHttpTunnelOnHttpPorts"
+		case "block_http_tunnel_on_non_http_ports":
+			return "blockHttpTunnelOnNonHttpPorts"
+		case "block_domain_fronting_on_host_header":
+			return "blockDomainFrontingOnHostHeader"
+		case "zscaler_client_connector_1_and_pac_road_warrior_in_firewall":
+			return "zscalerClientConnector1AndPacRoadWarriorInFirewall"
+		case "http2_nonbrowser_traffic_enabled":
+			return "http2NonbrowserTrafficEnabled"
+		case "sipa_xff_header_enabled":
+			return "sipaXffHeaderEnabled"
+		case "block_non_http_on_http_port_enabled":
+			return "blockNonHttpOnHttpPortEnabled"
+		case "sni_dns_optimization_bypass_url_categories":
+			return "sniDnsOptimizationBypassUrlCategories"
+		}
+	}
+
+	if resourceType == "zia_url_filtering_and_cloud_app_settings" {
+		switch fieldName {
+		case "enable_poe_prompt":
+			return "enablePOEPrompt"
+		case "enable_cipa_compliance":
+			return "enableCIPACompliance"
+		}
+	}
+
+	if resourceType == "zia_location_management" {
+		switch fieldName {
+		case "surrogate_ip":
+			return "surrogateIP"
+		case "surrogate_ip_enforced_for_known_browsers":
+			return "surrogateIPEnforcedForKnownBrowsers"
+		}
+	}
+
 	// Handle special cases for "TLS"
 	if fieldName == "min_client_tls_version" {
 		return "minClientTLSVersion"
