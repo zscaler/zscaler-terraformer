@@ -24,7 +24,7 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v8
         with:
-          version: latest
-        #   args: "--config .golintci.yml"
+          version: v2.1.6
           only-new-issues: true
           skip-cache: true
+          args: --out-format=colored-line-number
