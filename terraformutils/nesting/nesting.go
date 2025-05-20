@@ -587,7 +587,7 @@ func WriteAttrLine(key string, value interface{}, usedInBlock bool) string {
 	return ""
 }
 
-// IMPLEMENTING THIS AS A WORKAROUND TO HANDLE NON-STANDARD CAMEL-CASE ATTRIBUITES
+// IMPLEMENTING THIS AS A WORKAROUND TO HANDLE NON-STANDARD CAMEL-CASE ATTRIBUITES.
 func MapTfFieldNameToAPI(resourceType, fieldName string) string {
 	if resourceType == "zia_advanced_threat_settings" {
 		switch fieldName {
