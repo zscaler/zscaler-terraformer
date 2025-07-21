@@ -1404,6 +1404,7 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 			if helpers.IsInList(rule.Name, []string{"Default BA Rule"}) {
 				continue
 			}
+			rule.Order = 127
 			rulesFiltered = append(rulesFiltered, rule)
 		}
 		resourceCount = len(rulesFiltered)
