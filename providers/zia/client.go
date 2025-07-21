@@ -37,6 +37,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia"
+	"github.com/zscaler/zscaler-terraformer/v2/terraformutils/helpers"
 )
 
 // Client is the high-level client returned by NewClient().
@@ -215,7 +216,7 @@ func newConfigFromEnv() *Config {
 // zscalerSDKV2Client initializes the legacy ZIA client (V2).
 func zscalerSDKV2Client(c *Config) (*zscaler.Service, error) {
 	// You can set a custom user agent if desired.
-	customUserAgent := "(Terraformer Legacy) ZIA"
+	customUserAgent := helpers.GenerateUserAgent()
 
 	// Start building config setters for the V2 zia library.
 	setters := []zia.ConfigSetter{
@@ -269,7 +270,7 @@ func zscalerSDKV2Client(c *Config) (*zscaler.Service, error) {
 
 // zscalerSDKV3Client initializes the new OneAPI-based Zscaler client.
 func zscalerSDKV3Client(c *Config) (*zscaler.Client, error) {
-	customUserAgent := "(Terraformer V3) ZIA"
+	customUserAgent := helpers.GenerateUserAgent()
 
 	setters := []zscaler.ConfigSetter{
 		zscaler.WithCache(false),

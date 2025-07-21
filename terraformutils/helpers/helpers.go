@@ -29,9 +29,11 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"runtime"
 	"strings"
 
 	"github.com/iancoleman/strcase"
+	"github.com/zscaler/zscaler-terraformer/v2/terraformutils"
 )
 
 func IsInList(item string, list []string) bool {
@@ -427,4 +429,12 @@ func FormatHeredoc(value string) string {
 		}
 	}
 	return formatted
+}
+
+func GenerateUserAgent() string {
+	return fmt.Sprintf("(%s %s) Zscaler Terraformer/%s",
+		runtime.GOOS,
+		runtime.GOARCH,
+		terraformutils.Version(),
+	)
 }
