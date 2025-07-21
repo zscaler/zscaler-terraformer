@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.0.6 (July, 21 2025)
+
+### Notes
+
+- Release date: **(May, 20 2025)**
+- Supported Terraform version: **v1.x.x**
+
+### Bug Fixes
+- [PR #298](https://github.com/zscaler/zscaler-terraformer/pull/298). Upgraded to GO SDK v3.5.2
+
 ## 2.0.5 (May, 20 2025)
 
 ### Notes
