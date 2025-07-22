@@ -29,6 +29,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"regexp"
 	"runtime"
 	"strings"
 
@@ -437,4 +438,25 @@ func GenerateUserAgent() string {
 		runtime.GOARCH,
 		terraformutils.Version(),
 	)
+}
+
+func SnakeCaseNoDigitBreak(in string) string {
+	snake := strcase.ToSnake(in)
+
+	// Collapse the underscore that strcase inserts before a digit.
+	//   http_2_enabled -> http2_enabled
+	re := regexp.MustCompile(`_([0-9]+)_`)
+	for {
+		newSnake := re.ReplaceAllString(snake, `${1}_`)
+		if newSnake == snake {
+			break
+		}
+		snake = newSnake
+	}
+	return snake
+}
+
+// Convenience wrapper used by the writers.
+func TfAttrName(apiField string) string {
+	return strings.ToLower(SnakeCaseNoDigitBreak(apiField))
 }
