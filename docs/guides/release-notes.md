@@ -12,15 +12,25 @@ Track all Zscaler Terraformer Tool releases. New resources, features, and bug fi
 
 ---
 
-``Last updated: v2.0.6``
+``Last updated: v2.0.7``
 
 ---
+
+## 2.0.7 (July, 22 2025)
+
+### Notes
+
+- Release date: **(July, 22 2025)**
+- Supported Terraform version: **v1.x.x**
+
+### Bug Fixes
+- [PR #299](https://github.com/zscaler/zscaler-terraformer/pull/299). Fixed `zia_ssl_inspection_rules` attribute conversion `http2_enabled`
 
 ## 2.0.6 (July, 21 2025)
 
 ### Notes
 
-- Release date: **(May, 20 2025)**
+- Release date: **(July, 21 2025)**
 - Supported Terraform version: **v1.x.x**
 
 ### Bug Fixes

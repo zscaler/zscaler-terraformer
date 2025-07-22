@@ -408,7 +408,8 @@ func WriteNestedBlock(resourceType string, attributes []string, schemaBlock *tfj
 		}
 
 		// Convert attributes to snake_case.
-		snakeCaseAttrName := strcase.ToSnake(attrName)
+		snakeCaseAttrName := helpers.TfAttrName(attrName)
+		// snakeCaseAttrName := strcase.ToSnake(attrName)
 
 		switch {
 		case ty.IsPrimitiveType():
@@ -690,6 +691,9 @@ func MapTfFieldNameToAPI(resourceType, fieldName string) string {
 	}
 	if fieldName == "show_eunatp" {
 		return "showEUNATP"
+	}
+	if fieldName == "http2_enabled" { // keep this!
+		return "http2Enabled"
 	}
 	// Fallback
 	return strcase.ToLowerCamel(fieldName)
