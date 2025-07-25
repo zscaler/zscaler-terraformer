@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.0.8 (July, 24 2025)
+
+### Notes
+
+- Release date: **(July, 24 2025)**
+- Supported Terraform version: **v1.x.x**
+
+### Bug Fixes
+- [PR #300](https://github.com/zscaler/zscaler-terraformer/pull/300). Fixed `zia_url_categories` and Upgraded to [Zscaler-SDK-GO v3.5.6](https://github.com/zscaler/zscaler-sdk-go/releases/tag/v3.5.6)
+
 ## 2.0.7 (July, 22 2025)
 
 ### Notes

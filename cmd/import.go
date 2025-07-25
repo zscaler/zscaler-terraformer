@@ -991,35 +991,35 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		jsonStructData = append(jsonStructData, subJsonStructData...)
 
 		resourceCount += subResourceCount
+	// case "zia_url_categories":
+	// 	if api.ZIAService == nil {
+	// 		log.Fatal("ZIA service is not initialized")
+	// 	}
+	// 	// EXACTLY like the TF pattern:
+	// 	service := api.ZIAService
+	// 	log.Debugf("Fetching URL categories with customOnly=true...")
+	// 	jsonPayload, err := urlcategories.GetAll(ctx, service, true, false)
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// 	log.Debugf("Retrieved %d URL categories", len(jsonPayload))
+	// 	resourceCount = len(jsonPayload)
+	// 	m, _ := json.Marshal(jsonPayload)
+	// 	_ = json.Unmarshal(m, &jsonStructData)
+	// 	log.Debugf("Successfully processed URL categories data")
+
 	case "zia_url_categories":
 		if api.ZIAService == nil {
 			log.Fatal("ZIA service is not initialized")
 		}
 		// EXACTLY like the TF pattern:
 		service := api.ZIAService
-		list, err := urlcategories.GetAll(ctx, service)
+		jsonPayload, err := urlcategories.GetAll(ctx, service, true, false)
 		if err != nil {
 			log.Fatal(err)
 		}
-		items := []urlcategories.URLCategory{}
-		for _, i := range list {
-			if i.SuperCategory == "USER_DEFINED" ||
-				i.UrlsRetainingParentCategoryCount > 0 ||
-				len(i.KeywordsRetainingParentCategory) > 0 ||
-				len(i.Keywords) > 0 ||
-				len(i.Urls) > 0 {
-				items = append(items, i)
-			}
-		}
-		for i := range items {
-			details, err := urlcategories.Get(ctx, service, items[i].ID)
-			if err != nil {
-				continue
-			}
-			items[i] = *details
-		}
-		m, _ := json.Marshal(items)
-		resourceCount = len(items)
+		m, _ := json.Marshal(jsonPayload)
+		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_url_filtering_rules":
 		if api.ZIAService == nil {
