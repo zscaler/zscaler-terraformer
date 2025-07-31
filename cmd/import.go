@@ -1014,13 +1014,14 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		}
 		// EXACTLY like the TF pattern:
 		service := api.ZIAService
-		jsonPayload, err := urlcategories.GetAll(ctx, service, true, false)
+		jsonPayload, err := urlcategories.GetAllCustomURLCategories(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
 		m, _ := json.Marshal(jsonPayload)
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
+
 	case "zia_url_filtering_rules":
 		if api.ZIAService == nil {
 			log.Fatal("ZIA service is not initialized")

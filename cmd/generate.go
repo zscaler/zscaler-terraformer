@@ -1247,7 +1247,7 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		}
 		// EXACTLY like the TF pattern:
 		service := api.ZIAService
-		jsonPayload, err := urlcategories.GetAll(ctx, service, true, false)
+		jsonPayload, err := urlcategories.GetAllCustomURLCategories(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
