@@ -439,7 +439,7 @@ func WriteAttrLine(key string, value interface{}, usedInBlock bool) string {
 	}
 
 	// Handle `dest_countries` and `source_countries` for `zia_firewall_filtering_rule`
-	if helpers.IsInList(key, []string{"dest_countries", "source_countries", "blocked_countries"}) {
+	if helpers.IsInList(key, []string{"dest_countries", "source_countries", "blocked_countries", "countries"}) {
 		if countryList, ok := value.([]string); ok {
 			// Strip the "COUNTRY_" prefix
 			for i, country := range countryList {

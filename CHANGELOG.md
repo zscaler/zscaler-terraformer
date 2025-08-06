@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.0.10 (August, 6 2025)
+
+### Notes
+
+- Release date: **(August, 6 2025)**
+- Supported Terraform version: **v1.x.x**
+
+### Bug Fixes
+- [PR #306](https://github.com/zscaler/zscaler-terraformer/pull/306). Fixed `zia_firewall_filtering_destination_groups` to properly format the attribute `countries` in the HCL to comply with ISO 3166 Alpha-2 format.
+- [PR #306](https://github.com/zscaler/zscaler-terraformer/pull/306). Implemented temporary workaround to `zia_dlp_dictionaries` to exclude the attribute `confidence_level_for_predefined_dict` from custom dictionaries. 
+    **NOTE**: Issue will be addressed at the API level at a later date and the workaround removed.
+
 ## 2.0.9 (July, 31 2025)
 
 ### Notes
