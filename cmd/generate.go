@@ -1804,6 +1804,16 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 				continue
 			}
 
+			// Special handling for zia_dlp_dictionaries confidence_level_for_predefined_dict attribute
+			if resourceType == "zia_dlp_dictionaries" && attrName == "confidence_level_for_predefined_dict" {
+				// Check if this is a predefined clone dictionary
+				predefinedClone, ok := structData["predefinedClone"].(bool)
+				if !ok || !predefinedClone {
+					// Skip this attribute for non-predefined clone dictionaries
+					continue
+				}
+			}
+
 			// ty := r.Block.Attributes[attrName].AttributeType
 			switch {
 			case ty.IsPrimitiveType():
