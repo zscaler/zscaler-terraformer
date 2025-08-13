@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.0.11 (August, 7 2025)
+
+### Notes
+
+- Release date: **(August, 7 2025)**
+- Supported Terraform version: **v1.x.x**
+
+### Bug Fixes
+- [PR #307](https://github.com/zscaler/zscaler-terraformer/pull/307). Fixed `zia_sandbox_rules` to exclude the `url_categories` attribute when not explicitly present in the API response, preventing incorrect HCL generation.
+- [PR #307](https://github.com/zscaler/zscaler-terraformer/pull/307). Added `zia_sandbox_rules` to nesting function to parse nested attributes
+
 ## 2.0.10 (August, 6 2025)
 
 ### Notes

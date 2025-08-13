@@ -1404,7 +1404,7 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 			if helpers.IsInList(rule.Name, []string{"Default BA Rule"}) {
 				continue
 			}
-			rule.Order = 127
+			// rule.Order = 127
 			rulesFiltered = append(rulesFiltered, rule)
 		}
 		resourceCount = len(rulesFiltered)
@@ -1749,7 +1749,8 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 			}
 			ty := r.Block.Attributes[attrName].AttributeType
 			// If this attribute is "url_categories" and empty/missing, set to ANY
-			if attrName == "url_categories" {
+			// EXCEPT for zia_sandbox_rules where we should not set it unless explicitly present
+			if attrName == "url_categories" && resourceType != "zia_sandbox_rules" {
 				raw := structData[apiAttrName]
 				if raw == nil {
 					// Not present? Force to ANY
