@@ -1172,7 +1172,7 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 			if helpers.IsInList(rule.Name, []string{"Default BA Rule"}) {
 				continue
 			}
-			rule.Order = 127
+			// rule.Order = 127
 			rulesFiltered = append(rulesFiltered, rule)
 		}
 		resourceCount = len(rulesFiltered)
