@@ -417,18 +417,27 @@ func HandleZIAError(responseBody []byte) (bool, string) {
 }
 
 func FormatHeredoc(value string) string {
-	lines := strings.Split(value, "\n")
-	formatted := ""
-	for i, line := range lines {
-		trimmedLine := strings.TrimSpace(line)
-		if trimmedLine != "" {
-			// Escape `$` to `$$` to prevent Terraform interpretation issues
-			escapedLine := strings.ReplaceAll(trimmedLine, "$", "$$")
-			formatted += fmt.Sprintf("%s\n", escapedLine)
-		} else if i != len(lines)-1 {
-			formatted += "\n"
-		}
+	// Match the provider's normalizeMultiLineString logic
+	if value == "" {
+		return ""
 	}
+
+	// Trim leading/trailing whitespace for consistency
+	value = strings.TrimSpace(value)
+
+	// Ensure uniform indentation by trimming each line
+	lines := strings.Split(value, "\n")
+	for i := range lines {
+		lines[i] = strings.TrimSpace(lines[i])
+	}
+
+	// Join lines back together
+	formatted := strings.Join(lines, "\n")
+
+	// Escape Terraform variable interpolation (`$` → `$$`)
+	formatted = strings.ReplaceAll(formatted, "$", "$$")
+
+	// Don't add trailing newline for quoted strings
 	return formatted
 }
 

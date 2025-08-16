@@ -1704,7 +1704,14 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		if structData["name"] != nil {
 			resourceName = structData["name"].(string)
 		} else if structData["description"] != nil {
-			resourceName = structData["description"].(string)
+			desc := structData["description"].(string)
+			// Normalize description for resource name to avoid Terraform parsing issues
+			resourceName = helpers.FormatHeredoc(desc)
+			// Remove newlines and limit length for resource name
+			resourceName = strings.ReplaceAll(resourceName, "\n", " ")
+			if len(resourceName) > 50 {
+				resourceName = resourceName[:50] + "..."
+			}
 		} else {
 			resourceName = fmt.Sprintf("ID %v", structData["id"])
 		}
@@ -1770,8 +1777,8 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 				}
 			}
 			// (A) ADD THIS BLOCK:
-			// If this attribute is a boolean in the schema, but structData doesn’t have it at all,
-			// default it to false so WriteAttrLine will print “= false”.
+			// If this attribute is a boolean in the schema, but structData doesn't have it at all,
+			// default it to false so WriteAttrLine will print "= false".
 			if ty.Equals(cty.Bool) {
 				if _, present := structData[apiAttrName]; !present {
 					structData[apiAttrName] = false
@@ -1797,6 +1804,21 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 					output += nesting.WriteAttrLine(attrName, value, false)
 				}
 				continue
+			}
+
+			// Special handling for description field in zia_url_categories to prevent Terraform parsing issues
+			if attrName == "description" && resourceType == "zia_url_categories" {
+				value := structData[apiAttrName]
+				if value != nil {
+					valueStr := value.(string)
+					// Use the same normalization as the provider
+					normalized := helpers.FormatHeredoc(valueStr)
+					// Remove the trailing newline for quoted string
+					normalized = strings.TrimSuffix(normalized, "\n")
+					// Use regular quoted string instead of heredoc
+					output += fmt.Sprintf("  %s = %q\n", attrName, normalized)
+					continue
+				}
 			}
 
 			// No need to output computed attributes that are also not optional.

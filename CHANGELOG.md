@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.0.12 (August, 15 2025)
+
+### Notes
+
+- Release date: **(August, 15 2025)**
+- Supported Terraform version: **v1.x.x**
+
+### Bug Fixes
+- [PR #308](https://github.com/zscaler/zscaler-terraformer/pull/308) Fixed import failures for `zia_url_categories` when description field contains special characters
+    - Resolves inconsistent behavior where URL category imports would fail when descriptions contained operators like `&&, &*&, ||,` etc.
+    - Added proper string normalization for description fields to prevent Terraform parsing errors
+    - Isolated fix affecting only `zia_url_categories` resource description handling
+
 ## 2.0.11 (August, 13 2025)
 
 ### Notes
