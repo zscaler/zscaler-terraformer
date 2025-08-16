@@ -1806,17 +1806,24 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 				continue
 			}
 
-			// Special handling for description field in zia_url_categories to prevent Terraform parsing issues
-			if attrName == "description" && resourceType == "zia_url_categories" {
+			// Special handling for description field in ZIA resources to prevent Terraform parsing issues
+			if attrName == "description" && strings.HasPrefix(resourceType, "zia_") {
 				value := structData[apiAttrName]
 				if value != nil {
 					valueStr := value.(string)
 					// Use the same normalization as the provider
 					normalized := helpers.FormatHeredoc(valueStr)
-					// Remove the trailing newline for quoted string
-					normalized = strings.TrimSuffix(normalized, "\n")
-					// Use regular quoted string instead of heredoc
-					output += fmt.Sprintf("  %s = %q\n", attrName, normalized)
+
+					// Check if the description contains newlines
+					if strings.Contains(valueStr, "\n") {
+						// Use heredoc formatting for multi-line descriptions
+						output += fmt.Sprintf("  %s = <<EOT\n%sEOT\n", attrName, normalized)
+					} else {
+						// Use regular quoted string for single-line descriptions
+						// Remove the trailing newline for quoted string
+						normalized = strings.TrimSuffix(normalized, "\n")
+						output += fmt.Sprintf("  %s = %q\n", attrName, normalized)
+					}
 					continue
 				}
 			}

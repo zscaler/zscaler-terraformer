@@ -95,6 +95,12 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 			continue
 		}
 
+		// Special handling for workload_groups in zia_dlp_web_rules to include both id and name
+		if resourceType == "zia_dlp_web_rules" && block == "workload_groups" {
+			output += helpers.WorkloadGroupsBlock(block, structData[MapTfFieldNameToAPI(resourceType, block)])
+			continue
+		}
+
 		// Special handling for zia_dlp_web_rules TypeSet blocks.
 		if helpers.IsInList(resourceType, []string{"zia_dlp_web_rules"}) && helpers.IsInList(block, []string{
 			"notification_template", "auditor", "icap_server",
@@ -106,7 +112,7 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 			continue
 		}
 
-		//Specific handling for zpa_pra_approval_controller resource.
+		// Specific handling for zpa_pra_approval_controller resource.
 		if resourceType == "zpa_pra_approval_controller" {
 			if block == "working_hours" {
 				if workingHours, ok := structData["workingHours"].(map[string]interface{}); ok {

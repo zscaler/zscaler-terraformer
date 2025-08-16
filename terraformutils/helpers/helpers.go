@@ -240,6 +240,41 @@ func ListIdsIntBlockIDExtentionsSingle(fieldName string, obj interface{}) string
 	return output
 }
 
+// WorkloadGroupsBlock handles workload_groups blocks for zia_dlp_web_rules with both id and name fields
+func WorkloadGroupsBlock(fieldName string, obj interface{}) string {
+	output := ""
+	if obj != nil && len(obj.([]interface{})) > 0 {
+		for _, v := range obj.([]interface{}) {
+			m, ok := v.(map[string]interface{})
+			if !ok || m == nil {
+				continue
+			}
+
+			output += fieldName + " {\n"
+
+			// Add id if present
+			if id, ok := m["id"]; ok && id != nil && id != 0 {
+				switch idVal := id.(type) {
+				case float64:
+					output += fmt.Sprintf("  id = %d\n", int64(idVal))
+				case int:
+					output += fmt.Sprintf("  id = %d\n", idVal)
+				case string:
+					output += fmt.Sprintf("  id = %q\n", idVal)
+				}
+			}
+
+			// Add name if present
+			if name, ok := m["name"]; ok && name != nil && name != "" {
+				output += fmt.Sprintf("  name = %q\n", name)
+			}
+
+			output += "}\n"
+		}
+	}
+	return output
+}
+
 func ListIdsIntBlock(fieldName string, obj interface{}) string {
 	output := ""
 	if obj != nil && len(obj.([]interface{})) >= 0 {
@@ -437,8 +472,8 @@ func FormatHeredoc(value string) string {
 	// Escape Terraform variable interpolation (`$` → `$$`)
 	formatted = strings.ReplaceAll(formatted, "$", "$$")
 
-	// Don't add trailing newline for quoted strings
-	return formatted
+	// Ensure the final newline for heredoc formatting
+	return formatted + "\n"
 }
 
 func GenerateUserAgent() string {
