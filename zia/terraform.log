@@ -1,0 +1,722 @@
+2025-08-15T17:58:29.495-0700 [INFO]  Terraform version: 1.9.0
+2025-08-15T17:58:29.495-0700 [DEBUG] using github.com/hashicorp/go-tfe v1.51.0
+2025-08-15T17:58:29.495-0700 [DEBUG] using github.com/hashicorp/hcl/v2 v2.20.0
+2025-08-15T17:58:29.495-0700 [DEBUG] using github.com/hashicorp/terraform-svchost v0.1.1
+2025-08-15T17:58:29.495-0700 [DEBUG] using github.com/zclconf/go-cty v1.14.4
+2025-08-15T17:58:29.495-0700 [INFO]  Go runtime version: go1.22.4
+2025-08-15T17:58:29.495-0700 [INFO]  CLI args: []string{"terraform", "plan"}
+2025-08-15T17:58:29.495-0700 [TRACE] Stdout is a terminal of width 206
+2025-08-15T17:58:29.495-0700 [TRACE] Stderr is a terminal of width 206
+2025-08-15T17:58:29.495-0700 [TRACE] Stdin is a terminal
+2025-08-15T17:58:29.495-0700 [DEBUG] Attempting to open CLI config file: /Users/wguilherme/.terraformrc
+2025-08-15T17:58:29.495-0700 [DEBUG] File doesn't exist, but doesn't need to. Ignoring.
+2025-08-15T17:58:29.495-0700 [DEBUG] checking for credentials in "/Users/wguilherme/.terraform.d/plugins"
+2025-08-15T17:58:29.496-0700 [DEBUG] ignoring non-existing provider search directory terraform.d/plugins
+2025-08-15T17:58:29.496-0700 [DEBUG] will search for provider plugins in /Users/wguilherme/.terraform.d/plugins
+2025-08-15T17:58:29.496-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zcbc/zcbc v1.0.0 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zcbc/zcbc/1.0.0/darwin_arm64
+2025-08-15T17:58:29.496-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zcc/zcc v0.0.1 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zcc/zcc/0.0.1/darwin_arm64
+2025-08-15T17:58:29.497-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v2.7.0 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/2.7.0/darwin_arm64
+2025-08-15T17:58:29.497-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v2.92.0 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/2.92.0/darwin_arm64
+2025-08-15T17:58:29.497-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v3.0.0 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/3.0.0/darwin_arm64
+2025-08-15T17:58:29.497-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v3.0.1 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/3.0.1/darwin_arm64
+2025-08-15T17:58:29.497-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v3.0.2 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/3.0.2/darwin_arm64
+2025-08-15T17:58:29.497-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v3.0.3 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/3.0.3/darwin_arm64
+2025-08-15T17:58:29.497-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v3.0.4 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/3.0.4/darwin_arm64
+2025-08-15T17:58:29.497-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v3.0.5 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/3.0.5/darwin_arm64
+2025-08-15T17:58:29.498-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v3.0.6 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/3.0.6/darwin_arm64
+2025-08-15T17:58:29.498-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v3.0.7 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/3.0.7/darwin_arm64
+2025-08-15T17:58:29.498-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v3.1.0 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/3.1.0/darwin_arm64
+2025-08-15T17:58:29.498-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v4.0.0 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/4.0.0/darwin_arm64
+2025-08-15T17:58:29.498-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v4.0.1 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/4.0.1/darwin_arm64
+2025-08-15T17:58:29.498-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v4.0.10 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/4.0.10/darwin_arm64
+2025-08-15T17:58:29.498-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v4.0.2 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/4.0.2/darwin_arm64
+2025-08-15T17:58:29.499-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v4.0.3 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/4.0.3/darwin_arm64
+2025-08-15T17:58:29.499-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v4.0.4 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/4.0.4/darwin_arm64
+2025-08-15T17:58:29.499-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v4.0.5 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/4.0.5/darwin_arm64
+2025-08-15T17:58:29.499-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v4.0.6 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/4.0.6/darwin_arm64
+2025-08-15T17:58:29.499-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v4.0.7 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/4.0.7/darwin_arm64
+2025-08-15T17:58:29.499-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v4.0.8 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/4.0.8/darwin_arm64
+2025-08-15T17:58:29.499-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v4.0.9 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/4.0.9/darwin_arm64
+2025-08-15T17:58:29.499-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v4.1.0 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/4.1.0/darwin_arm64
+2025-08-15T17:58:29.500-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v4.1.1 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/4.1.1/darwin_arm64
+2025-08-15T17:58:29.500-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v4.1.2 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/4.1.2/darwin_arm64
+2025-08-15T17:58:29.500-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v4.1.3 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/4.1.3/darwin_arm64
+2025-08-15T17:58:29.500-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v4.1.4 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/4.1.4/darwin_arm64
+2025-08-15T17:58:29.500-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v4.2.0 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/4.2.0/darwin_arm64
+2025-08-15T17:58:29.500-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v4.3.0 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/4.3.0/darwin_arm64
+2025-08-15T17:58:29.500-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v4.3.1 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/4.3.1/darwin_arm64
+2025-08-15T17:58:29.501-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v4.3.2 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/4.3.2/darwin_arm64
+2025-08-15T17:58:29.501-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v4.3.3 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/4.3.3/darwin_arm64
+2025-08-15T17:58:29.501-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v4.4.0 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/4.4.0/darwin_arm64
+2025-08-15T17:58:29.501-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v4.4.1 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/4.4.1/darwin_arm64
+2025-08-15T17:58:29.501-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v4.4.2 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/4.4.2/darwin_arm64
+2025-08-15T17:58:29.501-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v4.4.3 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/4.4.3/darwin_arm64
+2025-08-15T17:58:29.501-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v4.4.4 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/4.4.4/darwin_arm64
+2025-08-15T17:58:29.502-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v4.4.5 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/4.4.5/darwin_arm64
+2025-08-15T17:58:29.502-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v4.4.6 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/4.4.6/darwin_arm64
+2025-08-15T17:58:29.502-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zia/zia v4.4.7 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zia/zia/4.4.7/darwin_arm64
+2025-08-15T17:58:29.502-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v3.1.1 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/3.1.1/darwin_arm64
+2025-08-15T17:58:29.502-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v3.2.0 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/3.2.0/darwin_arm64
+2025-08-15T17:58:29.503-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v3.2.1 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/3.2.1/darwin_arm64
+2025-08-15T17:58:29.503-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v3.2.10 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/3.2.10/darwin_arm64
+2025-08-15T17:58:29.503-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v3.2.11 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/3.2.11/darwin_arm64
+2025-08-15T17:58:29.503-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v3.3.0 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/3.3.0/darwin_arm64
+2025-08-15T17:58:29.503-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v3.3.1 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/3.3.1/darwin_arm64
+2025-08-15T17:58:29.503-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v3.3.22 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/3.3.22/darwin_arm64
+2025-08-15T17:58:29.503-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v3.3.23 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/3.3.23/darwin_arm64
+2025-08-15T17:58:29.504-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v3.3.25 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/3.3.25/darwin_arm64
+2025-08-15T17:58:29.504-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v3.31.0 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/3.31.0/darwin_arm64
+2025-08-15T17:58:29.504-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v3.32.0 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/3.32.0/darwin_arm64
+2025-08-15T17:58:29.504-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v3.32.2 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/3.32.2/darwin_arm64
+2025-08-15T17:58:29.504-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v3.32.3 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/3.32.3/darwin_arm64
+2025-08-15T17:58:29.504-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v3.32.4 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/3.32.4/darwin_arm64
+2025-08-15T17:58:29.505-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v3.32.5 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/3.32.5/darwin_arm64
+2025-08-15T17:58:29.505-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v3.32.6 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/3.32.6/darwin_arm64
+2025-08-15T17:58:29.505-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v3.321.0 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/3.321.0/darwin_arm64
+2025-08-15T17:58:29.505-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v3.33.10 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/3.33.10/darwin_arm64
+2025-08-15T17:58:29.505-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v3.33.2 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/3.33.2/darwin_arm64
+2025-08-15T17:58:29.505-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v3.33.3 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/3.33.3/darwin_arm64
+2025-08-15T17:58:29.505-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v3.33.4 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/3.33.4/darwin_arm64
+2025-08-15T17:58:29.506-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v3.33.5 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/3.33.5/darwin_arm64
+2025-08-15T17:58:29.506-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v3.33.7 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/3.33.7/darwin_arm64
+2025-08-15T17:58:29.506-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v3.33.8 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/3.33.8/darwin_arm64
+2025-08-15T17:58:29.506-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v3.33.9 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/3.33.9/darwin_arm64
+2025-08-15T17:58:29.506-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v4.0.0 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/4.0.0/darwin_arm64
+2025-08-15T17:58:29.506-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v4.0.1 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/4.0.1/darwin_arm64
+2025-08-15T17:58:29.506-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v4.0.10 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/4.0.10/darwin_arm64
+2025-08-15T17:58:29.507-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v4.0.11 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/4.0.11/darwin_arm64
+2025-08-15T17:58:29.507-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v4.0.12 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/4.0.12/darwin_arm64
+2025-08-15T17:58:29.507-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v4.0.13 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/4.0.13/darwin_arm64
+2025-08-15T17:58:29.507-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v4.0.2 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/4.0.2/darwin_arm64
+2025-08-15T17:58:29.507-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v4.0.3 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/4.0.3/darwin_arm64
+2025-08-15T17:58:29.507-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v4.0.4 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/4.0.4/darwin_arm64
+2025-08-15T17:58:29.507-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v4.0.5 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/4.0.5/darwin_arm64
+2025-08-15T17:58:29.508-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v4.0.6 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/4.0.6/darwin_arm64
+2025-08-15T17:58:29.508-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v4.0.7 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/4.0.7/darwin_arm64
+2025-08-15T17:58:29.508-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v4.0.8 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/4.0.8/darwin_arm64
+2025-08-15T17:58:29.508-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v4.0.9 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/4.0.9/darwin_arm64
+2025-08-15T17:58:29.508-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v4.1.0 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/4.1.0/darwin_arm64
+2025-08-15T17:58:29.508-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v4.1.1 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/4.1.1/darwin_arm64
+2025-08-15T17:58:29.508-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v4.1.10 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/4.1.10/darwin_arm64
+2025-08-15T17:58:29.508-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v4.1.11 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/4.1.11/darwin_arm64
+2025-08-15T17:58:29.509-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v4.1.12 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/4.1.12/darwin_arm64
+2025-08-15T17:58:29.509-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v4.1.13 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/4.1.13/darwin_arm64
+2025-08-15T17:58:29.509-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v4.1.14 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/4.1.14/darwin_arm64
+2025-08-15T17:58:29.509-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v4.1.2 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/4.1.2/darwin_arm64
+2025-08-15T17:58:29.509-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v4.1.3 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/4.1.3/darwin_arm64
+2025-08-15T17:58:29.509-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v4.1.4 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/4.1.4/darwin_arm64
+2025-08-15T17:58:29.510-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v4.1.5 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/4.1.5/darwin_arm64
+2025-08-15T17:58:29.510-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v4.1.6 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/4.1.6/darwin_arm64
+2025-08-15T17:58:29.510-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v4.1.7 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/4.1.7/darwin_arm64
+2025-08-15T17:58:29.510-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v4.1.8 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/4.1.8/darwin_arm64
+2025-08-15T17:58:29.510-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v4.1.9 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/4.1.9/darwin_arm64
+2025-08-15T17:58:29.510-0700 [TRACE] getproviders.SearchLocalDirectory: found zscaler.com/zpa/zpa v4.2.0 for darwin_arm64 at /Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/4.2.0/darwin_arm64
+2025-08-15T17:58:29.510-0700 [WARN]  ignoring local provider path "/Users/wguilherme/.terraform.d/plugins/zscaler.com/zpa/zpa/v3.332.0/darwin_arm64" with invalid version "v3.332.0": a "v" prefix should not be used
+2025-08-15T17:58:29.511-0700 [DEBUG] ignoring non-existing provider search directory /Users/wguilherme/Library/Application Support/io.terraform/plugins
+2025-08-15T17:58:29.511-0700 [DEBUG] ignoring non-existing provider search directory /Library/Application Support/io.terraform/plugins
+2025-08-15T17:58:29.511-0700 [INFO]  CLI command args: []string{"plan"}
+2025-08-15T17:58:29.511-0700 [TRACE] Meta.Backend: no config given or present on disk, so returning nil config
+2025-08-15T17:58:29.511-0700 [TRACE] Meta.Backend: backend has not previously been initialized in this working directory
+2025-08-15T17:58:29.511-0700 [TRACE] Meta.Backend: using default local state only (no backend configuration, and no existing initialized backend)
+2025-08-15T17:58:29.511-0700 [TRACE] Meta.Backend: instantiated backend of type <nil>
+2025-08-15T17:58:29.512-0700 [TRACE] providercache.fillMetaCache: scanning directory .terraform/providers
+2025-08-15T17:58:29.512-0700 [TRACE] getproviders.SearchLocalDirectory: found registry.terraform.io/zscaler/zia v4.4.5 for darwin_arm64 at .terraform/providers/registry.terraform.io/zscaler/zia/4.4.5/darwin_arm64
+2025-08-15T17:58:29.512-0700 [TRACE] providercache.fillMetaCache: including .terraform/providers/registry.terraform.io/zscaler/zia/4.4.5/darwin_arm64 as a candidate package for registry.terraform.io/zscaler/zia 4.4.5
+2025-08-15T17:58:29.521-0700 [DEBUG] checking for provisioner in "."
+2025-08-15T17:58:29.524-0700 [DEBUG] checking for provisioner in "/opt/homebrew/bin"
+2025-08-15T17:58:29.524-0700 [DEBUG] checking for provisioner in "/Users/wguilherme/.terraform.d/plugins"
+2025-08-15T17:58:29.524-0700 [TRACE] Meta.Backend: backend <nil> does not support operations, so wrapping it in a local backend
+2025-08-15T17:58:29.525-0700 [INFO]  backend/local: starting Plan operation
+2025-08-15T17:58:29.526-0700 [TRACE] backend/local: requesting state manager for workspace "default"
+2025-08-15T17:58:29.526-0700 [TRACE] backend/local: state manager for workspace "default" will:
+ - read initial snapshot from terraform.tfstate
+ - write new snapshots to terraform.tfstate
+ - create any backup at terraform.tfstate.backup
+2025-08-15T17:58:29.526-0700 [TRACE] backend/local: requesting state lock for workspace "default"
+2025-08-15T17:58:29.527-0700 [TRACE] statemgr.Filesystem: preparing to manage state snapshots at terraform.tfstate
+2025-08-15T17:58:29.528-0700 [TRACE] statemgr.Filesystem: existing snapshot has lineage "18329c09-e1b3-e01f-4952-64f9d254faeb" serial 1
+2025-08-15T17:58:29.528-0700 [TRACE] statemgr.Filesystem: locking terraform.tfstate using fcntl flock
+2025-08-15T17:58:29.528-0700 [TRACE] statemgr.Filesystem: writing lock metadata to .terraform.tfstate.lock.info
+2025-08-15T17:58:29.528-0700 [TRACE] backend/local: reading remote state for workspace "default"
+2025-08-15T17:58:29.528-0700 [TRACE] statemgr.Filesystem: reading latest snapshot from terraform.tfstate
+2025-08-15T17:58:29.529-0700 [TRACE] statemgr.Filesystem: read snapshot with lineage "18329c09-e1b3-e01f-4952-64f9d254faeb" serial 1
+2025-08-15T17:58:29.529-0700 [TRACE] backend/local: populating backendrun.LocalRun for current working directory
+2025-08-15T17:58:29.529-0700 [TRACE] Config.VerifyDependencySelections: provider registry.terraform.io/zscaler/zia has 4.4.5 to satisfy ""
+2025-08-15T17:58:29.529-0700 [TRACE] terraform.NewContext: starting
+2025-08-15T17:58:29.529-0700 [TRACE] terraform.NewContext: complete
+2025-08-15T17:58:29.529-0700 [TRACE] backend/local: requesting interactive input, if necessary
+2025-08-15T17:58:29.529-0700 [TRACE] LoadSchemas: retrieving schema for provider type "registry.terraform.io/zscaler/zia"
+2025-08-15T17:58:29.529-0700 [TRACE] terraform.contextPlugins: Initializing provider "registry.terraform.io/zscaler/zia" to read its schema
+2025-08-15T17:58:29.529-0700 [DEBUG] created provider logger: level=info
+2025-08-15T17:58:29.529-0700 [INFO]  provider: configuring client automatic mTLS
+2025-08-15T17:58:29.544-0700 [INFO]  provider.terraform-provider-zia_v4.4.5: configuring server automatic mTLS: timestamp=2025-08-15T17:58:29.544-0700
+2025-08-15T17:58:29.553-0700 [TRACE] GRPCProvider: GetProviderSchema
+2025-08-15T17:58:29.563-0700 [TRACE] GRPCProvider: Close
+2025-08-15T17:58:29.568-0700 [INFO]  provider: plugin process exited: plugin=.terraform/providers/registry.terraform.io/zscaler/zia/4.4.5/darwin_arm64/terraform-provider-zia_v4.4.5 id=62548
+2025-08-15T17:58:29.571-0700 [TRACE] Context.Input: Prompting for provider arguments
+2025-08-15T17:58:29.571-0700 [TRACE] Context.Input: Provider provider.zia declared at zia-provider.tf:8,1-15
+2025-08-15T17:58:29.571-0700 [TRACE] Context.Input: Input for provider.zia: map[string]cty.Value{}
+2025-08-15T17:58:29.571-0700 [TRACE] backend/local: running validation operation
+2025-08-15T17:58:29.571-0700 [TRACE] LoadSchemas: retrieving schema for provider type "registry.terraform.io/zscaler/zia"
+2025-08-15T17:58:29.571-0700 [TRACE] terraform.contextPlugins: Schema for provider "registry.terraform.io/zscaler/zia" is in the global cache
+2025-08-15T17:58:29.571-0700 [DEBUG] Building and walking validate graph
+2025-08-15T17:58:29.571-0700 [TRACE] building graph for walkValidate
+2025-08-15T17:58:29.571-0700 [TRACE] Executing graph transform *terraform.ConfigTransformer
+2025-08-15T17:58:29.571-0700 [TRACE] ConfigTransformer: Starting for path:
+2025-08-15T17:58:29.572-0700 [TRACE] Completed graph transform *terraform.ConfigTransformer with new graph:
+  zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 - *terraform.NodeValidatableResource
+  ------
+2025-08-15T17:58:29.572-0700 [TRACE] Executing graph transform *terraform.RootVariableTransformer
+2025-08-15T17:58:29.572-0700 [TRACE] Completed graph transform *terraform.RootVariableTransformer (no changes)
+2025-08-15T17:58:29.572-0700 [TRACE] Executing graph transform *terraform.ModuleVariableTransformer
+2025-08-15T17:58:29.572-0700 [TRACE] Completed graph transform *terraform.ModuleVariableTransformer (no changes)
+2025-08-15T17:58:29.572-0700 [TRACE] Executing graph transform *terraform.variableValidationTransformer
+2025-08-15T17:58:29.572-0700 [TRACE] variableValidationTransformer: adding validation nodes for any existing variable evaluation nodes
+2025-08-15T17:58:29.572-0700 [TRACE] Completed graph transform *terraform.variableValidationTransformer (no changes)
+2025-08-15T17:58:29.572-0700 [TRACE] Executing graph transform *terraform.LocalTransformer
+2025-08-15T17:58:29.572-0700 [TRACE] Completed graph transform *terraform.LocalTransformer (no changes)
+2025-08-15T17:58:29.572-0700 [TRACE] Executing graph transform *terraform.OutputTransformer
+2025-08-15T17:58:29.572-0700 [TRACE] OutputTransformer: adding zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id as *terraform.nodeExpandOutput
+2025-08-15T17:58:29.572-0700 [TRACE] Completed graph transform *terraform.OutputTransformer with new graph:
+  output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id (expand) - *terraform.nodeExpandOutput
+  zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 - *terraform.NodeValidatableResource
+  ------
+2025-08-15T17:58:29.572-0700 [TRACE] Executing graph transform *terraform.checkTransformer
+2025-08-15T17:58:29.572-0700 [TRACE] Completed graph transform *terraform.checkTransformer (no changes)
+2025-08-15T17:58:29.572-0700 [TRACE] Executing graph transform *terraform.OrphanResourceInstanceTransformer
+2025-08-15T17:58:29.572-0700 [TRACE] Completed graph transform *terraform.OrphanResourceInstanceTransformer (no changes)
+2025-08-15T17:58:29.572-0700 [TRACE] Executing graph transform *terraform.StateTransformer
+2025-08-15T17:58:29.572-0700 [TRACE] StateTransformer: pointless no-op call, creating no nodes at all
+2025-08-15T17:58:29.572-0700 [TRACE] Completed graph transform *terraform.StateTransformer (no changes)
+2025-08-15T17:58:29.572-0700 [TRACE] Executing graph transform *terraform.AttachStateTransformer
+2025-08-15T17:58:29.572-0700 [TRACE] Completed graph transform *terraform.AttachStateTransformer (no changes)
+2025-08-15T17:58:29.572-0700 [TRACE] Executing graph transform *terraform.OrphanOutputTransformer
+2025-08-15T17:58:29.572-0700 [TRACE] Completed graph transform *terraform.OrphanOutputTransformer (no changes)
+2025-08-15T17:58:29.572-0700 [TRACE] Executing graph transform *terraform.AttachResourceConfigTransformer
+2025-08-15T17:58:29.572-0700 [TRACE] AttachResourceConfigTransformer: attaching to "zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360" (*terraform.NodeValidatableResource) config from hcl.Range{Filename:"zia_dlp_web_rules.tf", Start:hcl.Pos{Line:2, Column:1, Byte:62}, End:hcl.Pos{Line:2, Column:66, Byte:127}}
+2025-08-15T17:58:29.572-0700 [TRACE] AttachResourceConfigTransformer: attaching provider meta configs to zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360
+2025-08-15T17:58:29.572-0700 [TRACE] Completed graph transform *terraform.AttachResourceConfigTransformer (no changes)
+2025-08-15T17:58:29.572-0700 [TRACE] Executing graph transform *terraform.graphTransformerMulti
+2025-08-15T17:58:29.572-0700 [TRACE] (graphTransformerMulti) Executing graph transform *terraform.externalProviderTransformer
+2025-08-15T17:58:29.572-0700 [TRACE] (graphTransformerMulti) Completed graph transform *terraform.externalProviderTransformer with new graph:
+  output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id (expand) - *terraform.nodeExpandOutput
+  zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 - *terraform.NodeValidatableResource
+  ------
+2025-08-15T17:58:29.572-0700 [TRACE] (graphTransformerMulti) Executing graph transform *terraform.ProviderConfigTransformer
+2025-08-15T17:58:29.572-0700 [TRACE] ProviderConfigTransformer: attaching to "provider[\"registry.terraform.io/zscaler/zia\"]" provider configuration from zia-provider.tf:8,1-15
+2025-08-15T17:58:29.572-0700 [TRACE] (graphTransformerMulti) Completed graph transform *terraform.ProviderConfigTransformer with new graph:
+  output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id (expand) - *terraform.nodeExpandOutput
+  provider["registry.terraform.io/zscaler/zia"] - *terraform.NodeApplyableProvider
+  zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 - *terraform.NodeValidatableResource
+  ------
+2025-08-15T17:58:29.572-0700 [TRACE] (graphTransformerMulti) Executing graph transform *terraform.MissingProviderTransformer
+2025-08-15T17:58:29.572-0700 [TRACE] (graphTransformerMulti) Completed graph transform *terraform.MissingProviderTransformer (no changes)
+2025-08-15T17:58:29.572-0700 [TRACE] (graphTransformerMulti) Executing graph transform *terraform.ProviderTransformer
+2025-08-15T17:58:29.572-0700 [TRACE] ProviderTransformer: exact match for provider["registry.terraform.io/zscaler/zia"] serving zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360
+2025-08-15T17:58:29.572-0700 [DEBUG] ProviderTransformer: "zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360" (*terraform.NodeValidatableResource) needs provider["registry.terraform.io/zscaler/zia"]
+2025-08-15T17:58:29.572-0700 [TRACE] (graphTransformerMulti) Completed graph transform *terraform.ProviderTransformer with new graph:
+  output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id (expand) - *terraform.nodeExpandOutput
+  provider["registry.terraform.io/zscaler/zia"] - *terraform.NodeApplyableProvider
+  zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 - *terraform.NodeValidatableResource
+    provider["registry.terraform.io/zscaler/zia"] - *terraform.NodeApplyableProvider
+  ------
+2025-08-15T17:58:29.575-0700 [TRACE] (graphTransformerMulti) Executing graph transform *terraform.PruneProviderTransformer
+2025-08-15T17:58:29.575-0700 [TRACE] (graphTransformerMulti) Completed graph transform *terraform.PruneProviderTransformer (no changes)
+2025-08-15T17:58:29.575-0700 [TRACE] Completed graph transform *terraform.graphTransformerMulti with new graph:
+  output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id (expand) - *terraform.nodeExpandOutput
+  provider["registry.terraform.io/zscaler/zia"] - *terraform.NodeApplyableProvider
+  zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 - *terraform.NodeValidatableResource
+    provider["registry.terraform.io/zscaler/zia"] - *terraform.NodeApplyableProvider
+  ------
+2025-08-15T17:58:29.575-0700 [TRACE] Executing graph transform *terraform.RemovedModuleTransformer
+2025-08-15T17:58:29.575-0700 [TRACE] Completed graph transform *terraform.RemovedModuleTransformer (no changes)
+2025-08-15T17:58:29.575-0700 [TRACE] Executing graph transform *terraform.AttachSchemaTransformer
+2025-08-15T17:58:29.575-0700 [TRACE] terraform.contextPlugins: Schema for provider "registry.terraform.io/zscaler/zia" is in the global cache
+2025-08-15T17:58:29.575-0700 [TRACE] AttachSchemaTransformer: attaching resource schema to zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360
+2025-08-15T17:58:29.575-0700 [TRACE] terraform.contextPlugins: Schema for provider "registry.terraform.io/zscaler/zia" is in the global cache
+2025-08-15T17:58:29.575-0700 [TRACE] AttachSchemaTransformer: attaching provider config schema to provider["registry.terraform.io/zscaler/zia"]
+2025-08-15T17:58:29.575-0700 [TRACE] Completed graph transform *terraform.AttachSchemaTransformer (no changes)
+2025-08-15T17:58:29.575-0700 [TRACE] Executing graph transform *terraform.ModuleExpansionTransformer
+2025-08-15T17:58:29.575-0700 [TRACE] Completed graph transform *terraform.ModuleExpansionTransformer (no changes)
+2025-08-15T17:58:29.575-0700 [TRACE] Executing graph transform *terraform.ExternalReferenceTransformer
+2025-08-15T17:58:29.575-0700 [TRACE] Completed graph transform *terraform.ExternalReferenceTransformer (no changes)
+2025-08-15T17:58:29.575-0700 [TRACE] Executing graph transform *terraform.ReferenceTransformer
+2025-08-15T17:58:29.575-0700 [DEBUG] ReferenceTransformer: "zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360" references: []
+2025-08-15T17:58:29.575-0700 [DEBUG] ReferenceTransformer: "output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id (expand)" references: [zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360]
+2025-08-15T17:58:29.575-0700 [DEBUG] ReferenceTransformer: "provider[\"registry.terraform.io/zscaler/zia\"]" references: []
+2025-08-15T17:58:29.575-0700 [TRACE] Completed graph transform *terraform.ReferenceTransformer with new graph:
+  output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id (expand) - *terraform.nodeExpandOutput
+    zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 - *terraform.NodeValidatableResource
+  provider["registry.terraform.io/zscaler/zia"] - *terraform.NodeApplyableProvider
+  zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 - *terraform.NodeValidatableResource
+    provider["registry.terraform.io/zscaler/zia"] - *terraform.NodeApplyableProvider
+  ------
+2025-08-15T17:58:29.575-0700 [TRACE] Executing graph transform *terraform.AttachDependenciesTransformer
+2025-08-15T17:58:29.575-0700 [TRACE] Completed graph transform *terraform.AttachDependenciesTransformer (no changes)
+2025-08-15T17:58:29.575-0700 [TRACE] Executing graph transform *terraform.attachDataResourceDependsOnTransformer
+2025-08-15T17:58:29.575-0700 [TRACE] Completed graph transform *terraform.attachDataResourceDependsOnTransformer (no changes)
+2025-08-15T17:58:29.575-0700 [TRACE] Executing graph transform *terraform.DestroyEdgeTransformer
+2025-08-15T17:58:29.575-0700 [TRACE] Completed graph transform *terraform.DestroyEdgeTransformer (no changes)
+2025-08-15T17:58:29.575-0700 [TRACE] Executing graph transform *terraform.pruneUnusedNodesTransformer
+2025-08-15T17:58:29.575-0700 [TRACE] Completed graph transform *terraform.pruneUnusedNodesTransformer (no changes)
+2025-08-15T17:58:29.575-0700 [TRACE] Executing graph transform *terraform.TargetsTransformer
+2025-08-15T17:58:29.575-0700 [TRACE] Completed graph transform *terraform.TargetsTransformer (no changes)
+2025-08-15T17:58:29.575-0700 [TRACE] Executing graph transform *terraform.ForcedCBDTransformer
+2025-08-15T17:58:29.575-0700 [TRACE] Completed graph transform *terraform.ForcedCBDTransformer (no changes)
+2025-08-15T17:58:29.575-0700 [TRACE] Executing graph transform *terraform.CloseProviderTransformer
+2025-08-15T17:58:29.575-0700 [TRACE] Completed graph transform *terraform.CloseProviderTransformer with new graph:
+  output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id (expand) - *terraform.nodeExpandOutput
+    zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 - *terraform.NodeValidatableResource
+  provider["registry.terraform.io/zscaler/zia"] - *terraform.NodeApplyableProvider
+  provider["registry.terraform.io/zscaler/zia"] (close) - *terraform.graphNodeCloseProvider
+    provider["registry.terraform.io/zscaler/zia"] - *terraform.NodeApplyableProvider
+    zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 - *terraform.NodeValidatableResource
+  zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 - *terraform.NodeValidatableResource
+    provider["registry.terraform.io/zscaler/zia"] - *terraform.NodeApplyableProvider
+  ------
+2025-08-15T17:58:29.575-0700 [TRACE] Executing graph transform *terraform.CloseRootModuleTransformer
+2025-08-15T17:58:29.575-0700 [TRACE] Completed graph transform *terraform.CloseRootModuleTransformer with new graph:
+  output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id (expand) - *terraform.nodeExpandOutput
+    zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 - *terraform.NodeValidatableResource
+  provider["registry.terraform.io/zscaler/zia"] - *terraform.NodeApplyableProvider
+  provider["registry.terraform.io/zscaler/zia"] (close) - *terraform.graphNodeCloseProvider
+    provider["registry.terraform.io/zscaler/zia"] - *terraform.NodeApplyableProvider
+    zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 - *terraform.NodeValidatableResource
+  root - *terraform.nodeCloseModule
+    output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id (expand) - *terraform.nodeExpandOutput
+    provider["registry.terraform.io/zscaler/zia"] (close) - *terraform.graphNodeCloseProvider
+  zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 - *terraform.NodeValidatableResource
+    provider["registry.terraform.io/zscaler/zia"] - *terraform.NodeApplyableProvider
+  ------
+2025-08-15T17:58:29.575-0700 [TRACE] Executing graph transform *terraform.TransitiveReductionTransformer
+2025-08-15T17:58:29.575-0700 [TRACE] Completed graph transform *terraform.TransitiveReductionTransformer with new graph:
+  output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id (expand) - *terraform.nodeExpandOutput
+    zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 - *terraform.NodeValidatableResource
+  provider["registry.terraform.io/zscaler/zia"] - *terraform.NodeApplyableProvider
+  provider["registry.terraform.io/zscaler/zia"] (close) - *terraform.graphNodeCloseProvider
+    zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 - *terraform.NodeValidatableResource
+  root - *terraform.nodeCloseModule
+    output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id (expand) - *terraform.nodeExpandOutput
+    provider["registry.terraform.io/zscaler/zia"] (close) - *terraform.graphNodeCloseProvider
+  zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 - *terraform.NodeValidatableResource
+    provider["registry.terraform.io/zscaler/zia"] - *terraform.NodeApplyableProvider
+  ------
+2025-08-15T17:58:29.575-0700 [DEBUG] Starting graph walk: walkValidate
+2025-08-15T17:58:29.576-0700 [TRACE] vertex "provider[\"registry.terraform.io/zscaler/zia\"]": starting visit (*terraform.NodeApplyableProvider)
+2025-08-15T17:58:29.576-0700 [TRACE] vertex "provider[\"registry.terraform.io/zscaler/zia\"]": belongs to
+2025-08-15T17:58:29.576-0700 [DEBUG] created provider logger: level=info
+2025-08-15T17:58:29.576-0700 [INFO]  provider: configuring client automatic mTLS
+2025-08-15T17:58:29.590-0700 [INFO]  provider.terraform-provider-zia_v4.4.5: configuring server automatic mTLS: timestamp=2025-08-15T17:58:29.590-0700
+2025-08-15T17:58:29.598-0700 [TRACE] BuiltinEvalContext: Initialized "provider[\"registry.terraform.io/zscaler/zia\"]" provider for provider["registry.terraform.io/zscaler/zia"]
+2025-08-15T17:58:29.598-0700 [TRACE] terraform.contextPlugins: Schema for provider "registry.terraform.io/zscaler/zia" is in the global cache
+2025-08-15T17:58:29.598-0700 [TRACE] NodeApplyableProvider: validating configuration for provider["registry.terraform.io/zscaler/zia"]
+2025-08-15T17:58:29.598-0700 [TRACE] buildProviderConfig for provider["registry.terraform.io/zscaler/zia"]: using explicit config only
+2025-08-15T17:58:29.598-0700 [TRACE] vertex "provider[\"registry.terraform.io/zscaler/zia\"]": visit complete
+2025-08-15T17:58:29.598-0700 [TRACE] vertex "zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360": starting visit (*terraform.NodeValidatableResource)
+2025-08-15T17:58:29.598-0700 [TRACE] vertex "zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360": belongs to
+2025-08-15T17:58:29.599-0700 [TRACE] terraform.contextPlugins: Schema for provider "registry.terraform.io/zscaler/zia" is in the global cache
+2025-08-15T17:58:29.599-0700 [TRACE] terraform.contextPlugins: Schema for provider "registry.terraform.io/zscaler/zia" is in the global cache
+2025-08-15T17:58:29.599-0700 [TRACE] GRPCProvider: ValidateResourceConfig
+2025-08-15T17:58:29.599-0700 [TRACE] GRPCProvider: GetProviderSchema
+2025-08-15T17:58:29.599-0700 [TRACE] GRPCProvider: returning cached schema: EXTRA_VALUE_AT_END=registry.terraform.io/zscaler/zia
+2025-08-15T17:58:29.600-0700 [TRACE] vertex "zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360": visit complete
+2025-08-15T17:58:29.600-0700 [TRACE] vertex "output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id (expand)": starting visit (*terraform.nodeExpandOutput)
+2025-08-15T17:58:29.600-0700 [TRACE] vertex "output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id (expand)": does not belong to any module instance
+2025-08-15T17:58:29.600-0700 [TRACE] vertex "output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id (expand)": expanding dynamic subgraph
+2025-08-15T17:58:29.600-0700 [TRACE] vertex "provider[\"registry.terraform.io/zscaler/zia\"] (close)": starting visit (*terraform.graphNodeCloseProvider)
+2025-08-15T17:58:29.600-0700 [TRACE] vertex "provider[\"registry.terraform.io/zscaler/zia\"] (close)": does not belong to any module instance
+2025-08-15T17:58:29.600-0700 [TRACE] GRPCProvider: Close
+2025-08-15T17:58:29.600-0700 [TRACE] Expanding output: adding output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id as *terraform.NodeApplyableOutput
+2025-08-15T17:58:29.600-0700 [TRACE] vertex "output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id (expand)": entering dynamic subgraph
+2025-08-15T17:58:29.600-0700 [TRACE] vertex "output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id": starting visit (*terraform.NodeApplyableOutput)
+2025-08-15T17:58:29.600-0700 [TRACE] vertex "output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id": belongs to
+2025-08-15T17:58:29.600-0700 [TRACE] terraform.contextPlugins: Schema for provider "registry.terraform.io/zscaler/zia" is in the global cache
+2025-08-15T17:58:29.600-0700 [TRACE] terraform.contextPlugins: Schema for provider "registry.terraform.io/zscaler/zia" is in the global cache
+2025-08-15T17:58:29.600-0700 [TRACE] terraform.contextPlugins: Schema for provider "registry.terraform.io/zscaler/zia" is in the global cache
+2025-08-15T17:58:29.600-0700 [TRACE] setValue: Saving Create change for output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id in changeset
+2025-08-15T17:58:29.600-0700 [TRACE] setValue: Saving value for output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id in state
+2025-08-15T17:58:29.600-0700 [TRACE] vertex "output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id": visit complete
+2025-08-15T17:58:29.600-0700 [TRACE] vertex "root": starting visit (terraform.graphNodeRoot)
+2025-08-15T17:58:29.600-0700 [TRACE] vertex "root": does not belong to any module instance
+2025-08-15T17:58:29.600-0700 [TRACE] vertex "root": visit complete
+2025-08-15T17:58:29.600-0700 [TRACE] vertex "output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id (expand)": dynamic subgraph completed successfully
+2025-08-15T17:58:29.600-0700 [TRACE] vertex "output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id (expand)": visit complete
+2025-08-15T17:58:29.601-0700 [INFO]  provider: plugin process exited: plugin=.terraform/providers/registry.terraform.io/zscaler/zia/4.4.5/darwin_arm64/terraform-provider-zia_v4.4.5 id=62549
+2025-08-15T17:58:29.601-0700 [TRACE] vertex "provider[\"registry.terraform.io/zscaler/zia\"] (close)": visit complete
+2025-08-15T17:58:29.601-0700 [TRACE] vertex "root": starting visit (*terraform.nodeCloseModule)
+2025-08-15T17:58:29.601-0700 [TRACE] vertex "root": does not belong to any module instance
+2025-08-15T17:58:29.601-0700 [TRACE] vertex "root": visit complete
+2025-08-15T17:58:29.601-0700 [INFO]  backend/local: plan calling Plan
+2025-08-15T17:58:29.602-0700 [DEBUG] Building and walking plan graph for NormalMode
+2025-08-15T17:58:29.602-0700 [TRACE] building graph for walkPlan
+2025-08-15T17:58:29.602-0700 [TRACE] Executing graph transform *terraform.ConfigTransformer
+2025-08-15T17:58:29.602-0700 [TRACE] ConfigTransformer: Starting for path:
+2025-08-15T17:58:29.603-0700 [TRACE] Completed graph transform *terraform.ConfigTransformer with new graph:
+  zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 (expand) - *terraform.nodeExpandPlannableResource
+  ------
+2025-08-15T17:58:29.603-0700 [TRACE] Executing graph transform *terraform.RootVariableTransformer
+2025-08-15T17:58:29.603-0700 [TRACE] Completed graph transform *terraform.RootVariableTransformer (no changes)
+2025-08-15T17:58:29.603-0700 [TRACE] Executing graph transform *terraform.ModuleVariableTransformer
+2025-08-15T17:58:29.603-0700 [TRACE] Completed graph transform *terraform.ModuleVariableTransformer (no changes)
+2025-08-15T17:58:29.603-0700 [TRACE] Executing graph transform *terraform.variableValidationTransformer
+2025-08-15T17:58:29.603-0700 [TRACE] variableValidationTransformer: adding validation nodes for any existing variable evaluation nodes
+2025-08-15T17:58:29.603-0700 [TRACE] Completed graph transform *terraform.variableValidationTransformer (no changes)
+2025-08-15T17:58:29.603-0700 [TRACE] Executing graph transform *terraform.LocalTransformer
+2025-08-15T17:58:29.603-0700 [TRACE] Completed graph transform *terraform.LocalTransformer (no changes)
+2025-08-15T17:58:29.603-0700 [TRACE] Executing graph transform *terraform.OutputTransformer
+2025-08-15T17:58:29.603-0700 [TRACE] OutputTransformer: adding zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id as *terraform.nodeExpandOutput
+2025-08-15T17:58:29.603-0700 [TRACE] Completed graph transform *terraform.OutputTransformer with new graph:
+  output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id (expand) - *terraform.nodeExpandOutput
+  zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 (expand) - *terraform.nodeExpandPlannableResource
+  ------
+2025-08-15T17:58:29.603-0700 [TRACE] Executing graph transform *terraform.checkTransformer
+2025-08-15T17:58:29.603-0700 [TRACE] Completed graph transform *terraform.checkTransformer (no changes)
+2025-08-15T17:58:29.603-0700 [TRACE] Executing graph transform *terraform.OrphanResourceInstanceTransformer
+2025-08-15T17:58:29.603-0700 [TRACE] Completed graph transform *terraform.OrphanResourceInstanceTransformer (no changes)
+2025-08-15T17:58:29.603-0700 [TRACE] Executing graph transform *terraform.StateTransformer
+2025-08-15T17:58:29.603-0700 [TRACE] StateTransformer: creating nodes for deposed instance objects only
+2025-08-15T17:58:29.603-0700 [TRACE] Completed graph transform *terraform.StateTransformer (no changes)
+2025-08-15T17:58:29.603-0700 [TRACE] Executing graph transform *terraform.AttachStateTransformer
+2025-08-15T17:58:29.603-0700 [TRACE] Completed graph transform *terraform.AttachStateTransformer (no changes)
+2025-08-15T17:58:29.603-0700 [TRACE] Executing graph transform *terraform.OrphanOutputTransformer
+2025-08-15T17:58:29.603-0700 [TRACE] Completed graph transform *terraform.OrphanOutputTransformer (no changes)
+2025-08-15T17:58:29.603-0700 [TRACE] Executing graph transform *terraform.AttachResourceConfigTransformer
+2025-08-15T17:58:29.603-0700 [TRACE] AttachResourceConfigTransformer: attaching to "zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 (expand)" (*terraform.nodeExpandPlannableResource) config from hcl.Range{Filename:"zia_dlp_web_rules.tf", Start:hcl.Pos{Line:2, Column:1, Byte:62}, End:hcl.Pos{Line:2, Column:66, Byte:127}}
+2025-08-15T17:58:29.603-0700 [TRACE] AttachResourceConfigTransformer: attaching provider meta configs to zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 (expand)
+2025-08-15T17:58:29.603-0700 [TRACE] Completed graph transform *terraform.AttachResourceConfigTransformer (no changes)
+2025-08-15T17:58:29.603-0700 [TRACE] Executing graph transform *terraform.graphTransformerMulti
+2025-08-15T17:58:29.603-0700 [TRACE] (graphTransformerMulti) Executing graph transform *terraform.externalProviderTransformer
+2025-08-15T17:58:29.603-0700 [TRACE] (graphTransformerMulti) Completed graph transform *terraform.externalProviderTransformer with new graph:
+  output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id (expand) - *terraform.nodeExpandOutput
+  zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 (expand) - *terraform.nodeExpandPlannableResource
+  ------
+2025-08-15T17:58:29.603-0700 [TRACE] (graphTransformerMulti) Executing graph transform *terraform.ProviderConfigTransformer
+2025-08-15T17:58:29.603-0700 [TRACE] ProviderConfigTransformer: attaching to "provider[\"registry.terraform.io/zscaler/zia\"]" provider configuration from zia-provider.tf:8,1-15
+2025-08-15T17:58:29.603-0700 [TRACE] (graphTransformerMulti) Completed graph transform *terraform.ProviderConfigTransformer with new graph:
+  output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id (expand) - *terraform.nodeExpandOutput
+  provider["registry.terraform.io/zscaler/zia"] - *terraform.NodeApplyableProvider
+  zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 (expand) - *terraform.nodeExpandPlannableResource
+  ------
+2025-08-15T17:58:29.603-0700 [TRACE] (graphTransformerMulti) Executing graph transform *terraform.MissingProviderTransformer
+2025-08-15T17:58:29.603-0700 [TRACE] (graphTransformerMulti) Completed graph transform *terraform.MissingProviderTransformer (no changes)
+2025-08-15T17:58:29.603-0700 [TRACE] (graphTransformerMulti) Executing graph transform *terraform.ProviderTransformer
+2025-08-15T17:58:29.603-0700 [TRACE] ProviderTransformer: exact match for provider["registry.terraform.io/zscaler/zia"] serving zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 (expand)
+2025-08-15T17:58:29.603-0700 [DEBUG] ProviderTransformer: "zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 (expand)" (*terraform.nodeExpandPlannableResource) needs provider["registry.terraform.io/zscaler/zia"]
+2025-08-15T17:58:29.603-0700 [TRACE] (graphTransformerMulti) Completed graph transform *terraform.ProviderTransformer with new graph:
+  output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id (expand) - *terraform.nodeExpandOutput
+  provider["registry.terraform.io/zscaler/zia"] - *terraform.NodeApplyableProvider
+  zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 (expand) - *terraform.nodeExpandPlannableResource
+    provider["registry.terraform.io/zscaler/zia"] - *terraform.NodeApplyableProvider
+  ------
+2025-08-15T17:58:29.603-0700 [TRACE] (graphTransformerMulti) Executing graph transform *terraform.PruneProviderTransformer
+2025-08-15T17:58:29.603-0700 [TRACE] (graphTransformerMulti) Completed graph transform *terraform.PruneProviderTransformer (no changes)
+2025-08-15T17:58:29.603-0700 [TRACE] Completed graph transform *terraform.graphTransformerMulti with new graph:
+  output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id (expand) - *terraform.nodeExpandOutput
+  provider["registry.terraform.io/zscaler/zia"] - *terraform.NodeApplyableProvider
+  zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 (expand) - *terraform.nodeExpandPlannableResource
+    provider["registry.terraform.io/zscaler/zia"] - *terraform.NodeApplyableProvider
+  ------
+2025-08-15T17:58:29.603-0700 [TRACE] Executing graph transform *terraform.RemovedModuleTransformer
+2025-08-15T17:58:29.603-0700 [TRACE] Completed graph transform *terraform.RemovedModuleTransformer (no changes)
+2025-08-15T17:58:29.603-0700 [TRACE] Executing graph transform *terraform.AttachSchemaTransformer
+2025-08-15T17:58:29.603-0700 [TRACE] terraform.contextPlugins: Schema for provider "registry.terraform.io/zscaler/zia" is in the global cache
+2025-08-15T17:58:29.603-0700 [TRACE] AttachSchemaTransformer: attaching resource schema to zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 (expand)
+2025-08-15T17:58:29.603-0700 [TRACE] terraform.contextPlugins: Schema for provider "registry.terraform.io/zscaler/zia" is in the global cache
+2025-08-15T17:58:29.603-0700 [TRACE] AttachSchemaTransformer: attaching provider config schema to provider["registry.terraform.io/zscaler/zia"]
+2025-08-15T17:58:29.603-0700 [TRACE] Completed graph transform *terraform.AttachSchemaTransformer (no changes)
+2025-08-15T17:58:29.603-0700 [TRACE] Executing graph transform *terraform.ModuleExpansionTransformer
+2025-08-15T17:58:29.603-0700 [TRACE] Completed graph transform *terraform.ModuleExpansionTransformer (no changes)
+2025-08-15T17:58:29.603-0700 [TRACE] Executing graph transform *terraform.ExternalReferenceTransformer
+2025-08-15T17:58:29.603-0700 [TRACE] Completed graph transform *terraform.ExternalReferenceTransformer (no changes)
+2025-08-15T17:58:29.603-0700 [TRACE] Executing graph transform *terraform.ReferenceTransformer
+2025-08-15T17:58:29.603-0700 [DEBUG] ReferenceTransformer: "zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 (expand)" references: []
+2025-08-15T17:58:29.603-0700 [DEBUG] ReferenceTransformer: "output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id (expand)" references: [zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 (expand)]
+2025-08-15T17:58:29.603-0700 [DEBUG] ReferenceTransformer: "provider[\"registry.terraform.io/zscaler/zia\"]" references: []
+2025-08-15T17:58:29.603-0700 [TRACE] Completed graph transform *terraform.ReferenceTransformer with new graph:
+  output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id (expand) - *terraform.nodeExpandOutput
+    zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 (expand) - *terraform.nodeExpandPlannableResource
+  provider["registry.terraform.io/zscaler/zia"] - *terraform.NodeApplyableProvider
+  zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 (expand) - *terraform.nodeExpandPlannableResource
+    provider["registry.terraform.io/zscaler/zia"] - *terraform.NodeApplyableProvider
+  ------
+2025-08-15T17:58:29.603-0700 [TRACE] Executing graph transform *terraform.AttachDependenciesTransformer
+2025-08-15T17:58:29.603-0700 [TRACE] AttachDependenciesTransformer: zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 depends on []
+2025-08-15T17:58:29.603-0700 [TRACE] Completed graph transform *terraform.AttachDependenciesTransformer (no changes)
+2025-08-15T17:58:29.603-0700 [TRACE] Executing graph transform *terraform.attachDataResourceDependsOnTransformer
+2025-08-15T17:58:29.603-0700 [TRACE] Completed graph transform *terraform.attachDataResourceDependsOnTransformer (no changes)
+2025-08-15T17:58:29.603-0700 [TRACE] Executing graph transform *terraform.DestroyEdgeTransformer
+2025-08-15T17:58:29.603-0700 [TRACE] Completed graph transform *terraform.DestroyEdgeTransformer (no changes)
+2025-08-15T17:58:29.603-0700 [TRACE] Executing graph transform *terraform.pruneUnusedNodesTransformer
+2025-08-15T17:58:29.603-0700 [TRACE] Completed graph transform *terraform.pruneUnusedNodesTransformer (no changes)
+2025-08-15T17:58:29.603-0700 [TRACE] Executing graph transform *terraform.TargetsTransformer
+2025-08-15T17:58:29.603-0700 [TRACE] Completed graph transform *terraform.TargetsTransformer (no changes)
+2025-08-15T17:58:29.603-0700 [TRACE] Executing graph transform *terraform.ForcedCBDTransformer
+2025-08-15T17:58:29.603-0700 [TRACE] ForcedCBDTransformer: "zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 (expand)" (*terraform.nodeExpandPlannableResource) has no CBD descendent, so skipping
+2025-08-15T17:58:29.603-0700 [TRACE] Completed graph transform *terraform.ForcedCBDTransformer (no changes)
+2025-08-15T17:58:29.603-0700 [TRACE] Executing graph transform *terraform.CloseProviderTransformer
+2025-08-15T17:58:29.603-0700 [TRACE] Completed graph transform *terraform.CloseProviderTransformer with new graph:
+  output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id (expand) - *terraform.nodeExpandOutput
+    zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 (expand) - *terraform.nodeExpandPlannableResource
+  provider["registry.terraform.io/zscaler/zia"] - *terraform.NodeApplyableProvider
+  provider["registry.terraform.io/zscaler/zia"] (close) - *terraform.graphNodeCloseProvider
+    provider["registry.terraform.io/zscaler/zia"] - *terraform.NodeApplyableProvider
+    zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 (expand) - *terraform.nodeExpandPlannableResource
+  zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 (expand) - *terraform.nodeExpandPlannableResource
+    provider["registry.terraform.io/zscaler/zia"] - *terraform.NodeApplyableProvider
+  ------
+2025-08-15T17:58:29.603-0700 [TRACE] Executing graph transform *terraform.CloseRootModuleTransformer
+2025-08-15T17:58:29.603-0700 [TRACE] Completed graph transform *terraform.CloseRootModuleTransformer with new graph:
+  output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id (expand) - *terraform.nodeExpandOutput
+    zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 (expand) - *terraform.nodeExpandPlannableResource
+  provider["registry.terraform.io/zscaler/zia"] - *terraform.NodeApplyableProvider
+  provider["registry.terraform.io/zscaler/zia"] (close) - *terraform.graphNodeCloseProvider
+    provider["registry.terraform.io/zscaler/zia"] - *terraform.NodeApplyableProvider
+    zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 (expand) - *terraform.nodeExpandPlannableResource
+  root - *terraform.nodeCloseModule
+    output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id (expand) - *terraform.nodeExpandOutput
+    provider["registry.terraform.io/zscaler/zia"] (close) - *terraform.graphNodeCloseProvider
+  zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 (expand) - *terraform.nodeExpandPlannableResource
+    provider["registry.terraform.io/zscaler/zia"] - *terraform.NodeApplyableProvider
+  ------
+2025-08-15T17:58:29.603-0700 [TRACE] Executing graph transform *terraform.TransitiveReductionTransformer
+2025-08-15T17:58:29.603-0700 [TRACE] Completed graph transform *terraform.TransitiveReductionTransformer with new graph:
+  output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id (expand) - *terraform.nodeExpandOutput
+    zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 (expand) - *terraform.nodeExpandPlannableResource
+  provider["registry.terraform.io/zscaler/zia"] - *terraform.NodeApplyableProvider
+  provider["registry.terraform.io/zscaler/zia"] (close) - *terraform.graphNodeCloseProvider
+    zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 (expand) - *terraform.nodeExpandPlannableResource
+  root - *terraform.nodeCloseModule
+    output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id (expand) - *terraform.nodeExpandOutput
+    provider["registry.terraform.io/zscaler/zia"] (close) - *terraform.graphNodeCloseProvider
+  zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 (expand) - *terraform.nodeExpandPlannableResource
+    provider["registry.terraform.io/zscaler/zia"] - *terraform.NodeApplyableProvider
+  ------
+2025-08-15T17:58:29.603-0700 [DEBUG] Starting graph walk: walkPlan
+2025-08-15T17:58:29.603-0700 [TRACE] vertex "provider[\"registry.terraform.io/zscaler/zia\"]": starting visit (*terraform.NodeApplyableProvider)
+2025-08-15T17:58:29.604-0700 [TRACE] vertex "provider[\"registry.terraform.io/zscaler/zia\"]": belongs to
+2025-08-15T17:58:29.604-0700 [DEBUG] created provider logger: level=info
+2025-08-15T17:58:29.604-0700 [INFO]  provider: configuring client automatic mTLS
+2025-08-15T17:58:29.619-0700 [INFO]  provider.terraform-provider-zia_v4.4.5: configuring server automatic mTLS: timestamp=2025-08-15T17:58:29.619-0700
+2025-08-15T17:58:29.627-0700 [TRACE] BuiltinEvalContext: Initialized "provider[\"registry.terraform.io/zscaler/zia\"]" provider for provider["registry.terraform.io/zscaler/zia"]
+2025-08-15T17:58:29.627-0700 [TRACE] terraform.contextPlugins: Schema for provider "registry.terraform.io/zscaler/zia" is in the global cache
+2025-08-15T17:58:29.627-0700 [TRACE] NodeApplyableProvider: configuring provider["registry.terraform.io/zscaler/zia"]
+2025-08-15T17:58:29.627-0700 [TRACE] buildProviderConfig for provider["registry.terraform.io/zscaler/zia"]: using explicit config only
+2025-08-15T17:58:29.627-0700 [TRACE] GRPCProvider: GetProviderSchema
+2025-08-15T17:58:29.627-0700 [TRACE] GRPCProvider: returning cached schema: EXTRA_VALUE_AT_END=registry.terraform.io/zscaler/zia
+2025-08-15T17:58:29.627-0700 [TRACE] terraform.contextPlugins: Schema for provider "registry.terraform.io/zscaler/zia" is in the global cache
+2025-08-15T17:58:29.627-0700 [TRACE] GRPCProvider: ValidateProviderConfig
+2025-08-15T17:58:29.627-0700 [TRACE] GRPCProvider: GetProviderSchema
+2025-08-15T17:58:29.627-0700 [TRACE] GRPCProvider: returning cached schema: EXTRA_VALUE_AT_END=registry.terraform.io/zscaler/zia
+2025-08-15T17:58:29.629-0700 [TRACE] GRPCProvider: ConfigureProvider
+2025-08-15T17:58:29.629-0700 [TRACE] GRPCProvider: GetProviderSchema
+2025-08-15T17:58:29.629-0700 [TRACE] GRPCProvider: returning cached schema: EXTRA_VALUE_AT_END=registry.terraform.io/zscaler/zia
+2025-08-15T17:58:29.629-0700 [INFO]  provider.terraform-provider-zia_v4.4.5: Initializing Zscaler client: timestamp=2025-08-15T17:58:29.629-0700
+2025-08-15T17:58:29.629-0700 [INFO]  provider.terraform-provider-zia_v4.4.5: Initializing ZIA V3 client: timestamp=2025-08-15T17:58:29.629-0700
+2025-08-15T17:58:29.631-0700 [WARN]  unexpected data: registry.terraform.io/zscaler/zia:stdout="oneapi-logger: 2025/08/15 17:58:29 logger.go:36: [DEBUG] authValid: token is nil or expiry not set"
+2025-08-15T17:58:29.631-0700 [WARN]  unexpected data:
+  registry.terraform.io/zscaler/zia:stdout=
+  | oneapi-logger: 2025/08/15 17:58:29 logger.go:36: [DEBUG] Request "POST https://securitygeekio.zsloginbeta.net/oauth2/v1/token" details:
+  | ---[ ZSCALER SDK REQUEST | ID:2e754816-982d-4cf2-abdf-163bdba78dcc ]-------------------------------
+  | POST /oauth2/v1/token HTTP/1.1\r
+  | Host: securitygeekio.zsloginbeta.net\r
+  | User-Agent: (darwin arm64) Terraform/1.9.0 Provider/4.4.4\r
+  | Content-Length: 147\r
+  | Content-Type: application/x-www-form-urlencoded\r
+  | Accept-Encoding: gzip\r
+  | \r
+  | 
+  | ---------------------------------------------------------
+  
+2025-08-15T17:58:29.631-0700 [WARN]  unexpected data: registry.terraform.io/zscaler/zia:stdout="oneapi-logger: 2025/08/15 17:58:29 logger.go:36: [DEBUG] POST https://securitygeekio.zsloginbeta.net/oauth2/v1/token"
+2025-08-15T17:58:29.894-0700 [WARN]  unexpected data: registry.terraform.io/zscaler/zia:stdout="oneapi-logger: 2025/08/15 17:58:29 logger.go:36: [DEBUG] parsed expires_in=86399 seconds, token expiry set to: 2025-08-16T17:58:28-07:00"
+2025-08-15T17:58:29.895-0700 [WARN]  unexpected data: registry.terraform.io/zscaler/zia:stdout="oneapi-logger: 2025/08/15 17:58:29 logger.go:36: [DEBUG] authValid: token is nil or expiry not set"
+2025-08-15T17:58:29.895-0700 [WARN]  unexpected data:
+  registry.terraform.io/zscaler/zia:stdout=
+  | oneapi-logger: 2025/08/15 17:58:29 logger.go:36: [DEBUG] Request "POST https://securitygeekio.zsloginbeta.net/oauth2/v1/token" details:
+  | ---[ ZSCALER SDK REQUEST | ID:37d0f04b-9b8e-4e06-b6ae-407a0a1c27be ]-------------------------------
+  | POST /oauth2/v1/token HTTP/1.1\r
+  | Host: securitygeekio.zsloginbeta.net\r
+  | User-Agent: (darwin arm64) Terraform/1.9.0 Provider/4.4.4\r
+  | Content-Length: 147\r
+  | Content-Type: application/x-www-form-urlencoded\r
+  | Accept-Encoding: gzip\r
+  | \r
+  | 
+  | ---------------------------------------------------------
+  | oneapi-logger: 2025/08/15 17:58:29 logger.go:36: [DEBUG] POST https://securitygeekio.zsloginbeta.net/oauth2/v1/token
+  
+2025-08-15T17:58:30.145-0700 [WARN]  unexpected data: registry.terraform.io/zscaler/zia:stdout="oneapi-logger: 2025/08/15 17:58:30 logger.go:36: [DEBUG] parsed expires_in=86399 seconds, token expiry set to: 2025-08-16T17:58:29-07:00"
+2025-08-15T17:58:30.145-0700 [TRACE] vertex "provider[\"registry.terraform.io/zscaler/zia\"]": visit complete
+2025-08-15T17:58:30.145-0700 [TRACE] vertex "zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 (expand)": starting visit (*terraform.nodeExpandPlannableResource)
+2025-08-15T17:58:30.145-0700 [TRACE] vertex "zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 (expand)": does not belong to any module instance
+2025-08-15T17:58:30.145-0700 [TRACE] vertex "zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 (expand)": expanding dynamic subgraph
+2025-08-15T17:58:30.146-0700 [TRACE] Executing graph transform *terraform.ResourceCountTransformer
+2025-08-15T17:58:30.146-0700 [TRACE] ResourceCountTransformer: adding zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 as *terraform.NodePlannableResourceInstance
+2025-08-15T17:58:30.146-0700 [TRACE] Completed graph transform *terraform.ResourceCountTransformer with new graph:
+  zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 - *terraform.NodePlannableResourceInstance
+  ------
+2025-08-15T17:58:30.146-0700 [TRACE] Executing graph transform *terraform.OrphanResourceInstanceCountTransformer
+2025-08-15T17:58:30.146-0700 [TRACE] Completed graph transform *terraform.OrphanResourceInstanceCountTransformer (no changes)
+2025-08-15T17:58:30.146-0700 [TRACE] Executing graph transform *terraform.AttachStateTransformer
+2025-08-15T17:58:30.146-0700 [TRACE] NodeAbstractResourceInstance.AttachResourceState for zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360
+2025-08-15T17:58:30.146-0700 [TRACE] Completed graph transform *terraform.AttachStateTransformer (no changes)
+2025-08-15T17:58:30.146-0700 [TRACE] Executing graph transform *terraform.TargetsTransformer
+2025-08-15T17:58:30.146-0700 [TRACE] Completed graph transform *terraform.TargetsTransformer (no changes)
+2025-08-15T17:58:30.146-0700 [TRACE] Executing graph transform *terraform.ReferenceTransformer
+2025-08-15T17:58:30.146-0700 [DEBUG] ReferenceTransformer: "zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360" references: []
+2025-08-15T17:58:30.146-0700 [TRACE] Completed graph transform *terraform.ReferenceTransformer (no changes)
+2025-08-15T17:58:30.146-0700 [TRACE] Executing graph transform *terraform.RootTransformer
+2025-08-15T17:58:30.146-0700 [TRACE] Completed graph transform *terraform.RootTransformer with new graph:
+  root - terraform.graphNodeRoot
+    zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 - *terraform.NodePlannableResourceInstance
+  zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 - *terraform.NodePlannableResourceInstance
+  ------
+2025-08-15T17:58:30.146-0700 [TRACE] vertex "zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 (expand)": entering dynamic subgraph
+2025-08-15T17:58:30.146-0700 [TRACE] vertex "zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360": starting visit (*terraform.NodePlannableResourceInstance)
+2025-08-15T17:58:30.146-0700 [TRACE] vertex "zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360": belongs to
+2025-08-15T17:58:30.146-0700 [TRACE] terraform.contextPlugins: Schema for provider "registry.terraform.io/zscaler/zia" is in the global cache
+2025-08-15T17:58:30.146-0700 [TRACE] terraform.contextPlugins: Schema for provider "registry.terraform.io/zscaler/zia" is in the global cache
+2025-08-15T17:58:30.146-0700 [TRACE] readResourceInstanceState: reading state for zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360
+2025-08-15T17:58:30.147-0700 [TRACE] upgradeResourceState: schema version of zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 is still 0; calling provider "zia" for any other minor fixups
+2025-08-15T17:58:30.147-0700 [TRACE] GRPCProvider: UpgradeResourceState
+2025-08-15T17:58:30.147-0700 [TRACE] GRPCProvider: GetProviderSchema
+2025-08-15T17:58:30.147-0700 [TRACE] GRPCProvider: returning cached schema: EXTRA_VALUE_AT_END=registry.terraform.io/zscaler/zia
+2025-08-15T17:58:30.150-0700 [TRACE] terraform.contextPlugins: Schema for provider "registry.terraform.io/zscaler/zia" is in the global cache
+2025-08-15T17:58:30.150-0700 [TRACE] NodeAbstractResouceInstance.writeResourceInstanceState to prevRunState for zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360
+2025-08-15T17:58:30.150-0700 [TRACE] NodeAbstractResouceInstance.writeResourceInstanceState: writing state object for zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360
+2025-08-15T17:58:30.151-0700 [TRACE] terraform.contextPlugins: Schema for provider "registry.terraform.io/zscaler/zia" is in the global cache
+2025-08-15T17:58:30.151-0700 [TRACE] NodeAbstractResouceInstance.writeResourceInstanceState to refreshState for zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360
+2025-08-15T17:58:30.151-0700 [TRACE] NodeAbstractResouceInstance.writeResourceInstanceState: writing state object for zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360
+2025-08-15T17:58:30.152-0700 [TRACE] NodeAbstractResourceInstance.refresh for zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360
+2025-08-15T17:58:30.152-0700 [TRACE] terraform.contextPlugins: Schema for provider "registry.terraform.io/zscaler/zia" is in the global cache
+2025-08-15T17:58:30.152-0700 [TRACE] terraform.contextPlugins: Schema for provider "registry.terraform.io/zscaler/zia" is in the global cache
+2025-08-15T17:58:30.152-0700 [TRACE] GRPCProvider: ReadResource
+2025-08-15T17:58:30.152-0700 [TRACE] GRPCProvider: GetProviderSchema
+2025-08-15T17:58:30.152-0700 [TRACE] GRPCProvider: returning cached schema: EXTRA_VALUE_AT_END=registry.terraform.io/zscaler/zia
+2025-08-15T17:58:30.154-0700 [WARN]  unexpected data: registry.terraform.io/zscaler/zia:stdout="oneapi-logger: 2025/08/15 17:58:30 logger.go:36: [DEBUG] authValid: token exists=true, expires_in=86398.99, valid=true"
+2025-08-15T17:58:30.154-0700 [WARN]  unexpected data:
+  registry.terraform.io/zscaler/zia:stdout=
+  | oneapi-logger: 2025/08/15 17:58:30 logger.go:36: [DEBUG] Request "GET https://api.beta.zsapi.net/zia/api/v1/webDlpRules/1112360" details:
+  | ---[ ZSCALER SDK REQUEST | ID:29f3a131-8292-4293-87dd-1a9c2e9f22a8 ]-------------------------------
+  | GET /zia/api/v1/webDlpRules/1112360 HTTP/1.1\r
+  | Host: api.beta.zsapi.net\r
+  | User-Agent: (darwin arm64) Terraform/1.9.0 Provider/4.4.4\r
+  | Authorization: Bearer eyJraWQiOiJtMWxtNDRyY3IwN3E1IiwidHlwIjoiSldUIiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJpcGxtY3EzazcwNjBkIiwiYXVkIjpbIlpQQS56cGFiZXRhLm5ldCIsIlpEWC56ZHhiZXRhLm5ldCIsImh0dHBzOi8vYXBpLnpzY2FsZXIuY29tIiwiQ0xPVURfQ09OTkVDVE9SLnpzY2FsZXJiZXRhLm5ldCIsIlpJQU0uc2VjdXJpdHlnZWVraW8uenNsb2dpbmJldGEubmV0IiwiWklBLnpzY2FsZXJiZXRhLm5ldCIsIlpDQy56c2NhbGVyYmV0YS5uZXQiXSwibmJmIjoxNzU1MzA1OTEwLCJzZXJ2aWNlLWluZm8iOlt7ImNhdCI6ImNvbmZpZyIsInByZCI6IlpQQSIsImNsZCI6InpwYWJldGEubmV0IiwidG50IjoiNzIwNTgzMDQ4NTUwMTU0MjQiLCJwY3QiOiJjb25maWciLCJleHQiOnsicmlkIjoiMjgiLCJybm0iOiJBUEkgRnVsbCBBY2Nlc3MiLCJzaWQiOiJEZWZhdWx0Iiwic25tIjoiRGVmYXVsdCJ9fSx7ImNhdCI6ImNvbmZpZyIsIn
+  
+2025-08-15T17:58:30.154-0700 [WARN]  unexpected data: registry.terraform.io/zscaler/zia:stdout=ByZCI6IlpJQSIsImNsZCI6InpzY2FsZXJiZXRhLm5ldCIsInRudCI6IjgwNjEyNDAiLCJwY3QiOiJjb25maWciLCJleHQiOnsicmlkIjoiMzM4NjAiLCJybm0iOiJaSUFfQVBJX1JvbGUwMSJ9fSx7ImNhdCI6ImNvbmZpZyIsInByZCI6IkNMT1VEX0NPTk5FQ1RPUiIsImNsZCI6InpzY2FsZXJiZXRhLm5ldCIsInRudCI6InpzY2FsZXJiZXRhLm5ldC44MDYxMjQwIiwicGN0IjoiY29uZmlnIiwiZXh0Ijp7InJpZCI6IjE4MzUwIiwicm5tIjoiU3VwZXIgQWRtaW4ifX0seyJjYXQiOiJjb25maWciLCJwcmQiOiJaQ0MiLCJjbGQiOiJ6c2NhbGVyYmV0YS5uZXQiLCJ0bnQiOiI4MDYxMjQwIiwicGN0IjoiY29uZmlnIiwiZXh0Ijp7InJpZCI6IjEiLCJybm0iOiJTdXBlciBBZG1pbiJ9fSx7ImNhdCI6ImNvbmZpZyIsInByZCI6IlpEWCIsImNsZCI6InpkeGJldGEubmV0IiwidG50IjoienNjYWxlcmJldGEubmV0LjgwNjEyNDAiLCJwY3QiOiJjb25maWciLCJleHQiOnsicmlkIjoiMTgzNDciLCJybm0iOiJaRFggU3VwZXIgQWRtaW4ifX0seyJjYXQiOiJjb25maWciLCJwcmQiOiJaSUFNIiwiY2xkIjoic2VjdXJpdHlnZWVraW8uenNsb2dpbmJldGEubmV0IiwidG50IjoiZ2hsbTQ0cmEwZzdpYSIsInBjdCI6ImNvbmZpZyIsImV4dCI6eyJyaWQiOiI5aDZwN2VidjkwM2s0Iiwicm5tIjoiU3VwZXIgQWRtaW4ifX1dLCJpc3MiOiJodHRwczovL3NlY3VyaXR5Z2Vla2lvLnpzbG9naW5iZXRhLm5ldCIsInRlbmFudElkIjoiZ2hsbTQ0cmEwZzdpYSIsImV4cCI6MT
+2025-08-15T17:58:30.154-0700 [WARN]  unexpected data:
+  registry.terraform.io/zscaler/zia:stdout=
+  | c1NTM5MjMxMCwiaWF0IjoxNzU1MzA1OTEwLCJqdGkiOiJiM2VhYzhkZi1lOWM0LTQ3NjctYWMyZi0zYmZkYzM3MWM3OTAiLCJjbGllbnRfaWQiOiJpcGxtY3EzazcwNjBkIn0.H33nRK8rG9IQx-YRFoKxcXe6tbEtV22OCqvzRbF-Lmcqn23QI9OOCazxkgS8P5k-VEIAXF6oCiGjF8f5GFya9aZKpYvyurFSLCDdYiwwBGoUZsnVPjIu9SynkveyfFqgt4U3kA9tQb0ZvnZ1vPHfaN1RovPsUlxZX1rknx0dJlOuAfWKCkeNxlrVQuuUuRh6rPgvj-cxMWVudCCxw30BgtsDKuvMlVS55iAiUPeOS7_CqRKB4m0IOj4P30r6vwZF42h6OfvK_CJPWvCAfKAWFB9n13wW8wnyAugHv4WRLPUUT_NveLVEqzewPl5EWD14OQG9wjXReDZQbctu3utcXA\r
+  | Content-Type: application/json\r
+  | Accept-Encoding: gzip\r
+  | \r
+  | 
+  | ---------------------------------------------------------
+  
+2025-08-15T17:58:30.154-0700 [WARN]  unexpected data: registry.terraform.io/zscaler/zia:stdout="oneapi-logger: 2025/08/15 17:58:30 logger.go:36: [DEBUG] GET https://api.beta.zsapi.net/zia/api/v1/webDlpRules/1112360"
+2025-08-15T17:58:33.096-0700 [WARN]  unexpected data:
+  registry.terraform.io/zscaler/zia:stdout=
+  | oneapi-logger: 2025/08/15 17:58:33 logger.go:36: [DEBUG] Response "GET https://api.beta.zsapi.net/zia/api/v1/webDlpRules/1112360" details:
+  | ---[ ZSCALER SDK RESPONSE | ID:29f3a131-8292-4293-87dd-1a9c2e9f22a8 | Duration:2.942210875s ]--------------------------------
+  | HTTP/2.0 200 OK\r
+  | Cache-Control: no-store, no-cache\r
+  | Content-Disposition: attachment; filename="api.json"\r
+  | Content-Type: application/json\r
+  | Date: Sat, 16 Aug 2025 00:58:33 GMT\r
+  | Server: Zscaler\r
+  | Strict-Transport-Security: max-age=31622400;includeSubDomains;preload\r
+  | Vary: accept-encoding\r
+  | X-Content-Type-Options: nosniff\r
+  | X-Envoy-Upstream-Service-Time: 2795\r
+  | X-Frame-Options: SAMEORIGIN\r
+  | X-Oneapi-Version: 109.0.10\r
+  | X-Ratelimit-Limit: 5000, 5000;w=60\r
+  | X-Ratelimit-Remaining: 4996\r
+  | X-Ratelimit-Reset: 30\r
+  | X-Transaction-Id: b3eac8df-e9c4-4767-ac2f-3bfdc371c790\r
+  | X-Xss-Protection: 1; mode=block\r
+  | X-Zscaler-Mode: read-write\r
+  | \r
+  | {"accessControl":"READ_WRITE","id":1112360,"order":1,"protocols":["FTP_RULE","HTTPS_RULE","HTTP_RULE"],"rank":0,"description":"Google Finan
+  
+2025-08-15T17:58:33.097-0700 [WARN]  unexpected data: registry.terraform.io/zscaler/zia:stdout="ce\n123.5.5.6 &*& ^ & && kjsdhfs\n123.5.5.6 &*& ^ & && kjsdhfs\nC13259587 - Enable HTTP/2 support in SSL inspection policy for test AD group NT0001\\fP-CLD-XQZS-A0-01\nC13259587 - Enable HTTP/2 support in AD group NT0001\\fP-CLD-XQZS-A0-01\",\"locations\":[{\"id\":22735190,\"name\":\"Location01\"}],\"locationGroups\":[{\"id\":8061255,\"name\":\"Corporate User Traffic Group\"}],\"urlCategories\":[{\"id\":2,\"name\":\"ADULT_THEMES\",\"isNameL10nTag\":true},{\"id\":6,\"name\":\"SEXUALITY\",\"isNameL10nTag\":true},{\"id\":7,\"name\":\"ADULT_SEX_EDUCATION\",\"isNameL10nTag\":true}],\"dlpEngines\":[{\"id\":63,\"name\":\"HIPAA\",\"isNameL10nTag\":true},{\"id\":62,\"name\":\"GLBA\",\"isNameL10nTag\":true}],\"cloudApplications\":[],\"minSize\":0,\"action\":\"ALLOW\",\"state\":\"ENABLED\",\"matchOnly\":false,\"lastModifiedTime\":1755305372,\"lastModifiedBy\":{\"id\":19474996,\"name\":\"admin@securitygeekio.zsloginbeta.net\"},\"receiver\":{},\"withoutContentInspection\":false,\"inspectHttpGetEnabled\":false,\"name\":\"NewRule 2209 test\",\"userRiskScoreLevels\":[\"LOW\",\"MEDIUM\",\"HIGH\",\"CRITICAL\"],\"dlpDownloadScanEna"
+2025-08-15T17:58:33.097-0700 [WARN]  unexpected data:
+  registry.terraform.io/zscaler/zia:stdout=
+  | bled":false,"workloadGroups":[{"id":17811899,"name":"BD_WORKLOAD_GROUP01","lastModifiedTime":0},{"id":17866268,"name":"BD_WORKLOAD_GROUP02","lastModifiedTime":0}],"zccNotificationsEnabled":false,"severity":"RULE_SEVERITY_HIGH","subRules":[],"sourceIpGroups":[{"id":18448894,"name":"bvepylxijp"}],"eunTemplateId":0,"ucTemplateId":0}
+  | -------------------------------------------------------
+  
+2025-08-15T17:58:33.097-0700 [WARN]  unexpected data: registry.terraform.io/zscaler/zia:stdout="oneapi-logger: 2025/08/15 17:58:33 logger.go:36: [DEBUG]Returning web dlp rule from Get: 1112360"
+2025-08-15T17:58:33.097-0700 [INFO]  provider.terraform-provider-zia_v4.4.5: Getting web dlp rule:
+&{ID:1112360 Order:1 AccessControl:READ_WRITE Protocols:[FTP_RULE HTTPS_RULE HTTP_RULE] Rank:0 Name:NewRule 2209 test Description:Google Finance
+123.5.5.6 &*& ^ & && kjsdhfs
+123.5.5.6 &*& ^ & && kjsdhfs
+C13259587 - Enable HTTP/2 support in SSL inspection policy for test AD group NT0001\fP-CLD-XQZS-A0-01
+C13259587 - Enable HTTP/2 support in AD group NT0001\fP-CLD-XQZS-A0-01 FileTypes:[] CloudApplications:[] MinSize:0 Action:ALLOW State:ENABLED MatchOnly:false LastModifiedTime:1755305372 WithoutContentInspection:false OcrEnabled:false DLPDownloadScanEnabled:false ZCCNotificationsEnabled:false ZscalerIncidentReceiver:false ExternalAuditorEmail: Auditor:<nil> LastModifiedBy:0x140009b5640 NotificationTemplate:<nil> IcapServer:<nil> Locations:[{ID:22735190 Name:Location01 Extensions:map[]}] LocationGroups:[{ID:8061255 Name:Corporate User Traffic Group Extensions:map[]}] Groups:[] Departments:[] Users:[] URLCategories:[{ID:2 Name:ADULT_THEMES Extensions:map[]} {ID:6 Name:SEXUALITY Extensions:map[]} {ID:7 Name:ADULT_SEX_EDUCATION Extensions:map[]}] DLPEngines:[{ID:63 Name:HIPAA Extensions:map[]} {ID:62 Name:GLBA Extensions:map[]}] TimeWindows:[] Labels:[] ExcludedGroups:[] ExcludedDepartments:[] ExcludedUsers:[] IncludedDomainProfiles:[] ExcludedDomainProfiles:[] SourceIpGroups:[{ID:18448894 Name:bvepylxijp Extensions:map[]}] WorkloadGroups:[{ID:17811899 Name:BD_WORKLOAD_GROUP01} {ID:17866268 Name:BD_WORKLOAD_GROUP02}] Severity:RULE_SEVERITY_HIGH ParentRule:0 SubRules:[] UserRiskScoreLevels:[LOW MEDIUM HIGH CRITICAL] InspectHttpGetEnabled:false}: timestamp=2025-08-15T17:58:33.096-0700
+2025-08-15T17:58:33.100-0700 [TRACE] terraform.contextPlugins: Schema for provider "registry.terraform.io/zscaler/zia" is in the global cache
+2025-08-15T17:58:33.100-0700 [TRACE] NodeAbstractResouceInstance.writeResourceInstanceState to refreshState for zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360
+2025-08-15T17:58:33.100-0700 [TRACE] NodeAbstractResouceInstance.writeResourceInstanceState: writing state object for zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360
+2025-08-15T17:58:33.101-0700 [TRACE] terraform.contextPlugins: Schema for provider "registry.terraform.io/zscaler/zia" is in the global cache
+2025-08-15T17:58:33.101-0700 [TRACE] terraform.contextPlugins: Schema for provider "registry.terraform.io/zscaler/zia" is in the global cache
+2025-08-15T17:58:33.101-0700 [TRACE] terraform.contextPlugins: Schema for provider "registry.terraform.io/zscaler/zia" is in the global cache
+2025-08-15T17:58:33.102-0700 [TRACE] Re-validating config for "zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360"
+2025-08-15T17:58:33.102-0700 [TRACE] GRPCProvider: ValidateResourceConfig
+2025-08-15T17:58:33.102-0700 [TRACE] GRPCProvider: GetProviderSchema
+2025-08-15T17:58:33.102-0700 [TRACE] GRPCProvider: returning cached schema: EXTRA_VALUE_AT_END=registry.terraform.io/zscaler/zia
+2025-08-15T17:58:33.103-0700 [TRACE] GRPCProvider: PlanResourceChange
+2025-08-15T17:58:33.103-0700 [TRACE] GRPCProvider: GetProviderSchema
+2025-08-15T17:58:33.103-0700 [TRACE] GRPCProvider: returning cached schema: EXTRA_VALUE_AT_END=registry.terraform.io/zscaler/zia
+2025-08-15T17:58:33.107-0700 [WARN]  Provider "registry.terraform.io/zscaler/zia" produced an invalid plan for zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360, but we are tolerating it because it is using the legacy plugin SDK.
+    The following problems may be the cause of any confusing errors from downstream operations:
+      - .external_auditor_email: planned value cty.StringVal("") for a non-computed attribute
+      - .cloud_applications: planned value cty.SetValEmpty(cty.String) for a non-computed attribute
+2025-08-15T17:58:33.107-0700 [TRACE] terraform.contextPlugins: Schema for provider "registry.terraform.io/zscaler/zia" is in the global cache
+2025-08-15T17:58:33.108-0700 [TRACE] writeChange: recorded NoOp change for zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360
+2025-08-15T17:58:33.108-0700 [TRACE] terraform.contextPlugins: Schema for provider "registry.terraform.io/zscaler/zia" is in the global cache
+2025-08-15T17:58:33.108-0700 [TRACE] NodeAbstractResouceInstance.writeResourceInstanceState to workingState for zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360
+2025-08-15T17:58:33.108-0700 [TRACE] NodeAbstractResouceInstance.writeResourceInstanceState: writing state object for zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360
+2025-08-15T17:58:33.108-0700 [TRACE] vertex "zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360": visit complete
+2025-08-15T17:58:33.108-0700 [TRACE] vertex "root": starting visit (terraform.graphNodeRoot)
+2025-08-15T17:58:33.108-0700 [TRACE] vertex "root": does not belong to any module instance
+2025-08-15T17:58:33.108-0700 [TRACE] vertex "root": visit complete
+2025-08-15T17:58:33.108-0700 [TRACE] vertex "zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 (expand)": dynamic subgraph completed successfully
+2025-08-15T17:58:33.108-0700 [TRACE] vertex "zia_dlp_web_rules.resource_zia_dlp_web_rules_1112360 (expand)": visit complete
+2025-08-15T17:58:33.108-0700 [TRACE] vertex "provider[\"registry.terraform.io/zscaler/zia\"] (close)": starting visit (*terraform.graphNodeCloseProvider)
+2025-08-15T17:58:33.108-0700 [TRACE] vertex "output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id (expand)": starting visit (*terraform.nodeExpandOutput)
+2025-08-15T17:58:33.108-0700 [TRACE] vertex "output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id (expand)": does not belong to any module instance
+2025-08-15T17:58:33.108-0700 [TRACE] vertex "output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id (expand)": expanding dynamic subgraph
+2025-08-15T17:58:33.108-0700 [TRACE] vertex "provider[\"registry.terraform.io/zscaler/zia\"] (close)": does not belong to any module instance
+2025-08-15T17:58:33.108-0700 [TRACE] GRPCProvider: Close
+2025-08-15T17:58:33.108-0700 [TRACE] Expanding output: adding output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id as *terraform.NodeApplyableOutput
+2025-08-15T17:58:33.108-0700 [TRACE] vertex "output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id (expand)": entering dynamic subgraph
+2025-08-15T17:58:33.108-0700 [TRACE] vertex "output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id": starting visit (*terraform.NodeApplyableOutput)
+2025-08-15T17:58:33.108-0700 [TRACE] vertex "output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id": belongs to
+2025-08-15T17:58:33.108-0700 [TRACE] terraform.contextPlugins: Schema for provider "registry.terraform.io/zscaler/zia" is in the global cache
+2025-08-15T17:58:33.108-0700 [TRACE] terraform.contextPlugins: Schema for provider "registry.terraform.io/zscaler/zia" is in the global cache
+2025-08-15T17:58:33.108-0700 [TRACE] terraform.contextPlugins: Schema for provider "registry.terraform.io/zscaler/zia" is in the global cache
+2025-08-15T17:58:33.109-0700 [TRACE] setValue: Saving NoOp change for output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id in changeset
+2025-08-15T17:58:33.109-0700 [TRACE] setValue: Saving value for output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id in state
+2025-08-15T17:58:33.109-0700 [TRACE] setValue: Saving value for output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id in state
+2025-08-15T17:58:33.109-0700 [TRACE] vertex "output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id": visit complete
+2025-08-15T17:58:33.109-0700 [TRACE] vertex "root": starting visit (terraform.graphNodeRoot)
+2025-08-15T17:58:33.109-0700 [TRACE] vertex "root": does not belong to any module instance
+2025-08-15T17:58:33.109-0700 [TRACE] vertex "root": visit complete
+2025-08-15T17:58:33.109-0700 [TRACE] vertex "output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id (expand)": dynamic subgraph completed successfully
+2025-08-15T17:58:33.109-0700 [TRACE] vertex "output.zia_dlp_web_rules_resource_zia_dlp_web_rules_1112360_id (expand)": visit complete
+2025-08-15T17:58:33.110-0700 [INFO]  provider: plugin process exited: plugin=.terraform/providers/registry.terraform.io/zscaler/zia/4.4.5/darwin_arm64/terraform-provider-zia_v4.4.5 id=62550
+2025-08-15T17:58:33.111-0700 [TRACE] vertex "provider[\"registry.terraform.io/zscaler/zia\"] (close)": visit complete
+2025-08-15T17:58:33.111-0700 [TRACE] vertex "root": starting visit (*terraform.nodeCloseModule)
+2025-08-15T17:58:33.111-0700 [TRACE] vertex "root": does not belong to any module instance
+2025-08-15T17:58:33.111-0700 [TRACE] vertex "root": visit complete
+2025-08-15T17:58:33.111-0700 [TRACE] LoadSchemas: retrieving schema for provider type "registry.terraform.io/zscaler/zia"
+2025-08-15T17:58:33.111-0700 [TRACE] terraform.contextPlugins: Schema for provider "registry.terraform.io/zscaler/zia" is in the global cache
+2025-08-15T17:58:33.111-0700 [TRACE] Plan is complete
+2025-08-15T17:58:33.111-0700 [TRACE] Plan is not applyable
+2025-08-15T17:58:33.111-0700 [TRACE] terraform.contextPlugins: Schema for provider "registry.terraform.io/zscaler/zia" is in the global cache
+2025-08-15T17:58:33.111-0700 [TRACE] LoadSchemas: retrieving schema for provider type "registry.terraform.io/zscaler/zia"
+2025-08-15T17:58:33.111-0700 [TRACE] terraform.contextPlugins: Schema for provider "registry.terraform.io/zscaler/zia" is in the global cache
+2025-08-15T17:58:33.111-0700 [DEBUG] no planned changes, skipping apply graph check
+2025-08-15T17:58:33.111-0700 [INFO]  backend/local: plan operation completed
+2025-08-15T17:58:33.111-0700 [TRACE] LoadSchemas: retrieving schema for provider type "registry.terraform.io/zscaler/zia"
+2025-08-15T17:58:33.111-0700 [TRACE] terraform.contextPlugins: Schema for provider "registry.terraform.io/zscaler/zia" is in the global cache
+2025-08-15T17:58:33.114-0700 [TRACE] statemgr.Filesystem: removing lock metadata file .terraform.tfstate.lock.info
+2025-08-15T17:58:33.114-0700 [TRACE] statemgr.Filesystem: unlocking terraform.tfstate using fcntl flock
