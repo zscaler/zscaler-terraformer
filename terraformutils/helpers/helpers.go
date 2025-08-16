@@ -240,7 +240,7 @@ func ListIdsIntBlockIDExtentionsSingle(fieldName string, obj interface{}) string
 	return output
 }
 
-// WorkloadGroupsBlock handles workload_groups blocks for zia_dlp_web_rules with both id and name fields
+// WorkloadGroupsBlock handles workload_groups blocks for zia_dlp_web_rules with both id and name fields.
 func WorkloadGroupsBlock(fieldName string, obj interface{}) string {
 	output := ""
 	if obj != nil && len(obj.([]interface{})) > 0 {
