@@ -12,9 +12,26 @@ Track all Zscaler Terraformer Tool releases. New resources, features, and bug fi
 
 ---
 
-``Last updated: v2.0.11``
+``Last updated: v2.0.12``
 
 ---
+
+## 2.0.12 (August, 15 2025)
+
+### Notes
+
+- Release date: **(August, 15 2025)**
+- Supported Terraform version: **v1.x.x**
+
+### Bug Fixes
+- [PR #308](https://github.com/zscaler/zscaler-terraformer/pull/308) Fixed import failures for `zia_url_categories` when description field contains special characters
+    - Resolves inconsistent behavior where URL category imports would fail when descriptions contained operators like `&&, &*&, ||,` etc.
+    - Added proper string normalization for description fields to prevent Terraform parsing errors
+    - Isolated fix affecting only `zia_url_categories` resource description handling
+- [PR #308](https://github.com/zscaler/zscaler-terraformer/pull/308) Fixed `workload_groups` block in `zia_dlp_web_rules` to include both id and name fields
+    - Resolves issue where `workload_groups` blocks only contained name field instead of both id and name as expected by the provider
+    - Added targeted handling for `workload_groups` in zia_dlp_web_rules resource to properly generate HCL with both fields
+    - Isolated fix affecting only the `workload_groups` block in `zia_dlp_web_rules` resources
 
 ## 2.0.11 (August, 13 2025)
 

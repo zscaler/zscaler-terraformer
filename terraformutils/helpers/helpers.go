@@ -240,6 +240,41 @@ func ListIdsIntBlockIDExtentionsSingle(fieldName string, obj interface{}) string
 	return output
 }
 
+// WorkloadGroupsBlock handles workload_groups blocks for zia_dlp_web_rules with both id and name fields.
+func WorkloadGroupsBlock(fieldName string, obj interface{}) string {
+	output := ""
+	if obj != nil && len(obj.([]interface{})) > 0 {
+		for _, v := range obj.([]interface{}) {
+			m, ok := v.(map[string]interface{})
+			if !ok || m == nil {
+				continue
+			}
+
+			output += fieldName + " {\n"
+
+			// Add id if present
+			if id, ok := m["id"]; ok && id != nil && id != 0 {
+				switch idVal := id.(type) {
+				case float64:
+					output += fmt.Sprintf("  id = %d\n", int64(idVal))
+				case int:
+					output += fmt.Sprintf("  id = %d\n", idVal)
+				case string:
+					output += fmt.Sprintf("  id = %q\n", idVal)
+				}
+			}
+
+			// Add name if present
+			if name, ok := m["name"]; ok && name != nil && name != "" {
+				output += fmt.Sprintf("  name = %q\n", name)
+			}
+
+			output += "}\n"
+		}
+	}
+	return output
+}
+
 func ListIdsIntBlock(fieldName string, obj interface{}) string {
 	output := ""
 	if obj != nil && len(obj.([]interface{})) >= 0 {
@@ -417,19 +452,28 @@ func HandleZIAError(responseBody []byte) (bool, string) {
 }
 
 func FormatHeredoc(value string) string {
-	lines := strings.Split(value, "\n")
-	formatted := ""
-	for i, line := range lines {
-		trimmedLine := strings.TrimSpace(line)
-		if trimmedLine != "" {
-			// Escape `$` to `$$` to prevent Terraform interpretation issues
-			escapedLine := strings.ReplaceAll(trimmedLine, "$", "$$")
-			formatted += fmt.Sprintf("%s\n", escapedLine)
-		} else if i != len(lines)-1 {
-			formatted += "\n"
-		}
+	// Match the provider's normalizeMultiLineString logic
+	if value == "" {
+		return ""
 	}
-	return formatted
+
+	// Trim leading/trailing whitespace for consistency
+	value = strings.TrimSpace(value)
+
+	// Ensure uniform indentation by trimming each line
+	lines := strings.Split(value, "\n")
+	for i := range lines {
+		lines[i] = strings.TrimSpace(lines[i])
+	}
+
+	// Join lines back together
+	formatted := strings.Join(lines, "\n")
+
+	// Escape Terraform variable interpolation (`$` → `$$`)
+	formatted = strings.ReplaceAll(formatted, "$", "$$")
+
+	// Ensure the final newline for heredoc formatting
+	return formatted + "\n"
 }
 
 func GenerateUserAgent() string {
