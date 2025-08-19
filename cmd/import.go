@@ -987,6 +987,17 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		var subJsonStructData []interface{}
 		_ = json.Unmarshal(m, &subJsonStructData)
 
+		// Process sublocations to ensure state field is preserved
+		for i, subLocation := range subJsonStructData {
+			if subLocationMap, ok := subLocation.(map[string]interface{}); ok {
+				// If state is null or missing in sublocation, set it to empty string
+				if stateValue, exists := subLocationMap["state"]; !exists || stateValue == nil {
+					subLocationMap["state"] = ""
+				}
+				subJsonStructData[i] = subLocationMap
+			}
+		}
+
 		// Append sublocations to the main jsonStructData slice
 		jsonStructData = append(jsonStructData, subJsonStructData...)
 
@@ -1499,6 +1510,7 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 
 	stateFile := workingDir + "/terraform.tfstate"
 	helpers.RemoveTcpPortRangesFromState(stateFile)
+
 }
 
 func buildCompositeID(resourceType, resourceID, name string) string {

@@ -513,6 +513,10 @@ func MapSpecialFieldNames(resourceType, fieldName string) string {
 		"zia_traffic_forwarding_static_ip": {
 			"routable_ip": "routableIP",
 		},
+		"zia_location_management": {
+			"state": "state", // Ensure state field is properly mapped
+		},
+
 		// Add more resource types and field mappings as needed
 	}
 
