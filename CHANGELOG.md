@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.0.13 (August, 19 2025)
+
+### Notes
+
+- Release date: **(August, 19 2025)**
+- Supported Terraform version: **v1.x.x**
+
+### Bug Fixes
+- [PR #311](https://github.com/zscaler/zscaler-terraformer/pull/311) Fixed `routable_ip` attribute in `zia_traffic_forwarding_static_ip` due to inconsistent non camelCase standard attribute.
+- [PR #311](https://github.com/zscaler/zscaler-terraformer/pull/311) Included `zia_forwarding_control_rule` resource in the special nesting function to handle nested ID attributes format.
+- [PR #311](https://github.com/zscaler/zscaler-terraformer/pull/311) Added special edge case formatting for `zia_url_filtering_rules` to handle the attribute `cbi_profile`.
+- [PR #311](https://github.com/zscaler/zscaler-terraformer/pull/311) Upgraded to [Zscaler-SDK-GO](https://github.com/zscaler/zscaler-sdk-go/releases/tag/v3.6.0)
+
 ## 2.0.12 (August, 15 2025)
 
 ### Notes
