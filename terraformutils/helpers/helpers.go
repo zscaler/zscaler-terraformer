@@ -505,19 +505,17 @@ func TfAttrName(apiField string) string {
 	return strings.ToLower(SnakeCaseNoDigitBreak(apiField))
 }
 
-// MapSpecialFieldNames handles special cases where API field names contain acronyms
-// that need to be preserved in uppercase (e.g., "IP" in "routableIP")
+// MapSpecialFieldNames handles special cases where API field names contain acronyms.
+// that need to be preserved in uppercase (e.g., "IP" in "routableIP").
 func MapSpecialFieldNames(resourceType, fieldName string) string {
-	// Define special mappings for resources that have non-standard camelCase
+	// Define special mappings for resources that have non-standard camelCase.
 	specialMappings := map[string]map[string]string{
 		"zia_traffic_forwarding_static_ip": {
 			"routable_ip": "routableIP",
 		},
 		"zia_location_management": {
-			"state": "state", // Ensure state field is properly mapped
+			"state": "state",
 		},
-
-		// Add more resource types and field mappings as needed
 	}
 
 	if resourceMappings, exists := specialMappings[resourceType]; exists {
