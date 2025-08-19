@@ -85,6 +85,20 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 			if idVal == "" && nameVal == "" && urlVal == "" {
 				continue
 			}
+
+			// Special handling for cbi_profile to ensure all three attributes are included
+			output += "cbi_profile {\n"
+			if idVal != "" {
+				output += fmt.Sprintf("  id = %q\n", idVal)
+			}
+			if nameVal != "" {
+				output += fmt.Sprintf("  name = %q\n", nameVal)
+			}
+			if urlVal != "" {
+				output += fmt.Sprintf("  url = %q\n", urlVal)
+			}
+			output += "}\n"
+			continue
 		}
 		// Skip 'applications' block for 'zpa_segment_group' and `zpa_server_group` resource.
 		if (resourceType == "zpa_segment_group" || resourceType == "zpa_server_group") && block == "applications" {
@@ -192,7 +206,7 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 			}
 			output += "}\n"
 			continue
-		} else if helpers.IsInList(resourceType, []string{"zia_firewall_filtering_network_service_groups", "zia_firewall_filtering_rule", "zia_url_filtering_rules", "zia_dlp_web_rules", "zia_ssl_inspection_rules", "zia_firewall_dns_rule", "zia_firewall_ips_rule", "zia_file_type_control_rules", "zia_sandbox_rules"}) && helpers.IsInList(block, []string{"departments",
+		} else if helpers.IsInList(resourceType, []string{"zia_firewall_filtering_network_service_groups", "zia_firewall_filtering_rule", "zia_url_filtering_rules", "zia_dlp_web_rules", "zia_ssl_inspection_rules", "zia_firewall_dns_rule", "zia_firewall_ips_rule", "zia_file_type_control_rules", "zia_sandbox_rules", "zia_forwarding_control_rule"}) && helpers.IsInList(block, []string{"departments",
 			"groups",
 			"locations",
 			"dlp_engines",
@@ -585,6 +599,7 @@ func WriteAttrLine(key string, value interface{}, usedInBlock bool) string {
 		return fmt.Sprintf("%s = %d\n", key, value)
 	case float64:
 		return fmt.Sprintf("%s = %v\n", key, value)
+
 	case bool:
 		return fmt.Sprintf("%s = %t\n", key, value)
 	default:
@@ -680,6 +695,11 @@ func MapTfFieldNameToAPI(resourceType, fieldName string) string {
 		case "surrogate_ip_enforced_for_known_browsers":
 			return "surrogateIPEnforcedForKnownBrowsers"
 		}
+	}
+
+	// Check for special field name mappings first
+	if specialMapping := helpers.MapSpecialFieldNames(resourceType, fieldName); specialMapping != "" {
+		return specialMapping
 	}
 
 	// Handle special cases for "TLS"
