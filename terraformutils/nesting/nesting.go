@@ -240,6 +240,9 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 		}) {
 			output += helpers.ListIdsIntBlock(block, structData[MapTfFieldNameToAPI(resourceType, block)])
 			continue
+		} else if helpers.IsInList(resourceType, []string{"zia_forwarding_control_zpa_gateway"}) && helpers.IsInList(block, []string{"zpa_app_segments", "zpa_server_group"}) {
+			output += helpers.ListExternalIdBlock(block, structData[MapTfFieldNameToAPI(resourceType, block)])
+			continue
 		} else if helpers.IsInList(resourceType, []string{"zia_firewall_filtering_rule"}) && helpers.IsInList(block, []string{"dest_ip_groups", "nw_services",
 			"departments",
 			"groups",
