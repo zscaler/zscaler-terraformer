@@ -324,7 +324,7 @@ func ListIdsStringBlock(fieldName string, obj interface{}) string {
 	return output
 }
 
-// ListExternalIdBlock handles blocks that contain external_id and name fields (like zpa_app_segments and zpa_server_group)
+// ListExternalIdBlock handles blocks that contain external_id and name fields (like zpa_app_segments and zpa_server_group).
 func ListExternalIdBlock(fieldName string, obj interface{}) string {
 	output := ""
 	if obj == nil {
@@ -352,7 +352,7 @@ func ListExternalIdBlock(fieldName string, obj interface{}) string {
 	return output
 }
 
-// Helper function to generate a single external_id block
+// Helper function to generate a single external_id block.
 func generateExternalIdBlock(fieldName string, m map[string]interface{}) string {
 	output := fieldName + " {\n"
 
