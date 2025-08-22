@@ -324,6 +324,59 @@ func ListIdsStringBlock(fieldName string, obj interface{}) string {
 	return output
 }
 
+// ListExternalIdBlock handles blocks that contain external_id and name fields (like zpa_app_segments and zpa_server_group)
+func ListExternalIdBlock(fieldName string, obj interface{}) string {
+	output := ""
+	if obj == nil {
+		return output
+	}
+
+	// Handle both single object and array cases
+	switch objType := obj.(type) {
+	case []interface{}:
+		// Handle array case (like zpa_app_segments)
+		if len(objType) > 0 {
+			for _, v := range objType {
+				m, ok := v.(map[string]interface{})
+				if !ok || m == nil {
+					continue
+				}
+				output += generateExternalIdBlock(fieldName, m)
+			}
+		}
+	case map[string]interface{}:
+		// Handle single object case (like zpa_server_group)
+		output += generateExternalIdBlock(fieldName, objType)
+	}
+
+	return output
+}
+
+// Helper function to generate a single external_id block
+func generateExternalIdBlock(fieldName string, m map[string]interface{}) string {
+	output := fieldName + " {\n"
+
+	// Add external_id if present
+	if externalID, ok := m["externalId"]; ok && externalID != nil && externalID != "" {
+		switch externalIDVal := externalID.(type) {
+		case float64:
+			output += fmt.Sprintf("  external_id = %d\n", int64(externalIDVal))
+		case int:
+			output += fmt.Sprintf("  external_id = %d\n", externalIDVal)
+		case string:
+			output += fmt.Sprintf("  external_id = %q\n", externalIDVal)
+		}
+	}
+
+	// Add name if present
+	if name, ok := m["name"]; ok && name != nil && name != "" {
+		output += fmt.Sprintf("  name = %q\n", name)
+	}
+
+	output += "}\n"
+	return output
+}
+
 // / Custom function to manipulate generate and import of ZPA application segments.
 func ListNestedBlock(fieldName string, obj interface{}) string {
 	output := fieldName + " {\n"

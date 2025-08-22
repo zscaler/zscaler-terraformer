@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.0.15 (August, 22 2025)
+
+### Notes
+
+- Release date: **(August, 22 2025)**
+- Supported Terraform version: **v1.x.x**
+
+### Bug Fixes
+- [PR #312](https://github.com/zscaler/zscaler-terraformer/pull/312) Fixed `zia_forwarding_control_zpa_gateway` resource to properly handle `zpa_app_segments` and `zpa_server_group` nested blocks with `external_id` and `name` attributes, ensuring correct HCL generation and Terraform state synchronization.
+
 ## 2.0.14 (August, 22 2025)
 
 ### Notes
