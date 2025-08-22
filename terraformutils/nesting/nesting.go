@@ -77,7 +77,23 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 			}
 
 			// Check if the 3 attributes ("id", "name", "url") are empty or nil
-			idVal, _ := cbiData["id"].(string)
+			// Handle id as both string and number (float64) since API might return it as either
+			var idVal string
+			if idInterface := cbiData["id"]; idInterface != nil {
+				switch v := idInterface.(type) {
+				case string:
+					idVal = v
+				case float64:
+					idVal = fmt.Sprintf("%.0f", v) // Convert float64 to string without decimal
+				case int:
+					idVal = fmt.Sprintf("%d", v)
+				case int64:
+					idVal = fmt.Sprintf("%d", v)
+				default:
+					idVal = fmt.Sprintf("%v", v)
+				}
+			}
+
 			nameVal, _ := cbiData["name"].(string)
 			urlVal, _ := cbiData["url"].(string)
 

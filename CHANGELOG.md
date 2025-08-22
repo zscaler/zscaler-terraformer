@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.0.14 (August, 22 2025)
+
+### Notes
+
+- Release date: **(August, 22 2025)**
+- Supported Terraform version: **v1.x.x**
+
+### Bug Fixes
+- [PR #311](https://github.com/zscaler/zscaler-terraformer/pull/311) Added special edge case formatting for `zia_url_filtering_rules` to handle the attribute `cbi_profile`.
+
+
 ## 2.0.13 (August, 19 2025)
 
 ### Notes
