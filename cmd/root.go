@@ -26,6 +26,8 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"os/exec"
+	"runtime"
 	"strings"
 	"text/tabwriter"
 
@@ -158,6 +160,37 @@ var rootCmd = &cobra.Command{
 		}
 	},
 	Run: func(cmd *cobra.Command, args []string) {
+		// Handle --version flag
+		if displayReleaseVersion {
+			cliVersion := getCLIVersion()
+			platform := fmt.Sprintf("%s_%s", runtime.GOOS, runtime.GOARCH)
+			fmt.Printf("zscaler-terraformer %s\n", cliVersion)
+
+			terraformVersion, err := exec.Command("terraform", "version").Output()
+			if err != nil {
+				log.Error("failed to get Terraform version")
+			} else {
+				tfVersion := strings.Split(string(terraformVersion), "\n")[0]
+				fmt.Printf("Terraform version: %s\n", tfVersion)
+			}
+			fmt.Printf("on (%s)\n", platform)
+
+			latestVersion := getLatestReleaseVersion()
+			if cliVersion != latestVersion {
+				fmt.Printf("\nYour version of Zscaler-Terraformer is out of date! The latest version\nis %s. You can update by running the command\n", latestVersion)
+
+				if runtime.GOOS == "windows" {
+					fmt.Println("\"choco upgrade zscaler-terraformer\"")
+				} else {
+					fmt.Println("\"brew upgrade zscaler/tap/zscaler-terraformer\"")
+				}
+
+				fmt.Println("or download the new version from")
+				fmt.Println("https://github.com/zscaler/zscaler-terraformer/releases")
+			}
+			return
+		}
+
 		if supportedResources != "" {
 			listSupportedResources(supportedResources)
 			return
