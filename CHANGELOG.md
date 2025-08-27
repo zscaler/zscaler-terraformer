@@ -8,16 +8,16 @@
 - Supported Terraform version: **v1.x.x**
 
 ### Bug Fixes
-- [PR #316](https://github.com/zscaler/zscaler-terraformer/pull/316) Fixed `--version` flag to display comprehensive version information
+- [PR #317](https://github.com/zscaler/zscaler-terraformer/pull/317) Fixed `--version` flag to display comprehensive version information
     - The `--version flag now shows the same detailed output as the version command
     - Includes Zscaler Terraformer version, Terraform version, platform info, and update notifications
     - Previously, `--version` showed minimal information or no output at all
     - Both zscaler-terraformer `--version` and zscaler-terraformer version now provide consistent output
 
-- [PR #316](https://github.com/zscaler/zscaler-terraformer/pull/316) - Updated ZIA `zia_firewall_filtering_rule` resource to allow the import of predefined rules.
+- [PR #317](https://github.com/zscaler/zscaler-terraformer/pull/317)  - Updated ZIA `zia_firewall_filtering_rule` resource to allow the import of predefined rules.
     **NOTE 1** Zscaler Cloud Firewall contain default and predefined rules which are placed in their respective orders. These rules `CANNOT` be deleted. When configuring your rules make sure that the `order` attributue value consider these pre-existing rules so that Terraform can place the new rules in the correct position, and drifts can be avoided. i.e If there are 2 pre-existing rules, you should start your rule order at `3` and manage your rule sets from that number onwards. The provider will reorder the rules automatically while ignoring the order of pre-existing rules, as the API will be responsible for moving these rules to their respective positions as API calls are made.
 
-- [PR #316](https://github.com/zscaler/zscaler-terraformer/pull/316) - Fixed heredoc for supported attributes on ZIA resource `zia_end_user_notification` resource.
+- [PR #317](https://github.com/zscaler/zscaler-terraformer/pull/317)  - Fixed heredoc for supported attributes on ZIA resource `zia_end_user_notification` resource.
     ## Important Notes
 
     **Text Attributes and CSS Styling**: When setting attributes such as `custom_text`, `url_cat_review_text`, `security_review_text`, `web_dlp_review_text`, `caution_custom_text`, `idp_proxy_notification_text`, and `quarantine_custom_notification_text`, we recommend using heredocs (EOT) especially when including CSS stylesheets. This ensures proper formatting and readability of complex text content.
@@ -26,7 +26,7 @@
 
 #### Enhancements 
 
-- [PR #316](https://github.com/zscaler/zscaler-terraformer/pull/316) Added support to new attribute `receiver` in the `zia_dlp_web_rules`.
+- [PR #317](https://github.com/zscaler/zscaler-terraformer/pull/317)  Added support to new attribute `receiver` in the `zia_dlp_web_rules`.
 
 ## 2.0.15 (August, 22 2025)
 
