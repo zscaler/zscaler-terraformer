@@ -470,7 +470,7 @@ func WriteNestedBlock(resourceType string, attributes []string, schemaBlock *tfj
 
 		// Exclude specific computed attributes.
 		// Special exception: allow 'id' attribute for receiver and tenant blocks in zia_dlp_web_rules.
-		skipIDAttribute := attrName == "id" && !(resourceType == "zia_dlp_web_rules" && (isReceiverBlock(attrStruct) || isTenantBlock(attrStruct)))
+		skipIDAttribute := attrName == "id" && (resourceType != "zia_dlp_web_rules" || (!isReceiverBlock(attrStruct) && !isTenantBlock(attrStruct)))
 		if skipIDAttribute || attrName == "appId" || attrName == "portal" || attrName == "hidden" || attrName == "certificate_name" {
 			continue
 		}
