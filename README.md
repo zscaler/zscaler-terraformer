@@ -228,6 +228,24 @@ You can provide credentials via the `ZIA_USERNAME`, `ZIA_PASSWORD`, `ZIA_API_KEY
 
 ## Usage
 
+### Version Information
+
+To check the version of zscaler-terraformer, you can use either of these commands:
+
+```bash
+# Display version information (recommended)
+zscaler-terraformer --version
+
+# Alternative: Use the version command
+zscaler-terraformer version
+```
+
+Both commands will display:
+- Zscaler Terraformer version
+- Terraform version (if installed)
+- Platform information
+- Update notifications (if a newer version is available)
+
 ```bash
 Usage:
   zscaler-terraformer [command]

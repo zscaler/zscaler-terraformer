@@ -237,6 +237,7 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 			"device_groups",
 			"source_ip_groups",
 			"proxy_gateways",
+			"app_service_groups",
 		}) {
 			output += helpers.ListIdsIntBlock(block, structData[MapTfFieldNameToAPI(resourceType, block)])
 			continue
@@ -435,6 +436,32 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 	return output
 }
 
+// isReceiverBlock checks if the current attrStruct represents a receiver block.
+// by looking for receiver-specific fields.
+func isReceiverBlock(attrStruct map[string]interface{}) bool {
+	// Check if this is a receiver block by looking for receiver-specific fields.
+	// We check for 'type' field which is specific to receiver blocks.
+	if _, hasType := attrStruct["type"]; hasType {
+		return true
+	}
+	return false
+}
+
+// isTenantBlock checks if the current attrStruct represents a tenant block within receiver.
+func isTenantBlock(attrStruct map[string]interface{}) bool {
+	// Check if this is a tenant block by checking if it has both id and name fields.
+	// and lacks other receiver-specific fields like 'type'.
+	if _, hasType := attrStruct["type"]; hasType {
+		return false // This is a receiver block, not a tenant block
+	}
+	if _, hasID := attrStruct["id"]; hasID {
+		if _, hasName := attrStruct["name"]; hasName {
+			return true
+		}
+	}
+	return false
+}
+
 func WriteNestedBlock(resourceType string, attributes []string, schemaBlock *tfjson.SchemaBlock, attrStruct map[string]interface{}, _ string) string {
 	nestedBlockOutput := ""
 	for _, attrName := range attributes {
@@ -442,7 +469,9 @@ func WriteNestedBlock(resourceType string, attributes []string, schemaBlock *tfj
 		ty := schemaBlock.Attributes[attrName].AttributeType
 
 		// Exclude specific computed attributes.
-		if attrName == "id" || attrName == "appId" || attrName == "portal" || attrName == "hidden" || attrName == "certificate_name" {
+		// Special exception: allow 'id' attribute for receiver and tenant blocks in zia_dlp_web_rules.
+		skipIDAttribute := attrName == "id" && (resourceType != "zia_dlp_web_rules" || (!isReceiverBlock(attrStruct) && !isTenantBlock(attrStruct)))
+		if skipIDAttribute || attrName == "appId" || attrName == "portal" || attrName == "hidden" || attrName == "certificate_name" {
 			continue
 		}
 
