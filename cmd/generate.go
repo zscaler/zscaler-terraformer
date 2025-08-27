@@ -1055,13 +1055,13 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		}
 		rulesFiltered := []filteringrules.FirewallFilteringRules{}
 		for _, rule := range rules {
-			if helpers.IsInList(rule.Name, []string{"Office 365 One Click Rule", "UCaaS One Click Rule", "Default Firewall Filtering Rule", "Recommended Firewall Rule", "Block All IPv6", "Block malicious IPs and domains", "Zscaler Proxy Traffic"}) {
+			if helpers.IsInList(rule.Name, []string{"Default Firewall Filtering Rule"}) {
 				continue
 			}
 			rulesFiltered = append(rulesFiltered, rule)
 		}
-		resourceCount = len(rulesFiltered)
 		m, _ := json.Marshal(rulesFiltered)
+		resourceCount = len(rulesFiltered)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_firewall_filtering_destination_groups":
 		if api.ZIAService == nil {
@@ -1734,7 +1734,7 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 			}
 
 			// Ensure proper Heredoc formatting for multi-line string attributes
-			if attrName == "quarantine_custom_notification_text" {
+			if attrName == "quarantine_custom_notification_text" || attrName == "url_cat_review_text" || attrName == "caution_custom_text" || attrName == "custom_text" || attrName == "idp_proxy_notification_text" || attrName == "security_review_text" || attrName == "web_dlp_review_text" {
 				value := structData[apiAttrName]
 				if value != nil {
 					valueStr := strings.TrimSpace(value.(string))

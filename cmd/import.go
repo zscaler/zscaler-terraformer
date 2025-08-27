@@ -823,7 +823,7 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		}
 		rulesFiltered := []filteringrules.FirewallFilteringRules{}
 		for _, rule := range rules {
-			if helpers.IsInList(rule.Name, []string{"Office 365 One Click Rule", "UCaaS One Click Rule", "Default Firewall Filtering Rule", "Recommended Firewall Rule", "Block All IPv6", "Block malicious IPs and domains", "Zscaler Proxy Traffic"}) {
+			if helpers.IsInList(rule.Name, []string{"Default Firewall Filtering Rule"}) {
 				continue
 			}
 			rulesFiltered = append(rulesFiltered, rule)
@@ -1002,22 +1002,6 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		jsonStructData = append(jsonStructData, subJsonStructData...)
 
 		resourceCount += subResourceCount
-	// case "zia_url_categories":
-	// 	if api.ZIAService == nil {
-	// 		log.Fatal("ZIA service is not initialized")
-	// 	}
-	// 	// EXACTLY like the TF pattern:
-	// 	service := api.ZIAService
-	// 	log.Debugf("Fetching URL categories with customOnly=true...")
-	// 	jsonPayload, err := urlcategories.GetAll(ctx, service, true, false)
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
-	// 	log.Debugf("Retrieved %d URL categories", len(jsonPayload))
-	// 	resourceCount = len(jsonPayload)
-	// 	m, _ := json.Marshal(jsonPayload)
-	// 	_ = json.Unmarshal(m, &jsonStructData)
-	// 	log.Debugf("Successfully processed URL categories data")
 
 	case "zia_url_categories":
 		if api.ZIAService == nil {
