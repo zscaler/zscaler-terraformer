@@ -257,6 +257,7 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		// EXACTLY like the TF pattern:
 		service := api.ZPAService
 
+		// First get the list to know what IDs exist
 		list, _, err := appconnectorgroup.GetAll(ctx, service)
 		if err != nil {
 			isLicErr, reason := isLicenseError(err)
@@ -267,6 +268,7 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 				log.Fatal(err)
 			}
 		}
+
 		jsonPayload := []appconnectorgroup.AppConnectorGroup{}
 		for _, i := range list {
 			if i.Name == "Zscaler Deception" {

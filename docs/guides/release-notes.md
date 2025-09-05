@@ -12,9 +12,20 @@ Track all Zscaler Terraformer Tool releases. New resources, features, and bug fi
 
 ---
 
-``Last updated: v2.0.17``
+``Last updated: v2.0.18``
 
 ---
+
+## 2.0.18 (September, 5 2025)
+
+### Notes
+
+- Release date: **(September, 5 2025)**
+- Supported Terraform version: **v1.x.x**
+
+### Bug Fixes
+- [PR #319](https://github.com/zscaler/zscaler-terraformer/pull/319) - **fix**: Resolve `lss_app_connector_group` attribute inconsistency between HCL generation and state file for `zpa_app_connector_group` resource
+- [PR #319](https://github.com/zscaler/zscaler-terraformer/pull/319) - **fix**: Exclude empty `app_connector_groups` and `app_server_groups` blocks from HCL generation for `zpa_policy_access_rule` resource
 
 ## 2.0.17 (September, 4 2025)
 
