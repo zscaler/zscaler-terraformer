@@ -276,49 +276,78 @@ func WorkloadGroupsBlock(fieldName string, obj interface{}) string {
 }
 
 func ListIdsIntBlock(fieldName string, obj interface{}) string {
-	output := ""
-	if obj != nil && len(obj.([]interface{})) >= 0 {
-		output = fieldName + " {\n"
-		output += "id=["
-		for i, v := range obj.([]interface{}) {
-			m, ok := v.(map[string]interface{})
-			if !ok || m == nil || m["id"] == 0 {
-				continue
-			}
-			id, ok := m["id"].(float64)
-			if !ok || id == 0 {
-				continue
-			}
-			if i > 0 {
-				output += ","
-			}
-			output += fmt.Sprintf("%d", int64(id))
-		}
-		output += "]\n"
-		output += "}\n"
+	// Check if the list is empty or nil, and if so, don't generate the block
+	if obj == nil {
+		return ""
 	}
+
+	objList, ok := obj.([]interface{})
+	if !ok || len(objList) == 0 {
+		return ""
+	}
+
+	// Check if all items in the list are valid (have non-zero id)
+	validItems := []string{}
+	for _, v := range objList {
+		m, ok := v.(map[string]interface{})
+		if !ok || m == nil || m["id"] == 0 {
+			continue
+		}
+		id, ok := m["id"].(float64)
+		if !ok || id == 0 {
+			continue
+		}
+		validItems = append(validItems, fmt.Sprintf("%d", int64(id)))
+	}
+
+	// If no valid items, don't generate the block
+	if len(validItems) == 0 {
+		return ""
+	}
+
+	// Generate the block with valid items
+	output := fieldName + " {\n"
+	output += "id=["
+	output += strings.Join(validItems, ",")
+	output += "]\n"
+	output += "}\n"
 	return output
 }
 
 func ListIdsStringBlock(fieldName string, obj interface{}) string {
+	// Check if the list is empty or nil, and if so, don't generate the block
+	if obj == nil {
+		return ""
+	}
+
+	objList, ok := obj.([]interface{})
+	if !ok || len(objList) == 0 {
+		return ""
+	}
+
+	// Check if all items in the list are valid (have non-empty id)
+	validItems := []string{}
+	for _, v := range objList {
+		m, ok := v.(map[string]interface{})
+		if !ok || m == nil || m["id"] == "" {
+			continue
+		}
+		id, ok := m["id"].(string)
+		if !ok || id == "" {
+			continue
+		}
+		validItems = append(validItems, "\""+id+"\"")
+	}
+
+	// If no valid items, don't generate the block
+	if len(validItems) == 0 {
+		return ""
+	}
+
+	// Generate the block with valid items
 	output := fieldName + " {\n"
 	output += "id=["
-	if obj != nil && len(obj.([]interface{})) >= 0 {
-		for i, v := range obj.([]interface{}) {
-			m, ok := v.(map[string]interface{})
-			if !ok || m == nil || m["id"] == "" {
-				continue
-			}
-			id, ok := m["id"].(string)
-			if !ok || id == "" {
-				continue
-			}
-			if i > 0 {
-				output += ","
-			}
-			output += "\"" + id + "\""
-		}
-	}
+	output += strings.Join(validItems, ",")
 	output += "]\n"
 	output += "}\n"
 	return output
