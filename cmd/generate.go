@@ -1729,7 +1729,7 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		for _, attrName := range sortedBlockAttributes {
 
 			apiAttrName := nesting.MapTfFieldNameToAPI(resourceType, attrName)
-			if attrName == "id" || attrName == "tcp_port_ranges" || attrName == "udp_port_ranges" || attrName == "rule_order" {
+			if attrName == "id" || attrName == "tcp_port_ranges" || attrName == "udp_port_ranges" || attrName == "rule_order" || (resourceType == "zia_url_categories" && attrName == "val") {
 				continue
 			}
 
