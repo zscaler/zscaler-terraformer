@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.0.17 (September, 4 2025)
+
+### Notes
+
+- Release date: **(September, 4 2025)**
+- Supported Terraform version: **v1.x.x**
+
+### Bug Fixes
+- [PR #318](https://github.com/zscaler/zscaler-terraformer/pull/318) - **fix**: Exclude computed `val` attribute from HCL generation for `zia_url_categories` resource
+
 ## 2.0.16 (August, 27 2025)
 
 ### Notes
