@@ -4,13 +4,13 @@ go 1.23.1
 
 require (
 	github.com/google/uuid v1.6.0
-	github.com/hashicorp/terraform-exec v0.23.0
+	github.com/hashicorp/terraform-exec v0.23.1
 	github.com/hashicorp/terraform-json v0.26.0
 	github.com/iancoleman/strcase v0.3.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.20.1
-	github.com/zclconf/go-cty v1.16.3
+	github.com/zclconf/go-cty v1.16.4
 	github.com/zscaler/zscaler-sdk-go/v3 v3.6.4
 )
 
