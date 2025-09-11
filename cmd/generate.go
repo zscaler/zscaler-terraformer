@@ -182,15 +182,16 @@ func generateResources() func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
 		if resources != "" {
 			var resourceTypes []string
-			if resources == "*" {
+			switch resources {
+			case "*":
 				resourceTypes = allGeneratableResources
-			} else if resources == "zia" || resources == "zpa" {
+			case "zia", "zpa":
 				for _, resource := range resourceImportStringFormats {
 					if strings.HasPrefix(resource, resources) {
 						resourceTypes = append(resourceTypes, resource)
 					}
 				}
-			} else {
+			default:
 				resourceTypes = strings.Split(resources, ",")
 			}
 
@@ -1741,8 +1742,13 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 				value := structData[apiAttrName]
 				if value != nil {
 					valueStr := strings.TrimSpace(value.(string))
-					formattedValue := helpers.FormatHeredoc(valueStr)
-					output += fmt.Sprintf("  %s = <<-EOT\n%s\nEOT\n\n", attrName, formattedValue)
+					// If the value is empty after trimming, skip the attribute entirely to avoid validation errors
+					if valueStr == "" {
+						continue
+					} else {
+						formattedValue := helpers.FormatHeredoc(valueStr)
+						output += fmt.Sprintf("  %s = <<-EOT\n%s\nEOT\n\n", attrName, formattedValue)
+					}
 					continue
 				}
 			}
@@ -1752,8 +1758,13 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 				value := structData[apiAttrName]
 				if value != nil {
 					valueStr := strings.TrimSpace(value.(string))
-					formattedValue := helpers.FormatHeredoc(valueStr) // Use the updated helper function
-					output += fmt.Sprintf("  %s = <<-EOT\n%s\nEOT\n\n", attrName, formattedValue)
+					// If the value is empty after trimming, skip the attribute entirely to avoid validation errors
+					if valueStr == "" {
+						continue
+					} else {
+						formattedValue := helpers.FormatHeredoc(valueStr) // Use the updated helper function
+						output += fmt.Sprintf("  %s = <<-EOT\n%s\nEOT\n\n", attrName, formattedValue)
+					}
 					continue
 				}
 			}
@@ -1814,18 +1825,23 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 				value := structData[apiAttrName]
 				if value != nil {
 					valueStr := value.(string)
-					// Use the same normalization as the provider
-					normalized := helpers.FormatHeredoc(valueStr)
-
-					// Check if the description contains newlines
-					if strings.Contains(valueStr, "\n") {
-						// Use heredoc formatting for multi-line descriptions
-						output += fmt.Sprintf("  %s = <<EOT\n%sEOT\n", attrName, normalized)
+					// If the value is empty, skip the attribute entirely to avoid validation errors
+					if strings.TrimSpace(valueStr) == "" {
+						continue
 					} else {
-						// Use regular quoted string for single-line descriptions
-						// Remove the trailing newline for quoted string
-						normalized = strings.TrimSuffix(normalized, "\n")
-						output += fmt.Sprintf("  %s = %q\n", attrName, normalized)
+						// Use the same normalization as the provider
+						normalized := helpers.FormatHeredoc(valueStr)
+
+						// Check if the description contains newlines
+						if strings.Contains(valueStr, "\n") {
+							// Use heredoc formatting for multi-line descriptions
+							output += fmt.Sprintf("  %s = <<EOT\n%sEOT\n", attrName, normalized)
+						} else {
+							// Use regular quoted string for single-line descriptions
+							// Remove the trailing newline for quoted string
+							normalized = strings.TrimSuffix(normalized, "\n")
+							output += fmt.Sprintf("  %s = %q\n", attrName, normalized)
+						}
 					}
 					continue
 				}

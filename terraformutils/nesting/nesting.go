@@ -468,6 +468,13 @@ func WriteNestedBlock(resourceType string, attributes []string, schemaBlock *tfj
 		apiFieldName := MapTfFieldNameToAPI(resourceType, attrName)
 		ty := schemaBlock.Attributes[attrName].AttributeType
 
+		// Special handling for vpn_credentials block in zia_location_management to skip empty attributes
+		if resourceType == "zia_location_management" && attrName == "ip_address" {
+			if value, ok := attrStruct[apiFieldName].(string); ok && strings.TrimSpace(value) == "" {
+				continue // Skip empty ip_address in vpn_credentials block
+			}
+		}
+
 		// Exclude specific computed attributes.
 		// Special exception: allow 'id' attribute for receiver and tenant blocks in zia_dlp_web_rules.
 		skipIDAttribute := attrName == "id" && (resourceType != "zia_dlp_web_rules" || (!isReceiverBlock(attrStruct) && !isTenantBlock(attrStruct)))

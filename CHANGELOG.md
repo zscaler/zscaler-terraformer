@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.0.19 (September, 11 2025)
+
+### Notes
+
+- Release date: **(September,11 2025)**
+- Supported Terraform version: **v1.x.x**
+
+### Bug Fixes
+- [PR #323](https://github.com/zscaler/zscaler-terraformer/pull/323) - Fix empty heredoc blocks causing Terraform drift by omitting empty attributes entirely for notification text fields
+- [PR #323](https://github.com/zscaler/zscaler-terraformer/pull/323) - Fix VPN credentials block in zia_location_management to skip empty ip_address attribute for UFQDN type credentials
+- [PR #323](https://github.com/zscaler/zscaler-terraformer/pull/323) - Fix ZPA license error handling to gracefully skip resources when encountering feature flag permission denied errors instead of failing completely
+
 ## 2.0.18 (September, 5 2025)
 
 ### Notes
