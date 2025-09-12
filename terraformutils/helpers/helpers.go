@@ -516,8 +516,12 @@ func ConvertAttributes(structData map[string]interface{}) {
 type ZIAAPIErrorResponse struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`
+	URL     string `json:"url,omitempty"`
+	Status  int    `json:"status,omitempty"`
 }
 
+// HandleZIAError processes ZIA API error responses and determines if the resource should be skipped.
+// Returns (shouldSkip, message) where shouldSkip indicates if the import should continue gracefully.
 func HandleZIAError(responseBody []byte) (bool, string) {
 	var ziaErr ZIAAPIErrorResponse
 	if jsonErr := json.Unmarshal(responseBody, &ziaErr); jsonErr == nil {
@@ -526,11 +530,49 @@ func HandleZIAError(responseBody []byte) (bool, string) {
 			if strings.Contains(ziaErr.Message, "Custom File Hash feature is not enabled for your org") {
 				return true, "Custom File Hash feature is disabled, skipping import"
 			}
+		case "NOT_SUBSCRIBED":
+			// Handle subscription-related errors that should be skipped gracefully
+			return true, fmt.Sprintf("Subscription required but not active: %s", ziaErr.Message)
 		default:
 			return false, fmt.Sprintf("Unhandled ZIA error: %s - %s", ziaErr.Code, ziaErr.Message)
 		}
 	}
 	return false, ""
+}
+
+// HandleZIAAPIError processes ZIA API errors and determines if the resource should be skipped.
+// Returns (shouldSkip, message) where shouldSkip indicates if the import should continue gracefully.
+func HandleZIAAPIError(err error, resourceType string) (bool, string) {
+	if err == nil {
+		return false, ""
+	}
+
+	errorString := err.Error()
+
+	// Try to extract and parse JSON from the error string
+	jsonStart := strings.Index(errorString, "{")
+	jsonEnd := strings.LastIndex(errorString, "}")
+
+	if jsonStart != -1 && jsonEnd != -1 && jsonEnd > jsonStart {
+		jsonStr := errorString[jsonStart : jsonEnd+1]
+		var ziaErr ZIAAPIErrorResponse
+		if jsonErr := json.Unmarshal([]byte(jsonStr), &ziaErr); jsonErr == nil {
+			switch ziaErr.Code {
+			case "INVALID_INPUT_ARGUMENT":
+				if strings.Contains(ziaErr.Message, "Custom File Hash feature is not enabled for your org") {
+					return true, "Custom File Hash feature is disabled, skipping import"
+				}
+			case "NOT_SUBSCRIBED":
+				// Handle subscription-related errors that should be skipped gracefully
+				return true, fmt.Sprintf("Subscription required but not active: %s", ziaErr.Message)
+			default:
+				return false, fmt.Sprintf("Unhandled ZIA error: %s - %s", ziaErr.Code, ziaErr.Message)
+			}
+		}
+	}
+
+	// If no subscription-related error detected, return false to indicate this is a real error
+	return false, fmt.Sprintf("Unhandled error for %s: %s", resourceType, errorString)
 }
 
 func FormatHeredoc(value string) string {
