@@ -325,7 +325,8 @@ provider "%s" {
 	// [4] Now handle credentials or advanced fields:
 	// useLegacy := viper.GetString("use_legacy_client")
 
-	if cloudType == "zpa" {
+	switch cloudType {
+	case "zpa":
 		zpaClientID := viper.GetString("zpa_client_id")
 		zpaClientSecret := viper.GetString("zpa_client_secret")
 		zpaCustomerID := viper.GetString("zpa_customer_id")
@@ -396,8 +397,7 @@ provider "%s" {
 			}
 		}
 
-	} else if cloudType == "zia" {
-
+	case "zia":
 		ziaUsername := viper.GetString("zia_username")
 		ziaPassword := viper.GetString("zia_password")
 		ziaApiKey := viper.GetString("zia_api_key")
@@ -524,6 +524,8 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 	}
 	tf, r, workingDir := initTf(resourceType) // Ensure workingDir is obtained
 	log.Debugf("beginning to read and build %s resources", resourceType)
+
+	// Note: Reference replacement is now handled in post-processing after all imports
 
 	// Initialise `resourceCount` outside of the switch for supported resources
 	// to allow it to be referenced further down in the loop that outputs the
@@ -795,6 +797,7 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 			if i.Name == "Zscaler Deception" {
 				continue
 			}
+
 			i.Applications = nil // Suppress the applications block
 			jsonPayload = append(jsonPayload, i)
 		}
@@ -1704,6 +1707,9 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		} else {
 			resourceID = buildResourceName(resourceType, structData)
 		}
+
+		// Note: Reference replacement is now handled in post-processing after all imports
+
 		resourceName := ""
 		if structData["name"] != nil {
 			resourceName = structData["name"].(string)
@@ -1972,10 +1978,30 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		helpers.GenerateOutputs(resourceType, resourceID, workingDir)
 	}
 
-	output, err := tf.FormatString(context.Background(), output)
+	formattedOutput, err := tf.FormatString(context.Background(), output)
 	if err != nil {
 		log.Printf("failed to format output: %s", err)
 	}
 
-	fmt.Fprint(writer, output)
+	// Write output to both stdout and file
+	fmt.Fprint(writer, formattedOutput)
+
+	// Also write to file for post-processing
+	filename := fmt.Sprintf("%s/%s.tf", workingDir, resourceType)
+	file, err := os.Create(filename)
+	if err != nil {
+		log.Printf("[WARNING] Failed to create file %s: %v", filename, err)
+	} else {
+		_, err = file.WriteString(formattedOutput)
+		if err != nil {
+			log.Printf("[WARNING] Failed to write to file %s: %v", filename, err)
+		}
+		file.Close()
+	}
+
+	// Post-process reference replacement after all generation is complete
+	err = helpers.PostProcessReferences(workingDir)
+	if err != nil {
+		log.Printf("[WARNING] Post-processing failed: %v", err)
+	}
 }

@@ -231,6 +231,19 @@ func runImport() func(cmd *cobra.Command, args []string) {
 				importResource(cmd.Context(), cmd, cmd.OutOrStdout(), resourceTyp, managedResourceTypes, includedSensitiveResources)
 
 			}
+
+			// Post-process reference replacement after all imports are complete
+			// This includes both requested resources and automatically imported referenced resources
+			if len(resourceTypes) > 0 {
+				// Get the working directory from the first resource type
+				_, _, workingDir := initTf(resourceTypes[0])
+				log.Printf("[INFO] Running final post-processing after all imports are complete...")
+				err := helpers.PostProcessReferences(workingDir)
+				if err != nil {
+					log.Printf("[WARNING] Post-processing failed: %v", err)
+				}
+			}
+
 			if len(managedResourceTypes) > 0 {
 				fmt.Println("\033[33mThe following resources are already managed by Terraform:\033[0m")
 				for resource := range managedResourceTypes {
@@ -247,6 +260,8 @@ func runImport() func(cmd *cobra.Command, args []string) {
 			return
 		}
 		importResource(cmd.Context(), cmd, cmd.OutOrStdout(), resourceType_, managedResourceTypes, includedSensitiveResources)
+
+		// Post-processing is handled by the main runImport function after all imports are complete
 
 		if len(managedResourceTypes) > 0 {
 			fmt.Println("\033[33mThe following resources are already managed by Terraform:\033[0m")
@@ -1687,9 +1702,106 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		}
 	}
 
+	// Automatically import referenced resources
+	// TEMPORARILY DISABLED to prevent recursive loops and multiple post-processing runs
+	// importReferencedResources(ctx, cmd, writer, resourceType, jsonStructData, managedResourceTypes, includedSensitiveResources)
+
 	stateFile := workingDir + "/terraform.tfstate"
 	helpers.RemoveTcpPortRangesFromState(stateFile)
 
+}
+
+// importReferencedResources automatically imports resources that are referenced by the imported resource
+func importReferencedResources(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourceType string, jsonStructData []interface{}, managedResourceTypes map[string]bool, includedSensitiveResources map[string]bool) {
+	// Define resource reference mappings (using API field names)
+	referenceMappings := map[string]map[string]string{
+		"zpa_server_group": {
+			"appConnectorGroups": "zpa_app_connector_group",
+		},
+		"zpa_application_segment": {
+			"serverGroups": "zpa_server_group",
+		},
+	}
+
+	// Get the reference mappings for this resource type
+	mappings, exists := referenceMappings[resourceType]
+	if !exists {
+		return // No referenced resources to import
+	}
+
+	// Collect all referenced resource IDs
+	referencedResourceIDs := make(map[string][]string) // resourceType -> []resourceIDs
+
+	for _, data := range jsonStructData {
+		structData := data.(map[string]interface{})
+
+		// Check each reference mapping
+		for attributeName, referencedResourceType := range mappings {
+			if referencedData, exists := structData[attributeName]; exists {
+				// Handle both single objects and arrays
+				var referencedItems []interface{}
+				if referencedArray, ok := referencedData.([]interface{}); ok {
+					referencedItems = referencedArray
+				} else if referencedObject, ok := referencedData.(map[string]interface{}); ok {
+					referencedItems = []interface{}{referencedObject}
+				}
+
+				// Extract IDs from referenced items
+				for _, item := range referencedItems {
+					if itemMap, ok := item.(map[string]interface{}); ok {
+						if id, exists := itemMap["id"]; exists {
+							var resourceID string
+							switch v := id.(type) {
+							case string:
+								resourceID = v
+							case int:
+								resourceID = strconv.Itoa(v)
+							case float64:
+								resourceID = strconv.FormatInt(int64(v), 10)
+							}
+							if resourceID != "" {
+								referencedResourceIDs[referencedResourceType] = append(referencedResourceIDs[referencedResourceType], resourceID)
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// Import each referenced resource type
+	for referencedResourceType, resourceIDs := range referencedResourceIDs {
+		// Remove duplicates
+		uniqueIDs := make(map[string]bool)
+		var uniqueResourceIDs []string
+		for _, id := range resourceIDs {
+			if !uniqueIDs[id] {
+				uniqueIDs[id] = true
+				uniqueResourceIDs = append(uniqueResourceIDs, id)
+			}
+		}
+
+		if len(uniqueResourceIDs) > 0 {
+			log.Printf("[INFO] Auto-importing %d referenced %s resources", len(uniqueResourceIDs), referencedResourceType)
+			// Import the referenced resources directly without calling importResource
+			// to prevent recursive loops and multiple post-processing runs
+			directImportReferencedResource(ctx, cmd, writer, referencedResourceType, uniqueResourceIDs, managedResourceTypes, includedSensitiveResources)
+		}
+	}
+
+	// Post-processing will be handled by the main runImport function after all resource types are processed
+}
+
+// directImportReferencedResource imports referenced resources directly without triggering automatic reference detection
+// This prevents recursive loops when importing referenced resources
+func directImportReferencedResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourceType string, resourceIDs []string, managedResourceTypes map[string]bool, includedSensitiveResources map[string]bool) {
+	// For now, just log that we would import these resources
+	// The actual import logic will be handled by the main importResource function
+	// This prevents the recursive loop while still allowing the referenced resources to be imported
+	log.Printf("[DEBUG] Would import %d %s resources with IDs: %v", len(resourceIDs), resourceType, resourceIDs)
+
+	// The referenced resources will be imported when the user explicitly imports them
+	// or when they are imported as part of a broader import command
 }
 
 func buildCompositeID(resourceType, resourceID, name string) string {

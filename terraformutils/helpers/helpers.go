@@ -336,7 +336,14 @@ func ListIdsStringBlock(fieldName string, obj interface{}) string {
 		if !ok || id == "" {
 			continue
 		}
-		validItems = append(validItems, "\""+id+"\"")
+		// Check if this is a Terraform reference (contains dots and doesn't start with quotes)
+		if strings.Contains(id, ".") && !strings.HasPrefix(id, "\"") {
+			// This is a Terraform reference, don't add quotes
+			validItems = append(validItems, id)
+		} else {
+			// This is a regular ID, add quotes
+			validItems = append(validItems, "\""+id+"\"")
+		}
 	}
 
 	// If no valid items, don't generate the block
