@@ -647,6 +647,10 @@ func MapSpecialFieldNames(resourceType, fieldName string) string {
 		"zia_location_management": {
 			"state": "state",
 		},
+		"zia_end_user_notification": {
+			"display_company_name": "displayCompName",
+			"display_company_logo": "displayCompLogo",
+		},
 	}
 
 	if resourceMappings, exists := specialMappings[resourceType]; exists {

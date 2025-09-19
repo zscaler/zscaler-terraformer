@@ -63,7 +63,7 @@ func GetResourceReferences() []ResourceReference {
 		{"locations", "zia_location_management"},
 		{"users", "zia_user_management"},
 		{"urlCategories", "zia_url_categories"},
-		{"dlpEngines", "zia_dlp_engines"},
+		{"dlp_engines", "zia_dlp_engines"},
 		{"dlpDictionaries", "zia_dlp_dictionaries"},
 		{"dlpNotificationTemplates", "zia_dlp_notification_templates"},
 		{"dlpWebRules", "zia_dlp_web_rules"},
@@ -72,6 +72,16 @@ func GetResourceReferences() []ResourceReference {
 		{"firewallFilteringIpSourceGroups", "zia_firewall_filtering_ip_source_groups"},
 		{"firewallFilteringNetworkApplicationGroups", "zia_firewall_filtering_network_application_groups"},
 		{"firewallFilteringNetworkServiceGroups", "zia_firewall_filtering_network_service_groups"},
+
+		// ZIA Firewall Filtering Rule Attribute Mappings
+		{"nw_application_groups", "zia_firewall_filtering_network_application_groups"},
+		//{"app_service_groups", "zia_firewall_filtering_network_service_groups"},
+		{"nw_service_groups", "zia_firewall_filtering_network_service_groups"},
+		{"nw_services", "zia_firewall_filtering_network_service"},
+		{"src_ip_groups", "zia_firewall_filtering_ip_source_groups"},
+		{"dest_ip_groups", "zia_firewall_filtering_destination_groups"},
+		{"labels", "zia_rule_labels"},
+		{"services", "zia_firewall_filtering_network_service"},
 		{"firewallFilteringNetworkServices", "zia_firewall_filtering_network_service"},
 		{"trafficForwardingGreTunnels", "zia_traffic_forwarding_gre_tunnel"},
 		{"trafficForwardingStaticIps", "zia_traffic_forwarding_static_ip"},
@@ -94,9 +104,7 @@ type OutputResource struct {
 // ParseOutputsFile parses the outputs.tf file and returns a map of resource ID to resource reference
 func ParseOutputsFile(workingDir string) (map[string]string, error) {
 	outputsFile := filepath.Join(workingDir, "outputs.tf")
-	fmt.Printf("[DEBUG] ParseOutputsFile: Looking for outputs.tf at %s\n", outputsFile)
 	if _, err := os.Stat(outputsFile); os.IsNotExist(err) {
-		fmt.Printf("[DEBUG] outputs.tf not found at %s, returning empty map\n", outputsFile)
 		return make(map[string]string), nil
 	}
 
@@ -108,19 +116,16 @@ func ParseOutputsFile(workingDir string) (map[string]string, error) {
 
 	resourceMap := make(map[string]string)
 	scanner := bufio.NewScanner(file)
-	fmt.Printf("[DEBUG] ParseOutputsFile: Successfully opened outputs.tf\n")
 
 	// Regex to match output lines like: output "zpa_server_group_resource_zpa_server_group_72058304855144105_id"
 	outputRegex := regexp.MustCompile(`output\s+"([^"]+)"`)
 
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
-		fmt.Printf("[DEBUG] Processing line: %s\n", line)
 
 		// Look for output declarations
 		if matches := outputRegex.FindStringSubmatch(line); matches != nil {
 			outputName := matches[1]
-			fmt.Printf("[DEBUG] Found output: %s\n", outputName)
 
 			// Parse the output name to extract resource type, name, and ID
 			// Format: zpa_app_connector_group_resource_zpa_app_connector_group_72058304855047746_id
@@ -129,9 +134,7 @@ func ParseOutputsFile(workingDir string) (map[string]string, error) {
 			// Find the last occurrence of "_id" to identify the end
 			if strings.HasSuffix(outputName, "_id") {
 				nameWithoutId := strings.TrimSuffix(outputName, "_id")
-				fmt.Printf("[DEBUG] nameWithoutId: %s\n", nameWithoutId)
 				parts := strings.Split(nameWithoutId, "_")
-				fmt.Printf("[DEBUG] parts: %v (length: %d)\n", parts, len(parts))
 
 				if len(parts) >= 4 {
 					// Find the resource type by looking for the pattern: zpa_*_group
@@ -163,25 +166,17 @@ func ParseOutputsFile(workingDir string) (map[string]string, error) {
 						// Resource ID is the last part
 						resourceID = parts[len(parts)-1]
 
-						fmt.Printf("[DEBUG] Extracted: resourceType=%s, resourceName=%s, resourceID=%s\n", resourceType, resourceName, resourceID)
 					}
 
 					if resourceType != "" && resourceID != "" && resourceName != "" {
 						// Store the mapping: resourceID -> resourceType.resourceName.id
 						resourceMap[resourceID] = fmt.Sprintf("%s.%s.id", resourceType, resourceName)
-						log.Printf("[DEBUG] Mapped resource ID %s -> %s.%s.id", resourceID, resourceType, resourceName)
-					} else {
-						log.Printf("[DEBUG] Failed to parse output %s: resourceType=%s, resourceID=%s, resourceName=%s", outputName, resourceType, resourceID, resourceName)
 					}
 				}
 			}
 		}
 	}
 
-	fmt.Printf("[DEBUG] ParseOutputsFile: Found %d resources in resourceMap:\n", len(resourceMap))
-	for id, ref := range resourceMap {
-		fmt.Printf("[DEBUG]   ID %s -> %s\n", id, ref)
-	}
 	return resourceMap, scanner.Err()
 }
 

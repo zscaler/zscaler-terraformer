@@ -236,7 +236,11 @@ func buildResourceName(resourceType string, structData map[string]interface{}) s
 		default:
 			resourceID = structData["id"].(string)
 		}
-		resID = fmt.Sprintf("resource_%s_%s", resourceType, resourceID)
+
+		// If we didn't set resID for the special case, use the default logic
+		if resID == "" {
+			resID = fmt.Sprintf("resource_%s_%s", resourceType, resourceID)
+		}
 	} else if structData["name"] != nil {
 		name := structData["name"].(string)
 		if name != "" {
