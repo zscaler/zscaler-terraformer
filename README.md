@@ -290,6 +290,117 @@ Flags:
 Use "zscaler-terraformer [command] --help" for more information about a command.
 ```
 
+## Automatic Resource and Data Source Reference Mapping
+
+The Zscaler Terraformer automatically replaces hard-coded IDs in resource attributes with readable resource references or data source references, making the generated Terraform code more maintainable and user-friendly.
+
+### How It Works
+
+**Before (Hard-coded IDs):**
+```hcl
+resource "zia_firewall_filtering_rule" "example" {
+  action = "ALLOW"
+  name   = "My Firewall Rule"
+  device_groups {
+    id = [35235179]
+  }
+  location_groups {
+    id = [66754722, 66754723]
+  }
+  users {
+    id = [29309057]
+  }
+  workload_groups {
+    id   = 2665545
+    name = "BD_WORKLOAD_GROUP01"
+  }
+}
+```
+
+**After (Intelligent Reference Resolution):**
+```hcl
+resource "zia_firewall_filtering_rule" "example" {
+  action = "ALLOW"
+  name   = "My Firewall Rule"
+  # Resource references (when resources were imported)
+  dlp_engines {
+    id = [zia_dlp_engines.resource_zia_dlp_engines_3.id]
+  }
+  locations {
+    id = [zia_location_management.resource_zia_location_management_36788941.id]
+  }
+  # Data source references (when resources were not imported)
+  device_groups {
+    id = [data.zia_device_groups.this_35235179.id]
+  }
+  location_groups {
+    id = [data.zia_location_groups.this_66754722.id, data.zia_location_groups.this_66754723.id]
+  }
+  users {
+    id = [data.zia_user_management.this_29309057.id]
+  }
+  workload_groups {
+    id   = data.zia_workload_groups.this_2665545.id
+    name = data.zia_workload_groups.this_2665545.name
+  }
+}
+```
+
+**Generated Data Sources:**
+```hcl
+# datasource.tf - automatically generated
+data "zia_device_groups" "this_35235179" {
+  id = 35235179
+}
+
+data "zia_location_groups" "this_66754722" {
+  id = 66754722
+}
+
+data "zia_user_management" "this_29309057" {
+  id = 29309057
+}
+
+data "zia_workload_groups" "this_2665545" {
+  id   = 2665545
+  name = "BD_WORKLOAD_GROUP01"
+}
+```
+
+### Supported Attribute Mappings
+
+The following attributes are automatically replaced with data source references:
+
+| Attribute Name | Data Source Type | Description |
+|----------------|------------------|-------------|
+| `location_groups` | `zia_location_groups` | Location group references |
+| `time_windows` | `zia_firewall_filtering_time_window` | Time window references |
+| `users` | `zia_user_management` | User references |
+| `groups` | `zia_group_management` | Group references |
+| `departments` | `zia_department_management` | Department references |
+| `proxy_gateways` | `zia_forwarding_control_proxy_gateway` | Proxy gateway references |
+| `device_groups` | `zia_device_groups` | Device group references |
+| `devices` | `zia_devices` | Device references |
+| `workload_groups` | `zia_workload_groups` | Workload group references (includes both `id` and `name`) |
+
+### Key Features
+
+- **🔄 Automatic Processing**: No configuration required - works automatically during import
+- **🎯 Intelligent Resolution**: 
+  - Uses **resource references** (e.g., `zia_dlp_engines.resource_name.id`) when resources were imported
+  - Uses **data source references** (e.g., `data.zia_device_groups.this_123.id`) when resources were not imported
+- **📁 File Generation**: Automatically creates `datasource.tf` with required data sources and `outputs.tf` with resource outputs
+- **⚙️ Special Handling**: `workload_groups` attributes get both `id` and `name` field replacement
+- **🚀 Performance Optimized**: Processes all references once at the end for optimal performance
+- **🛡️ Drift Prevention**: Avoids creating unnecessary data sources that could cause terraform drift
+
+### Benefits
+
+1. **📖 Improved Readability**: Data source references are more descriptive than raw IDs
+2. **🔧 Better Maintainability**: Easier to understand and modify configurations
+3. **🎯 Terraform Best Practices**: Uses proper data source referencing patterns
+4. **⚡ Automatic**: No manual configuration or setup required
+
 ## ZPA Example usage
 
 To get started with the zscaler-terraformer CLI to export your ZPA configuration, create a directory where you want the configuration to stored. See ZPA Demo:

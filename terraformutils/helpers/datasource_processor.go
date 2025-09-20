@@ -72,7 +72,7 @@ type CollectedDataSourceID struct {
 // PostProcessDataSources performs data source replacement after all imports are complete
 // This function is designed to work alongside the existing PostProcessReferences without interference
 func PostProcessDataSources(workingDir string) error {
-	log.Printf("[INFO] Starting data source post-processing...")
+	log.Printf("🔄 Starting data source post-processing...")
 
 	// Parse outputs.tf to get all available resource mappings (same as resource processing)
 	resourceMap, err := ParseOutputsFile(workingDir)
@@ -97,7 +97,7 @@ func PostProcessDataSources(workingDir string) error {
 		if err != nil {
 			return err
 		}
-		log.Printf("[INFO] Data source post-processing completed successfully")
+		log.Printf("🎯 Data source post-processing completed successfully")
 		return nil
 	case <-ctx.Done():
 		log.Printf("[ERROR] Data source post-processing timed out after 5 minutes")
@@ -197,7 +197,7 @@ func CleanupEmptyDataSourceBlocks(workingDir string) error {
 				log.Printf("[WARNING] Failed to write file %s: %v", tfFile, err)
 				continue
 			}
-			log.Printf("[INFO] Removed empty data source blocks from %s", baseName)
+			log.Printf("🧹 Cleaned up empty blocks in %s", baseName)
 		}
 	}
 
@@ -329,7 +329,7 @@ func CollectDataSourceIDs(workingDir string, resourceMap map[string]string) ([]C
 		}
 	}
 
-	log.Printf("[INFO] Collected %d unique data source IDs", len(collectedIDs))
+	log.Printf("📋 Collected %d unique data source IDs", len(collectedIDs))
 	return collectedIDs, nil
 }
 
@@ -413,7 +413,7 @@ func GenerateDataSourceFile(workingDir string, dataSourceIDs []CollectedDataSour
 		}
 	}
 
-	log.Printf("[INFO] Generated datasource.tf with %d data sources", len(dataSourceIDs))
+	log.Printf("📁 Generated datasource.tf with %d data sources", len(dataSourceIDs))
 	return nil
 }
 
@@ -594,7 +594,7 @@ func ReplaceDataSourceReferences(workingDir string, dataSourceIDs []CollectedDat
 				log.Printf("[WARNING] Failed to write file %s: %v", tfFile, err)
 				continue
 			}
-			log.Printf("[INFO] Updated data source references in %s", baseName)
+			log.Printf("🔗 Updated data source references in %s", baseName)
 		}
 	}
 

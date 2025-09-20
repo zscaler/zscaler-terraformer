@@ -237,19 +237,19 @@ func runImport() func(cmd *cobra.Command, args []string) {
 			if len(resourceTypes) > 0 {
 				// Get the working directory from the first resource type
 				_, _, workingDir := initTf(resourceTypes[0])
-				log.Printf("[INFO] Running final post-processing after all imports are complete...")
+				log.Printf("🔄 Running final post-processing after all imports are complete...")
 
 				// First: Process resource-to-resource references
 				err := helpers.PostProcessReferences(workingDir)
 				if err != nil {
-					log.Printf("[WARNING] Resource post-processing failed: %v", err)
+					log.Printf("⚠️  Resource post-processing failed: %v", err)
 				}
 
 				// Second: Process data source references (only once, at the very end)
-				log.Printf("[INFO] Running data source post-processing after all imports are complete...")
+				log.Printf("🔄 Running data source post-processing after all imports are complete...")
 				err = helpers.PostProcessDataSources(workingDir)
 				if err != nil {
-					log.Printf("[WARNING] Data source post-processing failed: %v", err)
+					log.Printf("⚠️  Data source post-processing failed: %v", err)
 				}
 			}
 
@@ -258,10 +258,12 @@ func runImport() func(cmd *cobra.Command, args []string) {
 				for resource := range managedResourceTypes {
 					fmt.Println(resource)
 				}
-			} else {
-				fmt.Println("\033[32mImport successful!\033[0m")
-				fmt.Println("\033[32mThe resources imported via Zscaler Terraformer are shown above.\033[0m")
-				fmt.Println("\033[32mThese resources are now in your Terraform state and will be managed by Terraform.\033[0m")
+			}
+
+			// Generate and display comprehensive import summary
+			if len(resourceTypes) > 0 {
+				_, _, workingDir := initTf(resourceTypes[0])
+				helpers.PrintImportSummary(workingDir)
 			}
 			if includedSensitiveResources["zpa_pra_credential_controller"] {
 				fmt.Println("\033[33mThe resource zpa_pra_credential_controller contains sensitive values not included in the generated code.\033[0m")
@@ -277,11 +279,11 @@ func runImport() func(cmd *cobra.Command, args []string) {
 			for resource := range managedResourceTypes {
 				fmt.Println(resource)
 			}
-		} else {
-			fmt.Println("\033[32mImport successful!\033[0m")
-			fmt.Println("\033[32mThe resources imported via Zscaler Terraformer are shown above.\033[0m")
-			fmt.Println("\033[32mThese resources are now in your Terraform state and will be managed by Terraform.\033[0m")
 		}
+
+		// Generate and display comprehensive import summary for single resource
+		_, _, workingDir := initTf(resourceType_)
+		helpers.PrintImportSummary(workingDir)
 		if includedSensitiveResources["zpa_pra_credential_controller"] {
 			fmt.Println("\033[33mThe resource zpa_pra_credential_controller contains sensitive values not included in the generated code.\033[0m")
 		}

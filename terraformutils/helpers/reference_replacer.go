@@ -156,8 +156,6 @@ func ParseOutputsFile(workingDir string) (map[string]string, error) {
 						}
 					}
 
-					fmt.Printf("[DEBUG] resourceIndex: %d\n", resourceIndex)
-
 					if resourceIndex > 0 && resourceIndex < len(parts)-1 {
 						// Resource type is everything before "resource"
 						resourceType = strings.Join(parts[0:resourceIndex], "_")

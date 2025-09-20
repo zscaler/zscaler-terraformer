@@ -1,5 +1,31 @@
 # Changelog
 
+## 2.1.0 (September, xx 2025)
+
+### Notes
+
+- Release date: **(September,xx 2025)**
+- Supported Terraform version: **v1.x.x**
+
+### Enhancements
+
+## **🐛 Bug Fixes**
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **fix**: Resolved terraform drift issues by avoiding unnecessary data source creation for imported resources
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **fix**: Fixed `workload_groups` attribute missing `id` field in non-dlp resource types
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **fix**: Added automatic cleanup of empty data source attribute blocks that caused validation errors
+
+## **✨ Enhancements**
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **feat**: Added automatic data source ID replacement system for attribute references
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **feat**: Implemented configurable attribute-to-data-source mapping system for easy extensibility
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **feat**: Added automatic generation of `datasource.tf` file with required data sources
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **feat**: Implemented intelligent reference resolution (resource refs vs data source refs)
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **feat**: Added special handling for `workload_groups` attribute with both `id` and `name` field replacement
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **feat**: Extended `workload_groups` support to all resource types (zia_firewall_filtering_rule, zia_dlp_web_rules, zia_url_filtering_rules, zia_ssl_inspection_rules)
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **perf**: Optimized post-processing to run once at import completion instead of per-resource
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **perf**: Added timeout protection and performance safeguards to prevent hanging
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **feat**: Implemented comprehensive import summary report with statistics and emoji styling
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **improvement**: Enhanced logging with emojis and removed debug noise for better user experience
+
 ## 2.0.19 (September, 11 2025)
 
 ### Notes
