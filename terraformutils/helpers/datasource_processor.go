@@ -74,6 +74,13 @@ type CollectedDataSourceID struct {
 func PostProcessDataSources(workingDir string) error {
 	log.Printf("[INFO] Starting data source post-processing...")
 
+	// Parse outputs.tf to get all available resource mappings (same as resource processing)
+	resourceMap, err := ParseOutputsFile(workingDir)
+	if err != nil {
+		log.Printf("[WARNING] Failed to parse outputs.tf: %v", err)
+		resourceMap = make(map[string]string)
+	}
+
 	// Create a timeout context to prevent hanging (5 minutes timeout)
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
@@ -81,7 +88,7 @@ func PostProcessDataSources(workingDir string) error {
 	// Run the processing in a goroutine with timeout protection
 	done := make(chan error, 1)
 	go func() {
-		done <- processDataSourcesWithTimeout(workingDir)
+		done <- processDataSourcesWithTimeout(workingDir, resourceMap)
 	}()
 
 	// Wait for completion or timeout
@@ -99,7 +106,7 @@ func PostProcessDataSources(workingDir string) error {
 }
 
 // processDataSourcesWithTimeout performs the actual data source processing
-func processDataSourcesWithTimeout(workingDir string) error {
+func processDataSourcesWithTimeout(workingDir string, resourceMap map[string]string) error {
 	// Step 1: Clean up empty data source attribute blocks first
 	log.Printf("[DEBUG] Step 1: Cleaning up empty blocks...")
 	err := CleanupEmptyDataSourceBlocks(workingDir)
@@ -107,9 +114,9 @@ func processDataSourcesWithTimeout(workingDir string) error {
 		log.Printf("[WARNING] Failed to cleanup empty blocks: %v", err)
 	}
 
-	// Step 2: Collect all IDs that need data source references
+	// Step 2: Collect all IDs that need data source references (excluding those with resource imports)
 	log.Printf("[DEBUG] Step 2: Collecting data source IDs...")
-	dataSourceIDs, err := CollectDataSourceIDs(workingDir)
+	dataSourceIDs, err := CollectDataSourceIDs(workingDir, resourceMap)
 	if err != nil {
 		return fmt.Errorf("failed to collect data source IDs: %w", err)
 	}
@@ -198,7 +205,8 @@ func CleanupEmptyDataSourceBlocks(workingDir string) error {
 }
 
 // CollectDataSourceIDs scans all .tf files and collects IDs that should be replaced with data source references
-func CollectDataSourceIDs(workingDir string) ([]CollectedDataSourceID, error) {
+// It excludes IDs that already have corresponding resource imports (found in resourceMap)
+func CollectDataSourceIDs(workingDir string, resourceMap map[string]string) ([]CollectedDataSourceID, error) {
 	var collectedIDs []CollectedDataSourceID
 	idTracker := make(map[string]bool) // To avoid duplicates
 
@@ -267,6 +275,12 @@ func CollectDataSourceIDs(workingDir string) ([]CollectedDataSourceID, error) {
 							continue // Already a reference
 						}
 
+						// Skip if this ID already has a corresponding resource import
+						if resourceRef, exists := resourceMap[id]; exists {
+							log.Printf("[DEBUG] Skipping workload_groups ID %s - already has resource import: %s", id, resourceRef)
+							continue
+						}
+
 						uniqueKey := fmt.Sprintf("%s_%s", dataSourceType, id)
 						if idTracker[uniqueKey] {
 							continue // Already collected
@@ -289,6 +303,12 @@ func CollectDataSourceIDs(workingDir string) ([]CollectedDataSourceID, error) {
 						// Skip if already processed or if it's already a resource reference
 						if strings.Contains(id, ".") {
 							continue // Already a reference
+						}
+
+						// Skip if this ID already has a corresponding resource import
+						if resourceRef, exists := resourceMap[id]; exists {
+							log.Printf("[DEBUG] Skipping ID %s for %s - already has resource import: %s", id, dataSourceType, resourceRef)
+							continue
 						}
 
 						uniqueKey := fmt.Sprintf("%s_%s", dataSourceType, id)
