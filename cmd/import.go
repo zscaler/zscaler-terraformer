@@ -251,6 +251,18 @@ func runImport() func(cmd *cobra.Command, args []string) {
 				if err != nil {
 					log.Printf("⚠️  Data source post-processing failed: %v", err)
 				}
+
+				// Third: Process ZPA policy data source references (isolated processing)
+				log.Printf("🔄 Running ZPA policy data source processing after all imports are complete...")
+				resourceMap, parseErr := helpers.ParseOutputsFile(workingDir)
+				if parseErr != nil {
+					log.Printf("[WARNING] Failed to parse outputs.tf for ZPA processing: %v", parseErr)
+					resourceMap = make(map[string]string)
+				}
+				err = helpers.PostProcessZPAPolicyDataSources(workingDir, resourceMap)
+				if err != nil {
+					log.Printf("⚠️  ZPA policy data source post-processing failed: %v", err)
+				}
 			}
 
 			if len(managedResourceTypes) > 0 {
