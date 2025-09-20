@@ -2003,9 +2003,6 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		file.Close()
 	}
 
-	// Post-process reference replacement after all generation is complete
-	err = helpers.PostProcessReferences(workingDir)
-	if err != nil {
-		log.Printf("[WARNING] Post-processing failed: %v", err)
-	}
+	// Note: Post-processing is now handled centrally after all imports are complete
+	// This improves performance by avoiding multiple file scans during generation
 }
