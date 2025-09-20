@@ -66,6 +66,7 @@ type CollectedDataSourceID struct {
 	DataSourceType string
 	ID             string
 	UniqueName     string // e.g., "this_345645"
+	Name           string // For workload_groups, stores the name value
 }
 
 // PostProcessDataSources performs data source replacement after all imports are complete
@@ -235,39 +236,74 @@ func CollectDataSourceIDs(workingDir string) ([]CollectedDataSourceID, error) {
 
 		// Look for attribute blocks that match our mappings
 		for attributeName, dataSourceType := range attributeToDataSource {
-			// Pattern to match: attribute_name { id = [123, 456] } or attribute_name { id = [123] }
-			// Use word boundaries to ensure exact attribute name match
-			// Use multiline and dotall mode to handle newlines and whitespace in blocks
-			pattern := fmt.Sprintf(`(?ms)\b%s\s*\{[^}]*id\s*=\s*\[([^\]]+)\][^}]*\}`, regexp.QuoteMeta(attributeName))
-			re := regexp.MustCompile(pattern)
+			var matches [][]string
 
-			matches := re.FindAllStringSubmatch(fileContent, -1)
+			if attributeName == "workload_groups" {
+				// Special pattern for workload_groups: capture both id and name
+				// Pattern: workload_groups { id = 123 name = "NAME" }
+				pattern := fmt.Sprintf(`(?ms)\b%s\s*\{[^}]*?id\s*=\s*(\d+)[^}]*?name\s*=\s*"([^"]+)"[^}]*\}`, regexp.QuoteMeta(attributeName))
+				re := regexp.MustCompile(pattern)
+				matches = re.FindAllStringSubmatch(fileContent, -1)
+			} else {
+				// Standard pattern for other attributes: attribute_name { id = [123, 456] }
+				pattern := fmt.Sprintf(`(?ms)\b%s\s*\{[^}]*id\s*=\s*\[([^\]]+)\][^}]*\}`, regexp.QuoteMeta(attributeName))
+				re := regexp.MustCompile(pattern)
+				matches = re.FindAllStringSubmatch(fileContent, -1)
+			}
+
 			for _, match := range matches {
 				if len(match) < 2 {
 					continue
 				}
 
-				// Extract IDs from the match
-				idsContent := match[1]
-				ids := extractIDsFromContent(idsContent)
+				if attributeName == "workload_groups" {
+					// For workload_groups, match[1] is the ID and match[2] is the name
+					if len(match) >= 3 {
+						id := match[1]
+						name := match[2]
 
-				for _, id := range ids {
-					// Skip if already processed or if it's already a resource reference
-					if strings.Contains(id, ".") {
-						continue // Already a reference
+						// Skip if already processed or if it's already a resource reference
+						if strings.Contains(id, ".") {
+							continue // Already a reference
+						}
+
+						uniqueKey := fmt.Sprintf("%s_%s", dataSourceType, id)
+						if idTracker[uniqueKey] {
+							continue // Already collected
+						}
+
+						collectedIDs = append(collectedIDs, CollectedDataSourceID{
+							DataSourceType: dataSourceType,
+							ID:             id,
+							UniqueName:     fmt.Sprintf("this_%s", id),
+							Name:           name, // Store the name for workload_groups
+						})
+						idTracker[uniqueKey] = true
 					}
+				} else {
+					// For other attributes, match[1] is the array content
+					idsContent := match[1]
+					ids := extractIDsFromContent(idsContent)
 
-					uniqueKey := fmt.Sprintf("%s_%s", dataSourceType, id)
-					if idTracker[uniqueKey] {
-						continue // Already collected
+					for _, id := range ids {
+						// Skip if already processed or if it's already a resource reference
+						if strings.Contains(id, ".") {
+							continue // Already a reference
+						}
+
+						uniqueKey := fmt.Sprintf("%s_%s", dataSourceType, id)
+						if idTracker[uniqueKey] {
+							continue // Already collected
+						}
+
+						collectedIDs = append(collectedIDs, CollectedDataSourceID{
+							DataSourceType: dataSourceType,
+							ID:             id,
+							UniqueName:     fmt.Sprintf("this_%s", id),
+							Name:           "", // Empty for non-workload_groups attributes
+						})
+						idTracker[uniqueKey] = true
 					}
-
-					collectedIDs = append(collectedIDs, CollectedDataSourceID{
-						DataSourceType: dataSourceType,
-						ID:             id,
-						UniqueName:     fmt.Sprintf("this_%s", id),
-					})
-					idTracker[uniqueKey] = true
 				}
 			}
 		}
@@ -332,11 +368,24 @@ func GenerateDataSourceFile(workingDir string, dataSourceIDs []CollectedDataSour
 
 	// Write each data source
 	for _, dsID := range dataSourceIDs {
-		dataSourceBlock := fmt.Sprintf(`data "%s" "%s" {
+		var dataSourceBlock string
+
+		if dsID.DataSourceType == "zia_workload_groups" && dsID.Name != "" {
+			// For workload_groups, include both id and name
+			dataSourceBlock = fmt.Sprintf(`data "%s" "%s" {
+  id   = %s
+  name = "%s"
+}
+
+`, dsID.DataSourceType, dsID.UniqueName, dsID.ID, dsID.Name)
+		} else {
+			// For other data sources, only include id
+			dataSourceBlock = fmt.Sprintf(`data "%s" "%s" {
   id = %s
 }
 
 `, dsID.DataSourceType, dsID.UniqueName, dsID.ID)
+		}
 
 		_, err = file.WriteString(dataSourceBlock)
 		if err != nil {
@@ -412,10 +461,49 @@ func ReplaceDataSourceReferences(workingDir string, dataSourceIDs []CollectedDat
 
 		// Replace IDs in each mapped attribute using pre-compiled patterns
 		for attributeName, expectedDataSourceType := range attributeToDataSource {
-			re := attributePatterns[attributeName]
+			var matches [][]string
 
-			// Use a simpler approach: find matches first, then process
-			matches := re.FindAllStringSubmatch(processedContent, -1)
+			if attributeName == "workload_groups" {
+				// Special handling for workload_groups - process both id and name replacement
+				workloadPattern := fmt.Sprintf(`(?ms)(\b%s\s*\{[^}]*?)id\s*=\s*(\d+)([^}]*?)name\s*=\s*"([^"]+)"([^}]*?\})`, regexp.QuoteMeta(attributeName))
+				workloadRe := regexp.MustCompile(workloadPattern)
+				workloadMatches := workloadRe.FindAllStringSubmatch(processedContent, -1)
+
+				// Process workload_groups matches in reverse order
+				for j := len(workloadMatches) - 1; j >= 0; j-- {
+					workloadMatch := workloadMatches[j]
+					if len(workloadMatch) < 6 {
+						continue
+					}
+
+					fullWorkloadMatch := workloadMatch[0]
+					prefix := workloadMatch[1]
+					id := workloadMatch[2]
+					middle := workloadMatch[3]
+					_ = workloadMatch[4] // name (not used for processing, but captured by regex)
+					suffix := workloadMatch[5]
+
+					// Check if this ID should be replaced with a data source reference
+					if reference, exists := idToReference[id]; exists {
+						// Ensure the reference matches the expected data source type
+						if strings.Contains(reference, expectedDataSourceType) {
+							// Create data source reference base (remove the .id suffix)
+							dataSourceBase := strings.TrimSuffix(reference, ".id")
+
+							// Replace both id and name with data source references
+							replacement := prefix + "id = " + dataSourceBase + ".id" + middle + "name = " + dataSourceBase + ".name" + suffix
+							processedContent = strings.Replace(processedContent, fullWorkloadMatch, replacement, 1)
+							hasChanges = true
+						}
+					}
+				}
+				continue // Skip the standard processing for workload_groups
+			} else {
+				// Standard pattern for other attributes using pre-compiled patterns
+				re := attributePatterns[attributeName]
+				matches = re.FindAllStringSubmatch(processedContent, -1)
+			}
+
 			if len(matches) == 0 {
 				continue // No matches for this attribute, skip to next
 			}
@@ -431,6 +519,8 @@ func ReplaceDataSourceReferences(workingDir string, dataSourceIDs []CollectedDat
 			// Process matches in reverse order to avoid index shifting issues
 			for i := len(matches) - 1; i >= 0; i-- {
 				match := matches[i]
+
+				// Handle standard array format: prefix + [ids] + suffix
 				if len(match) < 4 {
 					continue
 				}

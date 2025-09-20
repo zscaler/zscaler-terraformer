@@ -125,8 +125,9 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 			continue
 		}
 
-		// Special handling for workload_groups in zia_dlp_web_rules to include both id and name
-		if resourceType == "zia_dlp_web_rules" && block == "workload_groups" {
+		// Special handling for workload_groups to include both id and name
+		// This applies to all resource types that have workload_groups blocks
+		if block == "workload_groups" {
 			output += helpers.WorkloadGroupsBlock(block, structData[MapTfFieldNameToAPI(resourceType, block)])
 			continue
 		}
@@ -243,6 +244,7 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 			"nw_service_groups",
 			"nw_application_groups",
 			"time_windows",
+			"dest_ip_groups",
 		}) {
 			output += helpers.ListIdsIntBlock(block, structData[MapTfFieldNameToAPI(resourceType, block)])
 			continue
@@ -481,8 +483,20 @@ func WriteNestedBlock(resourceType string, attributes []string, schemaBlock *tfj
 		}
 
 		// Exclude specific computed attributes.
-		// Special exception: allow 'id' attribute for receiver and tenant blocks in zia_dlp_web_rules.
-		skipIDAttribute := attrName == "id" && (resourceType != "zia_dlp_web_rules" || (!isReceiverBlock(attrStruct) && !isTenantBlock(attrStruct)))
+		// Special exception: allow 'id' attribute for:
+		// 1. receiver and tenant blocks in zia_dlp_web_rules
+		// 2. workload_groups blocks in all resource types (since they need both id and name)
+		isWorkloadGroupsBlock := func(attrStruct map[string]interface{}) bool {
+			// Check if this looks like a workload_groups block (has both id and name)
+			_, hasID := attrStruct["id"]
+			_, hasName := attrStruct["name"]
+			return hasID && hasName
+		}
+
+		skipIDAttribute := attrName == "id" &&
+			!(resourceType == "zia_dlp_web_rules" && (isReceiverBlock(attrStruct) || isTenantBlock(attrStruct))) &&
+			!isWorkloadGroupsBlock(attrStruct)
+
 		if skipIDAttribute || attrName == "appId" || attrName == "portal" || attrName == "hidden" || attrName == "certificate_name" || (resourceType == "zia_url_categories" && attrName == "val") {
 			continue
 		}
