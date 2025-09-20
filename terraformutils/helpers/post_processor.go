@@ -90,7 +90,7 @@ func ProcessFileContent(content string, resourceMap map[string]string) string {
 
 	processedContent := re.ReplaceAllStringFunc(content, func(match string) string {
 		// Check if this is within an app_service_groups block - if so, skip processing
-		// Look backwards in the content to find the attribute name
+		// Also check if this is within a data source attribute block - if so, skip processing
 		matchIndex := strings.Index(content, match)
 		if matchIndex > 0 {
 			// Look for the attribute name before this match
@@ -100,6 +100,18 @@ func ProcessFileContent(content string, resourceMap map[string]string) string {
 				lastLine := strings.TrimSpace(lines[len(lines)-1])
 				if strings.Contains(lastLine, "app_service_groups") {
 					return match // Skip processing for app_service_groups
+				}
+
+				// Skip processing for data source attributes
+				dataSourceAttributes := []string{
+					"location_groups", "time_windows", "users", "groups",
+					"departments", "proxy_gateways", "device_groups",
+					"devices", "workload_groups",
+				}
+				for _, attr := range dataSourceAttributes {
+					if strings.Contains(lastLine, attr+" {") {
+						return match // Skip processing for data source attributes
+					}
 				}
 			}
 		}
