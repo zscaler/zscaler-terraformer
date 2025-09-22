@@ -55,6 +55,8 @@ func GetDataSourceMappings() []DataSourceMapping {
 		{"device_groups", "zia_device_groups"},
 		{"devices", "zia_devices"},
 		{"workload_groups", "zia_workload_groups"},
+		{"nw_services", "zia_firewall_filtering_network_service"},
+		{"services", "zia_firewall_filtering_network_service"},
 
 		// ZPA Profile Mappings for policy resources
 		{"zpn_inspection_profile_id", "zpa_inspection_profile"},

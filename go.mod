@@ -51,3 +51,5 @@ require (
 	golang.org/x/text v0.29.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace github.com/zscaler/zscaler-sdk-go/v3 => /Users/wguilherme/go/src/github.com/zscaler/zscaler-sdk-go

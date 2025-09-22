@@ -105,6 +105,8 @@ func GenerateOutputs(resourceType string, resourceID string, workingDir string) 
 		"zia_atp_malware_policy",
 		"zia_url_filtering_and_cloud_app_settings",
 		"zia_end_user_notification",
+		"zia_ftp_control_policy",
+		"zia_mobile_malware_protection_policy",
 	}
 
 	// Check if the resourceType is in the excluded list.

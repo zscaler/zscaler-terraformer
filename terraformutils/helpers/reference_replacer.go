@@ -78,6 +78,7 @@ func GetResourceReferences() []ResourceReference {
 		//{"app_service_groups", "zia_firewall_filtering_network_service_groups"},
 		{"nw_service_groups", "zia_firewall_filtering_network_service_groups"},
 		{"nw_services", "zia_firewall_filtering_network_service"},
+		{"bandwidth_classes", "zia_bandwidth_classes"},
 		{"src_ip_groups", "zia_firewall_filtering_ip_source_groups"},
 		{"dest_ip_groups", "zia_firewall_filtering_destination_groups"},
 		{"labels", "zia_rule_labels"},

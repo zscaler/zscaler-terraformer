@@ -223,7 +223,7 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 			}
 			output += "}\n"
 			continue
-		} else if helpers.IsInList(resourceType, []string{"zia_firewall_filtering_network_service_groups", "zia_firewall_filtering_rule", "zia_url_filtering_rules", "zia_dlp_web_rules", "zia_ssl_inspection_rules", "zia_firewall_dns_rule", "zia_firewall_ips_rule", "zia_file_type_control_rules", "zia_sandbox_rules", "zia_forwarding_control_rule"}) && helpers.IsInList(block, []string{"departments",
+		} else if helpers.IsInList(resourceType, []string{"zia_bandwidth_control_rule", "zia_firewall_filtering_network_service_groups", "zia_firewall_filtering_rule", "zia_url_filtering_rules", "zia_dlp_web_rules", "zia_ssl_inspection_rules", "zia_firewall_dns_rule", "zia_firewall_ips_rule", "zia_file_type_control_rules", "zia_sandbox_rules", "zia_forwarding_control_rule", "zia_nat_control_rules"}) && helpers.IsInList(block, []string{"departments",
 			"groups",
 			"departments",
 			"locations",
@@ -245,6 +245,8 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 			"nw_application_groups",
 			"time_windows",
 			"dest_ip_groups",
+			"nw_services",
+			"bandwidth_classes",
 		}) {
 			output += helpers.ListIdsIntBlock(block, structData[MapTfFieldNameToAPI(resourceType, block)])
 			continue
@@ -257,6 +259,9 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 			"time_windows",
 			"users",
 		}) {
+			output += helpers.ListIdsIntBlock(block, structData[MapTfFieldNameToAPI(resourceType, block)])
+			continue
+		} else if helpers.IsInList(resourceType, []string{"zia_virtual_service_edge_cluster"}) && helpers.IsInList(block, []string{"virtual_zen_nodes"}) {
 			output += helpers.ListIdsIntBlock(block, structData[MapTfFieldNameToAPI(resourceType, block)])
 			continue
 		} else if helpers.IsInList(resourceType, []string{"zpa_application_segment"}) && block == "server_groups" {
@@ -287,6 +292,12 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 			continue
 		} else if helpers.IsInList(resourceType, []string{"zpa_pra_console_controller"}) && block == "pra_application" {
 			output += helpers.TypeSetNestedBlock(block, structData["praApplication"])
+			continue
+		} else if helpers.IsInList(resourceType, []string{"zpa_user_portal_link"}) && block == "user_portals" {
+			output += helpers.ListIdsStringBlock(block, structData["userPortals"])
+			continue
+		} else if helpers.IsInList(resourceType, []string{"zpa_pra_credential_pool"}) && block == "credentials" {
+			output += helpers.ListIdsStringBlock(block, structData["credentials"])
 			continue
 		} else if helpers.IsInList(resourceType, []string{"zpa_server_group", "zpa_policy_access_rule"}) && block == "app_connector_groups" {
 			output += helpers.ListIdsStringBlock(block, structData["appConnectorGroups"])
