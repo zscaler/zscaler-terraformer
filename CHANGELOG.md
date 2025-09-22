@@ -25,6 +25,7 @@
 - [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **perf**: Added timeout protection and performance safeguards to prevent hanging
 - [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **feat**: Implemented comprehensive import summary report with statistics and emoji styling
 - [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **improvement**: Enhanced logging with emojis and removed debug noise for better user experience
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **feat**: Added comprehensive ZPA policy data source mapping for complex operand conditions with object type support (SCIM, SAML, POSTURE, TRUSTED_NETWORK, MACHINE_GRP)
 
 ## 2.0.19 (September, 11 2025)
 

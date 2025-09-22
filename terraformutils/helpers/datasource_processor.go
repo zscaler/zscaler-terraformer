@@ -56,6 +56,18 @@ func GetDataSourceMappings() []DataSourceMapping {
 		{"devices", "zia_devices"},
 		{"workload_groups", "zia_workload_groups"},
 
+		// ZPA Profile Mappings for policy resources
+		{"zpn_inspection_profile_id", "zpa_inspection_profile"},
+		{"zpn_isolation_profile_id", "zpa_isolation_profile"},
+
+		// ZPA Service Edge Group Mappings
+		{"service_edges", "zpa_service_edge_controller"},
+		{"trusted_networks", "zpa_trusted_network"},
+
+		// ZPA Cloud Browser Isolation Mappings
+		{"banner_id", "zpa_cloud_browser_isolation_banner"},
+		{"region_ids", "zpa_cloud_browser_isolation_region"},
+
 		// Additional mappings can be easily added here
 		// {"new_attribute", "zia_new_data_source"},
 	}
@@ -252,6 +264,18 @@ func CollectDataSourceIDs(workingDir string, resourceMap map[string]string) ([]C
 				pattern := fmt.Sprintf(`(?ms)\b%s\s*\{[^}]*?id\s*=\s*(\d+)[^}]*?name\s*=\s*"([^"]+)"[^}]*\}`, regexp.QuoteMeta(attributeName))
 				re := regexp.MustCompile(pattern)
 				matches = re.FindAllStringSubmatch(fileContent, -1)
+			} else if strings.HasSuffix(attributeName, "_id") || strings.HasSuffix(attributeName, "_ids") {
+				if strings.HasSuffix(attributeName, "_ids") {
+					// Pattern for array ID attributes: attribute_name = ["123", "456"]
+					pattern := fmt.Sprintf(`(?m)\b%s\s*=\s*\[([^\]]+)\]`, regexp.QuoteMeta(attributeName))
+					re := regexp.MustCompile(pattern)
+					matches = re.FindAllStringSubmatch(fileContent, -1)
+				} else {
+					// Pattern for single-value ID attributes: attribute_name = "123"
+					pattern := fmt.Sprintf(`(?m)\b%s\s*=\s*"([^"]+)"`, regexp.QuoteMeta(attributeName))
+					re := regexp.MustCompile(pattern)
+					matches = re.FindAllStringSubmatch(fileContent, -1)
+				}
 			} else {
 				// Standard pattern for other attributes: attribute_name { id = [123, 456] }
 				pattern := fmt.Sprintf(`(?ms)\b%s\s*\{[^}]*id\s*=\s*\[([^\]]+)\][^}]*\}`, regexp.QuoteMeta(attributeName))
@@ -291,6 +315,65 @@ func CollectDataSourceIDs(workingDir string, resourceMap map[string]string) ([]C
 							ID:             id,
 							UniqueName:     fmt.Sprintf("this_%s", id),
 							Name:           name, // Store the name for workload_groups
+						})
+						idTracker[uniqueKey] = true
+					}
+				} else if strings.HasSuffix(attributeName, "_id") {
+					if strings.HasSuffix(attributeName, "_ids") {
+						// For array ID attributes, match[1] is the array content
+						idsContent := match[1]
+						ids := extractIDsFromContent(idsContent)
+
+						for _, id := range ids {
+							// Skip if already processed or if it's already a resource reference
+							if strings.Contains(id, ".") {
+								continue // Already a reference
+							}
+
+							// Skip if this ID already has a corresponding resource import
+							if resourceRef, exists := resourceMap[id]; exists {
+								log.Printf("[DEBUG] Skipping %s ID %s - already has resource import: %s", attributeName, id, resourceRef)
+								continue
+							}
+
+							uniqueKey := fmt.Sprintf("%s_%s", dataSourceType, id)
+							if idTracker[uniqueKey] {
+								continue // Already collected
+							}
+
+							collectedIDs = append(collectedIDs, CollectedDataSourceID{
+								DataSourceType: dataSourceType,
+								ID:             id,
+								UniqueName:     fmt.Sprintf("this_%s", id),
+								Name:           "", // Empty for array ID attributes
+							})
+							idTracker[uniqueKey] = true
+						}
+					} else {
+						// For single-value ID attributes, match[1] is the ID value
+						id := match[1]
+
+						// Skip if already processed or if it's already a resource reference
+						if strings.Contains(id, ".") {
+							continue // Already a reference
+						}
+
+						// Skip if this ID already has a corresponding resource import
+						if resourceRef, exists := resourceMap[id]; exists {
+							log.Printf("[DEBUG] Skipping %s ID %s - already has resource import: %s", attributeName, id, resourceRef)
+							continue
+						}
+
+						uniqueKey := fmt.Sprintf("%s_%s", dataSourceType, id)
+						if idTracker[uniqueKey] {
+							continue // Already collected
+						}
+
+						collectedIDs = append(collectedIDs, CollectedDataSourceID{
+							DataSourceType: dataSourceType,
+							ID:             id,
+							UniqueName:     fmt.Sprintf("this_%s", id),
+							Name:           "", // Empty for single-value attributes
 						})
 						idTracker[uniqueKey] = true
 					}
@@ -391,17 +474,17 @@ func GenerateDataSourceFile(workingDir string, dataSourceIDs []CollectedDataSour
 		var dataSourceBlock string
 
 		if dsID.DataSourceType == "zia_workload_groups" && dsID.Name != "" {
-			// For workload_groups, include both id and name
+			// For workload_groups, include both id and name (always quote the ID)
 			dataSourceBlock = fmt.Sprintf(`data "%s" "%s" {
-  id   = %s
+  id   = "%s"
   name = "%s"
 }
 
 `, dsID.DataSourceType, dsID.UniqueName, dsID.ID, dsID.Name)
 		} else {
-			// For other data sources, only include id
+			// For other data sources, only include id (always quote the ID)
 			dataSourceBlock = fmt.Sprintf(`data "%s" "%s" {
-  id = %s
+  id = "%s"
 }
 
 `, dsID.DataSourceType, dsID.UniqueName, dsID.ID)
@@ -583,6 +666,94 @@ func ReplaceDataSourceReferences(workingDir string, dataSourceIDs []CollectedDat
 					replacement := prefix + strings.Join(processedIds, ", ") + suffix
 					processedContent = strings.Replace(processedContent, fullMatch, replacement, 1)
 					hasChanges = true
+				}
+			}
+		}
+
+		// Handle ID attributes (both single-value and array)
+		for attributeName, expectedDataSourceType := range attributeToDataSource {
+			if strings.HasSuffix(attributeName, "_id") || strings.HasSuffix(attributeName, "_ids") {
+				if strings.HasSuffix(attributeName, "_ids") {
+					// Pattern for array ID attributes: attribute_name = ["123", "456"]
+					pattern := fmt.Sprintf(`(?m)(\b%s\s*=\s*\[)([^\]]+)(\])`, regexp.QuoteMeta(attributeName))
+					re := regexp.MustCompile(pattern)
+
+					processedContent = re.ReplaceAllStringFunc(processedContent, func(match string) string {
+						submatches := re.FindStringSubmatch(match)
+						if len(submatches) < 4 {
+							return match
+						}
+
+						prefix := submatches[1]
+						idsContent := submatches[2]
+						suffix := submatches[3]
+
+						// Extract and process IDs
+						ids := extractIDsFromContent(idsContent)
+						var processedIds []string
+						needsReplacement := false
+
+						for _, id := range ids {
+							// Skip if this is already a data source reference
+							if strings.Contains(id, "data.") {
+								processedIds = append(processedIds, id)
+								continue
+							}
+
+							// Check if this ID should be replaced with a data source reference
+							if reference, exists := idToReference[id]; exists {
+								// Ensure the reference matches the expected data source type
+								if strings.Contains(reference, expectedDataSourceType) {
+									processedIds = append(processedIds, reference)
+									needsReplacement = true
+								} else {
+									// Keep original ID if data source type doesn't match
+									processedIds = append(processedIds, `"`+id+`"`)
+								}
+							} else {
+								// Keep original ID if no data source reference found
+								processedIds = append(processedIds, `"`+id+`"`)
+							}
+						}
+
+						// Only replace if we actually made changes
+						if needsReplacement {
+							hasChanges = true
+							return prefix + strings.Join(processedIds, ", ") + suffix
+						}
+
+						return match
+					})
+				} else {
+					// Pattern for single-value attributes: attribute_name = "123"
+					pattern := fmt.Sprintf(`(?m)(\b%s\s*=\s*)"([^"]+)"`, regexp.QuoteMeta(attributeName))
+					re := regexp.MustCompile(pattern)
+
+					processedContent = re.ReplaceAllStringFunc(processedContent, func(match string) string {
+						submatches := re.FindStringSubmatch(match)
+						if len(submatches) < 3 {
+							return match
+						}
+
+						prefix := submatches[1]
+						id := submatches[2]
+
+						// Skip if this is already a data source reference
+						if strings.Contains(id, "data.") {
+							return match
+						}
+
+						// Check if this ID should be replaced with a data source reference
+						if reference, exists := idToReference[id]; exists {
+							// Ensure the reference matches the expected data source type
+							if strings.Contains(reference, expectedDataSourceType) {
+								hasChanges = true
+								return prefix + reference
+							}
+						}
+
+						return match // No replacement found
+					})
 				}
 			}
 		}

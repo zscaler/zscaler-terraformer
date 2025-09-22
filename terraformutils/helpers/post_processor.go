@@ -278,6 +278,7 @@ func ProcessFileContent(content string, resourceMap map[string]string) string {
 	flatAttributePatterns := []string{
 		`segment_group_id\s*=\s*"([^"]+)"`,
 		`zpn_isolation_profile_id\s*=\s*"([^"]+)"`,
+		`banner_id\s*=\s*"([^"]+)"`,
 	}
 
 	for _, pattern := range flatAttributePatterns {
@@ -297,6 +298,8 @@ func ProcessFileContent(content string, resourceMap map[string]string) string {
 				expectedResourceType = "zpa_segment_group"
 			} else if strings.Contains(pattern, "zpn_isolation_profile_id") {
 				expectedResourceType = "zpa_cloud_browser_isolation_external_profile"
+			} else if strings.Contains(pattern, "banner_id") {
+				expectedResourceType = "zpa_cloud_browser_isolation_banner"
 			}
 
 			// Check if this ID exists in our resource map
@@ -355,6 +358,11 @@ func ProcessFileContent(content string, resourceMap map[string]string) string {
 		`services\s*\{\s*id\s*=\s*\["([^"]+)"\]\s*\}`,
 	}
 
+	// Handle array ID attributes like certificate_ids = ["id1", "id2"]
+	arrayIdAttributePatterns := []string{
+		`certificate_ids\s*=\s*\[([^\]]+)\]`,
+	}
+
 	for _, pattern := range singleIdAttributePatterns {
 		re = regexp.MustCompile(pattern)
 		processedContent = re.ReplaceAllStringFunc(processedContent, func(match string) string {
@@ -385,6 +393,78 @@ func ProcessFileContent(content string, resourceMap map[string]string) string {
 				}
 				// Convert to set format: [id1, id2, id3] (no quotes)
 				return fmt.Sprintf("services {\n    id = [%s]\n  }", strings.Join(processedIds, ", "))
+			}
+
+			return match
+		})
+	}
+
+	// Process array ID attribute patterns
+	for _, pattern := range arrayIdAttributePatterns {
+		re = regexp.MustCompile(pattern)
+		processedContent = re.ReplaceAllStringFunc(processedContent, func(match string) string {
+			submatches := re.FindStringSubmatch(match)
+			if len(submatches) < 2 {
+				return match
+			}
+
+			idsContent := submatches[1]
+
+			// Parse the IDs from the array content
+			// Handle formats like: "id1", "id2" or id1, id2
+			var idParts []string
+			if strings.Contains(idsContent, `", "`) {
+				// Format: "id1", "id2"
+				parts := strings.Split(idsContent, `", "`)
+				for i, part := range parts {
+					if i == 0 {
+						part = strings.TrimPrefix(part, `"`)
+					}
+					if i == len(parts)-1 {
+						part = strings.TrimSuffix(part, `"`)
+					}
+					part = strings.TrimSpace(part)
+					if part != "" {
+						idParts = append(idParts, part)
+					}
+				}
+			} else {
+				// Handle other formats
+				cleanContent := strings.TrimSpace(idsContent)
+				if strings.HasPrefix(cleanContent, `"`) && strings.HasSuffix(cleanContent, `"`) {
+					cleanContent = cleanContent[1 : len(cleanContent)-1]
+				}
+				parts := strings.Split(cleanContent, ",")
+				for _, part := range parts {
+					part = strings.TrimSpace(part)
+					part = strings.Trim(part, `"`)
+					if part != "" {
+						idParts = append(idParts, part)
+					}
+				}
+			}
+
+			// Process each ID for replacement
+			var processedIds []string
+			hasReplacements := false
+
+			for _, id := range idParts {
+				if strings.Contains(id, ".") {
+					// Already a resource reference
+					processedIds = append(processedIds, id)
+				} else if resourceRef, exists := resourceMap[id]; exists {
+					// Found in resource map
+					processedIds = append(processedIds, resourceRef)
+					hasReplacements = true
+				} else {
+					// Keep as quoted string
+					processedIds = append(processedIds, fmt.Sprintf(`"%s"`, id))
+				}
+			}
+
+			// Reconstruct the array if we made replacements
+			if hasReplacements {
+				return strings.Replace(match, idsContent, strings.Join(processedIds, ", "), 1)
 			}
 
 			return match

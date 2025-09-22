@@ -636,6 +636,12 @@ func WriteAttrLine(key string, value interface{}, usedInBlock bool) string {
 			return WriteAttrLine(key, interfaceItems, false)
 		}
 
+		// Special handling for empty arrays that should be written to HCL to prevent drift
+		// This applies to attributes like debug_mode in zpa_cloud_browser_isolation_external_profile
+		if key == "debug_mode" && len(value.([]interface{})) == 0 {
+			return fmt.Sprintf("%s = []\n", key)
+		}
+
 	case []map[string]interface{}:
 		var stringyInterfaces []string
 		var op string
@@ -768,6 +774,15 @@ func MapTfFieldNameToAPI(resourceType, fieldName string) string {
 			return "surrogateIP"
 		case "surrogate_ip_enforced_for_known_browsers":
 			return "surrogateIPEnforcedForKnownBrowsers"
+		}
+	}
+
+	if resourceType == "zpa_application_segment" {
+		switch fieldName {
+		case "is_incomplete_dr_config":
+			return "isIncompleteDRConfig"
+		case "use_in_dr_mode":
+			return "useInDrMode"
 		}
 	}
 
