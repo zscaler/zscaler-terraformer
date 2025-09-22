@@ -382,6 +382,8 @@ The following attributes are automatically replaced with data source references:
 | `device_groups` | `zia_device_groups` | Device group references |
 | `devices` | `zia_devices` | Device references |
 | `workload_groups` | `zia_workload_groups` | Workload group references (includes both `id` and `name`) |
+| `nw_services` | `zia_firewall_filtering_network_service` | Network service references |
+| `services` | `zia_firewall_filtering_network_service` | Network service references |
 
 ### Key Features
 
@@ -543,7 +545,7 @@ $ zscaler-terraformer import \
 
 Any resources not listed are currently not supported.
 
-Last updated July 11, 2024
+Last updated September 22, 2025
 
 Use the following command once the tool is installed to visualize the table of supported ZPA resources:
 ```shell
@@ -575,14 +577,19 @@ zscaler-terraformer --supported-resources="zpa"
 | [zpa_policy_access_rule](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_policy_access_rule) | Policy | ✅ | ✅ |
 | [zpa_policy_timeout_rule](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_policy_access_timeout_rule) | Policy | ✅ | ✅ |
 | [zpa_policy_forwarding_rule](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_policy_access_forwarding_rule) | Policy | ✅ | ✅ |
-| [zpa_policy_access_inspection_rule](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_policy_access_inspection_rule) | Policy | ✅ | ✅ |
-| [zpa_policy_redirection_rule](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_policy_access_redirection_rule) | Policy | ✅ | ✅ |
+| [zpa_policy_inspection_rule](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_policy_inspection_rule) | Policy | ✅ | ✅ |
+| [zpa_policy_isolation_rule](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_policy_isolation_rule) | Policy | ✅ | ✅ |
+| [zpa_pra_credential_pool](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_pra_credential_pool) | PRA | ✅ | ✅ |
+| [zpa_user_portal_controller](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_user_portal_controller) | Portal | ✅ | ✅ |
+| [zpa_user_portal_link](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_user_portal_link) | Portal | ✅ | ✅ |
+| [zpa_c2c_ip_ranges](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_c2c_ip_ranges) | Network | ✅ | ✅ |
+| [zpa_private_cloud_group](https://registry.terraform.io/providers/zscaler/zpa/latest/docs/resources/zpa_private_cloud_group) | Network | ✅ | ✅ |
 
 ## ZIA Supported Resources
 
 Any resources not listed are currently not supported.
 
-Last updated July 11, 2024
+Last updated September 22, 2025
 
 Use the following command once the tool is installed to visualize the table of supported ZIA resources:
 
@@ -602,6 +609,7 @@ zscaler-terraformer --supported-resources="zia"
 | [zia_firewall_filtering_network_service](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_firewall_filtering_network_service) | Cloud Firewall  | ✅ | ✅ |
 | [zia_firewall_filtering_network_service_groups](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_firewall_filtering_network_service_groups) | Cloud Firewall | ✅ | ✅ |
 | [zia_firewall_filtering_rule](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_firewall_filtering_rule) | Cloud Firewall | ✅ | ✅ |
+| [zia_nat_control_rules](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_nat_control_rules) | Cloud Firewall | ✅ | ✅ |
 | [zia_firewall_dns_rule](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_firewall_dns_rules) | Cloud Firewall | ✅ | ✅ |
 | [zia_firewall_ips_rule](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_firewall_ips_rules) | Cloud Firewall | ✅ | ✅ |
 | [zia_location_management](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_location_management) | Location | ✅ | ✅ |
@@ -630,6 +638,13 @@ zscaler-terraformer --supported-resources="zia"
 | [zia_atp_malicious_urls](https://registry.terraform.io/providers/zscaler/zia/latest/docs/data-sources/zia_atp_malicious_urls) | Threat Protection | ✅ | ✅ |
 | [zia_url_filtering_and_cloud_app_settings](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_url_filtering_and_cloud_app_settings) | URL | ✅ | ✅ |
 | [zia_end_user_notification](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_end_user_notification) | Notification | ✅ | ✅ |
+| [zia_mobile_malware_protection_policy](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_mobile_malware_protection_policy) | Malware Protection | ✅ | ✅ |
+| [zia_ftp_control_policy](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_ftp_control_policy) | File Control | ✅ | ✅ |
+| [zia_virtual_service_edge_cluster](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_virtual_service_edge_cluster) | Service Edge | ✅ | ✅ |
+| [zia_virtual_service_edge_node](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_virtual_service_edge_node) | Service Edge | ✅ | ✅ |
+| [zia_risk_profiles](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_risk_profiles) | Risk Assessment | ✅ | ✅ |
+| [zia_workload_groups](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_workload_groups) | Workload Management | ✅ | ✅ |
+| [zia_subscription_alert](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_subscription_alert) | Alerts | ✅ | ✅ |
 
 ## Testing
 
