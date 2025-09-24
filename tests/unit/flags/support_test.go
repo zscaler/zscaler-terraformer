@@ -5,12 +5,12 @@ import (
 	"testing"
 )
 
-// Note: We need to import cmd package to test the support functions
-// For now, we'll test the data structures and logic
+// Note: We need to import cmd package to test the support functions.
+// For now, we'll test the data structures and logic.
 
 func TestSupportContactsDataStructure(t *testing.T) {
-	// This test verifies the support contact data structure
-	// We'll implement this by testing the expected structure
+	// This test verifies the support contact data structure.
+	// We'll implement this by testing the expected structure.
 
 	// Test contact regions
 	expectedRegions := []string{"Americas", "EMEA", "Asia/Pacific"}

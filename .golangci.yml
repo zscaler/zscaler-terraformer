@@ -5,6 +5,8 @@ run:
   issues-exit-code: 1
   tests: true
   modules-download-mode: readonly
+  skip-dirs:
+    - vendor
 
 linters:
   enable:
