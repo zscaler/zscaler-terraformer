@@ -292,9 +292,9 @@ var originalStdout *os.File
 var progressTracker *ProgressTracker
 
 // setupLogCollection moves temp log to working directory and finalizes setup
-func setupLogCollection(workingDir string) string {
+func setupLogCollection(workingDir string) {
 	if logFile == nil {
-		return "" // Log collection not initialized
+		return // Log collection not initialized
 	}
 
 	// Create final log file name in working directory
@@ -324,25 +324,25 @@ func setupLogCollection(workingDir string) string {
 	header += "=====================================\n\n"
 
 	// Close current temp file and read its contents
-	logFile.Close()
+	_ = logFile.Close()
 	tempContent, err := os.ReadFile(logFile.Name())
 	if err != nil {
-		fmt.Fprintf(originalStdout, "⚠️  Warning: Could not read temp log file: %v\n", err)
-		return finalLogFileName
+		_, _ = fmt.Fprintf(originalStdout, "⚠️  Warning: Could not read temp log file: %v\n", err)
+		return
 	}
 
 	// Create final log file with header + existing content
 	finalLogFile, err := os.Create(finalLogFileName)
 	if err != nil {
-		fmt.Fprintf(originalStdout, "⚠️  Warning: Could not create final log file %s: %v\n", finalLogFileName, err)
-		return finalLogFileName
+		_, _ = fmt.Fprintf(originalStdout, "⚠️  Warning: Could not create final log file %s: %v\n", finalLogFileName, err)
+		return
 	}
 
-	finalLogFile.WriteString(header)
-	finalLogFile.Write(tempContent)
+	_, _ = finalLogFile.WriteString(header)
+	_, _ = finalLogFile.Write(tempContent)
 
 	// Remove temp file
-	os.Remove(logFile.Name())
+	_ = os.Remove(logFile.Name())
 
 	// Redirect to final log file
 	logFile = finalLogFile
@@ -351,20 +351,18 @@ func setupLogCollection(workingDir string) string {
 
 	// Update console with final log location (only if progress is not enabled for clean display)
 	if !progress {
-		fmt.Fprintf(originalStdout, "📄 Debug log relocated to: \033[33m%s\033[0m\n", finalLogFileName)
-		fmt.Fprintf(originalStdout, "🔍 Monitor SDK details: \033[36mtail -f %s\033[0m\n", finalLogFileName)
-		fmt.Fprintf(originalStdout, "📋 Continuing operation...\n\n")
+		_, _ = fmt.Fprintf(originalStdout, "📄 Debug log relocated to: \033[33m%s\033[0m\n", finalLogFileName)
+		_, _ = fmt.Fprintf(originalStdout, "🔍 Monitor SDK details: \033[36mtail -f %s\033[0m\n", finalLogFileName)
+		_, _ = fmt.Fprintf(originalStdout, "📋 Continuing operation...\n\n")
 	}
-
-	return finalLogFileName
 }
 
 // cleanupLogCollection restores normal output and cleans up environment variables
 func cleanupLogCollection() {
 	// Write completion message to log file
 	if logFile != nil {
-		logFile.WriteString("\n=== Log Collection Completed ===\n")
-		logFile.Close()
+		_, _ = logFile.WriteString("\n=== Log Collection Completed ===\n")
+		_ = logFile.Close()
 	}
 
 	// Restore original stdout
@@ -373,7 +371,7 @@ func cleanupLogCollection() {
 	}
 
 	// Unset SDK environment variables
-	os.Unsetenv("ZSCALER_SDK_LOG")
+	_ = os.Unsetenv("ZSCALER_SDK_LOG")
 	os.Unsetenv("ZSCALER_SDK_VERBOSE")
 
 	// Print completion message to console (only if progress is not enabled for clean display)
@@ -568,7 +566,7 @@ func validateGeneratedFiles(workingDir string) error {
 	if err != nil {
 		fmt.Printf("⚠️  Terraform CLI not found in PATH. Please install Terraform to use --validate flag\n")
 		fmt.Printf("   Download from: \033[36mhttps://terraform.io/downloads\033[0m\n")
-		return nil // Don't error out, just skip validation
+		return nil //nolint:nilerr // Skip validation when terraform not found
 	}
 
 	// Step 1: Run terraform init first
@@ -644,7 +642,7 @@ func validateGeneratedFiles(workingDir string) error {
 		fmt.Printf("│ \033[31mValidation Errors Found\033[0m                                                │\n")
 		fmt.Printf("└─────────────────────────────────────────────────────────────────────────────┘\n")
 		fmt.Printf("\n📋 \033[31mValidation output:\033[0m\n")
-		fmt.Printf("   %s\n", strings.Replace(string(validateOutput), "\n", "\n   ", -1))
+		fmt.Printf("   %s\n", strings.ReplaceAll(string(validateOutput), "\n", "\n   "))
 		fmt.Printf("\n💡 \033[33mCommon fixes:\033[0m\n")
 		fmt.Printf("   • Check for syntax errors in generated .tf files\n")
 		fmt.Printf("   • Ensure all resources have closing braces\n")

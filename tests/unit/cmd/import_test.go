@@ -266,7 +266,7 @@ func TestReferenceResolution(t *testing.T) {
 
 // Mock helper functions for testing
 
-func mockValidateImportParams(resources, exclude string) bool {
+func mockValidateImportParams(resources, _ string) bool {
 	if resources == "" {
 		return false
 	}

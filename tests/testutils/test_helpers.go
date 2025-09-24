@@ -17,7 +17,7 @@ func CreateTempTestDir(t *testing.T, prefix string) string {
 
 	// Cleanup function to remove temp directory after test
 	t.Cleanup(func() {
-		os.RemoveAll(tempDir)
+		_ = os.RemoveAll(tempDir)
 	})
 
 	return tempDir
@@ -51,14 +51,14 @@ func ReadFileContent(t *testing.T, filepath string) string {
 // SetTestEnvVar sets an environment variable for testing and ensures cleanup
 func SetTestEnvVar(t *testing.T, key, value string) {
 	originalValue := os.Getenv(key)
-	os.Setenv(key, value)
+	_ = os.Setenv(key, value)
 
 	// Cleanup function to restore original value
 	t.Cleanup(func() {
 		if originalValue == "" {
-			os.Unsetenv(key)
+			_ = os.Unsetenv(key)
 		} else {
-			os.Setenv(key, originalValue)
+			_ = os.Setenv(key, originalValue)
 		}
 	})
 }
@@ -80,7 +80,7 @@ func CaptureStdout(fn func()) (string, error) {
 
 	// Goroutine to read from pipe
 	go func() {
-		defer r.Close()
+		defer func() { _ = r.Close() }()
 		buf := make([]byte, 1024)
 		var output string
 		for {
@@ -98,7 +98,7 @@ func CaptureStdout(fn func()) (string, error) {
 
 	// Restore stdout and close writer
 	os.Stdout = originalStdout
-	w.Close()
+	_ = w.Close()
 
 	// Get captured output with timeout
 	select {

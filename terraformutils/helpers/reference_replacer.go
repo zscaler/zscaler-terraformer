@@ -113,7 +113,7 @@ func ParseOutputsFile(workingDir string) (map[string]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	resourceMap := make(map[string]string)
 	scanner := bufio.NewScanner(file)
@@ -164,7 +164,6 @@ func ParseOutputsFile(workingDir string) (map[string]string, error) {
 						resourceName = strings.Join(parts[resourceIndex:], "_")
 						// Resource ID is the last part
 						resourceID = parts[len(parts)-1]
-
 					}
 
 					if resourceType != "" && resourceID != "" && resourceName != "" {
@@ -269,12 +268,12 @@ func GenerateDatasourceFile(workingDir string, missingResources map[string]strin
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
-	file.WriteString("# Datasources for missing referenced resources\n\n")
+	_, _ = file.WriteString("# Datasources for missing referenced resources\n\n")
 
 	for resourceType, resourceID := range missingResources {
-		file.WriteString(fmt.Sprintf(`data "%s" "this" {
+		_, _ = file.WriteString(fmt.Sprintf(`data "%s" "this" {
   id = "%s"
 }
 

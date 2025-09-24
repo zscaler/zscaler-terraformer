@@ -25,7 +25,7 @@ package helpers
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -64,7 +64,7 @@ func GenerateImportSummary(workingDir string) (*ImportSummary, error) {
 		summary.FilesProcessed++
 
 		// Read the file
-		content, err := ioutil.ReadFile(tfFile)
+		content, err := os.ReadFile(tfFile)
 		if err != nil {
 			continue
 		}

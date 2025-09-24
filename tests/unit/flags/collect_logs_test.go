@@ -23,7 +23,7 @@ func TestLogFileCreation(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create log file: %v", err)
 	}
-	defer logFile.Close()
+	defer func() { _ = logFile.Close() }()
 
 	// Verify file was created
 	if !testutils.FileExists(expectedFileName) {
@@ -88,12 +88,12 @@ func TestEnvironmentVariableCleanup(t *testing.T) {
 
 	// Set variables
 	for _, key := range testVars {
-		os.Setenv(key, "true")
+		_ = os.Setenv(key, "true")
 	}
 
 	// Simulate cleanup
 	for _, key := range testVars {
-		os.Unsetenv(key)
+		_ = os.Unsetenv(key)
 	}
 
 	// Verify cleanup

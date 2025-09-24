@@ -2299,7 +2299,7 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 	}
 
 	// Write output to both stdout and file
-	fmt.Fprint(writer, formattedOutput)
+	_, _ = fmt.Fprint(writer, formattedOutput)
 
 	// Also write to file for post-processing
 	filename := fmt.Sprintf("%s/%s.tf", workingDir, resourceType)

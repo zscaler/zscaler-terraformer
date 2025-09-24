@@ -2101,7 +2101,9 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 
 }
 
-// importReferencedResources automatically imports resources that are referenced by the imported resource
+// importReferencedResources is currently unused but kept for potential future use
+//
+//nolint:unused // importReferencedResources automatically imports resources that are referenced by the imported resource
 func importReferencedResources(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourceType string, jsonStructData []interface{}, managedResourceTypes map[string]bool, includedSensitiveResources map[string]bool) {
 	// Define resource reference mappings (using API field names)
 	referenceMappings := map[string]map[string]string{
@@ -2182,8 +2184,9 @@ func importReferencedResources(ctx context.Context, cmd *cobra.Command, writer i
 	// Post-processing will be handled by the main runImport function after all resource types are processed
 }
 
-// directImportReferencedResource imports referenced resources directly without triggering automatic reference detection
 // This prevents recursive loops when importing referenced resources
+//
+//nolint:unused // directImportReferencedResource imports referenced resources directly without triggering automatic reference detection
 func directImportReferencedResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourceType string, resourceIDs []string, managedResourceTypes map[string]bool, includedSensitiveResources map[string]bool) {
 	// For now, just log that we would import these resources
 	// The actual import logic will be handled by the main importResource function

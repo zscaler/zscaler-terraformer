@@ -26,7 +26,6 @@ package helpers
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -35,14 +34,14 @@ import (
 	"time"
 )
 
-// DataSourceMapping defines a mapping between an attribute and its corresponding data source
+// DataSourceMapping defines a mapping between an attribute and its corresponding data source.
 type DataSourceMapping struct {
 	AttributeName  string // e.g., "location_groups", "time_windows"
 	DataSourceType string // e.g., "zia_location_groups", "zia_firewall_filtering_time_window"
 }
 
 // GetDataSourceMappings returns the mapping of attribute names to data source types
-// This is where you can easily add new mappings as requested by the user
+// This is where you can easily add new mappings as requested by the user.
 func GetDataSourceMappings() []DataSourceMapping {
 	return []DataSourceMapping{
 		// ZIA Data Source Mappings for common attributes
@@ -114,7 +113,7 @@ func GetDataSourceMappings() []DataSourceMapping {
 	}
 }
 
-// CollectedDataSourceID represents a data source that needs to be created
+// CollectedDataSourceID represents a data source that needs to be created.
 type CollectedDataSourceID struct {
 	DataSourceType string
 	ID             string
@@ -222,7 +221,7 @@ func CleanupEmptyDataSourceBlocks(workingDir string) error {
 		}
 
 		// Read the file
-		content, err := ioutil.ReadFile(tfFile)
+		content, err := os.ReadFile(tfFile)
 		if err != nil {
 			log.Printf("[WARNING] Failed to read file %s: %v", tfFile, err)
 			continue
@@ -251,7 +250,7 @@ func CleanupEmptyDataSourceBlocks(workingDir string) error {
 
 		// Write back the processed content if it changed
 		if processedContent != originalContent {
-			err = ioutil.WriteFile(tfFile, []byte(processedContent), 0644)
+			err = os.WriteFile(tfFile, []byte(processedContent), 0644)
 			if err != nil {
 				log.Printf("[WARNING] Failed to write file %s: %v", tfFile, err)
 				continue
@@ -293,7 +292,7 @@ func CollectDataSourceIDs(workingDir string, resourceMap map[string]string) ([]C
 		}
 
 		// Read the file
-		content, err := ioutil.ReadFile(tfFile)
+		content, err := os.ReadFile(tfFile)
 		if err != nil {
 			log.Printf("[WARNING] Failed to read file %s: %v", tfFile, err)
 			continue
@@ -504,7 +503,7 @@ func GenerateDataSourceFile(workingDir string, dataSourceIDs []CollectedDataSour
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	// Write header
 	_, err = file.WriteString("# Data sources for attribute ID references\n")
@@ -599,7 +598,7 @@ func ReplaceDataSourceReferences(workingDir string, dataSourceIDs []CollectedDat
 		}
 
 		// Read the file
-		content, err := ioutil.ReadFile(tfFile)
+		content, err := os.ReadFile(tfFile)
 		if err != nil {
 			log.Printf("[WARNING] Failed to read file %s: %v", tfFile, err)
 			continue
@@ -807,7 +806,7 @@ func ReplaceDataSourceReferences(workingDir string, dataSourceIDs []CollectedDat
 
 		// Write back the processed content if it changed
 		if hasChanges && processedContent != originalContent {
-			err = ioutil.WriteFile(tfFile, []byte(processedContent), 0644)
+			err = os.WriteFile(tfFile, []byte(processedContent), 0644)
 			if err != nil {
 				log.Printf("[WARNING] Failed to write file %s: %v", tfFile, err)
 				continue

@@ -25,8 +25,8 @@ package helpers
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -59,7 +59,7 @@ func PostProcessReferences(workingDir string) error {
 		}
 
 		// Read the file
-		content, err := ioutil.ReadFile(tfFile)
+		content, err := os.ReadFile(tfFile)
 		if err != nil {
 			log.Printf("[WARNING] Failed to read file %s: %v", tfFile, err)
 			continue
@@ -70,7 +70,7 @@ func PostProcessReferences(workingDir string) error {
 
 		// Write back the processed content
 		if processedContent != string(content) {
-			err = ioutil.WriteFile(tfFile, []byte(processedContent), 0644)
+			err = os.WriteFile(tfFile, []byte(processedContent), 0644)
 			if err != nil {
 				log.Printf("[WARNING] Failed to write file %s: %v", tfFile, err)
 				continue
