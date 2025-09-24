@@ -28,8 +28,8 @@ func TestPrefixSanitization(t *testing.T) {
 		{
 			name:        "Prefix with special characters",
 			input:       "prod-env@2024!",
-			expected:    "prod_env_2024_",
-			description: "Should replace special characters with underscores",
+			expected:    "prod_env_2024",
+			description: "Should replace special characters with underscores and trim trailing underscores",
 		},
 		{
 			name:        "Prefix starting with number",
@@ -171,7 +171,7 @@ func mockSanitizePrefix(prefix string) string {
 		return "resource"
 	}
 
-	// Convert to lowercase and replace invalid characters
+	// Convert to lowercase and replace invalid characters (matching the actual implementation)
 	sanitized := strings.ToLower(prefix)
 	sanitized = strings.ReplaceAll(sanitized, " ", "_")
 	sanitized = strings.ReplaceAll(sanitized, "-", "_")
@@ -181,11 +181,34 @@ func mockSanitizePrefix(prefix string) string {
 	sanitized = strings.ReplaceAll(sanitized, "#", "_")
 	sanitized = strings.ReplaceAll(sanitized, "$", "_")
 	sanitized = strings.ReplaceAll(sanitized, "%", "_")
+	sanitized = strings.ReplaceAll(sanitized, "^", "_")
+	sanitized = strings.ReplaceAll(sanitized, "&", "_")
+	sanitized = strings.ReplaceAll(sanitized, "*", "_")
+	sanitized = strings.ReplaceAll(sanitized, "(", "_")
+	sanitized = strings.ReplaceAll(sanitized, ")", "_")
+	sanitized = strings.ReplaceAll(sanitized, "+", "_")
+	sanitized = strings.ReplaceAll(sanitized, "=", "_")
+	sanitized = strings.ReplaceAll(sanitized, "[", "_")
+	sanitized = strings.ReplaceAll(sanitized, "]", "_")
+	sanitized = strings.ReplaceAll(sanitized, "{", "_")
+	sanitized = strings.ReplaceAll(sanitized, "}", "_")
+	sanitized = strings.ReplaceAll(sanitized, "|", "_")
+	sanitized = strings.ReplaceAll(sanitized, "\\", "_")
+	sanitized = strings.ReplaceAll(sanitized, ":", "_")
+	sanitized = strings.ReplaceAll(sanitized, ";", "_")
+	sanitized = strings.ReplaceAll(sanitized, "\"", "_")
+	sanitized = strings.ReplaceAll(sanitized, "'", "_")
+	sanitized = strings.ReplaceAll(sanitized, "<", "_")
+	sanitized = strings.ReplaceAll(sanitized, ">", "_")
+	sanitized = strings.ReplaceAll(sanitized, ",", "_")
+	sanitized = strings.ReplaceAll(sanitized, "?", "_")
+	sanitized = strings.ReplaceAll(sanitized, "/", "_")
+	sanitized = strings.ReplaceAll(sanitized, "`", "_")
 
 	// Remove multiple consecutive underscores
 	sanitized = strings.ReplaceAll(sanitized, "__", "_")
 
-	// Trim leading/trailing underscores
+	// Trim leading/trailing underscores (this is why trailing underscore is removed)
 	sanitized = strings.Trim(sanitized, "_")
 
 	// Ensure it's not empty after sanitization
