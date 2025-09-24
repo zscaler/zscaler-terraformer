@@ -34,8 +34,10 @@ import (
 )
 
 // PostProcessReferences performs reference replacement after all imports are complete.
-func PostProcessReferences(workingDir string) error {
-	log.Printf("🔄 Starting resource reference replacement...")
+func PostProcessReferences(workingDir string, showVerbose bool) error {
+	if showVerbose {
+		log.Printf("🔄 Starting resource reference replacement...")
+	}
 
 	// Parse outputs.tf to get all available resource mappings
 	resourceMap, err := ParseOutputsFile(workingDir)
@@ -78,7 +80,9 @@ func PostProcessReferences(workingDir string) error {
 		}
 	}
 
-	log.Printf("🎯 Resource reference replacement completed")
+	if showVerbose {
+		log.Printf("🎯 Resource reference replacement completed")
+	}
 	return nil
 }
 

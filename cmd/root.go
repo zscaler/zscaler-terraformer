@@ -66,7 +66,7 @@ var ziaAPIKey string   // required
 var ziaCloud string    // required
 
 var useLegacyClient bool
-var verbose, displayReleaseVersion, support, collectLogs, validateTerraform, progress bool
+var verbose, displayReleaseVersion, support, collectLogs, validateTerraform, progress, noProgress bool
 var supportedResources string
 var resourcePrefix string
 
@@ -351,7 +351,7 @@ func setupLogCollection(workingDir string) {
 	logFileName = finalLogFileName
 
 	// Update console with final log location (only if progress is not enabled for clean display)
-	if !progress {
+	if !progress || noProgress {
 		_, _ = fmt.Fprintf(originalStdout, "📄 Debug log relocated to: \033[33m%s\033[0m\n", finalLogFileName)
 		_, _ = fmt.Fprintf(originalStdout, "🔍 Monitor SDK details: \033[36mtail -f %s\033[0m\n", finalLogFileName)
 		_, _ = fmt.Fprintf(originalStdout, "📋 Continuing operation...\n\n")
@@ -405,7 +405,7 @@ func NewProgressTracker(total int) *ProgressTracker {
 
 // Update updates the progress and redraws the progress bar.
 func (pt *ProgressTracker) Update(taskName string) {
-	if !progress {
+	if !progress || noProgress {
 		return // Progress disabled
 	}
 
@@ -417,7 +417,7 @@ func (pt *ProgressTracker) Update(taskName string) {
 
 // UpdateWithOutput updates progress and handles output redirection for collect-logs.
 func (pt *ProgressTracker) UpdateWithOutput(taskName string) {
-	if !progress {
+	if !progress || noProgress {
 		return // Progress disabled
 	}
 
@@ -550,7 +550,7 @@ func (pt *ProgressTracker) redraw() {
 
 // Finish completes the progress bar.
 func (pt *ProgressTracker) Finish() {
-	if !progress {
+	if !progress || noProgress {
 		return
 	}
 
@@ -677,7 +677,7 @@ var rootCmd = &cobra.Command{
 		"all of their existing ZPA/ZIA configuration into Terraform.",
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		// Set appropriate log level based on flags
-		if progress {
+		if progress && !noProgress {
 			// When progress is enabled, suppress INFO logs for clean display
 			log.SetLevel(logrus.WarnLevel)
 		} else if verbose {
@@ -705,7 +705,7 @@ var rootCmd = &cobra.Command{
 				_ = os.Setenv("ZSCALER_SDK_VERBOSE", "true")
 
 				// Only show setup message if progress is not enabled (to keep it clean)
-				if !progress {
+				if !progress || noProgress {
 					_, _ = fmt.Fprintf(originalStdout, "📝 SDK debug logging enabled - output will be captured\n")
 					_, _ = fmt.Fprintf(originalStdout, "⏳ Setting up logging...\n\n")
 				}
@@ -916,7 +916,8 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(&support, "support", "", false, "Display Zscaler support contact information")
 	rootCmd.PersistentFlags().BoolVarP(&collectLogs, "collect-logs", "", false, "Enable SDK debug logging and save to timestamped log file")
 	rootCmd.PersistentFlags().BoolVarP(&validateTerraform, "validate", "", false, "Run terraform validate on generated HCL files")
-	rootCmd.PersistentFlags().BoolVarP(&progress, "progress", "", false, "Show colored progress bar during import/generate operations")
+	rootCmd.PersistentFlags().BoolVarP(&progress, "progress", "", true, "Show colored progress bar during import/generate operations (default: enabled)")
+	rootCmd.PersistentFlags().BoolVarP(&noProgress, "no-progress", "", false, "Disable colored progress bar and show detailed scrolling output")
 	rootCmd.PersistentFlags().StringVar(&resourcePrefix, "prefix", "", "Custom prefix for terraform resource names (default: 'resource')")
 
 	rootCmd.PersistentFlags().StringVar(&terraformInstallPath, "terraform-install-path", ".", "Path to the default Terraform installation")

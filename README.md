@@ -261,7 +261,8 @@ Enhanced Flags:
   --support       Display regional Zscaler support contact information
   --collect-logs  Enable SDK debug logging for troubleshooting
   --validate      Run terraform validation on generated files
-  --progress      Show colored progress bar during operations
+  --progress      Show colored progress bar during operations (default: enabled)
+  --no-progress   Disable progress bar and show detailed scrolling output
   --prefix        Custom prefix for terraform resource names
 
 Flags:
@@ -487,21 +488,24 @@ zscaler-terraformer --validate generate --resource-type "zpa_application_segment
 - Helpful error messages with specific fix suggestions
 - Graceful handling of missing provider configurations
 
-#### `--progress`
-Display a colored progress bar with real-time updates during import and generation operations, including ETA calculation and current task display.
+#### `--progress` (Default) / `--no-progress`
+By default, zscaler-terraformer displays a colored progress bar with real-time updates during import and generation operations. Use `--no-progress` to show detailed scrolling output instead.
 
 ```bash
-# Show progress for large imports
-zscaler-terraformer --progress import --resources "zpa"
+# Default behavior (progress bar enabled)
+zscaler-terraformer import --resources "zpa"
+# 🚀 Progress: [████████████████░░░░] 80% (24/30) | Importing zpa_server_group | ETA: 30s
 
-# Progress for single resource
-zscaler-terraformer --progress import --resources "zia_firewall_filtering_rule"
+# Disable progress bar for detailed scrolling output
+zscaler-terraformer --no-progress import --resources "zpa"
+# INFO[0001] Importing zpa_app_connector_group...
+# INFO[0002] Importing zpa_application_segment...
 
-# Combine with logging for clean experience
-zscaler-terraformer --progress --collect-logs import --resources "zpa"
+# Combine with verbose for maximum detail
+zscaler-terraformer --no-progress --verbose import --resources "zpa"
 ```
 
-**Features:**
+**Default Progress Bar Features:**
 - Real-time colored progress bar with percentage completion
 - Current task display (e.g., "Importing zpa_application_segment")
 - Intelligent ETA calculation based on processing speed

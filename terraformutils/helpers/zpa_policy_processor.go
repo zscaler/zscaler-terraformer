@@ -97,12 +97,14 @@ type ZPACollectedDataSource struct {
 }
 
 // PostProcessZPAPolicyDataSources processes ZPA policy data source references.
-func PostProcessZPAPolicyDataSources(workingDir string, resourceMap map[string]string) error {
-	log.Printf("🔄 Starting ZPA policy data source processing...")
+func PostProcessZPAPolicyDataSources(workingDir string, resourceMap map[string]string, showVerbose bool) error {
+	if showVerbose {
+		log.Printf("🔄 Starting ZPA policy data source processing...")
+	}
 
 	// Step 1: Collect ZPA policy data source IDs
 	log.Printf("[DEBUG] Collecting ZPA policy data source IDs...")
-	zpaDataSources, err := CollectZPAPolicyDataSourceIDs(workingDir, resourceMap)
+	zpaDataSources, err := CollectZPAPolicyDataSourceIDs(workingDir, resourceMap, showVerbose)
 	if err != nil {
 		return fmt.Errorf("failed to collect ZPA policy data source IDs: %w", err)
 	}
@@ -114,24 +116,26 @@ func PostProcessZPAPolicyDataSources(workingDir string, resourceMap map[string]s
 
 	// Step 2: Generate ZPA data sources in datasource.tf
 	log.Printf("[DEBUG] Generating ZPA data sources...")
-	err = AppendZPADataSources(workingDir, zpaDataSources)
+	err = AppendZPADataSources(workingDir, zpaDataSources, showVerbose)
 	if err != nil {
 		return fmt.Errorf("failed to generate ZPA data sources: %w", err)
 	}
 
 	// Step 3: Replace IDs with data source references
 	log.Printf("[DEBUG] Replacing ZPA policy data source references...")
-	err = ReplaceZPAPolicyReferences(workingDir, zpaDataSources)
+	err = ReplaceZPAPolicyReferences(workingDir, zpaDataSources, showVerbose)
 	if err != nil {
 		return fmt.Errorf("failed to replace ZPA policy references: %w", err)
 	}
 
-	log.Printf("🎯 ZPA policy data source processing completed successfully")
+	if showVerbose {
+		log.Printf("🎯 ZPA policy data source processing completed successfully")
+	}
 	return nil
 }
 
 // CollectZPAPolicyDataSourceIDs scans ZPA policy files and collects operand IDs that need data source references.
-func CollectZPAPolicyDataSourceIDs(workingDir string, resourceMap map[string]string) ([]ZPACollectedDataSource, error) {
+func CollectZPAPolicyDataSourceIDs(workingDir string, resourceMap map[string]string, showVerbose bool) ([]ZPACollectedDataSource, error) {
 	var collectedDataSources []ZPACollectedDataSource
 	idTracker := make(map[string]bool)
 
@@ -260,12 +264,14 @@ func CollectZPAPolicyDataSourceIDs(workingDir string, resourceMap map[string]str
 		}
 	}
 
-	log.Printf("📋 Collected %d unique ZPA policy data source IDs", len(collectedDataSources))
+	if showVerbose {
+		log.Printf("📋 Collected %d unique ZPA policy data source IDs", len(collectedDataSources))
+	}
 	return collectedDataSources, nil
 }
 
 // AppendZPADataSources appends ZPA data sources to the existing datasource.tf file.
-func AppendZPADataSources(workingDir string, zpaDataSources []ZPACollectedDataSource) error {
+func AppendZPADataSources(workingDir string, zpaDataSources []ZPACollectedDataSource, showVerbose bool) error {
 	if len(zpaDataSources) == 0 {
 		return nil
 	}
@@ -338,12 +344,14 @@ func AppendZPADataSources(workingDir string, zpaDataSources []ZPACollectedDataSo
 		}
 	}
 
-	log.Printf("📁 Appended %d ZPA data sources to datasource.tf", len(zpaDataSources))
+	if showVerbose {
+		log.Printf("📁 Appended %d ZPA data sources to datasource.tf", len(zpaDataSources))
+	}
 	return nil
 }
 
 // ReplaceZPAPolicyReferences replaces ZPA policy operand IDs with data source references.
-func ReplaceZPAPolicyReferences(workingDir string, zpaDataSources []ZPACollectedDataSource) error {
+func ReplaceZPAPolicyReferences(workingDir string, zpaDataSources []ZPACollectedDataSource, showVerbose bool) error {
 	// Create lookup maps for replacements
 	idToReference := make(map[string]map[string]string) // objectType -> fieldName -> reference
 
@@ -457,7 +465,9 @@ func ReplaceZPAPolicyReferences(workingDir string, zpaDataSources []ZPACollected
 				log.Printf("[WARNING] Failed to write ZPA policy file %s: %v", tfFile, err)
 				continue
 			}
-			log.Printf("🔗 Updated ZPA policy references in %s", filepath.Base(tfFile))
+			if showVerbose {
+				log.Printf("🔗 Updated ZPA policy references in %s", filepath.Base(tfFile))
+			}
 		}
 	}
 

@@ -81,18 +81,18 @@ func NewClient() (*Client, error) {
 	var svc *zscaler.Service
 
 	if cfg.useLegacyClient {
-		logrus.Infof("[INFO] Initializing legacy V2 client...")
+		logrus.Infof("[INFO] Initializing Legacy client...")
 		legacySvc, err := zscalerSDKV2Client(cfg)
 		if err != nil {
-			return nil, fmt.Errorf("failed to initialize V2 client: %w", err)
+			return nil, fmt.Errorf("failed to initialize Legacy client: %w", err)
 		}
 		// Wrap the underlying client in zscaler.Service so usage is consistent.
 		svc = zscaler.NewService(legacySvc.Client, nil)
 	} else {
-		logrus.Infof("[INFO] Initializing V3 client...")
+		logrus.Infof("[INFO] Initializing ONEAPI client...")
 		v3Client, err := zscalerSDKV3Client(cfg)
 		if err != nil {
-			return nil, fmt.Errorf("failed to initialize V3 client: %w", err)
+			return nil, fmt.Errorf("failed to initialize ONEAPI client: %w", err)
 		}
 		// Wrap the underlying client in zscaler.Service so usage is consistent.
 		svc = zscaler.NewService(v3Client, nil)
@@ -352,16 +352,16 @@ func zscalerSDKV3Client(c *Config) (*zscaler.Client, error) {
 
 	conf, err := zscaler.NewConfiguration(setters...)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create V3 configuration: %w", err)
+		return nil, fmt.Errorf("failed to create Zscaler ONEAPI configuration: %w", err)
 	}
 	conf.UserAgent = customUserAgent
 
 	// Build the client.
 	v3Client, err := zscaler.NewOneAPIClient(conf)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create Zscaler OneAPI client: %w", err)
+		return nil, fmt.Errorf("failed to create Zscaler ONEAPI client: %w", err)
 	}
 
-	log.Println("[INFO] Successfully initialized ZPA V3 client")
+	log.Println("[INFO] Successfully initialized ZPA via Zscaler ONEAPI client")
 	return v3Client.Client, nil
 }

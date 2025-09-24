@@ -123,8 +123,10 @@ type CollectedDataSourceID struct {
 
 // PostProcessDataSources performs data source replacement after all imports are complete.
 // This function is designed to work alongside the existing PostProcessReferences without interference.
-func PostProcessDataSources(workingDir string) error {
-	log.Printf("🔄 Starting data source post-processing...")
+func PostProcessDataSources(workingDir string, showVerbose bool) error {
+	if showVerbose {
+		log.Printf("🔄 Starting data source post-processing...")
+	}
 
 	// Parse outputs.tf to get all available resource mappings (same as resource processing)
 	resourceMap, err := ParseOutputsFile(workingDir)
@@ -132,12 +134,14 @@ func PostProcessDataSources(workingDir string) error {
 		log.Printf("[WARNING] Failed to parse outputs.tf: %v", err)
 		resourceMap = make(map[string]string)
 	}
-	return PostProcessDataSourcesWithResourceMap(workingDir, resourceMap)
+	return PostProcessDataSourcesWithResourceMap(workingDir, resourceMap, showVerbose)
 }
 
 // PostProcessDataSourcesWithResourceMap performs the data source post-processing operations with a provided resource map.
-func PostProcessDataSourcesWithResourceMap(workingDir string, resourceMap map[string]string) error {
-	log.Printf("🔄 Starting data source post-processing...")
+func PostProcessDataSourcesWithResourceMap(workingDir string, resourceMap map[string]string, showVerbose bool) error {
+	if showVerbose {
+		log.Printf("🔄 Starting data source post-processing...")
+	}
 
 	// Create a timeout context to prevent hanging (5 minutes timeout)
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
@@ -146,7 +150,7 @@ func PostProcessDataSourcesWithResourceMap(workingDir string, resourceMap map[st
 	// Run the processing in a goroutine with timeout protection
 	done := make(chan error, 1)
 	go func() {
-		done <- processDataSourcesWithTimeout(workingDir, resourceMap)
+		done <- processDataSourcesWithTimeout(workingDir, resourceMap, showVerbose)
 	}()
 
 	// Wait for completion or timeout
@@ -155,7 +159,9 @@ func PostProcessDataSourcesWithResourceMap(workingDir string, resourceMap map[st
 		if err != nil {
 			return err
 		}
-		log.Printf("🎯 Data source post-processing completed successfully")
+		if showVerbose {
+			log.Printf("🎯 Data source post-processing completed successfully")
+		}
 		return nil
 	case <-ctx.Done():
 		log.Printf("[ERROR] Data source post-processing timed out after 5 minutes")
@@ -164,7 +170,7 @@ func PostProcessDataSourcesWithResourceMap(workingDir string, resourceMap map[st
 }
 
 // processDataSourcesWithTimeout performs the actual data source processing.
-func processDataSourcesWithTimeout(workingDir string, resourceMap map[string]string) error {
+func processDataSourcesWithTimeout(workingDir string, resourceMap map[string]string, showVerbose bool) error {
 	// Step 1: Clean up empty data source attribute blocks first
 	log.Printf("[DEBUG] Step 1: Cleaning up empty blocks...")
 	err := CleanupEmptyDataSourceBlocks(workingDir)
@@ -174,7 +180,7 @@ func processDataSourcesWithTimeout(workingDir string, resourceMap map[string]str
 
 	// Step 2: Collect all IDs that need data source references (excluding those with resource imports)
 	log.Printf("[DEBUG] Step 2: Collecting data source IDs...")
-	dataSourceIDs, err := CollectDataSourceIDs(workingDir, resourceMap)
+	dataSourceIDs, err := CollectDataSourceIDs(workingDir, resourceMap, showVerbose)
 	if err != nil {
 		return fmt.Errorf("failed to collect data source IDs: %w", err)
 	}
@@ -186,14 +192,14 @@ func processDataSourcesWithTimeout(workingDir string, resourceMap map[string]str
 
 	// Step 3: Generate datasource.tf file
 	log.Printf("[DEBUG] Step 3: Generating datasource.tf file...")
-	err = GenerateDataSourceFile(workingDir, dataSourceIDs)
+	err = GenerateDataSourceFile(workingDir, dataSourceIDs, showVerbose)
 	if err != nil {
 		return fmt.Errorf("failed to generate datasource.tf: %w", err)
 	}
 
 	// Step 4: Replace IDs with data source references in all .tf files
 	log.Printf("[DEBUG] Step 4: Replacing data source references...")
-	err = ReplaceDataSourceReferences(workingDir, dataSourceIDs)
+	err = ReplaceDataSourceReferences(workingDir, dataSourceIDs, showVerbose)
 	if err != nil {
 		return fmt.Errorf("failed to replace data source references: %w", err)
 	}
@@ -264,7 +270,7 @@ func CleanupEmptyDataSourceBlocks(workingDir string) error {
 
 // CollectDataSourceIDs scans all .tf files and collects IDs that should be replaced with data source references.
 // It excludes IDs that already have corresponding resource imports (found in resourceMap).
-func CollectDataSourceIDs(workingDir string, resourceMap map[string]string) ([]CollectedDataSourceID, error) {
+func CollectDataSourceIDs(workingDir string, resourceMap map[string]string, showVerbose bool) ([]CollectedDataSourceID, error) {
 	var collectedIDs []CollectedDataSourceID
 	idTracker := make(map[string]bool) // To avoid duplicates
 
@@ -458,7 +464,9 @@ func CollectDataSourceIDs(workingDir string, resourceMap map[string]string) ([]C
 		}
 	}
 
-	log.Printf("📋 Collected %d unique data source IDs", len(collectedIDs))
+	if showVerbose {
+		log.Printf("📋 Collected %d unique data source IDs", len(collectedIDs))
+	}
 	return collectedIDs, nil
 }
 
@@ -493,7 +501,7 @@ func extractIDsFromContent(content string) []string {
 }
 
 // GenerateDataSourceFile creates a datasource.tf file with all required data sources.
-func GenerateDataSourceFile(workingDir string, dataSourceIDs []CollectedDataSourceID) error {
+func GenerateDataSourceFile(workingDir string, dataSourceIDs []CollectedDataSourceID, showVerbose bool) error {
 	if len(dataSourceIDs) == 0 {
 		return nil
 	}
@@ -542,12 +550,14 @@ func GenerateDataSourceFile(workingDir string, dataSourceIDs []CollectedDataSour
 		}
 	}
 
-	log.Printf("📁 Generated datasource.tf with %d data sources", len(dataSourceIDs))
+	if showVerbose {
+		log.Printf("📁 Generated datasource.tf with %d data sources", len(dataSourceIDs))
+	}
 	return nil
 }
 
 // ReplaceDataSourceReferences replaces IDs with data source references in all .tf files.
-func ReplaceDataSourceReferences(workingDir string, dataSourceIDs []CollectedDataSourceID) error {
+func ReplaceDataSourceReferences(workingDir string, dataSourceIDs []CollectedDataSourceID, showVerbose bool) error {
 	// Create a lookup map: ID -> data source reference
 	idToReference := make(map[string]string)
 	for _, dsID := range dataSourceIDs {
@@ -811,7 +821,9 @@ func ReplaceDataSourceReferences(workingDir string, dataSourceIDs []CollectedDat
 				log.Printf("[WARNING] Failed to write file %s: %v", tfFile, err)
 				continue
 			}
-			log.Printf("🔗 Updated data source references in %s", baseName)
+			if showVerbose {
+				log.Printf("🔗 Updated data source references in %s", baseName)
+			}
 		}
 	}
 

@@ -298,7 +298,7 @@ func runImport() func(cmd *cobra.Command, args []string) {
 				if progress {
 					progressTracker.UpdateWithOutput("Processing resource references")
 				}
-				err := helpers.PostProcessReferences(workingDir)
+				err := helpers.PostProcessReferences(workingDir, verbose)
 				if err != nil {
 					log.Printf("⚠️  Resource post-processing failed: %v", err)
 				}
@@ -320,7 +320,7 @@ func runImport() func(cmd *cobra.Command, args []string) {
 				if !progress {
 					log.Printf("🔄 Running data source post-processing after all imports are complete...")
 				}
-				err = helpers.PostProcessDataSourcesWithResourceMap(workingDir, resourceMap)
+				err = helpers.PostProcessDataSourcesWithResourceMap(workingDir, resourceMap, verbose)
 				if err != nil {
 					log.Printf("⚠️  Data source post-processing failed: %v", err)
 				}
@@ -329,7 +329,7 @@ func runImport() func(cmd *cobra.Command, args []string) {
 				if progress {
 					progressTracker.UpdateWithOutput("Processing ZPA policy references")
 				}
-				err = helpers.PostProcessZPAPolicyDataSources(workingDir, resourceMap)
+				err = helpers.PostProcessZPAPolicyDataSources(workingDir, resourceMap, verbose)
 				if err != nil {
 					log.Printf("⚠️  ZPA policy data source post-processing failed: %v", err)
 				}
@@ -2081,7 +2081,10 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		}
 		if resourceID != "" {
 			name := buildResourceName(resourceType, structData)
-			_, _ = fmt.Fprint(writer, buildCompositeID(resourceType, resourceID, name))
+			// Only print terraform import commands when progress bar is disabled
+			if !progress || noProgress {
+				_, _ = fmt.Fprint(writer, buildCompositeID(resourceType, resourceID, name))
+			}
 			err := tf.Import(ctx, resourceType+"."+name, resourceID)
 			if err != nil {
 				if strings.Contains(err.Error(), "Resource already managed by Terraform") {
