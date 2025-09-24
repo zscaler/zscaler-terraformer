@@ -130,6 +130,45 @@ test-clean:
 	@go clean -testcache
 	@echo "$(COLOR_OK)✅ Test artifacts and cache cleaned$(COLOR_NONE)"
 
+# Integration tests (requires API credentials)
+test-integration:
+	@echo "$(COLOR_ZSCALER)🧪 Running Integration Tests...$(COLOR_NONE)"
+	@if [ ! -f "./tests/integration/run_integration_tests.sh" ]; then \
+		echo "$(COLOR_ERROR)❌ Integration test script not found$(COLOR_NONE)"; \
+		exit 1; \
+	fi
+	@./tests/integration/run_integration_tests.sh
+
+# Integration tests with Go test directly
+test-integration-go:
+	@echo "$(COLOR_ZSCALER)🧪 Running Integration Tests with Go...$(COLOR_NONE)"
+	@go test -v ./tests/integration/... -timeout 10m
+
+# Check if integration test environment is ready
+test-integration-check:
+	@echo "$(COLOR_ZSCALER)🔍 Checking Integration Test Environment...$(COLOR_NONE)"
+	@if [ -z "$$ZSCALER_CLIENT_ID" ]; then \
+		echo "$(COLOR_ERROR)❌ ZSCALER_CLIENT_ID not set$(COLOR_NONE)"; \
+		exit 1; \
+	fi
+	@if [ -z "$$ZSCALER_CLIENT_SECRET" ]; then \
+		echo "$(COLOR_ERROR)❌ ZSCALER_CLIENT_SECRET not set$(COLOR_NONE)"; \
+		exit 1; \
+	fi
+	@if [ -z "$$ZSCALER_VANITY_DOMAIN" ]; then \
+		echo "$(COLOR_ERROR)❌ ZSCALER_VANITY_DOMAIN not set$(COLOR_NONE)"; \
+		exit 1; \
+	fi
+	@if [ -z "$$ZPA_CUSTOMER_ID" ]; then \
+		echo "$(COLOR_ERROR)❌ ZPA_CUSTOMER_ID not set$(COLOR_NONE)"; \
+		exit 1; \
+	fi
+	@if [ -z "$$ZSCALER_CLOUD" ]; then \
+		echo "$(COLOR_ERROR)❌ ZSCALER_CLOUD not set$(COLOR_NONE)"; \
+		exit 1; \
+	fi
+	@echo "$(COLOR_OK)✅ All integration test environment variables are set$(COLOR_NONE)"
+
 # Integration Tests
 test_zia:
 	@CI=true \
@@ -179,4 +218,4 @@ print-version:
 	@echo "VERSION = $(VERSION)"
 	@echo "LD_FLAGS = $(LD_FLAGS)"
 
-.PHONY: build install build_all test test-unit test-coverage test-coverage-html test-fresh test-all test-clean test_zpa test_zia vet imports fmt fmtcheck errcheck lint tools tools-update validate-tf
+.PHONY: build install build_all test test-unit test-coverage test-coverage-html test-fresh test-all test-clean test-integration test-integration-go test-integration-check test_zpa test_zia vet imports fmt fmtcheck errcheck lint tools tools-update validate-tf
