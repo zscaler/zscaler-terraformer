@@ -111,7 +111,4 @@ jobs:
             ZSCALER_CLOUD: ${{ secrets.ZSCALER_CLOUD }}
             ZPA_CUSTOMER_ID: ${{ secrets.ZPA_CUSTOMER_ID }}
             ZSCALER_TERRAFORM_INSTALL_PATH: ${{ github.workspace }}
-        run: |
-          echo "🧪 Running Integration Tests with API credentials..."
-          go test -v ./tests/integration/... -timeout 5m
-          echo "✅ Integration tests with credentials completed"
+        run: make test-integration

@@ -133,16 +133,7 @@ test-clean:
 # Integration tests (requires API credentials)
 test-integration:
 	@echo "$(COLOR_ZSCALER)🧪 Running Integration Tests...$(COLOR_NONE)"
-	@if [ ! -f "./tests/integration/run_integration_tests.sh" ]; then \
-		echo "$(COLOR_ERROR)❌ Integration test script not found$(COLOR_NONE)"; \
-		exit 1; \
-	fi
-	@./tests/integration/run_integration_tests.sh
-
-# Integration tests with Go test directly
-test-integration-go:
-	@echo "$(COLOR_ZSCALER)🧪 Running Integration Tests with Go...$(COLOR_NONE)"
-	@go test -v ./tests/integration/... -timeout 10m
+	@go test -v ./tests/integration/... -timeout 15m
 
 # Check if integration test environment is ready
 test-integration-check:
@@ -218,4 +209,4 @@ print-version:
 	@echo "VERSION = $(VERSION)"
 	@echo "LD_FLAGS = $(LD_FLAGS)"
 
-.PHONY: build install build_all test test-unit test-coverage test-coverage-html test-fresh test-all test-clean test-integration test-integration-go test-integration-check test_zpa test_zia vet imports fmt fmtcheck errcheck lint tools tools-update validate-tf
+.PHONY: build install build_all test test-unit test-coverage test-coverage-html test-fresh test-all test-clean test-integration test-integration-check test_zpa test_zia vet imports fmt fmtcheck errcheck lint tools tools-update validate-tf

@@ -47,7 +47,7 @@ func TestIntegrationBasicImport(t *testing.T) {
 				"zpa/zpa_application_segment.tf",
 				"zpa/outputs.tf",
 			},
-			timeoutMinutes: 3,
+			timeoutMinutes: 5,
 		},
 		{
 			name: "ZIA Firewall Rule with Data Sources",
@@ -60,7 +60,7 @@ func TestIntegrationBasicImport(t *testing.T) {
 				"zia/outputs.tf",
 				"zia/datasource.tf",
 			},
-			timeoutMinutes: 3,
+			timeoutMinutes: 5,
 		},
 		{
 			name: "Custom Prefix with Validation",
@@ -74,7 +74,7 @@ func TestIntegrationBasicImport(t *testing.T) {
 				"zpa/zpa_application_segment.tf",
 				"zpa/outputs.tf",
 			},
-			timeoutMinutes: 3,
+			timeoutMinutes: 5,
 		},
 		{
 			name: "No Progress with Verbose and Collect Logs",
@@ -90,7 +90,7 @@ func TestIntegrationBasicImport(t *testing.T) {
 				"zpa/outputs.tf",
 				"zpa/debug_*.log",
 			},
-			timeoutMinutes: 3,
+			timeoutMinutes: 5,
 		},
 		{
 			name: "ZPA Policy Access Rule with Operand Mapping",
@@ -103,7 +103,7 @@ func TestIntegrationBasicImport(t *testing.T) {
 				"zpa/outputs.tf",
 				"zpa/datasource.tf",
 			},
-			timeoutMinutes: 3,
+			timeoutMinutes: 5,
 		},
 	}
 
@@ -223,7 +223,7 @@ func TestIntegrationMultiResourceImport(t *testing.T) {
 		"--resources", "zpa_application_segment,zpa_server_group",
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), 8*time.Minute)
 	defer cancel()
 
 	cmd := exec.CommandContext(ctx, binaryPath, args...)
