@@ -706,8 +706,8 @@ var rootCmd = &cobra.Command{
 
 				// Only show setup message if progress is not enabled (to keep it clean)
 				if !progress {
-					fmt.Fprintf(originalStdout, "📝 SDK debug logging enabled - output will be captured\n")
-					fmt.Fprintf(originalStdout, "⏳ Setting up logging...\n\n")
+					_, _ = fmt.Fprintf(originalStdout, "📝 SDK debug logging enabled - output will be captured\n")
+					_, _ = fmt.Fprintf(originalStdout, "⏳ Setting up logging...\n\n")
 				}
 			}
 		}

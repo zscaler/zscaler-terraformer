@@ -201,7 +201,7 @@ func processDataSourcesWithTimeout(workingDir string, resourceMap map[string]str
 	return nil
 }
 
-// CleanupEmptyDataSourceBlocks removes empty data source attribute blocks from .tf files
+// CleanupEmptyDataSourceBlocks removes empty data source attribute blocks from .tf files.
 func CleanupEmptyDataSourceBlocks(workingDir string) error {
 	// Get all .tf files in the working directory
 	tfFiles, err := filepath.Glob(filepath.Join(workingDir, "*.tf"))
@@ -263,7 +263,7 @@ func CleanupEmptyDataSourceBlocks(workingDir string) error {
 }
 
 // CollectDataSourceIDs scans all .tf files and collects IDs that should be replaced with data source references
-// It excludes IDs that already have corresponding resource imports (found in resourceMap)
+// It excludes IDs that already have corresponding resource imports (found in resourceMap).
 func CollectDataSourceIDs(workingDir string, resourceMap map[string]string) ([]CollectedDataSourceID, error) {
 	var collectedIDs []CollectedDataSourceID
 	idTracker := make(map[string]bool) // To avoid duplicates
@@ -462,7 +462,7 @@ func CollectDataSourceIDs(workingDir string, resourceMap map[string]string) ([]C
 	return collectedIDs, nil
 }
 
-// extractIDsFromContent extracts individual IDs from content like "123, 456" or "123", "456"
+// extractIDsFromContent extracts individual IDs from content like "123, 456" or "123", "456".
 func extractIDsFromContent(content string) []string {
 	var ids []string
 

@@ -2380,7 +2380,7 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		helpers.GenerateOutputs(resourceType, resourceID, workingDir)
 	}
 
-	formattedOutput, err := tf.FormatString(cmd.Context(), output)
+	formattedOutput, err := tf.FormatString(ctx, output)
 	if err != nil {
 		log.Printf("failed to format output: %s", err)
 	}
