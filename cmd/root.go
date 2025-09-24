@@ -1040,24 +1040,22 @@ func initConfig() {
 }
 
 func sharedPreRun(cmd *cobra.Command, args []string) {
-	if os.Getenv("CI") != "true" {
-		if api == nil {
-			api = &Client{}
+	if api == nil {
+		api = &Client{}
+	}
+	if wantsZPA(resourceType_, resources) {
+		zpaCli, err := zpa.NewClient()
+		if err != nil {
+			log.Fatal("failed to initialize ZPA client:", err)
 		}
-		if wantsZPA(resourceType_, resources) {
-			zpaCli, err := zpa.NewClient()
-			if err != nil {
-				log.Fatal("failed to initialize ZPA client:", err)
-			}
-			api.ZPAService = zpaCli.Service
+		api.ZPAService = zpaCli.Service
+	}
+	if wantsZIA(resourceType_, resources) {
+		ziaCli, err := zia.NewClient()
+		if err != nil {
+			log.Fatal("failed to initialize ZIA client:", err)
 		}
-		if wantsZIA(resourceType_, resources) {
-			ziaCli, err := zia.NewClient()
-			if err != nil {
-				log.Fatal("failed to initialize ZIA client:", err)
-			}
-			api.ZIAService = ziaCli.Service
-		}
+		api.ZIAService = ziaCli.Service
 	}
 }
 

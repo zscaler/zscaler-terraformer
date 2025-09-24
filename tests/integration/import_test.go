@@ -117,7 +117,7 @@ func TestIntegrationBasicImport(t *testing.T) {
 			// Change to test directory
 			originalDir, err := os.Getwd()
 			require.NoError(t, err)
-			defer os.Chdir(originalDir)
+			defer func() { _ = os.Chdir(originalDir) }()
 
 			err = os.Chdir(testSubDir)
 			require.NoError(t, err)
@@ -209,7 +209,7 @@ func TestIntegrationMultiResourceImport(t *testing.T) {
 
 	testDir := t.TempDir()
 	originalDir, _ := os.Getwd()
-	defer os.Chdir(originalDir)
+	defer func() { _ = os.Chdir(originalDir) }()
 
 	err := os.Chdir(testDir)
 	require.NoError(t, err)
@@ -311,9 +311,9 @@ func findProjectRoot(t *testing.T) string {
 	}
 }
 
-func cleanupBinary(t *testing.T, binaryPath string) {
+func cleanupBinary(_ *testing.T, binaryPath string) {
 	if binaryPath != "" && !strings.HasSuffix(binaryPath, "/zscaler-terraformer") {
-		os.Remove(binaryPath)
+		_ = os.Remove(binaryPath)
 	}
 }
 
