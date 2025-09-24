@@ -40,7 +40,7 @@ type ImportSummary struct {
 	FilesProcessed       int
 }
 
-// GenerateImportSummary analyzes the imported resources and generates a comprehensive summary
+// GenerateImportSummary analyzes the imported resources and generates a comprehensive summary.
 func GenerateImportSummary(workingDir string) (*ImportSummary, error) {
 	summary := &ImportSummary{
 		ResourcesByType: make(map[string]int),
@@ -97,7 +97,7 @@ func GenerateImportSummary(workingDir string) (*ImportSummary, error) {
 	return summary, nil
 }
 
-// PrintImportSummary displays a beautiful summary report with emojis
+// PrintImportSummary displays a beautiful summary report with emojis.
 func PrintImportSummary(workingDir string) {
 	fmt.Println("\n" + strings.Repeat("=", 70))
 	fmt.Println("🎉 ZSCALER TERRAFORMER IMPORT SUMMARY")

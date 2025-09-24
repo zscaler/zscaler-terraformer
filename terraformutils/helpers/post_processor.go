@@ -33,7 +33,7 @@ import (
 	"strings"
 )
 
-// PostProcessReferences performs reference replacement after all imports are complete
+// PostProcessReferences performs reference replacement after all imports are complete.
 func PostProcessReferences(workingDir string) error {
 	log.Printf("🔄 Starting resource reference replacement...")
 
