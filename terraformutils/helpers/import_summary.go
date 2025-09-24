@@ -31,7 +31,7 @@ import (
 	"strings"
 )
 
-// ImportSummary contains statistics about the import process
+// ImportSummary contains statistics about the import process.
 type ImportSummary struct {
 	TotalResources       int
 	ResourcesByType      map[string]int

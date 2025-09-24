@@ -2187,7 +2187,7 @@ func importReferencedResources(ctx context.Context, cmd *cobra.Command, writer i
 // This prevents recursive loops when importing referenced resources
 //
 //nolint:unused // directImportReferencedResource imports referenced resources directly without triggering automatic reference detection
-func directImportReferencedResource(_ context.Context, _ *cobra.Command, writer io.Writer, resourceType string, resourceIDs []string, managedResourceTypes map[string]bool, includedSensitiveResources map[string]bool) {
+func directImportReferencedResource(_ context.Context, _ *cobra.Command, _ io.Writer, resourceType string, resourceIDs []string, managedResourceTypes map[string]bool, includedSensitiveResources map[string]bool) {
 	// For now, just log that we would import these resources
 	// The actual import logic will be handled by the main importResource function
 	// This prevents the recursive loop while still allowing the referenced resources to be imported

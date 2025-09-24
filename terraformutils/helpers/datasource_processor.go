@@ -492,7 +492,7 @@ func extractIDsFromContent(content string) []string {
 	return ids
 }
 
-// GenerateDataSourceFile creates a datasource.tf file with all required data sources
+// GenerateDataSourceFile creates a datasource.tf file with all required data sources.
 func GenerateDataSourceFile(workingDir string, dataSourceIDs []CollectedDataSourceID) error {
 	if len(dataSourceIDs) == 0 {
 		return nil
@@ -546,7 +546,7 @@ func GenerateDataSourceFile(workingDir string, dataSourceIDs []CollectedDataSour
 	return nil
 }
 
-// ReplaceDataSourceReferences replaces IDs with data source references in all .tf files
+// ReplaceDataSourceReferences replaces IDs with data source references in all .tf files.
 func ReplaceDataSourceReferences(workingDir string, dataSourceIDs []CollectedDataSourceID) error {
 	// Create a lookup map: ID -> data source reference
 	idToReference := make(map[string]string)
