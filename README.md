@@ -426,6 +426,17 @@ The following attributes are automatically replaced with data source references:
 3. **🎯 Terraform Best Practices**: Uses proper data source referencing patterns
 4. **⚡ Automatic**: No manual configuration or setup required
 
+### Important Notes
+
+⚠️ **Unmapped Attributes**: Some attributes may not be automatically mapped to their corresponding data source or resource references. This typically occurs when:
+
+- **Resource doesn't exist**: The corresponding terraform resource is not yet available in the provider
+- **Data source doesn't exist**: The corresponding terraform data source is not yet available in the provider  
+- **API not available**: The underlying API for the resource/data source is not yet implemented
+- **Mapping not defined**: The attribute mapping has not been added to the tool's configuration
+
+In these cases, the original hard-coded IDs will remain in the generated HCL files. Users can manually replace these with appropriate references once the corresponding resources or data sources become available in the terraform providers.
+
 ## Command Line Flags
 
 The Zscaler Terraformer provides several flags to enhance the import and generation experience:
