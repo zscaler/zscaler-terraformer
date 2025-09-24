@@ -68,6 +68,7 @@ var ziaCloud string    // required
 var useLegacyClient bool
 var verbose, displayReleaseVersion, support, collectLogs, validateTerraform, progress bool
 var supportedResources string
+var resourcePrefix string
 
 var resourceType_, resources, excludedResources string
 
@@ -372,7 +373,7 @@ func cleanupLogCollection() {
 
 	// Unset SDK environment variables
 	_ = os.Unsetenv("ZSCALER_SDK_LOG")
-	os.Unsetenv("ZSCALER_SDK_VERBOSE")
+	_ = os.Unsetenv("ZSCALER_SDK_VERBOSE")
 
 	// Print completion message to console (only if progress is not enabled for clean display)
 	if logFileName != "" && !progress {
@@ -478,14 +479,14 @@ func (pt *ProgressTracker) redrawToOutput(output *os.File) {
 	}
 
 	// Print progress line to specific output
-	fmt.Fprintf(output, "\r🚀 Progress: [%s] \033[1m%3.0f%%\033[0m (\033[33m%d/%d\033[0m) | \033[36m%-30s\033[0m | %s",
+	_, _ = fmt.Fprintf(output, "\r🚀 Progress: [%s] \033[1m%3.0f%%\033[0m (\033[33m%d/%d\033[0m) | \033[36m%-30s\033[0m | %s",
 		bar, percentage, pt.current, pt.total, taskDisplay, etaStr)
 
 	// If completed, add newline
 	if pt.current >= pt.total {
-		fmt.Fprintf(output, "\n")
+		_, _ = fmt.Fprintf(output, "\n")
 		elapsed := time.Since(pt.startTime)
-		fmt.Fprintf(output, "✅ \033[32mCompleted!\033[0m Total time: \033[33m%v\033[0m\n\n", elapsed.Round(time.Second))
+		_, _ = fmt.Fprintf(output, "✅ \033[32mCompleted!\033[0m Total time: \033[33m%v\033[0m\n\n", elapsed.Round(time.Second))
 	}
 }
 
@@ -700,8 +701,8 @@ var rootCmd = &cobra.Command{
 				logFile = file
 
 				// Set SDK environment variables
-				os.Setenv("ZSCALER_SDK_LOG", "true")
-				os.Setenv("ZSCALER_SDK_VERBOSE", "true")
+				_ = os.Setenv("ZSCALER_SDK_LOG", "true")
+				_ = os.Setenv("ZSCALER_SDK_VERBOSE", "true")
 
 				// Only show setup message if progress is not enabled (to keep it clean)
 				if !progress {
@@ -916,6 +917,7 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(&collectLogs, "collect-logs", "", false, "Enable SDK debug logging and save to timestamped log file")
 	rootCmd.PersistentFlags().BoolVarP(&validateTerraform, "validate", "", false, "Run terraform validate on generated HCL files")
 	rootCmd.PersistentFlags().BoolVarP(&progress, "progress", "", false, "Show colored progress bar during import/generate operations")
+	rootCmd.PersistentFlags().StringVar(&resourcePrefix, "prefix", "", "Custom prefix for terraform resource names (default: 'resource')")
 
 	rootCmd.PersistentFlags().StringVar(&terraformInstallPath, "terraform-install-path", ".", "Path to the default Terraform installation")
 	if err := viper.BindPFlag("terraform-install-path", rootCmd.PersistentFlags().Lookup("terraform-install-path")); err != nil {

@@ -273,11 +273,11 @@ func GenerateDatasourceFile(workingDir string, missingResources map[string]strin
 	_, _ = file.WriteString("# Datasources for missing referenced resources\n\n")
 
 	for resourceType, resourceID := range missingResources {
-		_, _ = file.WriteString(fmt.Sprintf(`data "%s" "this" {
+		_, _ = fmt.Fprintf(file, `data "%s" "this" {
   id = "%s"
 }
 
-`, resourceType, resourceID))
+`, resourceType, resourceID)
 	}
 
 	log.Printf("[DEBUG] Generated datasource.tf with %d missing resources", len(missingResources))

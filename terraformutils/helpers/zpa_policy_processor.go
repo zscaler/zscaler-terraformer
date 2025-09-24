@@ -25,7 +25,6 @@ package helpers
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -158,7 +157,7 @@ func CollectZPAPolicyDataSourceIDs(workingDir string, resourceMap map[string]str
 		}
 
 		// Read the file
-		content, err := ioutil.ReadFile(tfFile)
+		content, err := os.ReadFile(tfFile)
 		if err != nil {
 			log.Printf("[WARNING] Failed to read file %s: %v", tfFile, err)
 			continue
@@ -278,7 +277,7 @@ func AppendZPADataSources(workingDir string, zpaDataSources []ZPACollectedDataSo
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	// Add header if this is the first ZPA data source
 	_, err = file.WriteString("\n# ZPA Policy Data Sources\n")
@@ -395,7 +394,7 @@ func ReplaceZPAPolicyReferences(workingDir string, zpaDataSources []ZPACollected
 		}
 
 		// Read the file
-		content, err := ioutil.ReadFile(tfFile)
+		content, err := os.ReadFile(tfFile)
 		if err != nil {
 			log.Printf("[WARNING] Failed to read ZPA policy file %s: %v", tfFile, err)
 			continue
@@ -453,7 +452,7 @@ func ReplaceZPAPolicyReferences(workingDir string, zpaDataSources []ZPACollected
 
 		// Write back the processed content if it changed
 		if hasChanges && processedContent != originalContent {
-			err = ioutil.WriteFile(tfFile, []byte(processedContent), 0644)
+			err = os.WriteFile(tfFile, []byte(processedContent), 0644)
 			if err != nil {
 				log.Printf("[WARNING] Failed to write ZPA policy file %s: %v", tfFile, err)
 				continue

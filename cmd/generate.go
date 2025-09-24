@@ -330,34 +330,62 @@ func buildResourceName(resourceType string, structData map[string]interface{}) s
 		shortUUID = uuid.New().String()[:8]
 	}
 
-	// Construct the resource ID using only the short UUID for specific resources, or use the existing logic for others.
+	// Construct the resource ID based on whether custom prefix is provided
 	var resID string
-	if shortUUID != "" {
-		resID = fmt.Sprintf("resource_%s", shortUUID)
-	} else if structData["id"] != nil {
-		var resourceID string
-		switch structData["id"].(type) {
-		case float64:
-			resourceID = fmt.Sprintf("%d", int64(structData["id"].(float64)))
-		default:
-			resourceID = structData["id"].(string)
+
+	if resourcePrefix != "" {
+		// Custom prefix mode: prefix_ID (much shorter, cleaner names)
+		sanitizedPrefix := sanitizePrefix(resourcePrefix)
+
+		if shortUUID != "" {
+			resID = fmt.Sprintf("%s_%s", sanitizedPrefix, shortUUID)
+		} else if structData["id"] != nil {
+			var resourceID string
+			switch structData["id"].(type) {
+			case float64:
+				resourceID = fmt.Sprintf("%d", int64(structData["id"].(float64)))
+			default:
+				resourceID = structData["id"].(string)
+			}
+			resID = fmt.Sprintf("%s_%s", sanitizedPrefix, resourceID)
+		} else if structData["name"] != nil {
+			name := structData["name"].(string)
+			if name != "" {
+				id := strings.ReplaceAll(strings.ToLower(helpers.Strip(name)), " ", "_")
+				resID = fmt.Sprintf("%s_%s", sanitizedPrefix, id)
+			}
 		}
 
-		// If we didn't set resID for the special case, use the default logic
 		if resID == "" {
-			resID = fmt.Sprintf("resource_%s_%s", resourceType, resourceID)
+			resID = fmt.Sprintf("%s_%s", sanitizedPrefix, shortUUID)
 		}
-	} else if structData["name"] != nil {
-		name := structData["name"].(string)
-		if name != "" {
-			id := strings.ReplaceAll(strings.ToLower(helpers.Strip(name)), " ", "_")
-			resID = fmt.Sprintf("resource_%s_%s", resourceType, id)
-		}
-	}
+	} else {
+		// Default mode: current approach (resourceType_ID)
+		if shortUUID != "" {
+			resID = fmt.Sprintf("%s_%s", resourceType, shortUUID)
+		} else if structData["id"] != nil {
+			var resourceID string
+			switch structData["id"].(type) {
+			case float64:
+				resourceID = fmt.Sprintf("%d", int64(structData["id"].(float64)))
+			default:
+				resourceID = structData["id"].(string)
+			}
 
-	if resID == "" {
-		// Fallback to using the short UUID if no other identifier is available.
-		resID = fmt.Sprintf("resource_%s", shortUUID)
+			// Use the current approach: resourceType_ID
+			resID = fmt.Sprintf("%s_%s", resourceType, resourceID)
+		} else if structData["name"] != nil {
+			name := structData["name"].(string)
+			if name != "" {
+				id := strings.ReplaceAll(strings.ToLower(helpers.Strip(name)), " ", "_")
+				resID = fmt.Sprintf("%s_%s", resourceType, id)
+			}
+		}
+
+		if resID == "" {
+			// Fallback to using the short UUID if no other identifier is available.
+			resID = fmt.Sprintf("%s_%s", resourceType, shortUUID)
+		}
 	}
 
 	resID = strings.ReplaceAll(resID, `"`, "")
@@ -366,6 +394,65 @@ func buildResourceName(resourceType string, structData map[string]interface{}) s
 	resID = strings.ReplaceAll(resID, "__", "_")
 
 	return resID
+}
+
+// sanitizePrefix ensures the custom prefix follows terraform naming conventions
+func sanitizePrefix(prefix string) string {
+	if prefix == "" {
+		return "resource"
+	}
+
+	// Convert to lowercase and replace invalid characters
+	sanitized := strings.ToLower(prefix)
+	sanitized = strings.ReplaceAll(sanitized, " ", "_")
+	sanitized = strings.ReplaceAll(sanitized, "-", "_")
+	sanitized = strings.ReplaceAll(sanitized, ".", "_")
+	sanitized = strings.ReplaceAll(sanitized, "@", "_")
+	sanitized = strings.ReplaceAll(sanitized, "!", "_")
+	sanitized = strings.ReplaceAll(sanitized, "#", "_")
+	sanitized = strings.ReplaceAll(sanitized, "$", "_")
+	sanitized = strings.ReplaceAll(sanitized, "%", "_")
+	sanitized = strings.ReplaceAll(sanitized, "^", "_")
+	sanitized = strings.ReplaceAll(sanitized, "&", "_")
+	sanitized = strings.ReplaceAll(sanitized, "*", "_")
+	sanitized = strings.ReplaceAll(sanitized, "(", "_")
+	sanitized = strings.ReplaceAll(sanitized, ")", "_")
+	sanitized = strings.ReplaceAll(sanitized, "+", "_")
+	sanitized = strings.ReplaceAll(sanitized, "=", "_")
+	sanitized = strings.ReplaceAll(sanitized, "[", "_")
+	sanitized = strings.ReplaceAll(sanitized, "]", "_")
+	sanitized = strings.ReplaceAll(sanitized, "{", "_")
+	sanitized = strings.ReplaceAll(sanitized, "}", "_")
+	sanitized = strings.ReplaceAll(sanitized, "|", "_")
+	sanitized = strings.ReplaceAll(sanitized, "\\", "_")
+	sanitized = strings.ReplaceAll(sanitized, ":", "_")
+	sanitized = strings.ReplaceAll(sanitized, ";", "_")
+	sanitized = strings.ReplaceAll(sanitized, "\"", "_")
+	sanitized = strings.ReplaceAll(sanitized, "'", "_")
+	sanitized = strings.ReplaceAll(sanitized, "<", "_")
+	sanitized = strings.ReplaceAll(sanitized, ">", "_")
+	sanitized = strings.ReplaceAll(sanitized, ",", "_")
+	sanitized = strings.ReplaceAll(sanitized, "?", "_")
+	sanitized = strings.ReplaceAll(sanitized, "/", "_")
+	sanitized = strings.ReplaceAll(sanitized, "`", "_")
+
+	// Remove multiple consecutive underscores
+	sanitized = strings.ReplaceAll(sanitized, "__", "_")
+
+	// Trim leading/trailing underscores
+	sanitized = strings.Trim(sanitized, "_")
+
+	// Ensure it's not empty after sanitization
+	if sanitized == "" {
+		return "resource"
+	}
+
+	// Ensure it doesn't start with a number (terraform requirement)
+	if len(sanitized) > 0 && sanitized[0] >= '0' && sanitized[0] <= '9' {
+		sanitized = "prefix_" + sanitized
+	}
+
+	return sanitized
 }
 
 func initTf(resourceType string) (tf *tfexec.Terraform, r *tfjson.Schema, workingDir string) {
@@ -2293,7 +2380,7 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		helpers.GenerateOutputs(resourceType, resourceID, workingDir)
 	}
 
-	formattedOutput, err := tf.FormatString(context.Background(), output)
+	formattedOutput, err := tf.FormatString(cmd.Context(), output)
 	if err != nil {
 		log.Printf("failed to format output: %s", err)
 	}
@@ -2311,7 +2398,7 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		if err != nil {
 			log.Printf("[WARNING] Failed to write to file %s: %v", filename, err)
 		}
-		file.Close()
+		func() { _ = file.Close() }()
 	}
 
 	// Note: Post-processing is now handled centrally after all imports are complete

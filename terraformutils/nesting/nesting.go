@@ -505,7 +505,7 @@ func WriteNestedBlock(resourceType string, attributes []string, schemaBlock *tfj
 		}
 
 		skipIDAttribute := attrName == "id" &&
-			!(resourceType == "zia_dlp_web_rules" && (isReceiverBlock(attrStruct) || isTenantBlock(attrStruct))) &&
+			(resourceType != "zia_dlp_web_rules" || (!isReceiverBlock(attrStruct) && !isTenantBlock(attrStruct))) &&
 			!isWorkloadGroupsBlock(attrStruct)
 
 		if skipIDAttribute || attrName == "appId" || attrName == "portal" || attrName == "hidden" || attrName == "certificate_name" || (resourceType == "zia_url_categories" && attrName == "val") {

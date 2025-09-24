@@ -262,6 +262,7 @@ Enhanced Flags:
   --collect-logs  Enable SDK debug logging for troubleshooting
   --validate      Run terraform validation on generated files
   --progress      Show colored progress bar during operations
+  --prefix        Custom prefix for terraform resource names
 
 Flags:
       --client_id string                    OneAPI client_id (required in V3 mode)
@@ -507,6 +508,31 @@ zscaler-terraformer --progress --collect-logs import --resources "zpa"
 - Post-processing step tracking (reference resolution, data source creation)
 - Clean visual experience with suppressed verbose logging
 
+#### `--prefix`
+Customize terraform resource names by replacing the long resource type with a short custom prefix. By default, resources use the full type name (e.g., `zpa_pra_credential_controller_14669`). This flag allows you to use shorter, custom names for cleaner terraform code.
+
+```bash
+# Use custom prefix for much shorter resource names
+zscaler-terraformer --prefix "sgio" import --resources "zpa_pra_credential_controller"
+# → terraform import zpa_pra_credential_controller.sgio_14669 14669
+# → terraform import zpa_pra_credential_controller.sgio_14671 14671
+
+# Environment-specific prefixes
+zscaler-terraformer --prefix "prod" import --resources "zpa_application_segment"
+# → terraform import zpa_application_segment.prod_216196257331383019 216196257331383019
+
+# Without prefix (current default behavior)
+zscaler-terraformer import --resources "zpa_pra_credential_controller"  
+# → terraform import zpa_pra_credential_controller.zpa_pra_credential_controller_14669 14669
+```
+
+**Features:**
+- Significantly shorter terraform resource names for better readability
+- Eliminates long resource type repetition in names
+- Automatic prefix sanitization for terraform compatibility
+- Backward compatibility (uses current naming when prefix not specified)
+- Works with all import and generate operations
+
 ### Flag Combinations
 
 The flags can be combined for enhanced functionality:
@@ -518,8 +544,14 @@ zscaler-terraformer --progress --collect-logs --validate import --resources "zpa
 # Support-ready import with full logging
 zscaler-terraformer --collect-logs --progress import --resources "zia"
 
+# Custom prefix with progress and validation
+zscaler-terraformer --prefix "prod" --progress --validate import --resources "zpa"
+
 # Quick validation check
 zscaler-terraformer --validate generate --resource-type "zpa_server_group"
+
+# Enterprise naming with logging
+zscaler-terraformer --prefix "security_team" --collect-logs import --resources "zia"
 ```
 
 ### Troubleshooting and Support Workflows

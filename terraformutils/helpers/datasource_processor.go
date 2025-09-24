@@ -122,7 +122,7 @@ type CollectedDataSourceID struct {
 }
 
 // PostProcessDataSources performs data source replacement after all imports are complete
-// This function is designed to work alongside the existing PostProcessReferences without interference
+// This function is designed to work alongside the existing PostProcessReferences without interference.
 func PostProcessDataSources(workingDir string) error {
 	log.Printf("🔄 Starting data source post-processing...")
 
@@ -135,7 +135,7 @@ func PostProcessDataSources(workingDir string) error {
 	return PostProcessDataSourcesWithResourceMap(workingDir, resourceMap)
 }
 
-// PostProcessDataSourcesWithResourceMap performs the data source post-processing operations with a provided resource map
+// PostProcessDataSourcesWithResourceMap performs the data source post-processing operations with a provided resource map.
 func PostProcessDataSourcesWithResourceMap(workingDir string, resourceMap map[string]string) error {
 	log.Printf("🔄 Starting data source post-processing...")
 
@@ -163,7 +163,7 @@ func PostProcessDataSourcesWithResourceMap(workingDir string, resourceMap map[st
 	}
 }
 
-// processDataSourcesWithTimeout performs the actual data source processing
+// processDataSourcesWithTimeout performs the actual data source processing.
 func processDataSourcesWithTimeout(workingDir string, resourceMap map[string]string) error {
 	// Step 1: Clean up empty data source attribute blocks first
 	log.Printf("[DEBUG] Step 1: Cleaning up empty blocks...")

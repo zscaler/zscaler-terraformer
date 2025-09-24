@@ -388,9 +388,7 @@ func ProcessFileContent(content string, resourceMap map[string]string) string {
 			// Convert all IDs to a set format (no quotes)
 			if len(idParts) > 0 {
 				var processedIds []string
-				for _, id := range idParts {
-					processedIds = append(processedIds, id)
-				}
+				processedIds = append(processedIds, idParts...)
 				// Convert to set format: [id1, id2, id3] (no quotes)
 				return fmt.Sprintf("services {\n    id = [%s]\n  }", strings.Join(processedIds, ", "))
 			}

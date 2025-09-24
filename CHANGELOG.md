@@ -36,6 +36,7 @@
 - [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **feat**: Added `--collect-logs` flag for automatic SDK debug logging with silent console operation
 - [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **feat**: Added `--validate` flag for automatic terraform validation with enhanced error handling
 - [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **feat**: Added `--progress` flag for colored progress bar display during import/generate operations
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **feat**: Added `--prefix` flag for shorter terraform resource names (e.g., `sgio_14669` vs `zpa_pra_credential_controller_14669`)
 
 ## 2.0.19 (September, 11 2025)
 
