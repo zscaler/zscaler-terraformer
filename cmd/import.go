@@ -831,6 +831,7 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		}
 		// EXACTLY like the TF pattern:
 		service := api.ZPAService
+
 		list, _, err := segmentgroup.GetAll(ctx, service)
 		if err != nil {
 			log.Fatal(err)
