@@ -498,11 +498,14 @@ zscaler-terraformer import --resources "zpa"
 
 # Disable progress bar for detailed scrolling output
 zscaler-terraformer --no-progress import --resources "zpa"
-# INFO[0001] Importing zpa_app_connector_group...
-# INFO[0002] Importing zpa_application_segment...
+# terraform import zpa_policy_access_rule.zpa_policy_access_rule_123 123
+# terraform import zpa_application_segment.zpa_application_segment_456 456
 
 # Combine with verbose for maximum detail
 zscaler-terraformer --no-progress --verbose import --resources "zpa"
+# terraform import zpa_app_connector_group.zpa_app_connector_group_789 789
+# INFO[0001] 🔄 Starting resource reference replacement...
+# INFO[0002] 📋 Collected 17 unique data source IDs...
 ```
 
 **Default Progress Bar Features:**
