@@ -131,9 +131,25 @@ test-clean:
 	@echo "$(COLOR_OK)✅ Test artifacts and cache cleaned$(COLOR_NONE)"
 
 # Integration tests (requires API credentials)
-test-integration:
+test-integration: test-integration-check
 	@echo "$(COLOR_ZSCALER)🧪 Running Integration Tests...$(COLOR_NONE)"
-	@go test -v ./tests/integration/... -timeout 15m
+	@echo "$(COLOR_BLUE)Building terraformer binary...$(COLOR_NONE)"
+	@go build -o zscaler-terraformer .
+	@echo "$(COLOR_BLUE)Testing ZPA Application Segment import...$(COLOR_NONE)"
+	@mkdir -p /tmp/terraformer-test && cd /tmp/terraformer-test && \
+		$(PWD)/zscaler-terraformer import --resources zpa_application_segment --no-progress && \
+		echo "$(COLOR_OK)✅ ZPA test passed$(COLOR_NONE)" || \
+		echo "$(COLOR_ERROR)❌ ZPA test failed$(COLOR_NONE)"
+	@echo "$(COLOR_BLUE)Testing ZIA Firewall Rule import...$(COLOR_NONE)"
+	@mkdir -p /tmp/terraformer-test-zia && cd /tmp/terraformer-test-zia && \
+		$(PWD)/zscaler-terraformer import --resources zia_firewall_filtering_rule --no-progress && \
+		echo "$(COLOR_OK)✅ ZIA test passed$(COLOR_NONE)" || \
+		echo "$(COLOR_ERROR)❌ ZIA test failed$(COLOR_NONE)"
+	@echo "$(COLOR_BLUE)Running Go integration tests...$(COLOR_NONE)"
+	@go test -v ./tests/integration/... -timeout 5m
+	@rm -f zscaler-terraformer
+	@rm -rf /tmp/terraformer-test /tmp/terraformer-test-zia
+	@echo "$(COLOR_OK)✅ All integration tests completed$(COLOR_NONE)"
 
 # Check if integration test environment is ready
 test-integration-check:

@@ -29,7 +29,6 @@ import (
 	"io"
 	"os"
 	"strings"
-	"time"
 
 	"strconv"
 
@@ -277,10 +276,7 @@ func runImport() func(cmd *cobra.Command, args []string) {
 				if progress {
 					progressTracker.UpdateWithOutput(fmt.Sprintf("Importing %s", resourceTyp))
 				}
-				// Create a timeout context for API calls (5 minutes per resource type)
-				ctx, cancel := context.WithTimeout(cmd.Context(), 5*time.Minute)
-				importResource(ctx, cmd, cmd.OutOrStdout(), resourceTyp, managedResourceTypes, includedSensitiveResources)
-				cancel()
+				importResource(cmd.Context(), cmd, cmd.OutOrStdout(), resourceTyp, managedResourceTypes, includedSensitiveResources)
 			}
 
 			// Post-process reference replacement after all imports are complete
@@ -389,10 +385,7 @@ func runImport() func(cmd *cobra.Command, args []string) {
 			progressTracker.UpdateWithOutput(fmt.Sprintf("Importing %s", resourceType_))
 		}
 
-		// Create a timeout context for API calls (5 minutes per resource type)
-		ctx, cancel := context.WithTimeout(cmd.Context(), 5*time.Minute)
-		importResource(ctx, cmd, cmd.OutOrStdout(), resourceType_, managedResourceTypes, includedSensitiveResources)
-		cancel()
+		importResource(cmd.Context(), cmd, cmd.OutOrStdout(), resourceType_, managedResourceTypes, includedSensitiveResources)
 
 		// Finish progress tracking for single resource
 		if progress {
@@ -422,14 +415,6 @@ func runImport() func(cmd *cobra.Command, args []string) {
 }
 
 func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourceType string, managedResourceTypes map[string]bool, includedSensitiveResources map[string]bool) {
-	// Check if context is already cancelled/timed out
-	select {
-	case <-ctx.Done():
-		log.Printf("⚠️  Import cancelled for %s: %v", resourceType, ctx.Err())
-		return
-	default:
-	}
-
 	var jsonStructData []interface{}
 	resourceCount := 0
 	switch resourceType {
