@@ -6,10 +6,6 @@ run:
   tests: true
   modules-download-mode: readonly
 
-issues:
-  exclude-dirs:
-    - vendor
-
 linters:
   enable:
     - contextcheck
