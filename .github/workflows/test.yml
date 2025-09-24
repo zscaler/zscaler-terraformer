@@ -89,7 +89,21 @@ jobs:
       - name: terraform init
         run: terraform init
 
-      - name: Run go test
+      - name: Run All Tests
+        run: |
+          echo "🧪 Running All Tests..."
+          go test -v ./tests/... -timeout 30s
+          echo "✅ All tests completed"
+
+      - name: Run All Tests with Coverage
+        run: |
+          echo "📊 Running All Tests with Coverage..."
+          go test -cover -coverprofile=coverage.out ./tests/... -timeout 30s
+          go tool cover -func=coverage.out
+          echo "✅ Coverage report completed"
+
+      - name: Run Integration Tests (with credentials)
+        if: ${{ hashFiles('tests/integration/**/*_test.go') != '' }}
         env:
             ZSCALER_CLIENT_ID: ${{ secrets.ZSCALER_CLIENT_ID }}
             ZSCALER_CLIENT_SECRET: ${{ secrets.ZSCALER_CLIENT_SECRET }}
@@ -97,6 +111,7 @@ jobs:
             ZSCALER_CLOUD: ${{ secrets.ZSCALER_CLOUD }}
             ZPA_CUSTOMER_ID: ${{ secrets.ZPA_CUSTOMER_ID }}
             ZSCALER_TERRAFORM_INSTALL_PATH: ${{ github.workspace }}
-        run: | 
-
-
+        run: |
+          echo "🧪 Running Integration Tests with API credentials..."
+          go test -v ./tests/integration/... -timeout 5m
+          echo "✅ Integration tests with credentials completed"

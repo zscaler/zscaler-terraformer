@@ -30,6 +30,7 @@ import (
 	"runtime"
 	"strings"
 	"text/tabwriter"
+	"time"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -37,6 +38,7 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler"
 	zia "github.com/zscaler/zscaler-terraformer/v2/providers/zia"
 	zpa "github.com/zscaler/zscaler-terraformer/v2/providers/zpa"
+	"github.com/zscaler/zscaler-terraformer/v2/terraformutils"
 )
 
 var log = logrus.New()
@@ -64,7 +66,7 @@ var ziaAPIKey string   // required
 var ziaCloud string    // required
 
 var useLegacyClient bool
-var verbose, displayReleaseVersion bool
+var verbose, displayReleaseVersion, support, collectLogs, validateTerraform, progress bool
 var supportedResources string
 
 var resourceType_, resources, excludedResources string
@@ -98,12 +100,17 @@ var allSupportedResources = []string{
 	"zpa_pra_approval_controller",
 	"zpa_pra_console_controller",
 	"zpa_pra_credential_controller",
+	"zpa_pra_credential_pool",
 	"zpa_pra_portal_controller",
 	"zpa_provisioning_key",
 	"zpa_service_edge_group",
 	"zpa_lss_config_controller",
 	"zpa_inspection_custom_controls",
 	"zpa_microtenant_controller",
+	"zpa_user_portal_controller",
+	"zpa_user_portal_link",
+	"zpa_c2c_ip_ranges",
+	"zpa_private_cloud_group",
 	"zia_dlp_dictionaries",
 	"zia_dlp_engines",
 	"zia_dlp_notification_templates",
@@ -120,22 +127,538 @@ var allSupportedResources = []string{
 	"zia_location_management",
 	"zia_url_categories",
 	"zia_url_filtering_rules",
+	"zia_nat_control_rules",
 	"zia_rule_labels",
 	"zia_auth_settings_urls",
 	"zia_sandbox_behavioral_analysis",
 	"zia_security_settings",
+	"zia_file_type_control_rules",
 	"zia_forwarding_control_zpa_gateway",
 	"zia_forwarding_control_rule",
 	"zia_sandbox_rules",
-	"zia_file_type_control_rules",
 	"zia_ssl_inspection_rules",
 	"zia_firewall_dns_rule",
 	"zia_firewall_ips_rule",
 	"zia_advanced_settings",
+	"zia_atp_security_exceptions",
 	"zia_advanced_threat_settings",
+	"zia_atp_malware_inspection",
+	"zia_atp_malware_protocols",
+	"zia_atp_malware_settings",
+	"zia_atp_malware_policy",
 	"zia_atp_malicious_urls",
-	"zia_end_user_notification",
 	"zia_url_filtering_and_cloud_app_settings",
+	"zia_end_user_notification",
+	"zia_virtual_service_edge_cluster",
+	"zia_virtual_service_edge_node",
+	"zia_risk_profiles",
+	"zia_workload_groups",
+	"zia_ftp_control_policy",
+	"zia_subscription_alert",
+	"zia_forwarding_control_proxies",
+	"zia_mobile_malware_protection_policy",
+}
+
+// SupportContact represents support contact information for a specific region/country
+type SupportContact struct {
+	Region  string
+	Country string
+	Phone   string
+	Type    string
+}
+
+// getSupportContacts returns all support contact information organized by region
+func getSupportContacts() []SupportContact {
+	return []SupportContact{
+		// Americas
+		{"Americas", "USA", "+1-844-971-0010", "Toll Free"},
+		{"Americas", "USA", "+1-408-752-5885", "Global Direct"},
+		{"Americas", "US Federal Govt", "+1-866-439-1163", "Support"},
+
+		// EMEA
+		{"EMEA", "UK", "+44-20-3319-5076", ""},
+		{"EMEA", "France", "+33-1-7627-6919", ""},
+		{"EMEA", "Germany", "+49-8-91-4377-7444", ""},
+		{"EMEA", "Netherlands", "+31-20-299-3638", ""},
+
+		// Asia/Pacific
+		{"Asia/Pacific", "Australia", "+61-2-8074-3996", ""},
+		{"Asia/Pacific", "India", "000-8000-502-150", ""},
+	}
+}
+
+// displaySupportTable shows formatted support contact information
+func displaySupportTable() {
+	contacts := getSupportContacts()
+
+	fmt.Println("\033[36m╔══════════════════════════════════════════════════════════════════════════════╗\033[0m")
+	fmt.Println("\033[36m║                           📞 ZSCALER PHONE SUPPORT                           ║\033[0m")
+	fmt.Println("\033[36m╚══════════════════════════════════════════════════════════════════════════════╝\033[0m")
+	fmt.Println()
+
+	// Group contacts by region
+	regions := map[string][]SupportContact{
+		"Americas":     {},
+		"EMEA":         {},
+		"Asia/Pacific": {},
+	}
+
+	for _, contact := range contacts {
+		regions[contact.Region] = append(regions[contact.Region], contact)
+	}
+
+	// Display each region in a simple, clean format
+	regionOrder := []string{"Americas", "EMEA", "Asia/Pacific"}
+
+	for i, regionName := range regionOrder {
+		if i > 0 {
+			fmt.Print("    ")
+		}
+		fmt.Printf("\033[1;34m%-20s\033[0m", regionName)
+	}
+	fmt.Println()
+
+	for i := range regionOrder {
+		if i > 0 {
+			fmt.Print("    ")
+		}
+		fmt.Printf("%-20s", strings.Repeat("─", 20))
+	}
+	fmt.Println()
+
+	// Find the maximum number of contacts in any region
+	maxContacts := 0
+	for _, contacts := range regions {
+		if len(contacts) > maxContacts {
+			maxContacts = len(contacts)
+		}
+	}
+
+	// Display contacts row by row
+	for row := 0; row < maxContacts; row++ {
+		// Display the label line
+		for i, regionName := range regionOrder {
+			if i > 0 {
+				fmt.Print("    ")
+			}
+
+			contacts := regions[regionName]
+			if row < len(contacts) {
+				contact := contacts[row]
+				label := contact.Country
+				if contact.Type != "" {
+					label = contact.Type
+				}
+				fmt.Printf("\033[1m%-20s\033[0m", label+":")
+			} else {
+				fmt.Printf("%-20s", "")
+			}
+		}
+		fmt.Println()
+
+		// Display the phone number line
+		for i, regionName := range regionOrder {
+			if i > 0 {
+				fmt.Print("    ")
+			}
+
+			contacts := regions[regionName]
+			if row < len(contacts) {
+				contact := contacts[row]
+				fmt.Printf("\033[32m%-20s\033[0m", contact.Phone)
+			} else {
+				fmt.Printf("%-20s", "")
+			}
+		}
+		fmt.Println()
+
+		if row < maxContacts-1 {
+			fmt.Println()
+		}
+	}
+
+	fmt.Println()
+	fmt.Println("\033[33m💡 For technical documentation and guides, visit:\033[0m")
+	fmt.Println("   \033[36mhttps://help.zscaler.com\033[0m")
+	fmt.Println()
+	fmt.Println("\033[33m🎫 To submit a support ticket online:\033[0m")
+	fmt.Println("   \033[36mhttps://help.zscaler.com/submit-ticket\033[0m")
+	fmt.Println()
+}
+
+var logFileName string
+var logFile *os.File
+var originalStdout *os.File
+var progressTracker *ProgressTracker
+
+// setupLogCollection moves temp log to working directory and finalizes setup
+func setupLogCollection(workingDir string) string {
+	if logFile == nil {
+		return "" // Log collection not initialized
+	}
+
+	// Create final log file name in working directory
+	timestamp := time.Now().Format("20060102_150405")
+	if workingDir == "" {
+		workingDir = "."
+	}
+	finalLogFileName := fmt.Sprintf("%s/debug_%s.log", strings.TrimSuffix(workingDir, "/"), timestamp)
+
+	// Get Terraform version for the header (disable terraform's own logging)
+	terraformVersion := "Not installed"
+	terraformCmd := exec.Command("terraform", "version")
+	terraformCmd.Env = append(os.Environ(), "TF_LOG=") // Disable terraform logging
+	if tfVersion, err := terraformCmd.Output(); err == nil {
+		terraformVersion = strings.Split(string(tfVersion), "\n")[0]
+		terraformVersion = strings.TrimSpace(terraformVersion)
+	}
+
+	// Write header to the current log file
+	header := "=== Zscaler Terraformer Debug Log ===\n"
+	header += fmt.Sprintf("Timestamp: %s\n", time.Now().Format("2006-01-02 15:04:05 MST"))
+	header += fmt.Sprintf("Terraformer Version: %s\n", terraformutils.Version())
+	header += fmt.Sprintf("Terraform Version: %s\n", terraformVersion)
+	header += fmt.Sprintf("OS: %s_%s\n", runtime.GOOS, runtime.GOARCH)
+	header += fmt.Sprintf("Working Directory: %s\n", workingDir)
+	header += fmt.Sprintf("Command: %s\n", strings.Join(os.Args, " "))
+	header += "=====================================\n\n"
+
+	// Close current temp file and read its contents
+	logFile.Close()
+	tempContent, err := os.ReadFile(logFile.Name())
+	if err != nil {
+		fmt.Fprintf(originalStdout, "⚠️  Warning: Could not read temp log file: %v\n", err)
+		return finalLogFileName
+	}
+
+	// Create final log file with header + existing content
+	finalLogFile, err := os.Create(finalLogFileName)
+	if err != nil {
+		fmt.Fprintf(originalStdout, "⚠️  Warning: Could not create final log file %s: %v\n", finalLogFileName, err)
+		return finalLogFileName
+	}
+
+	finalLogFile.WriteString(header)
+	finalLogFile.Write(tempContent)
+
+	// Remove temp file
+	os.Remove(logFile.Name())
+
+	// Redirect to final log file
+	logFile = finalLogFile
+	os.Stdout = finalLogFile
+	logFileName = finalLogFileName
+
+	// Update console with final log location (only if progress is not enabled for clean display)
+	if !progress {
+		fmt.Fprintf(originalStdout, "📄 Debug log relocated to: \033[33m%s\033[0m\n", finalLogFileName)
+		fmt.Fprintf(originalStdout, "🔍 Monitor SDK details: \033[36mtail -f %s\033[0m\n", finalLogFileName)
+		fmt.Fprintf(originalStdout, "📋 Continuing operation...\n\n")
+	}
+
+	return finalLogFileName
+}
+
+// cleanupLogCollection restores normal output and cleans up environment variables
+func cleanupLogCollection() {
+	// Write completion message to log file
+	if logFile != nil {
+		logFile.WriteString("\n=== Log Collection Completed ===\n")
+		logFile.Close()
+	}
+
+	// Restore original stdout
+	if originalStdout != nil {
+		os.Stdout = originalStdout
+	}
+
+	// Unset SDK environment variables
+	os.Unsetenv("ZSCALER_SDK_LOG")
+	os.Unsetenv("ZSCALER_SDK_VERBOSE")
+
+	// Print completion message to console (only if progress is not enabled for clean display)
+	if logFileName != "" && !progress {
+		fmt.Printf("✅ Debug logging completed! Log saved to: \033[33m%s\033[0m\n", logFileName)
+		fmt.Printf("📄 All SDK debug output captured for support analysis\n\n")
+	}
+}
+
+// ProgressTracker manages colored progress bar display during operations
+type ProgressTracker struct {
+	current     int
+	total       int
+	startTime   time.Time
+	lastUpdate  time.Time
+	width       int
+	currentTask string
+}
+
+// NewProgressTracker creates a new progress tracker
+func NewProgressTracker(total int) *ProgressTracker {
+	return &ProgressTracker{
+		current:    0,
+		total:      total,
+		startTime:  time.Now(),
+		lastUpdate: time.Now(),
+		width:      50, // Default progress bar width
+	}
+}
+
+// Update updates the progress and redraws the progress bar
+func (pt *ProgressTracker) Update(taskName string) {
+	if !progress {
+		return // Progress disabled
+	}
+
+	pt.current++
+	pt.currentTask = taskName
+	pt.lastUpdate = time.Now()
+	pt.redraw()
+}
+
+// UpdateWithOutput updates progress and handles output redirection for collect-logs
+func (pt *ProgressTracker) UpdateWithOutput(taskName string) {
+	if !progress {
+		return // Progress disabled
+	}
+
+	// If collect-logs is enabled, write progress to original stdout, not log file
+	if collectLogs && originalStdout != nil {
+		pt.current++
+		pt.currentTask = taskName
+		pt.lastUpdate = time.Now()
+		pt.redrawToOutput(originalStdout)
+	} else {
+		pt.Update(taskName)
+	}
+}
+
+// redrawToOutput renders progress bar to specific output (for collect-logs compatibility)
+func (pt *ProgressTracker) redrawToOutput(output *os.File) {
+	if pt.total == 0 {
+		return
+	}
+
+	// Calculate percentage
+	percentage := float64(pt.current) / float64(pt.total) * 100
+	completed := int(float64(pt.width) * float64(pt.current) / float64(pt.total))
+
+	// Calculate ETA
+	elapsed := time.Since(pt.startTime)
+	var etaStr string
+	if pt.current > 0 {
+		totalEstimate := elapsed * time.Duration(pt.total) / time.Duration(pt.current)
+		remaining := totalEstimate - elapsed
+		if remaining > 0 {
+			if remaining > time.Minute {
+				etaStr = fmt.Sprintf("ETA: %dm%ds", int(remaining.Minutes()), int(remaining.Seconds())%60)
+			} else {
+				etaStr = fmt.Sprintf("ETA: %ds", int(remaining.Seconds()))
+			}
+		} else {
+			etaStr = "ETA: <1s"
+		}
+	} else {
+		etaStr = "ETA: calculating..."
+	}
+
+	// Build progress bar
+	bar := "\033[32m" // Green for completed
+	for i := 0; i < completed; i++ {
+		bar += "█"
+	}
+	bar += "\033[37m" // White for remaining
+	for i := completed; i < pt.width; i++ {
+		bar += "░"
+	}
+	bar += "\033[0m" // Reset color
+
+	// Truncate task name if too long
+	taskDisplay := pt.currentTask
+	if len(taskDisplay) > 30 {
+		taskDisplay = taskDisplay[:27] + "..."
+	}
+
+	// Print progress line to specific output
+	fmt.Fprintf(output, "\r🚀 Progress: [%s] \033[1m%3.0f%%\033[0m (\033[33m%d/%d\033[0m) | \033[36m%-30s\033[0m | %s",
+		bar, percentage, pt.current, pt.total, taskDisplay, etaStr)
+
+	// If completed, add newline
+	if pt.current >= pt.total {
+		fmt.Fprintf(output, "\n")
+		elapsed := time.Since(pt.startTime)
+		fmt.Fprintf(output, "✅ \033[32mCompleted!\033[0m Total time: \033[33m%v\033[0m\n\n", elapsed.Round(time.Second))
+	}
+}
+
+// redraw renders the colored progress bar
+func (pt *ProgressTracker) redraw() {
+	if pt.total == 0 {
+		return
+	}
+
+	// Calculate percentage
+	percentage := float64(pt.current) / float64(pt.total) * 100
+	completed := int(float64(pt.width) * float64(pt.current) / float64(pt.total))
+
+	// Calculate ETA
+	elapsed := time.Since(pt.startTime)
+	var etaStr string
+	if pt.current > 0 {
+		totalEstimate := elapsed * time.Duration(pt.total) / time.Duration(pt.current)
+		remaining := totalEstimate - elapsed
+		if remaining > 0 {
+			if remaining > time.Minute {
+				etaStr = fmt.Sprintf("ETA: %dm%ds", int(remaining.Minutes()), int(remaining.Seconds())%60)
+			} else {
+				etaStr = fmt.Sprintf("ETA: %ds", int(remaining.Seconds()))
+			}
+		} else {
+			etaStr = "ETA: <1s"
+		}
+	} else {
+		etaStr = "ETA: calculating..."
+	}
+
+	// Build progress bar
+	bar := "\033[32m" // Green for completed
+	for i := 0; i < completed; i++ {
+		bar += "█"
+	}
+	bar += "\033[37m" // White for remaining
+	for i := completed; i < pt.width; i++ {
+		bar += "░"
+	}
+	bar += "\033[0m" // Reset color
+
+	// Truncate task name if too long
+	taskDisplay := pt.currentTask
+	if len(taskDisplay) > 30 {
+		taskDisplay = taskDisplay[:27] + "..."
+	}
+
+	// Print progress line with carriage return (overwrites previous line)
+	fmt.Printf("\r🚀 Progress: [%s] \033[1m%3.0f%%\033[0m (\033[33m%d/%d\033[0m) | \033[36m%-30s\033[0m | %s",
+		bar, percentage, pt.current, pt.total, taskDisplay, etaStr)
+
+	// If completed, add newline
+	if pt.current >= pt.total {
+		fmt.Println()
+		elapsed := time.Since(pt.startTime)
+		fmt.Printf("✅ \033[32mCompleted!\033[0m Total time: \033[33m%v\033[0m\n\n", elapsed.Round(time.Second))
+	}
+}
+
+// Finish completes the progress bar
+func (pt *ProgressTracker) Finish() {
+	if !progress {
+		return
+	}
+
+	pt.current = pt.total
+	pt.redraw()
+}
+
+// validateGeneratedFiles runs terraform init and validate on the working directory
+func validateGeneratedFiles(workingDir string) error {
+	fmt.Printf("🔍 Running terraform validation on generated files in: \033[33m%s\033[0m\n", workingDir)
+
+	// Check if terraform is available
+	_, err := exec.LookPath("terraform")
+	if err != nil {
+		fmt.Printf("⚠️  Terraform CLI not found in PATH. Please install Terraform to use --validate flag\n")
+		fmt.Printf("   Download from: \033[36mhttps://terraform.io/downloads\033[0m\n")
+		return nil // Don't error out, just skip validation
+	}
+
+	// Step 1: Run terraform init first
+	fmt.Printf("🔧 Initializing terraform in working directory...\n")
+	initCmd := exec.Command("terraform", "init")
+	initCmd.Dir = workingDir
+	initCmd.Env = append(os.Environ(), "TF_LOG=") // Disable terraform's own logging
+
+	initOutput, err := initCmd.CombinedOutput()
+	if err != nil {
+		// Check if it's a configuration syntax error vs provider issue
+		outputStr := string(initOutput)
+
+		if strings.Contains(outputStr, "Unclosed configuration block") ||
+			strings.Contains(outputStr, "syntax") ||
+			strings.Contains(outputStr, "parsing") {
+			// This is a syntax error in the generated files - show detailed error
+			fmt.Printf("❌ \033[31mSyntax Error Detected\033[0m - Generated files have configuration issues:\n")
+			fmt.Printf("┌─────────────────────────────────────────────────────────────────────────────┐\n")
+			fmt.Printf("│ \033[31mCritical: Configuration syntax errors found\033[0m                           │\n")
+			fmt.Printf("└─────────────────────────────────────────────────────────────────────────────┘\n")
+			fmt.Printf("\n📋 \033[31mDetailed error information:\033[0m\n")
+
+			// Clean up and format the error output
+			lines := strings.Split(outputStr, "\n")
+			for _, line := range lines {
+				line = strings.TrimSpace(line)
+				if line != "" && !strings.Contains(line, "Terraform encountered problems") {
+					fmt.Printf("   %s\n", line)
+				}
+			}
+
+			fmt.Printf("\n🔧 \033[33mSuggested fixes:\033[0m\n")
+			fmt.Printf("   • Check for missing closing braces '}' in .tf files\n")
+			fmt.Printf("   • Verify all resource blocks are properly formatted\n")
+			fmt.Printf("   • Look for unclosed quotes or brackets\n")
+			fmt.Printf("   • Review files in: %s\n", workingDir)
+			fmt.Println()
+			return fmt.Errorf("syntax errors in generated terraform files")
+		} else {
+			// This is likely a provider configuration issue - provide helpful guidance
+			fmt.Printf("⚠️  Terraform init needs provider configuration:\n")
+			fmt.Printf("┌─────────────────────────────────────────────────────────────────────────────┐\n")
+			fmt.Printf("│ \033[33mNote: Provider configuration required for terraform init\033[0m               │\n")
+			fmt.Printf("└─────────────────────────────────────────────────────────────────────────────┘\n")
+			fmt.Printf("\n💡 \033[33mTo enable validation:\033[0m\n")
+			fmt.Printf("   • Add provider configuration to your .tf files:\n")
+			fmt.Printf("     \033[36mterraform {\n")
+			fmt.Printf("       required_providers {\n")
+			fmt.Printf("         zpa = { source = \"zscaler/zpa\" }\n")
+			fmt.Printf("         zia = { source = \"zscaler/zia\" }\n")
+			fmt.Printf("       }\n")
+			fmt.Printf("     }\033[0m\n")
+			fmt.Printf("   • Then run 'terraform init' in: %s\n", workingDir)
+			fmt.Println()
+			return nil // Don't treat provider config issues as fatal
+		}
+	}
+
+	fmt.Printf("✅ Terraform init completed successfully\n")
+
+	// Step 2: Run terraform validate
+	fmt.Printf("🔍 Running terraform validate...\n")
+	validateCmd := exec.Command("terraform", "validate")
+	validateCmd.Dir = workingDir
+	validateCmd.Env = append(os.Environ(), "TF_LOG=") // Disable terraform's own logging
+
+	validateOutput, err := validateCmd.CombinedOutput()
+
+	if err != nil {
+		fmt.Printf("❌ Terraform validation \033[31mFAILED\033[0m:\n")
+		fmt.Printf("┌─────────────────────────────────────────────────────────────────────────────┐\n")
+		fmt.Printf("│ \033[31mValidation Errors Found\033[0m                                                │\n")
+		fmt.Printf("└─────────────────────────────────────────────────────────────────────────────┘\n")
+		fmt.Printf("\n📋 \033[31mValidation output:\033[0m\n")
+		fmt.Printf("   %s\n", strings.Replace(string(validateOutput), "\n", "\n   ", -1))
+		fmt.Printf("\n💡 \033[33mCommon fixes:\033[0m\n")
+		fmt.Printf("   • Check for syntax errors in generated .tf files\n")
+		fmt.Printf("   • Ensure all resources have closing braces\n")
+		fmt.Printf("   • Verify attribute syntax and formatting\n")
+		fmt.Printf("   • Review files in: %s\n", workingDir)
+		fmt.Println()
+		return fmt.Errorf("terraform validation failed")
+	} else {
+		fmt.Printf("✅ Terraform validation \033[32mPASSED\033[0m\n")
+		fmt.Printf("🎉 All generated HCL files are syntactically valid!\n")
+		fmt.Println()
+	}
+
+	return nil
 }
 
 // rootCmd represents the base command when called without any subcommands.
@@ -154,17 +677,48 @@ var rootCmd = &cobra.Command{
 		"to be able to adopt Terraform by giving them a feasible way to get\n" +
 		"all of their existing ZPA/ZIA configuration into Terraform.",
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		if verbose {
+		// Set appropriate log level based on flags
+		if progress {
+			// When progress is enabled, suppress INFO logs for clean display
+			log.SetLevel(logrus.WarnLevel)
+		} else if verbose {
 			log.SetLevel(logrus.DebugLevel)
 			log.Debug("Verbose mode enabled")
+		}
+
+		// Early setup for log collection - create temp log file and redirect immediately
+		if collectLogs {
+			timestamp := time.Now().Format("20060102_150405")
+			tempLogFile := fmt.Sprintf("temp_debug_%s.log", timestamp)
+
+			// Create temporary log file in current directory
+			file, err := os.Create(tempLogFile)
+			if err != nil {
+				fmt.Printf("⚠️  Warning: Could not create temp log file: %v\n", err)
+			} else {
+				// Store original stdout and redirect immediately to capture all SDK output
+				originalStdout = os.Stdout
+				os.Stdout = file
+				logFile = file
+
+				// Set SDK environment variables
+				os.Setenv("ZSCALER_SDK_LOG", "true")
+				os.Setenv("ZSCALER_SDK_VERBOSE", "true")
+
+				// Only show setup message if progress is not enabled (to keep it clean)
+				if !progress {
+					fmt.Fprintf(originalStdout, "📝 SDK debug logging enabled - output will be captured\n")
+					fmt.Fprintf(originalStdout, "⏳ Setting up logging...\n\n")
+				}
+			}
 		}
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		// Handle --version flag
 		if displayReleaseVersion {
-			cliVersion := getCLIVersion()
+			cliVersion := terraformutils.Version()
 			platform := fmt.Sprintf("%s_%s", runtime.GOOS, runtime.GOARCH)
-			fmt.Printf("zscaler-terraformer %s\n", cliVersion)
+			fmt.Printf("zscaler-terraformer v%s\n", cliVersion)
 
 			terraformVersion, err := exec.Command("terraform", "version").Output()
 			if err != nil {
@@ -175,19 +729,13 @@ var rootCmd = &cobra.Command{
 			}
 			fmt.Printf("on (%s)\n", platform)
 
-			latestVersion := getLatestReleaseVersion()
-			if cliVersion != latestVersion {
-				fmt.Printf("\nYour version of Zscaler-Terraformer is out of date! The latest version\nis %s. You can update by running the command\n", latestVersion)
+			fmt.Println("\nFor the latest releases and updates, visit:")
+			fmt.Println("https://github.com/zscaler/zscaler-terraformer/releases")
+			return
+		}
 
-				if runtime.GOOS == "windows" {
-					fmt.Println("\"choco upgrade zscaler-terraformer\"")
-				} else {
-					fmt.Println("\"brew upgrade zscaler/tap/zscaler-terraformer\"")
-				}
-
-				fmt.Println("or download the new version from")
-				fmt.Println("https://github.com/zscaler/zscaler-terraformer/releases")
-			}
+		if support {
+			displaySupportTable()
 			return
 		}
 
@@ -366,6 +914,10 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&supportedResources, "supported-resources", "", "List supported resources for ZPA or ZIA")
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose debug output")
 	rootCmd.PersistentFlags().BoolVarP(&displayReleaseVersion, "version", "", false, "Display the release version")
+	rootCmd.PersistentFlags().BoolVarP(&support, "support", "", false, "Display Zscaler support contact information")
+	rootCmd.PersistentFlags().BoolVarP(&collectLogs, "collect-logs", "", false, "Enable SDK debug logging and save to timestamped log file")
+	rootCmd.PersistentFlags().BoolVarP(&validateTerraform, "validate", "", false, "Run terraform validate on generated HCL files")
+	rootCmd.PersistentFlags().BoolVarP(&progress, "progress", "", false, "Show colored progress bar during import/generate operations")
 
 	rootCmd.PersistentFlags().StringVar(&terraformInstallPath, "terraform-install-path", ".", "Path to the default Terraform installation")
 	if err := viper.BindPFlag("terraform-install-path", rootCmd.PersistentFlags().Lookup("terraform-install-path")); err != nil {

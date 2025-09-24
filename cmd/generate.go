@@ -225,19 +225,97 @@ func generateResources() func(cmd *cobra.Command, args []string) {
 
 			excludedResourcesTypes := strings.Split(excludedResources, ",")
 
+			// Filter out excluded resources for accurate progress count
+			filteredResourceTypes := []string{}
 			for _, rt := range resourceTypes {
 				resourceTyp := strings.Trim(rt, " ")
-				if helpers.IsInList(resourceTyp, excludedResourcesTypes) {
-					continue
+				if !helpers.IsInList(resourceTyp, excludedResourcesTypes) {
+					filteredResourceTypes = append(filteredResourceTypes, resourceTyp)
 				}
+			}
 
+			// Initialize progress tracker if enabled
+			if progress && len(filteredResourceTypes) > 0 {
+				progressTracker = NewProgressTracker(len(filteredResourceTypes))
+				fmt.Printf("🎯 Starting generation of \033[33m%d resources\033[0m with progress tracking\n\n", len(filteredResourceTypes))
+			}
+
+			for _, resourceTyp := range filteredResourceTypes {
+				if progress {
+					progressTracker.UpdateWithOutput(fmt.Sprintf("Generating %s", resourceTyp))
+				}
 				// Pass cmd.Context() as the new ctx argument:
 				generate(cmd.Context(), cmd, cmd.OutOrStdout(), resourceTyp)
 			}
+
+			// Finish progress tracking for generation
+			if progress && len(filteredResourceTypes) > 0 {
+				progressTracker.Finish()
+			}
+
+			// Set up log collection and run validation if requested and we generated resources
+			if len(filteredResourceTypes) > 0 {
+				// Get working directory from first resource type
+				_, _, workingDir := initTf(filteredResourceTypes[0])
+
+				// Set up log collection if enabled (now that we know the working directory)
+				if collectLogs {
+					setupLogCollection(workingDir)
+				}
+
+				// Run terraform validate if requested
+				if validateTerraform {
+					err := validateGeneratedFiles(workingDir)
+					if err != nil {
+						log.Printf("⚠️  Validation completed with errors: %v", err)
+					}
+				}
+			}
+
+			// Cleanup log collection if it was enabled
+			if collectLogs {
+				cleanupLogCollection()
+			}
 			return
 		}
-		// Similarly here:
-		generate(cmd.Context(), cmd, cmd.OutOrStdout(), resourceType_)
+
+		// Set up log collection, progress tracking and validation for single resource generation
+		if resourceType_ != "" {
+			_, _, workingDir := initTf(resourceType_)
+
+			// Set up log collection if enabled
+			if collectLogs {
+				setupLogCollection(workingDir)
+			}
+
+			// Initialize progress tracker for single resource generation
+			if progress {
+				progressTracker = NewProgressTracker(1) // Single resource
+				fmt.Printf("🎯 Starting single resource generation with progress tracking\n\n")
+				progressTracker.UpdateWithOutput(fmt.Sprintf("Generating %s", resourceType_))
+			}
+
+			// Generate the resource
+			generate(cmd.Context(), cmd, cmd.OutOrStdout(), resourceType_)
+
+			// Finish progress tracking for single resource
+			if progress {
+				progressTracker.Finish()
+			}
+
+			// Run terraform validate if requested
+			if validateTerraform {
+				err := validateGeneratedFiles(workingDir)
+				if err != nil {
+					log.Printf("⚠️  Validation completed with errors: %v", err)
+				}
+			}
+		}
+
+		// Cleanup log collection if it was enabled
+		if collectLogs {
+			cleanupLogCollection()
+		}
 	}
 }
 

@@ -58,13 +58,52 @@ func GetDataSourceMappings() []DataSourceMapping {
 		{"nw_services", "zia_firewall_filtering_network_service"},
 		{"services", "zia_firewall_filtering_network_service"},
 
+		// ZIA Firewall and IP Group Mappings
+		{"source_ip_groups", "zia_firewall_filtering_ip_source_groups"},
+		{"src_ip_groups", "zia_firewall_filtering_ip_source_groups"},
+		{"dest_ip_groups", "zia_firewall_filtering_destination_groups"},
+		{"destination_groups", "zia_firewall_filtering_destination_groups"},
+
+		// ZIA Network and Application Group Mappings
+		{"nw_application_groups", "zia_firewall_filtering_network_application_groups"},
+		{"nw_service_groups", "zia_firewall_filtering_network_service_groups"},
+
+		// ZIA Rule and Label Mappings
+		{"labels", "zia_rule_labels"},
+
+		// ZPA Application and Group Mappings
+		{"app_connector_groups", "zpa_app_connector_group"},
+		{"appConnectorGroups", "zpa_app_connector_group"},
+		{"zcomponentId", "zpa_app_connector_group"},
+		{"connector_groups", "zpa_app_connector_group"},
+		{"connectorGroups", "zpa_app_connector_group"},
+		{"server_groups", "zpa_server_group"},
+		{"serverGroups", "zpa_server_group"},
+		{"app_server_groups", "zpa_application_server"},
+		{"appServerGroups", "zpa_application_server"},
+		{"segment_group_id", "zpa_segment_group"},
+		{"segmentGroupId", "zpa_segment_group"},
+		{"applications", "zpa_application_segment"},
+		{"app_segments", "zpa_application_segment"},
+		{"appSegments", "zpa_application_segment"},
+
+		// ZPA Service Edge and Network Mappings
+		{"service_edges", "zpa_service_edge_controller"},
+		{"serviceEdges", "zpa_service_edge_controller"},
+		{"trusted_networks", "zpa_trusted_network"},
+		{"trustedNetworks", "zpa_trusted_network"},
+
+		// ZPA PRA Mappings
+		{"pra_portals", "zpa_pra_portal_controller"},
+		{"praPortals", "zpa_pra_portal_controller"},
+		{"pra_applications", "zpa_application_segment"},
+		{"praApplications", "zpa_application_segment"},
+		{"pra_application", "zpa_application_segment"},
+		{"praApplication", "zpa_application_segment"},
+
 		// ZPA Profile Mappings for policy resources
 		{"zpn_inspection_profile_id", "zpa_inspection_profile"},
 		{"zpn_isolation_profile_id", "zpa_isolation_profile"},
-
-		// ZPA Service Edge Group Mappings
-		{"service_edges", "zpa_service_edge_controller"},
-		{"trusted_networks", "zpa_trusted_network"},
 
 		// ZPA Cloud Browser Isolation Mappings
 		{"banner_id", "zpa_cloud_browser_isolation_banner"},
@@ -94,6 +133,12 @@ func PostProcessDataSources(workingDir string) error {
 		log.Printf("[WARNING] Failed to parse outputs.tf: %v", err)
 		resourceMap = make(map[string]string)
 	}
+	return PostProcessDataSourcesWithResourceMap(workingDir, resourceMap)
+}
+
+// PostProcessDataSourcesWithResourceMap performs the data source post-processing operations with a provided resource map
+func PostProcessDataSourcesWithResourceMap(workingDir string, resourceMap map[string]string) error {
+	log.Printf("🔄 Starting data source post-processing...")
 
 	// Create a timeout context to prevent hanging (5 minutes timeout)
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)

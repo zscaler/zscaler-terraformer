@@ -248,7 +248,7 @@ Both commands will display:
 
 ```bash
 Usage:
-  zscaler-terraformer [command]
+  zscaler-terraformer [flags] [command]
 
 Available Commands:
   completion  Generate the autocompletion script for the specified shell
@@ -256,6 +256,12 @@ Available Commands:
   help        Help about any command
   import      Output `terraform import` compatible commands in order to import resources into state
   version     Print the version number of zscaler-terraformer
+
+Enhanced Flags:
+  --support       Display regional Zscaler support contact information
+  --collect-logs  Enable SDK debug logging for troubleshooting
+  --validate      Run terraform validation on generated files
+  --progress      Show colored progress bar during operations
 
 Flags:
       --client_id string                    OneAPI client_id (required in V3 mode)
@@ -384,6 +390,23 @@ The following attributes are automatically replaced with data source references:
 | `workload_groups` | `zia_workload_groups` | Workload group references (includes both `id` and `name`) |
 | `nw_services` | `zia_firewall_filtering_network_service` | Network service references |
 | `services` | `zia_firewall_filtering_network_service` | Network service references |
+| `source_ip_groups` | `zia_firewall_filtering_ip_source_groups` | Source IP group references |
+| `src_ip_groups` | `zia_firewall_filtering_ip_source_groups` | Source IP group references |
+| `dest_ip_groups` | `zia_firewall_filtering_destination_groups` | Destination IP group references |
+| `destination_groups` | `zia_firewall_filtering_destination_groups` | Destination IP group references |
+| `nw_application_groups` | `zia_firewall_filtering_network_application_groups` | Network application group references |
+| `nw_service_groups` | `zia_firewall_filtering_network_service_groups` | Network service group references |
+| `labels` | `zia_rule_labels` | Rule label references |
+| `app_connector_groups` | `zpa_app_connector_group` | App Connector group references |
+| `server_groups` | `zpa_server_group` | Server group references |
+| `app_server_groups` | `zpa_application_server` | Application server references |
+| `segment_group_id` | `zpa_segment_group` | Segment group references |
+| `applications` | `zpa_application_segment` | Application segment references |
+| `app_segments` | `zpa_application_segment` | Application segment references |
+| `service_edges` | `zpa_service_edge_controller` | Service Edge references |
+| `trusted_networks` | `zpa_trusted_network` | Trusted network references |
+| `pra_portals` | `zpa_pra_portal_controller` | PRA portal references |
+| `pra_applications` | `zpa_application_segment` | PRA application references |
 
 ### Key Features
 
@@ -403,6 +426,127 @@ The following attributes are automatically replaced with data source references:
 3. **🎯 Terraform Best Practices**: Uses proper data source referencing patterns
 4. **⚡ Automatic**: No manual configuration or setup required
 
+## Command Line Flags
+
+The Zscaler Terraformer provides several flags to enhance the import and generation experience:
+
+### Core Operational Flags
+
+#### `--support`
+Display regional Zscaler support contact information with phone numbers organized by region.
+
+```bash
+zscaler-terraformer --support
+```
+
+**Output:** Professional table showing Americas, EMEA, and Asia/Pacific support contacts with direct phone numbers and online resources.
+
+#### `--collect-logs`
+Enable comprehensive SDK debug logging with automatic output capture to timestamped log files. All SDK debug output, API requests, and responses are captured for support analysis.
+
+```bash
+# Enable debug logging for troubleshooting
+zscaler-terraformer --collect-logs import --resources "zpa_segment_group"
+
+# Combine with other flags  
+zscaler-terraformer --collect-logs --progress import --resources "zpa"
+```
+
+**Features:**
+- Creates timestamped debug files (e.g., `debug_20250922_213457.log`) in the working directory
+- Captures all SDK API requests, responses, and debug details
+- Clean console output with debug details in log file
+- Automatic environment cleanup after completion
+
+#### `--validate`
+Automatically run `terraform init` and `terraform validate` on generated HCL files to verify syntax and configuration correctness.
+
+```bash
+# Validate generated files after import
+zscaler-terraformer --validate import --resources "zia_firewall_filtering_rule"
+
+# Validate after generation
+zscaler-terraformer --validate generate --resource-type "zpa_application_segment"
+```
+
+**Features:**
+- Automatic terraform initialization before validation
+- Smart error detection (syntax errors vs provider configuration issues)
+- Helpful error messages with specific fix suggestions
+- Graceful handling of missing provider configurations
+
+#### `--progress`
+Display a colored progress bar with real-time updates during import and generation operations, including ETA calculation and current task display.
+
+```bash
+# Show progress for large imports
+zscaler-terraformer --progress import --resources "zpa"
+
+# Progress for single resource
+zscaler-terraformer --progress import --resources "zia_firewall_filtering_rule"
+
+# Combine with logging for clean experience
+zscaler-terraformer --progress --collect-logs import --resources "zpa"
+```
+
+**Features:**
+- Real-time colored progress bar with percentage completion
+- Current task display (e.g., "Importing zpa_application_segment")
+- Intelligent ETA calculation based on processing speed
+- Post-processing step tracking (reference resolution, data source creation)
+- Clean visual experience with suppressed verbose logging
+
+### Flag Combinations
+
+The flags can be combined for enhanced functionality:
+
+```bash
+# Complete troubleshooting setup
+zscaler-terraformer --progress --collect-logs --validate import --resources "zpa"
+
+# Support-ready import with full logging
+zscaler-terraformer --collect-logs --progress import --resources "zia"
+
+# Quick validation check
+zscaler-terraformer --validate generate --resource-type "zpa_server_group"
+```
+
+### Troubleshooting and Support Workflows
+
+**For Support Cases:**
+```bash
+# Generate comprehensive debug logs for support analysis
+zscaler-terraformer --collect-logs import --resources "zpa"
+# → Creates debug_YYYYMMDD_HHMMSS.log with all API details
+
+# Get support contact information
+zscaler-terraformer --support
+# → Shows regional phone numbers and support resources
+```
+
+**For Development and Testing:**
+```bash
+# Validate configuration before use
+zscaler-terraformer --validate import --resources "zia_firewall_filtering_rule"
+# → Checks HCL syntax and provides fix suggestions
+
+# Monitor large imports with visual feedback
+zscaler-terraformer --progress import --resources "zia"
+# → Shows real-time progress with ETA
+```
+
+## Important Notes and Limitations
+
+The Zscaler Terraformer tool is designed to **facilitate the adoption** of Zscaler's [ZIA](https://registry.terraform.io/providers/zscaler/zia/latest/docs) and [ZPA](https://registry.terraform.io/providers/zscaler/zpa/latest/docs) Terraform providers by assisting with the initial heavy lift of writing Terraform code and obtaining existing configurations from your tenants.
+
+### Key Considerations
+
+**📚 Always Refer to Official Documentation**: While the tool auto-generates HCL code, **DevOps engineers and developers should always refer to the official provider documentation** to understand what actions specific attributes perform and their proper usage.
+
+**🔧 Provider Dependencies**: The tool relies on the respective Terraform providers. Configuration drifts may be due to provider schema issues or odd API behavior. Many drift issues can be resolved by manually editing the generated HCL code. For provider-specific issues, submit a support case via [Zscaler Global Support](https://help.zscaler.com/submit-ticket).
+
+**⚠️ Tool Limitations**: The tool is **not meant to be 100% perfect**. Some provider resources may not be immediately supported - use `terraform import` directly for these cases. Structured heredocs, environment-specific behaviors, and custom formatting requirements will not be addressed unless they represent existing bugs in the tool.
+
 ## ZPA Example usage
 
 To get started with the zscaler-terraformer CLI to export your ZPA configuration, create a directory where you want the configuration to stored. See ZPA Demo:
@@ -414,19 +558,34 @@ To get started with the zscaler-terraformer CLI to export your ZPA configuration
 ### Import All ZPA Configuration
 
 ```bash
+# Basic import
 zscaler-terraformer import --resources="zpa"
+
+# With progress tracking and debug logging
+zscaler-terraformer --progress --collect-logs import --resources="zpa"
+
+# With validation
+zscaler-terraformer --progress --validate import --resources="zpa"
 ```
 
 ### Import Specific ZPA Resource
 
 ```bash
+# Basic import
 zscaler-terraformer import --resources="zpa_application_segment"
+
+# With progress bar
+zscaler-terraformer --progress import --resources="zpa_application_segment"
 ```
 
 ### Exclude specific ZPA resources from Importing
 
 ```bash
+# Basic exclusion
 zscaler-terraformer import --resources="zpa" --exclude='zpa_segment_group, zpa_server_group'
+
+# With progress and logging
+zscaler-terraformer --progress --collect-logs import --resources="zpa" --exclude='zpa_segment_group'
 ```
 
 By default, ``zscaler-terraformer`` will create a local configuration directory where it is being executed. You can also indicate the path where the imported configuration should be stored by using the folowing environment variable ``ZSCALER_ZPA_TERRAFORM_INSTALL_PATH``.
@@ -448,19 +607,34 @@ https://user-images.githubusercontent.com/23208337/204072949-a6f9bfb7-aaf0-4f76-
 ### Import All ZIA Configuration
 
 ```bash
+# Basic import
 zscaler-terraformer import --resources="zia"
+
+# With progress tracking and debug logging
+zscaler-terraformer --progress --collect-logs import --resources="zia"
+
+# With validation
+zscaler-terraformer --progress --validate import --resources="zia"
 ```
 
 ### Import Specific ZIA Resource
 
 ```bash
+# Basic import
 zscaler-terraformer import --resources="zia_firewall_filtering_rule"
+
+# With progress bar and validation
+zscaler-terraformer --progress --validate import --resources="zia_firewall_filtering_rule"
 ```
 
 ### Exclude specific ZIA resources from Importing
 
 ```bash
+# Basic exclusion
 zscaler-terraformer import --resources="zia" --exclude='zia_forwarding_control_rule,zia_forwarding_control_zpa_gateway,zia_user_management'
+
+# With enhanced flags
+zscaler-terraformer --progress --collect-logs import --resources="zia" --exclude='zia_forwarding_control_rule'
 ```
 
 By default, ``zscaler-terraformer`` will create a local configuration directory where it is being executed. You can also indicate the path where the imported configuration should be stored by using the folowing environment variable ``ZSCALER_ZIA_TERRAFORM_INSTALL_PATH``.
@@ -476,9 +650,19 @@ $ zscaler-terraformer generate \
 To simply generate the HCL configuration output without importing and creating the state file, use the command ``zscaler-terraformer generate``
 
 ```bash
+# Basic generation
 $ zscaler-terraformer generate \
   --zia-terraform-install-path $HOME/Desktop/zia_configuration \
   --resource-type "zia_firewall_filtering_rule"
+
+# With progress and validation
+$ zscaler-terraformer --progress --validate generate \
+  --zia-terraform-install-path $HOME/Desktop/zia_configuration \
+  --resource-type "zia_firewall_filtering_rule"
+
+# With debug logging for troubleshooting
+$ zscaler-terraformer --collect-logs generate \
+  --resource-type "zpa_application_segment"
 ```
 
 ## Prerequisites

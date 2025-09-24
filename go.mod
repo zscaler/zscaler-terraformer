@@ -7,13 +7,13 @@ toolchain go1.24.7
 require (
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/terraform-exec v0.23.1
-	github.com/hashicorp/terraform-json v0.26.0
+	github.com/hashicorp/terraform-json v0.27.1
 	github.com/iancoleman/strcase v0.3.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.10.1
 	github.com/spf13/viper v1.20.1
 	github.com/zclconf/go-cty v1.17.0
-	github.com/zscaler/zscaler-sdk-go/v3 v3.7.0
+	github.com/zscaler/zscaler-sdk-go/v3 v3.7.1
 )
 
 require (
@@ -32,7 +32,7 @@ require (
 	github.com/hashicorp/go-version v1.7.0 // indirect
 	github.com/hashicorp/logutils v1.0.0 // indirect
 	github.com/hashicorp/terraform-plugin-log v0.9.0 // indirect
-	github.com/hashicorp/terraform-plugin-sdk/v2 v2.37.0 // indirect
+	github.com/hashicorp/terraform-plugin-sdk/v2 v2.38.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/kelseyhightower/envconfig v1.4.0 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
@@ -52,4 +52,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace github.com/zscaler/zscaler-sdk-go/v3 => /Users/wguilherme/go/src/github.com/zscaler/zscaler-sdk-go
+// replace github.com/zscaler/zscaler-sdk-go/v3 => /Users/wguilherme/go/src/github.com/zscaler/zscaler-sdk-go

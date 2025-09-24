@@ -217,7 +217,11 @@ func isLicenseError(err error) (bool, string) {
 			if jsonErr := json.Unmarshal([]byte(jsonStr), &apiErr); jsonErr == nil {
 				// Check if it's a feature flag permission denied error
 				if apiErr.ID == "authz.featureflag.permission.denied" {
-					// Check if any param starts with "feature."
+					// Check if the reason contains feature flag information
+					if strings.Contains(apiErr.Reason, "feature.") || strings.Contains(apiErr.Reason, "Feature flag") {
+						return true, apiErr.Reason
+					}
+					// Also check params if they exist
 					for _, param := range apiErr.Params {
 						if strings.HasPrefix(param, "feature.") {
 							return true, apiErr.Reason
@@ -251,13 +255,27 @@ func runImport() func(cmd *cobra.Command, args []string) {
 			}
 			excludedResourcesTypes := strings.Split(excludedResources, ",")
 
+			// Filter out excluded resources for accurate progress count
+			filteredResourceTypes := []string{}
 			for _, rt := range resourceTypes {
 				resourceTyp := strings.Trim(rt, " ")
-				if helpers.IsInList(resourceTyp, excludedResourcesTypes) {
-					continue
+				if !helpers.IsInList(resourceTyp, excludedResourcesTypes) {
+					filteredResourceTypes = append(filteredResourceTypes, resourceTyp)
+				}
+			}
+
+			// Initialize progress tracker if enabled (resource imports + 3 post-processing steps)
+			if progress && len(filteredResourceTypes) > 0 {
+				totalSteps := len(filteredResourceTypes) + 3 // +3 for post-processing steps
+				progressTracker = NewProgressTracker(totalSteps)
+				fmt.Printf("🎯 Starting import of \033[33m%d resources\033[0m with progress tracking\n\n", len(filteredResourceTypes))
+			}
+
+			for _, resourceTyp := range filteredResourceTypes {
+				if progress {
+					progressTracker.UpdateWithOutput(fmt.Sprintf("Importing %s", resourceTyp))
 				}
 				importResource(cmd.Context(), cmd, cmd.OutOrStdout(), resourceTyp, managedResourceTypes, includedSensitiveResources)
-
 			}
 
 			// Post-process reference replacement after all imports are complete
@@ -265,31 +283,59 @@ func runImport() func(cmd *cobra.Command, args []string) {
 			if len(resourceTypes) > 0 {
 				// Get the working directory from the first resource type
 				_, _, workingDir := initTf(resourceTypes[0])
-				log.Printf("🔄 Running final post-processing after all imports are complete...")
+
+				// Set up log collection if enabled (now that we know the working directory)
+				if collectLogs {
+					setupLogCollection(workingDir)
+				}
+
+				if !progress {
+					log.Printf("🔄 Running final post-processing after all imports are complete...")
+				}
 
 				// First: Process resource-to-resource references
+				if progress {
+					progressTracker.UpdateWithOutput("Processing resource references")
+				}
 				err := helpers.PostProcessReferences(workingDir)
 				if err != nil {
 					log.Printf("⚠️  Resource post-processing failed: %v", err)
 				}
 
-				// Second: Process data source references (only once, at the very end)
-				log.Printf("🔄 Running data source post-processing after all imports are complete...")
-				err = helpers.PostProcessDataSources(workingDir)
+				// Second: Parse the resource map first
+				if !progress {
+					log.Printf("🔄 Parsing resource outputs for intelligent reference resolution...")
+				}
+				resourceMap, parseErr := helpers.ParseOutputsFile(workingDir)
+				if parseErr != nil {
+					log.Printf("[WARNING] Failed to parse outputs.tf: %v", parseErr)
+					resourceMap = make(map[string]string)
+				}
+
+				// Third: Process data source references (only once, at the very end) with resource map
+				if progress {
+					progressTracker.UpdateWithOutput("Processing data source references")
+				}
+				if !progress {
+					log.Printf("🔄 Running data source post-processing after all imports are complete...")
+				}
+				err = helpers.PostProcessDataSourcesWithResourceMap(workingDir, resourceMap)
 				if err != nil {
 					log.Printf("⚠️  Data source post-processing failed: %v", err)
 				}
 
-				// Third: Process ZPA policy data source references (isolated processing)
-				log.Printf("🔄 Running ZPA policy data source processing after all imports are complete...")
-				resourceMap, parseErr := helpers.ParseOutputsFile(workingDir)
-				if parseErr != nil {
-					log.Printf("[WARNING] Failed to parse outputs.tf for ZPA processing: %v", parseErr)
-					resourceMap = make(map[string]string)
+				// Fourth: Process ZPA policy data source references (isolated processing)
+				if progress {
+					progressTracker.UpdateWithOutput("Processing ZPA policy references")
 				}
 				err = helpers.PostProcessZPAPolicyDataSources(workingDir, resourceMap)
 				if err != nil {
 					log.Printf("⚠️  ZPA policy data source post-processing failed: %v", err)
+				}
+
+				// Finish progress tracking
+				if progress {
+					progressTracker.Finish()
 				}
 			}
 
@@ -304,13 +350,51 @@ func runImport() func(cmd *cobra.Command, args []string) {
 			if len(resourceTypes) > 0 {
 				_, _, workingDir := initTf(resourceTypes[0])
 				helpers.PrintImportSummary(workingDir)
+
+				// Run terraform validate if requested
+				if validateTerraform {
+					err := validateGeneratedFiles(workingDir)
+					if err != nil {
+						log.Printf("⚠️  Validation completed with errors: %v", err)
+					}
+				}
 			}
 			if includedSensitiveResources["zpa_pra_credential_controller"] {
 				fmt.Println("\033[33mThe resource zpa_pra_credential_controller contains sensitive values not included in the generated code.\033[0m")
 			}
+
+			// Cleanup log collection if it was enabled
+			if collectLogs {
+				cleanupLogCollection()
+			}
 			return
 		}
+
+		// Set up log collection and progress tracking for single resource import if enabled
+		_, _, workingDir := initTf(resourceType_)
+
+		if collectLogs {
+			setupLogCollection(workingDir)
+		}
+
+		// Initialize progress tracker for single resource import
+		if progress {
+			progressTracker = NewProgressTracker(1) // Single resource
+			fmt.Printf("🎯 Starting single resource import with progress tracking\n\n")
+			progressTracker.UpdateWithOutput(fmt.Sprintf("Importing %s", resourceType_))
+		}
+
 		importResource(cmd.Context(), cmd, cmd.OutOrStdout(), resourceType_, managedResourceTypes, includedSensitiveResources)
+
+		// Finish progress tracking for single resource
+		if progress {
+			progressTracker.Finish()
+		}
+
+		// Cleanup log collection if it was enabled for single resource import
+		if collectLogs {
+			cleanupLogCollection()
+		}
 
 		// Post-processing is handled by the main runImport function after all imports are complete
 
@@ -321,8 +405,7 @@ func runImport() func(cmd *cobra.Command, args []string) {
 			}
 		}
 
-		// Generate and display comprehensive import summary for single resource
-		_, _, workingDir := initTf(resourceType_)
+		// Generate and display comprehensive import summary for single resource (reuse workingDir)
 		helpers.PrintImportSummary(workingDir)
 		if includedSensitiveResources["zpa_pra_credential_controller"] {
 			fmt.Println("\033[33mThe resource zpa_pra_credential_controller contains sensitive values not included in the generated code.\033[0m")
@@ -348,6 +431,7 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 			// If it's a license error, log and continue, otherwise, terminate.
 			if isLicErr {
 				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+				return
 			} else {
 				log.Fatal(err)
 			}
@@ -372,7 +456,14 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 
 		jsonPayload, _, err := appservercontroller.GetAll(ctx, service)
 		if err != nil {
-			log.Fatal(err)
+			isLicErr, reason := isLicenseError(err)
+			// If it's a license error, log and continue, otherwise, terminate.
+			if isLicErr {
+				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+				return
+			} else {
+				log.Fatal(err)
+			}
 		}
 		m, _ := json.Marshal(jsonPayload)
 		resourceCount = len(jsonPayload)
@@ -385,7 +476,14 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		service := api.ZPAService
 		jsonPayload, _, err := applicationsegment.GetAll(ctx, service)
 		if err != nil {
-			log.Fatal(err)
+			isLicErr, reason := isLicenseError(err)
+			// If it's a license error, log and continue, otherwise, terminate.
+			if isLicErr {
+				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+				return
+			} else {
+				log.Fatal(err)
+			}
 		}
 		jsonStructData = make([]interface{}, len(jsonPayload))
 		for i, item := range jsonPayload {
@@ -403,7 +501,14 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		service := api.ZPAService
 		jsonPayload, _, err := applicationsegmentbrowseraccess.GetAll(ctx, service)
 		if err != nil {
-			log.Fatal(err)
+			isLicErr, reason := isLicenseError(err)
+			// If it's a license error, log and continue, otherwise, terminate.
+			if isLicErr {
+				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+				return
+			} else {
+				log.Fatal(err)
+			}
 		}
 		jsonStructData = make([]interface{}, len(jsonPayload))
 		for i, item := range jsonPayload {
@@ -421,7 +526,14 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		service := api.ZPAService
 		jsonPayload, _, err := applicationsegmentinspection.GetAll(ctx, service)
 		if err != nil {
-			log.Fatal(err)
+			isLicErr, reason := isLicenseError(err)
+			// If it's a license error, log and continue, otherwise, terminate.
+			if isLicErr {
+				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+				return
+			} else {
+				log.Fatal(err)
+			}
 		}
 		m, _ := json.Marshal(jsonPayload)
 		resourceCount = len(jsonPayload)
@@ -563,6 +675,7 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 			// If it's a license error, log and continue, otherwise, terminate.
 			if isLicErr {
 				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+				return
 			} else {
 				log.Fatal(err)
 			}
@@ -582,6 +695,7 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 			// If it's a license error, log and continue, otherwise, terminate.
 			if isLicErr {
 				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+				return
 			} else {
 				log.Fatal(err)
 			}
@@ -601,6 +715,7 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 			// If it's a license error, log and continue, otherwise, terminate.
 			if isLicErr {
 				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+				return
 			} else {
 				log.Fatal(err)
 			}
@@ -621,6 +736,7 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 			// If it's a license error, log and continue, otherwise, terminate.
 			if isLicErr {
 				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+				return
 			} else {
 				log.Fatal(err)
 			}
@@ -641,6 +757,7 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 			// If it's a license error, log and continue, otherwise, terminate.
 			if isLicErr {
 				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+				return
 			} else {
 				log.Fatal(err)
 			}
@@ -695,7 +812,14 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		service := api.ZPAService
 		jsonPayload, _, err := private_cloud_group.GetAll(ctx, service)
 		if err != nil {
-			log.Fatal(err)
+			isLicErr, reason := isLicenseError(err)
+			// If it's a license error, log and continue, otherwise, terminate.
+			if isLicErr {
+				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+				return
+			} else {
+				log.Fatal(err)
+			}
 		}
 		m, _ := json.Marshal(jsonPayload)
 		resourceCount = len(jsonPayload)
@@ -899,6 +1023,7 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 			// If it's a license error, log and continue, otherwise, terminate.
 			if isLicErr {
 				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+				return
 			} else {
 				log.Fatal(err)
 			}
@@ -918,6 +1043,7 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 			// If it's a license error, log and continue, otherwise, terminate.
 			if isLicErr {
 				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+				return
 			} else {
 				log.Fatal(err)
 			}
