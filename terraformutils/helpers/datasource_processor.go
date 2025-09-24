@@ -40,7 +40,7 @@ type DataSourceMapping struct {
 	DataSourceType string // e.g., "zia_location_groups", "zia_firewall_filtering_time_window"
 }
 
-// GetDataSourceMappings returns the mapping of attribute names to data source types
+// GetDataSourceMappings returns the mapping of attribute names to data source types.
 // This is where you can easily add new mappings as requested by the user.
 func GetDataSourceMappings() []DataSourceMapping {
 	return []DataSourceMapping{
@@ -121,7 +121,7 @@ type CollectedDataSourceID struct {
 	Name           string // For workload_groups, stores the name value
 }
 
-// PostProcessDataSources performs data source replacement after all imports are complete
+// PostProcessDataSources performs data source replacement after all imports are complete.
 // This function is designed to work alongside the existing PostProcessReferences without interference.
 func PostProcessDataSources(workingDir string) error {
 	log.Printf("🔄 Starting data source post-processing...")
@@ -262,7 +262,7 @@ func CleanupEmptyDataSourceBlocks(workingDir string) error {
 	return nil
 }
 
-// CollectDataSourceIDs scans all .tf files and collects IDs that should be replaced with data source references
+// CollectDataSourceIDs scans all .tf files and collects IDs that should be replaced with data source references.
 // It excludes IDs that already have corresponding resource imports (found in resourceMap).
 func CollectDataSourceIDs(workingDir string, resourceMap map[string]string) ([]CollectedDataSourceID, error) {
 	var collectedIDs []CollectedDataSourceID

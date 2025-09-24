@@ -82,7 +82,7 @@ func PostProcessReferences(workingDir string) error {
 	return nil
 }
 
-// ProcessFileContent processes the content of a .tf file and returns processed content
+// ProcessFileContent processes the content of a .tf file and returns processed content.
 func ProcessFileContent(content string, resourceMap map[string]string) string {
 	// Find all id = ["..."] patterns (nested blocks) - handle both single and multiple IDs
 	// Only match raw IDs (those in quotes), not already-processed resource references
@@ -472,7 +472,7 @@ func ProcessFileContent(content string, resourceMap map[string]string) string {
 	return processedContent
 }
 
-// getSingleIdResourceType returns the resource type for single ID attributes
+// getSingleIdResourceType returns the resource type for single ID attributes.
 func getSingleIdResourceType(attributeName string) string {
 	// Map of attribute names to their corresponding resource types
 	singleIdMappings := map[string]string{

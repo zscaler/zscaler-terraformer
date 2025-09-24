@@ -266,7 +266,7 @@ func TestHCLGeneration(t *testing.T) {
 	}
 }
 
-// Mock helper functions for testing
+// Mock helper functions for testing.
 
 func mockValidateGenerateParams(resourceType, resources string) bool {
 	// Basic validation logic

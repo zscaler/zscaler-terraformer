@@ -122,7 +122,7 @@ func TestHCLPatternMatching(t *testing.T) {
 	}
 }
 
-// Mock helper functions for testing
+// Mock helper functions for testing.
 
 func mockParseOutputsContent(content string) map[string]string {
 	resourceMap := make(map[string]string)

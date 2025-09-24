@@ -1,8 +1,8 @@
 package fixtures
 
-// Mock API response data for testing
+// Mock API response data for testing.
 
-// ZPA API Responses
+// ZPA API Responses.
 const ZPAAppConnectorGroupResponse = `[
   {
     "id": "72058304855047746",
@@ -52,7 +52,7 @@ const ZPALicenseErrorResponse = `{
   "status": 401
 }`
 
-// ZIA API Responses
+// ZIA API Responses.
 const ZIAFirewallRuleResponse = `[
   {
     "id": 1503414,
@@ -89,7 +89,7 @@ const ZIAAPIErrorResponse = `{
   "timestamp": "2025-09-22T21:45:30Z"
 }`
 
-// Expected HCL Output
+// Expected HCL Output.
 const ExpectedZPAApplicationSegmentHCL = `# __generated__ by Zscaler Terraformer from Test_App_Segment
 resource "zpa_application_segment" "resource_zpa_application_segment_72058304855047123" {
   name                     = "Test_App_Segment"
@@ -131,7 +131,7 @@ resource "zia_firewall_filtering_rule" "resource_zia_firewall_filtering_rule_150
   }
 }`
 
-// Provider Configuration Templates
+// Provider Configuration Templates.
 const ZPAProviderConfig = `terraform {
   required_providers {
     zpa = {

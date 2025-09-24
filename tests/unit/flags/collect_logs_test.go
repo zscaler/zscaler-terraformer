@@ -185,7 +185,7 @@ func TestLogFileLocation(t *testing.T) {
 	}
 }
 
-// Mock helper functions for testing
+// Mock helper functions for testing.
 
 func mockGenerateLogPath(workingDir string) string {
 	timestamp := "20250922_213457"

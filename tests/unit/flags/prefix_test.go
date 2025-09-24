@@ -164,7 +164,7 @@ func TestPrefixValidation(t *testing.T) {
 	}
 }
 
-// Mock helper functions for testing
+// Mock helper functions for testing.
 
 func mockSanitizePrefix(prefix string) string {
 	if prefix == "" {

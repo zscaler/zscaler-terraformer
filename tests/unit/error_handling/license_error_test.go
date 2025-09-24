@@ -133,7 +133,7 @@ func TestLicenseErrorJSONParsing(t *testing.T) {
 	}
 }
 
-// Mock implementation of license error detection for testing
+// Mock implementation of license error detection for testing.
 func mockIsLicenseError(err error) (bool, string) {
 	const licenseErrorMsg = "authz.featureflag.permission.denied"
 	errorString := err.Error()
@@ -167,7 +167,7 @@ func mockIsLicenseError(err error) (bool, string) {
 	return false, ""
 }
 
-// Helper function to check if error string contains valid JSON
+// Helper function to check if error string contains valid JSON.
 func hasValidJSON(errorString string) bool {
 	jsonStart := strings.Index(errorString, "{")
 	jsonEnd := strings.LastIndex(errorString, "}")

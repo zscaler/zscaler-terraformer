@@ -264,7 +264,7 @@ func TestReferenceResolution(t *testing.T) {
 	}
 }
 
-// Mock helper functions for testing
+// Mock helper functions for testing.
 
 func mockValidateImportParams(resources, _ string) bool {
 	if resources == "" {

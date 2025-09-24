@@ -32,13 +32,13 @@ import (
 	"strings"
 )
 
-// ZPAPolicyOperandMapping defines how ZPA policy operand fields map to data sources based on object_type
+// ZPAPolicyOperandMapping defines how ZPA policy operand fields map to data sources based on object_type.
 type ZPAPolicyOperandMapping struct {
 	ObjectType    string            // e.g., "SCIM", "SAML", "POSTURE"
 	FieldMappings map[string]string // e.g., "idp_id" -> "zpa_idp_controller"
 }
 
-// GetZPAPolicyMappings returns the mapping configuration for ZPA policy operands
+// GetZPAPolicyMappings returns the mapping configuration for ZPA policy operands.
 func GetZPAPolicyMappings() []ZPAPolicyOperandMapping {
 	return []ZPAPolicyOperandMapping{
 		{
@@ -85,7 +85,7 @@ func GetZPAPolicyMappings() []ZPAPolicyOperandMapping {
 	}
 }
 
-// ZPACollectedDataSource represents a ZPA data source that needs to be created
+// ZPACollectedDataSource represents a ZPA data source that needs to be created.
 type ZPACollectedDataSource struct {
 	DataSourceType  string
 	ID              string
@@ -96,7 +96,7 @@ type ZPACollectedDataSource struct {
 	IDPControllerID string // The IDP controller ID to reference for idp_name
 }
 
-// PostProcessZPAPolicyDataSources processes ZPA policy data source references
+// PostProcessZPAPolicyDataSources processes ZPA policy data source references.
 func PostProcessZPAPolicyDataSources(workingDir string, resourceMap map[string]string) error {
 	log.Printf("🔄 Starting ZPA policy data source processing...")
 
@@ -130,7 +130,7 @@ func PostProcessZPAPolicyDataSources(workingDir string, resourceMap map[string]s
 	return nil
 }
 
-// CollectZPAPolicyDataSourceIDs scans ZPA policy files and collects operand IDs that need data source references
+// CollectZPAPolicyDataSourceIDs scans ZPA policy files and collects operand IDs that need data source references.
 func CollectZPAPolicyDataSourceIDs(workingDir string, resourceMap map[string]string) ([]ZPACollectedDataSource, error) {
 	var collectedDataSources []ZPACollectedDataSource
 	idTracker := make(map[string]bool)
@@ -264,7 +264,7 @@ func CollectZPAPolicyDataSourceIDs(workingDir string, resourceMap map[string]str
 	return collectedDataSources, nil
 }
 
-// AppendZPADataSources appends ZPA data sources to the existing datasource.tf file
+// AppendZPADataSources appends ZPA data sources to the existing datasource.tf file.
 func AppendZPADataSources(workingDir string, zpaDataSources []ZPACollectedDataSource) error {
 	if len(zpaDataSources) == 0 {
 		return nil
@@ -342,7 +342,7 @@ func AppendZPADataSources(workingDir string, zpaDataSources []ZPACollectedDataSo
 	return nil
 }
 
-// ReplaceZPAPolicyReferences replaces ZPA policy operand IDs with data source references
+// ReplaceZPAPolicyReferences replaces ZPA policy operand IDs with data source references.
 func ReplaceZPAPolicyReferences(workingDir string, zpaDataSources []ZPACollectedDataSource) error {
 	// Create lookup maps for replacements
 	idToReference := make(map[string]map[string]string) // objectType -> fieldName -> reference

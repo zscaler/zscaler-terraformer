@@ -271,16 +271,18 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 			output += helpers.ListIdsStringBlock(block, structData["serverGroups"])
 			continue
 		} else if helpers.IsInList(resourceType, []string{"zpa_application_segment_pra"}) {
-			if block == "server_groups" {
+			switch block {
+			case "server_groups":
 				output += helpers.ListIdsStringBlock(block, structData["serverGroups"])
-			} else if block == "common_apps_dto" {
+			case "common_apps_dto":
 				output += helpers.ListNestedBlock(block, structData["praApps"])
 			}
 			continue
 		} else if helpers.IsInList(resourceType, []string{"zpa_application_segment_inspection"}) {
-			if block == "server_groups" {
+			switch block {
+			case "server_groups":
 				output += helpers.ListIdsStringBlock(block, structData["serverGroups"])
-			} else if block == "common_apps_dto" {
+			case "common_apps_dto":
 				output += helpers.ListNestedBlock(block, structData["inspectionApps"])
 			}
 			continue
@@ -537,7 +539,6 @@ func WriteNestedBlock(resourceType string, attributes []string, schemaBlock *tfj
 // WriteAttrLine outputs a line of HCL configuration with a configurable depth.
 // for known types.
 func WriteAttrLine(key string, value interface{}, usedInBlock bool) string {
-
 	// General handling for attributes that are returned as nil.
 	if value == nil {
 		return ""

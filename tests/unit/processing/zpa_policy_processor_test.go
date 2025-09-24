@@ -234,7 +234,7 @@ func TestIDExtractionFromContent(t *testing.T) {
 	}
 }
 
-// Mock implementation of ID extraction for testing
+// Mock implementation of ID extraction for testing.
 func mockExtractIDsFromContent(content string) []string {
 	var ids []string
 	content = strings.TrimSpace(content)

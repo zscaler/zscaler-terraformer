@@ -89,7 +89,7 @@ func TestZPAAPIErrorHandling(t *testing.T) {
 	}
 }
 
-// Mock error handling functions
+// Mock error handling functions.
 func mockHandleZIAAPIError(errorMsg string) bool {
 	// Simplified ZIA error handling logic
 	skipPatterns := []string{"Rate limit", "not found"}

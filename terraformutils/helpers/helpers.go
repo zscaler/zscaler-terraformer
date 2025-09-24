@@ -26,7 +26,6 @@ package helpers
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"regexp"
@@ -143,7 +142,7 @@ func GenerateOutputs(resourceType string, resourceID string, workingDir string) 
 	if err != nil {
 		log.Fatalf("failed to open outputs file: %s", err)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	// Write the output block to the file.
 	if _, err := f.WriteString(outputBlock); err != nil {
@@ -154,7 +153,7 @@ func GenerateOutputs(resourceType string, resourceID string, workingDir string) 
 // / Custom function to Removes attributes from ZPA StateFile.
 func RemoveTcpPortRangesFromState(stateFile string) {
 	// Read the state file
-	stateData, err := ioutil.ReadFile(stateFile)
+	stateData, err := os.ReadFile(stateFile)
 	if err != nil {
 		log.Fatalf("failed to read state file: %s", err)
 	}
@@ -206,7 +205,7 @@ func RemoveTcpPortRangesFromState(stateFile string) {
 	}
 
 	// Write the modified state back to the file
-	if err := ioutil.WriteFile(stateFile, modifiedStateData, 0600); err != nil {
+	if err := os.WriteFile(stateFile, modifiedStateData, 0600); err != nil {
 		log.Fatalf("failed to write modified state file: %s", err)
 	}
 }

@@ -147,7 +147,7 @@ func TestWorkloadGroupsFormatting(t *testing.T) {
 	}
 }
 
-// Mock helper functions for testing
+// Mock helper functions for testing.
 
 func mockGenerateIDBlock(fieldName string, ids []int) string {
 	if len(ids) == 0 {

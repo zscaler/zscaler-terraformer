@@ -240,17 +240,18 @@ func runImport() func(cmd *cobra.Command, args []string) {
 		includedSensitiveResources := make(map[string]bool)
 		if resources != "" {
 			var resourceTypes []string
-			if resources == "*" {
+			switch resources {
+			case "*":
 				for resource := range resourceImportStringFormats {
 					resourceTypes = append(resourceTypes, resource)
 				}
-			} else if resources == "zia" || resources == "zpa" {
+			case "zia", "zpa":
 				for resource := range resourceImportStringFormats {
 					if strings.HasPrefix(resource, resources) {
 						resourceTypes = append(resourceTypes, resource)
 					}
 				}
-			} else {
+			default:
 				resourceTypes = strings.Split(resources, ",")
 			}
 			excludedResourcesTypes := strings.Split(excludedResources, ",")
@@ -282,7 +283,7 @@ func runImport() func(cmd *cobra.Command, args []string) {
 			// This includes both requested resources and automatically imported referenced resources
 			if len(resourceTypes) > 0 {
 				// Get the working directory from the first resource type
-				_, _, workingDir := initTf(resourceTypes[0])
+				_, _, workingDir := initTf(cmd.Context(), resourceTypes[0])
 
 				// Set up log collection if enabled (now that we know the working directory)
 				if collectLogs {
@@ -348,7 +349,7 @@ func runImport() func(cmd *cobra.Command, args []string) {
 
 			// Generate and display comprehensive import summary
 			if len(resourceTypes) > 0 {
-				_, _, workingDir := initTf(resourceTypes[0])
+				_, _, workingDir := initTf(cmd.Context(), resourceTypes[0])
 				helpers.PrintImportSummary(workingDir)
 
 				// Run terraform validate if requested
@@ -371,7 +372,7 @@ func runImport() func(cmd *cobra.Command, args []string) {
 		}
 
 		// Set up log collection and progress tracking for single resource import if enabled
-		_, _, workingDir := initTf(resourceType_)
+		_, _, workingDir := initTf(cmd.Context(), resourceType_)
 
 		if collectLogs {
 			setupLogCollection(workingDir)
@@ -2052,7 +2053,7 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		return
 	}
 
-	tf, _, workingDir := initTf(resourceType)
+	tf, _, workingDir := initTf(ctx, resourceType)
 	f, err := os.Create(strings.TrimSuffix(workingDir, "/") + "/" + resourceType + ".tf")
 	if err != nil {
 		log.Fatal(err)
@@ -2080,8 +2081,8 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		}
 		if resourceID != "" {
 			name := buildResourceName(resourceType, structData)
-			fmt.Fprint(writer, buildCompositeID(resourceType, resourceID, name))
-			err := tf.Import(cmd.Context(), resourceType+"."+name, resourceID)
+			_, _ = fmt.Fprint(writer, buildCompositeID(resourceType, resourceID, name))
+			err := tf.Import(ctx, resourceType+"."+name, resourceID)
 			if err != nil {
 				if strings.Contains(err.Error(), "Resource already managed by Terraform") {
 					managedResourceTypes[resourceType] = true
@@ -2098,7 +2099,6 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 
 	stateFile := workingDir + "/terraform.tfstate"
 	helpers.RemoveTcpPortRangesFromState(stateFile)
-
 }
 
 // importReferencedResources is currently unused but kept for potential future use
@@ -2184,10 +2184,10 @@ func importReferencedResources(ctx context.Context, cmd *cobra.Command, writer i
 	// Post-processing will be handled by the main runImport function after all resource types are processed
 }
 
-// This prevents recursive loops when importing referenced resources
+// This prevents recursive loops when importing referenced resources.
 //
 //nolint:unused // directImportReferencedResource imports referenced resources directly without triggering automatic reference detection
-func directImportReferencedResource(_ context.Context, _ *cobra.Command, _ io.Writer, resourceType string, resourceIDs []string, _ map[string]bool, includedSensitiveResources map[string]bool) {
+func directImportReferencedResource(_ context.Context, _ *cobra.Command, _ io.Writer, resourceType string, resourceIDs []string, _ map[string]bool, _ map[string]bool) {
 	// For now, just log that we would import these resources
 	// The actual import logic will be handled by the main importResource function
 	// This prevents the recursive loop while still allowing the referenced resources to be imported

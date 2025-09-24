@@ -92,7 +92,7 @@ func TestSupportContactValidation(t *testing.T) {
 	}
 }
 
-// Helper function to validate phone number format
+// Helper function to validate phone number format.
 func isValidPhoneFormat(phone string) bool {
 	if phone == "" {
 		return false

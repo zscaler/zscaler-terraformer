@@ -41,7 +41,7 @@ import (
 )
 
 // Client is the high-level client returned by NewClient().
-// We only keep one Service pointer, and at runtime
+// We only keep one Service pointer, and at runtime.
 // it will be backed by either the legacy (V2) client or the new (V3) client.
 type Client struct {
 	Service *zscaler.Service

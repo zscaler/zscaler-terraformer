@@ -154,7 +154,7 @@ func TestFileOutputGeneration(t *testing.T) {
 	}
 }
 
-// Mock helper functions
+// Mock helper functions.
 func mockPostProcessingStep(step string) bool {
 	// All steps should complete successfully in normal cases
 	validSteps := []string{

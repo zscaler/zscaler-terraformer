@@ -160,7 +160,7 @@ var allSupportedResources = []string{
 	"zia_mobile_malware_protection_policy",
 }
 
-// SupportContact represents support contact information for a specific region/country
+// SupportContact represents support contact information for a specific region/country.
 type SupportContact struct {
 	Region  string
 	Country string
@@ -168,7 +168,7 @@ type SupportContact struct {
 	Type    string
 }
 
-// getSupportContacts returns all support contact information organized by region
+// getSupportContacts returns all support contact information organized by region.
 func getSupportContacts() []SupportContact {
 	return []SupportContact{
 		// Americas
@@ -188,7 +188,7 @@ func getSupportContacts() []SupportContact {
 	}
 }
 
-// displaySupportTable shows formatted support contact information
+// displaySupportTable shows formatted support contact information.
 func displaySupportTable() {
 	contacts := getSupportContacts()
 
@@ -292,7 +292,7 @@ var logFile *os.File
 var originalStdout *os.File
 var progressTracker *ProgressTracker
 
-// setupLogCollection moves temp log to working directory and finalizes setup
+// setupLogCollection moves temp log to working directory and finalizes setup.
 func setupLogCollection(workingDir string) {
 	if logFile == nil {
 		return // Log collection not initialized
@@ -358,7 +358,7 @@ func setupLogCollection(workingDir string) {
 	}
 }
 
-// cleanupLogCollection restores normal output and cleans up environment variables
+// cleanupLogCollection restores normal output and cleans up environment variables.
 func cleanupLogCollection() {
 	// Write completion message to log file
 	if logFile != nil {
@@ -382,7 +382,7 @@ func cleanupLogCollection() {
 	}
 }
 
-// ProgressTracker manages colored progress bar display during operations
+// ProgressTracker manages colored progress bar display during operations.
 type ProgressTracker struct {
 	current     int
 	total       int
@@ -392,7 +392,7 @@ type ProgressTracker struct {
 	currentTask string
 }
 
-// NewProgressTracker creates a new progress tracker
+// NewProgressTracker creates a new progress tracker.
 func NewProgressTracker(total int) *ProgressTracker {
 	return &ProgressTracker{
 		current:    0,
@@ -403,7 +403,7 @@ func NewProgressTracker(total int) *ProgressTracker {
 	}
 }
 
-// Update updates the progress and redraws the progress bar
+// Update updates the progress and redraws the progress bar.
 func (pt *ProgressTracker) Update(taskName string) {
 	if !progress {
 		return // Progress disabled
@@ -415,7 +415,7 @@ func (pt *ProgressTracker) Update(taskName string) {
 	pt.redraw()
 }
 
-// UpdateWithOutput updates progress and handles output redirection for collect-logs
+// UpdateWithOutput updates progress and handles output redirection for collect-logs.
 func (pt *ProgressTracker) UpdateWithOutput(taskName string) {
 	if !progress {
 		return // Progress disabled
@@ -432,7 +432,7 @@ func (pt *ProgressTracker) UpdateWithOutput(taskName string) {
 	}
 }
 
-// redrawToOutput renders progress bar to specific output (for collect-logs compatibility)
+// redrawToOutput renders progress bar to specific output (for collect-logs compatibility).
 func (pt *ProgressTracker) redrawToOutput(output *os.File) {
 	if pt.total == 0 {
 		return
@@ -490,13 +490,13 @@ func (pt *ProgressTracker) redrawToOutput(output *os.File) {
 	}
 }
 
-// redraw renders the colored progress bar
+// redraw renders the colored progress bar.
 func (pt *ProgressTracker) redraw() {
 	if pt.total == 0 {
 		return
 	}
 
-	// Calculate percentage
+	// Calculate percentage.
 	percentage := float64(pt.current) / float64(pt.total) * 100
 	completed := int(float64(pt.width) * float64(pt.current) / float64(pt.total))
 
@@ -519,7 +519,7 @@ func (pt *ProgressTracker) redraw() {
 		etaStr = "ETA: calculating..."
 	}
 
-	// Build progress bar
+	// Build progress bar.
 	bar := "\033[32m" // Green for completed
 	for i := 0; i < completed; i++ {
 		bar += "█"
@@ -548,7 +548,7 @@ func (pt *ProgressTracker) redraw() {
 	}
 }
 
-// Finish completes the progress bar
+// Finish completes the progress bar.
 func (pt *ProgressTracker) Finish() {
 	if !progress {
 		return
@@ -558,7 +558,7 @@ func (pt *ProgressTracker) Finish() {
 	pt.redraw()
 }
 
-// validateGeneratedFiles runs terraform init and validate on the working directory
+// validateGeneratedFiles runs terraform init and validate on the working directory.
 func validateGeneratedFiles(workingDir string) error {
 	fmt.Printf("🔍 Running terraform validation on generated files in: \033[33m%s\033[0m\n", workingDir)
 
@@ -1082,22 +1082,22 @@ func listSupportedResources(prefix string) {
 	width2 := 18
 	width3 := 18
 
-	fmt.Fprintf(w, "╔%s╗\n", strings.Repeat("═", width1+width2+width3+10))
-	fmt.Fprintf(w, "║ %-*s │ %-*s │ %-*s   ║\n",
+	_, _ = fmt.Fprintf(w, "╔%s╗\n", strings.Repeat("═", width1+width2+width3+10))
+	_, _ = fmt.Fprintf(w, "║ %-*s │ %-*s │ %-*s   ║\n",
 		width1, centerText(header1, width1),
 		width2, centerText(header2, width2),
 		width3, centerText(header3, width3))
-	fmt.Fprintf(w, "╠%s╣\n", strings.Repeat("═", width1+width2+width3+10))
+	_, _ = fmt.Fprintf(w, "╠%s╣\n", strings.Repeat("═", width1+width2+width3+10))
 
 	for _, resource := range allSupportedResources {
 		if strings.HasPrefix(resource, prefix) {
-			fmt.Fprintf(w, "║ %-*s │ %-*s │ %-*s ║\n",
+			_, _ = fmt.Fprintf(w, "║ %-*s │ %-*s │ %-*s ║\n",
 				width1, resource,
 				width2, centerText("✅", width2),
 				width3, centerText("✅", width3))
 		}
 	}
-	fmt.Fprintf(w, "╚%s╝\n", strings.Repeat("═", width1+width2+width3+10))
+	_, _ = fmt.Fprintf(w, "╚%s╝\n", strings.Repeat("═", width1+width2+width3+10))
 
 	if err := w.Flush(); err != nil {
 		log.Fatalf("Error flushing output: %v", err)

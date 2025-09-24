@@ -1,6 +1,6 @@
 package fixtures
 
-// Sample HCL content for testing
+// Sample HCL content for testing.
 
 const SampleZIAFirewallRule = `# __generated__ by Zscaler Terraformer from Test_Rule
 resource "zia_firewall_filtering_rule" "resource_zia_firewall_filtering_rule_1503414" {
@@ -103,7 +103,7 @@ output "zia_device_groups_resource_zia_device_groups_789012_id" {
   value = "${zia_device_groups.resource_zia_device_groups_789012.id}"
 }`
 
-// API Error Response samples for testing
+// API Error Response samples for testing.
 const SampleLicenseError = `{
   "code": null,
   "message": "",

@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-// Mock progress tracker for testing
+// Mock progress tracker for testing.
 type MockProgressTracker struct {
 	current     int
 	total       int
@@ -194,7 +194,7 @@ func TestTaskNameTruncation(t *testing.T) {
 	}
 }
 
-// Helper function for testing task name truncation
+// Helper function for testing task name truncation.
 func truncateTaskName(taskName string, maxLength int) string {
 	if len(taskName) > maxLength {
 		return taskName[:maxLength-3] + "..."

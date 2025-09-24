@@ -33,13 +33,13 @@ import (
 	"strings"
 )
 
-// ResourceReference defines a mapping between an attribute and a target resource type
+// ResourceReference defines a mapping between an attribute and a target resource type.
 type ResourceReference struct {
 	AttributeName string
 	ResourceType  string
 }
 
-// GetResourceReferences returns the mapping of attribute names to resource types
+// GetResourceReferences returns the mapping of attribute names to resource types.
 func GetResourceReferences() []ResourceReference {
 	return []ResourceReference{
 		// ZPA Resource Mappings
@@ -95,14 +95,14 @@ func GetResourceReferences() []ResourceReference {
 	}
 }
 
-// OutputResource represents a resource from outputs.tf
+// OutputResource represents a resource from outputs.tf.
 type OutputResource struct {
 	ResourceType string
 	ResourceName string
 	ResourceID   string
 }
 
-// ParseOutputsFile parses the outputs.tf file and returns a map of resource ID to resource reference
+// ParseOutputsFile parses the outputs.tf file and returns a map of resource ID to resource reference.
 func ParseOutputsFile(workingDir string) (map[string]string, error) {
 	outputsFile := filepath.Join(workingDir, "outputs.tf")
 	if _, err := os.Stat(outputsFile); os.IsNotExist(err) {
@@ -178,7 +178,7 @@ func ParseOutputsFile(workingDir string) (map[string]string, error) {
 	return resourceMap, scanner.Err()
 }
 
-// ExtractResourceIDFromName extracts the resource ID from a Terraform resource name
+// ExtractResourceIDFromName extracts the resource ID from a Terraform resource name.
 func ExtractResourceIDFromName(resourceName string) string {
 	// Resource names are typically in format: resource_type_resource_id
 	// Extract the ID part after the last underscore
@@ -189,7 +189,7 @@ func ExtractResourceIDFromName(resourceName string) string {
 	return ""
 }
 
-// ReplaceReferencesInData replaces raw IDs with resource references in the data
+// ReplaceReferencesInData replaces raw IDs with resource references in the data.
 func ReplaceReferencesInData(resourceType string, structData map[string]interface{}, resourceMap map[string]string) {
 	references := GetResourceReferences()
 
@@ -200,7 +200,7 @@ func ReplaceReferencesInData(resourceType string, structData map[string]interfac
 	}
 }
 
-// replaceAttributeReferencesInData handles the replacement of references in a specific attribute
+// replaceAttributeReferencesInData handles the replacement of references in a specific attribute.
 func replaceAttributeReferencesInData(value interface{}, targetResourceType string, resourceMap map[string]string) {
 	switch v := value.(type) {
 	case []interface{}:
@@ -257,7 +257,7 @@ func replaceAttributeReferencesInData(value interface{}, targetResourceType stri
 	}
 }
 
-// GenerateDatasourceFile generates a datasource.tf file for missing resources
+// GenerateDatasourceFile generates a datasource.tf file for missing resources.
 func GenerateDatasourceFile(workingDir string, missingResources map[string]string) error {
 	if len(missingResources) == 0 {
 		return nil

@@ -131,7 +131,7 @@ func TestTerraformVersionDetection(t *testing.T) {
 	}
 }
 
-// Helper functions for testing (these simulate the logic from the actual code)
+// Helper functions for testing (these simulate the logic from the actual code).
 
 func isSyntaxError(output string) bool {
 	return strings.Contains(output, "Unclosed configuration block") ||

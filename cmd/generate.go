@@ -256,7 +256,7 @@ func generateResources() func(cmd *cobra.Command, args []string) {
 			// Set up log collection and run validation if requested and we generated resources
 			if len(filteredResourceTypes) > 0 {
 				// Get working directory from first resource type
-				_, _, workingDir := initTf(filteredResourceTypes[0])
+				_, _, workingDir := initTf(cmd.Context(), filteredResourceTypes[0])
 
 				// Set up log collection if enabled (now that we know the working directory)
 				if collectLogs {
@@ -281,7 +281,7 @@ func generateResources() func(cmd *cobra.Command, args []string) {
 
 		// Set up log collection, progress tracking and validation for single resource generation
 		if resourceType_ != "" {
-			_, _, workingDir := initTf(resourceType_)
+			_, _, workingDir := initTf(cmd.Context(), resourceType_)
 
 			// Set up log collection if enabled
 			if collectLogs {
@@ -396,7 +396,7 @@ func buildResourceName(resourceType string, structData map[string]interface{}) s
 	return resID
 }
 
-// sanitizePrefix ensures the custom prefix follows terraform naming conventions
+// sanitizePrefix ensures the custom prefix follows terraform naming conventions.
 func sanitizePrefix(prefix string) string {
 	if prefix == "" {
 		return "resource"
@@ -455,7 +455,7 @@ func sanitizePrefix(prefix string) string {
 	return sanitized
 }
 
-func initTf(resourceType string) (tf *tfexec.Terraform, r *tfjson.Schema, workingDir string) {
+func initTf(ctx context.Context, resourceType string) (tf *tfexec.Terraform, r *tfjson.Schema, workingDir string) {
 	// [1] Install or locate terraform as before
 	execPath, err := exec.LookPath("terraform")
 	if err != nil {
@@ -673,12 +673,12 @@ provider "%s" {
 	}
 
 	// [6] Now init the Terraform config
-	err = tf.Init(context.Background(), tfexec.Upgrade(true))
+	err = tf.Init(ctx, tfexec.Upgrade(true))
 	if err != nil {
 		log.Fatal("tf init failed ", err)
 	}
 
-	ps, err := tf.ProvidersSchema(context.Background())
+	ps, err := tf.ProvidersSchema(ctx)
 	if err != nil {
 		log.Fatal("failed to read provider schema", err)
 	}
@@ -702,7 +702,7 @@ provider "%s" {
 	}
 	r = s.ResourceSchemas[resourceType]
 	if displayReleaseVersion {
-		tfVrsion, providerVersions, err := tf.Version(context.Background(), false)
+		tfVrsion, providerVersions, err := tf.Version(ctx, false)
 		if err == nil {
 			if tfVrsion != nil {
 				log.Infof("Terraform Version: %s", tfVrsion.String())
@@ -719,7 +719,7 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 	if resourceType == "" {
 		log.Fatal("you must define a resource type to generate")
 	}
-	tf, r, workingDir := initTf(resourceType) // Ensure workingDir is obtained
+	tf, r, workingDir := initTf(ctx, resourceType) // Ensure workingDir is obtained
 	log.Debugf("beginning to read and build %s resources", resourceType)
 
 	// Note: Reference replacement is now handled in post-processing after all imports
@@ -2088,12 +2088,12 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	default:
-		fmt.Fprintf(cmd.OutOrStdout(), "%q is not yet supported for automatic generation", resourceType)
+		_, _ = fmt.Fprintf(cmd.OutOrStdout(), "%q is not yet supported for automatic generation", resourceType)
 		return
 	}
 
 	if resourceCount == 0 {
-		fmt.Fprintf(cmd.OutOrStdout(), "no resources found to generate.")
+		_, _ = fmt.Fprintf(cmd.OutOrStdout(), "no resources found to generate.")
 		return
 	}
 
@@ -2137,9 +2137,7 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		}
 
 		sort.Strings(sortedBlockAttributes)
-
 		for _, attrName := range sortedBlockAttributes {
-
 			apiAttrName := nesting.MapTfFieldNameToAPI(resourceType, attrName)
 			if attrName == "id" || attrName == "tcp_port_ranges" || attrName == "udp_port_ranges" || attrName == "rule_order" || (resourceType == "zia_url_categories" && attrName == "val") {
 				continue

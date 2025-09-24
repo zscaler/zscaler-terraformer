@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-// CreateTempTestDir creates a temporary directory for testing
+// CreateTempTestDir creates a temporary directory for testing.
 func CreateTempTestDir(t *testing.T, prefix string) string {
 	tempDir, err := os.MkdirTemp("", prefix)
 	if err != nil {
@@ -23,7 +23,7 @@ func CreateTempTestDir(t *testing.T, prefix string) string {
 	return tempDir
 }
 
-// CreateTestFile creates a test file with specified content
+// CreateTestFile creates a test file with specified content.
 func CreateTestFile(t *testing.T, dir, filename, content string) string {
 	filePath := filepath.Join(dir, filename)
 	err := os.WriteFile(filePath, []byte(content), 0644)
@@ -33,13 +33,13 @@ func CreateTestFile(t *testing.T, dir, filename, content string) string {
 	return filePath
 }
 
-// FileExists checks if a file exists
+// FileExists checks if a file exists.
 func FileExists(filepath string) bool {
 	_, err := os.Stat(filepath)
 	return !os.IsNotExist(err)
 }
 
-// ReadFileContent reads and returns file content
+// ReadFileContent reads and returns file content.
 func ReadFileContent(t *testing.T, filepath string) string {
 	content, err := os.ReadFile(filepath)
 	if err != nil {
@@ -48,7 +48,7 @@ func ReadFileContent(t *testing.T, filepath string) string {
 	return string(content)
 }
 
-// SetTestEnvVar sets an environment variable for testing and ensures cleanup
+// SetTestEnvVar sets an environment variable for testing and ensures cleanup.
 func SetTestEnvVar(t *testing.T, key, value string) {
 	originalValue := os.Getenv(key)
 	_ = os.Setenv(key, value)
@@ -63,7 +63,7 @@ func SetTestEnvVar(t *testing.T, key, value string) {
 	})
 }
 
-// CaptureStdout captures stdout during function execution
+// CaptureStdout captures stdout during function execution.
 func CaptureStdout(fn func()) (string, error) {
 	// Create a pipe to capture output
 	r, w, err := os.Pipe()
@@ -109,14 +109,14 @@ func CaptureStdout(fn func()) (string, error) {
 	}
 }
 
-// AssertContains checks if a string contains a substring
+// AssertContains checks if a string contains a substring.
 func AssertContains(t *testing.T, haystack, needle, message string) {
 	if !strings.Contains(haystack, needle) {
 		t.Errorf("%s: Expected to contain '%s', but got: %s", message, needle, haystack)
 	}
 }
 
-// AssertNotContains checks if a string does not contain a substring
+// AssertNotContains checks if a string does not contain a substring.
 func AssertNotContains(t *testing.T, haystack, needle, message string) {
 	if strings.Contains(haystack, needle) {
 		t.Errorf("%s: Expected NOT to contain '%s', but got: %s", message, needle, haystack)
