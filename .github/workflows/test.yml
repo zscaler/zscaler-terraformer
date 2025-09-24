@@ -102,7 +102,7 @@ jobs:
           go tool cover -func=coverage.out
           echo "✅ Coverage report completed"
 
-      - name: Run Integration Tests with retries
+      - name: Run integration tests with retries
         if: ${{ hashFiles('tests/integration/**/*_test.go') != '' }}
         run: |
           max_attempts=3
@@ -110,20 +110,17 @@ jobs:
           until [ "$attempt" -ge "$max_attempts" ]
           do
             attempt=$((attempt+1))
-            echo "🧪 Integration test attempt $attempt of $max_attempts"
-            timeout 10m make test-integration && break
+            make test-integration && break
             echo "Attempt $attempt of $max_attempts failed. Retrying..."
             sleep 10
           done
           if [ "$attempt" -eq "$max_attempts" ]; then
-            echo "Integration tests failed after $max_attempts attempts."
+            echo "Test failed after $max_attempts attempts."
             exit 1
           fi
-          echo "✅ Integration tests passed on attempt $attempt"
         env:
-            ZSCALER_CLIENT_ID: ${{ secrets.ZSCALER_CLIENT_ID }}
-            ZSCALER_CLIENT_SECRET: ${{ secrets.ZSCALER_CLIENT_SECRET }}
-            ZSCALER_VANITY_DOMAIN: ${{ secrets.ZSCALER_VANITY_DOMAIN }}
-            ZSCALER_CLOUD: ${{ secrets.ZSCALER_CLOUD }}
-            ZPA_CUSTOMER_ID: ${{ secrets.ZPA_CUSTOMER_ID }}
-            ZSCALER_TERRAFORM_INSTALL_PATH: ${{ github.workspace }}
+          ZSCALER_CLIENT_ID: ${{ secrets.ZSCALER_CLIENT_ID }}
+          ZSCALER_CLIENT_SECRET: ${{ secrets.ZSCALER_CLIENT_SECRET }}
+          ZSCALER_VANITY_DOMAIN: ${{ secrets.ZSCALER_VANITY_DOMAIN }}
+          ZSCALER_CLOUD: ${{ secrets.ZSCALER_CLOUD }}
+          ZPA_CUSTOMER_ID: ${{ secrets.ZPA_CUSTOMER_ID }}
