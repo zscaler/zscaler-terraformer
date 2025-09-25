@@ -1,0 +1,182 @@
+name: Update Chocolatey Package
+
+on:
+#   release:
+#     types: [published]
+    push:
+        branches: [master]
+
+jobs:
+  update-chocolatey:
+    runs-on: windows-latest  # Use Windows runner for Chocolatey
+    steps:
+      - name: Checkout zscaler-terraformer
+        uses: actions/checkout@v5
+
+      - name: Extract release info
+        id: release_info
+        shell: pwsh
+        run: |
+          # Extract version from tag (remove 'v' prefix if present)
+          $version = "${{ github.event.release.tag_name }}" -replace '^v', ''
+          echo "version=$version" >> $env:GITHUB_OUTPUT
+          
+          # Get download URL for assets
+          $downloadUrl = "https://github.com/zscaler/zscaler-terraformer/releases/download/${{ github.event.release.tag_name }}"
+          echo "download_url=$downloadUrl" >> $env:GITHUB_OUTPUT
+
+      - name: Download and parse SHA256SUMS
+        id: checksums
+        shell: pwsh
+        run: |
+          # Download the SHA256SUMS file
+          $url = "${{ steps.release_info.outputs.download_url }}/zscaler-terraformer_${{ steps.release_info.outputs.version }}_SHA256SUMS"
+          Invoke-WebRequest -Uri $url -OutFile "SHA256SUMS"
+          
+          # Extract Windows checksums
+          $content = Get-Content "SHA256SUMS"
+          $windows386SHA = ($content | Where-Object { $_ -match "windows_386" }) -split '\s+' | Select-Object -First 1
+          $windowsAmd64SHA = ($content | Where-Object { $_ -match "windows_amd64" }) -split '\s+' | Select-Object -First 1
+          
+          echo "windows_386_sha=$windows386SHA" >> $env:GITHUB_OUTPUT
+          echo "windows_amd64_sha=$windowsAmd64SHA" >> $env:GITHUB_OUTPUT
+          
+          Write-Host "✅ Extracted checksums:"
+          Write-Host "Windows 32-bit: $windows386SHA"
+          Write-Host "Windows 64-bit: $windowsAmd64SHA"
+
+      - name: Checkout chocolatey-packages repository
+        uses: actions/checkout@v5
+        with:
+          repository: zscaler/chocolatey-packages
+          token: ${{ secrets.CHOCOLATEY_REPO_TOKEN }}
+          path: chocolatey-packages
+
+      - name: Update Chocolatey package files
+        shell: pwsh
+        run: |
+          cd chocolatey-packages/zscaler-terraformer
+          
+          # Update version.txt
+          "${{ steps.release_info.outputs.version }}" | Out-File -FilePath "version.txt" -Encoding UTF8 -NoNewline
+          Write-Host "✅ Updated version.txt to ${{ steps.release_info.outputs.version }}"
+          
+          # Update chocolateyinstall.ps1 with new checksums
+          $installScript = @"
+           <#
+          .SYNOPSIS
+          Installs the Zscaler Terraformer CLI.
+          
+          Authors: Zscaler Technology Alliances <devrel@zscaler.com>
+          
+          .DESCRIPTION
+          This script installs the Zscaler Terraformer Command Line Interface.
+          
+          #>
+          
+          `$ErrorActionPreference = 'Stop'
+          
+          `$toolsDir = Split-Path `$MyInvocation.MyCommand.Definition
+          
+          # Define package details
+          `$packageName = 'zscaler-terraformer'
+          
+          # Read version from version.txt file
+          `$versionFile = Join-Path (Split-Path `$MyInvocation.MyCommand.Definition -Parent) "..\version.txt"
+          `$version = (Get-Content `$versionFile).Trim()
+          
+          # URL and checksum for the 64-bit .zip file
+          `$url64bit = "https://github.com/zscaler/zscaler-terraformer/releases/download/v`$version/zscaler-terraformer_`$version``_windows_amd64.zip"
+          `$checksum64bit = '${{ steps.checksums.outputs.windows_amd64_sha }}'
+          
+          # URL and checksum for the 32-bit .zip file
+          `$url32bit = "https://github.com/zscaler/zscaler-terraformer/releases/download/v`$version/zscaler-terraformer_`$version``_windows_386.zip"
+          `$checksum32bit = '${{ steps.checksums.outputs.windows_386_sha }}'
+          
+          # Download, verify, and unzip the package
+          `$packageArgs = @{
+              packageName    = `$packageName
+              unzipLocation  = `$toolsDir
+              url            = `$url32bit  # Default to 32-bit
+              checksum       = `$checksum32bit
+              checksumType   = 'sha256'
+              url64bit       = `$url64bit  # Use this for 64-bit systems
+              checksum64     = `$checksum64bit
+              checksumType64 = 'sha256'
+          }
+          
+          Install-ChocolateyZipPackage @packageArgs
+          "@
+          
+          $installScript | Out-File -FilePath "tools/chocolateyinstall.ps1" -Encoding UTF8
+          Write-Host "✅ Updated chocolateyinstall.ps1 with new checksums"
+
+      - name: Install Chocolatey
+        shell: pwsh
+        run: |
+          Set-ExecutionPolicy Bypass -Scope Process -Force
+          [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+          iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+
+      - name: Build and push Chocolatey package
+        shell: pwsh
+        run: |
+          cd chocolatey-packages/zscaler-terraformer
+          
+          # Build the package
+          Write-Host "📦 Building Chocolatey package..."
+          choco pack
+          
+          # Set API key for Chocolatey
+          Write-Host "🔑 Setting Chocolatey API key..."
+          choco apikey --key ${{ secrets.CHOCOLATEY_API_KEY }} --source https://push.chocolatey.org
+          
+          # Find the generated .nupkg file
+          $nupkgFile = Get-ChildItem -Filter "zscaler-terraformer.${{ steps.release_info.outputs.version }}.nupkg" | Select-Object -First 1
+          
+          if ($nupkgFile) {
+            Write-Host "📤 Pushing $($nupkgFile.Name) to Chocolatey.org..."
+            choco push $nupkgFile.Name --source https://push.chocolatey.org
+            Write-Host "✅ Chocolatey package pushed successfully!"
+          } else {
+            Write-Error "❌ Could not find generated .nupkg file"
+            exit 1
+          }
+
+      - name: Commit chocolatey-packages updates
+        shell: pwsh
+        run: |
+          cd chocolatey-packages
+          
+          # Configure git
+          git config user.name "zscaler-terraformer-bot"
+          git config user.email "devrel@zscaler.com"
+          
+          # Check if there are changes to commit
+          $status = git status --porcelain
+          if ($status) {
+            Write-Host "📋 Files that will be updated:"
+            git status --porcelain
+            
+            # Commit and push changes
+            git add .
+            git commit -m "🤖 Update zscaler-terraformer to v${{ steps.release_info.outputs.version }}
+
+            Updates zscaler-terraformer Chocolatey package to version ${{ steps.release_info.outputs.version }}.
+            
+            Changes:
+            - 📦 Version: ${{ steps.release_info.outputs.version }}
+            - 🔐 Updated SHA256 checksums for Windows platforms
+            - 🔗 Release: ${{ github.event.release.html_url }}
+            
+            Platforms updated:
+            - Windows 32-bit: ${{ steps.checksums.outputs.windows_386_sha }}
+            - Windows 64-bit: ${{ steps.checksums.outputs.windows_amd64_sha }}
+            
+            Package automatically pushed to Chocolatey.org"
+            
+            git push origin master
+            Write-Host "✅ Chocolatey repository updated successfully!"
+          } else {
+            Write-Host "ℹ️  No changes detected in chocolatey-packages"
+          }
