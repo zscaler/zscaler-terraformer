@@ -110,9 +110,21 @@ jobs:
           # Update main formula (root)
           cp ../zscaler-terraformer.rb .
           
-          # Update Formula directory
+          # Update Formula directory (with explicit logging)
           if [ -d "Formula" ]; then
+            echo "📁 Updating Formula/zscaler-terraformer.rb"
             cp ../zscaler-terraformer.rb Formula/
+            echo "✅ Formula directory updated"
+          else
+            echo "❌ Formula directory not found!"
+            ls -la
+          fi
+          
+          # Also check for lowercase formula directory 
+          if [ -d "formula" ]; then
+            echo "📁 Updating formula/zscaler-terraformer.rb (lowercase)"
+            cp ../zscaler-terraformer.rb formula/
+            echo "✅ formula directory updated"
           fi
           
           # Update Casks directory with proper cask format
@@ -170,6 +182,10 @@ jobs:
           # Configure git
           git config user.name "zscaler-terraformer-bot"
           git config user.email "devrel@zscaler.com"
+          
+          # Show what files were changed for debugging
+          echo "📋 Files that will be updated:"
+          git status --porcelain
           
           # Check if there are changes to commit
           if ! git diff --quiet; then
