@@ -103,53 +103,41 @@ jobs:
             cp ../zscaler-terraformer.rb Formula/
           fi
           
-          # Update Casks directory with cask format
+          # Update Casks directory (if it exists, though typically not needed for CLI tools)
           if [ -d "Casks" ]; then
-            # Generate cask version
-            cat > Casks/zscaler-terraformer.rb << 'EOF'
-          # Copyright (c) Zscaler, Inc.
-          # MIT License
-
-          cask "zscaler-terraformer" do
-            name "zscaler-terraformer"
-            homepage "https://github.com/zscaler/zscaler-terraformer"
-            desc "CLI tool to generate terraform files from existing ZPA and ZIA"
-            version "${{ steps.release_info.outputs.version }}"
-
-            if Hardware::CPU.intel?
-              url "${{ steps.release_info.outputs.download_url }}/zscaler-terraformer_${{ steps.release_info.outputs.version }}_darwin_amd64.zip"
-              sha256 "${{ steps.checksums.outputs.darwin_amd64_sha }}"
-            else
-              url "${{ steps.release_info.outputs.download_url }}/zscaler-terraformer_${{ steps.release_info.outputs.version }}_darwin_arm64.zip"  
-              sha256 "${{ steps.checksums.outputs.darwin_arm64_sha }}"
-            end
-
-            binary "zscaler-terraformer"
-          end
-          EOF
+            # Use the same formula format since it's a CLI tool, not a GUI app
+            cp ../zscaler-terraformer.rb Casks/
           fi
 
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v7
-        with:
-          token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
-          path: homebrew-tap
-          commit-message: "Update zscaler-terraformer to v${{ steps.release_info.outputs.version }}"
-          title: "Update zscaler-terraformer to v${{ steps.release_info.outputs.version }}"
-          body: |
-            🤖 **Automated Homebrew Tap Update**
+      - name: Commit directly to homebrew-tap
+        run: |
+          cd homebrew-tap
+          
+          # Configure git
+          git config user.name "zscaler-terraformer-bot"
+          git config user.email "devrel@zscaler.com"
+          
+          # Check if there are changes to commit
+          if ! git diff --quiet; then
+            # Commit and push changes directly to master
+            git add .
+            git commit -m "🤖 Update zscaler-terraformer to v${{ steps.release_info.outputs.version }}
+
+            Updates zscaler-terraformer formula to version ${{ steps.release_info.outputs.version }}.
             
-            Updates zscaler-terraformer formula to version `${{ steps.release_info.outputs.version }}`.
-            
-            **Changes:**
-            - 📦 Version: `${{ steps.release_info.outputs.version }}`
+            Changes:
+            - 📦 Version: ${{ steps.release_info.outputs.version }}
             - 🔐 Updated SHA256 checksums for all platforms
             - 🔗 Release: ${{ github.event.release.html_url }}
             
-            **Platforms updated:**
-            - macOS Intel: `${{ steps.checksums.outputs.darwin_amd64_sha }}`
-            - macOS ARM: `${{ steps.checksums.outputs.darwin_arm64_sha }}`
-            - Linux Intel: `${{ steps.checksums.outputs.linux_amd64_sha }}`
-            - Linux ARM: `${{ steps.checksums.outputs.linux_arm64_sha }}`
-          branch: update-terraformer-v${{ steps.release_info.outputs.version }}
-          delete-branch: true
+            Platforms updated:
+            - macOS Intel: ${{ steps.checksums.outputs.darwin_amd64_sha }}
+            - macOS ARM: ${{ steps.checksums.outputs.darwin_arm64_sha }}
+            - Linux Intel: ${{ steps.checksums.outputs.linux_amd64_sha }}
+            - Linux ARM: ${{ steps.checksums.outputs.linux_arm64_sha }}"
+            
+            git push origin master
+            echo "✅ Homebrew tap updated successfully!"
+          else
+            echo "ℹ️  No changes detected in homebrew-tap"
+          fi
