@@ -71,6 +71,18 @@ jobs:
           "${{ steps.release_info.outputs.version }}" | Out-File -FilePath "version.txt" -Encoding UTF8 -NoNewline
           Write-Host "✅ Updated version.txt to ${{ steps.release_info.outputs.version }}"
           
+          # Update .nuspec file with release version
+          $nuspecFile = "zscaler-terraformer.nuspec"
+          if (Test-Path $nuspecFile) {
+            $nuspecContent = Get-Content $nuspecFile -Raw
+            $nuspecContent = $nuspecContent -replace '<version>[^<]*</version>', "<version>${{ steps.release_info.outputs.version }}</version>"
+            $nuspecContent | Out-File -FilePath $nuspecFile -Encoding UTF8
+            Write-Host "✅ Updated .nuspec file version to ${{ steps.release_info.outputs.version }}"
+          } else {
+            Write-Error "❌ Could not find $nuspecFile"
+            exit 1
+          }
+          
           # Update chocolateyinstall.ps1 with new checksums
           $installScript = @"
            <#
