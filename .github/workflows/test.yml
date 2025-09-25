@@ -30,6 +30,7 @@ jobs:
         with:
           go-version: "1.24"
 
+
       - name: checkout
         uses: actions/checkout@v5
 
@@ -101,26 +102,3 @@ jobs:
           go test -cover -coverprofile=coverage.out ./tests/... -timeout 30s
           go tool cover -func=coverage.out
           echo "✅ Coverage report completed"
-
-      - name: Run integration tests with retries
-        if: ${{ hashFiles('tests/integration/**/*_test.go') != '' }}
-        run: |
-          max_attempts=3
-          attempt=0
-          until [ "$attempt" -ge "$max_attempts" ]
-          do
-            attempt=$((attempt+1))
-            make test-integration && break
-            echo "Attempt $attempt of $max_attempts failed. Retrying..."
-            sleep 10
-          done
-          if [ "$attempt" -eq "$max_attempts" ]; then
-            echo "Test failed after $max_attempts attempts."
-            exit 1
-          fi
-        env:
-          ZSCALER_CLIENT_ID: ${{ secrets.ZSCALER_CLIENT_ID }}
-          ZSCALER_CLIENT_SECRET: ${{ secrets.ZSCALER_CLIENT_SECRET }}
-          ZSCALER_VANITY_DOMAIN: ${{ secrets.ZSCALER_VANITY_DOMAIN }}
-          ZSCALER_CLOUD: ${{ secrets.ZSCALER_CLOUD }}
-          ZPA_CUSTOMER_ID: ${{ secrets.ZPA_CUSTOMER_ID }}

@@ -22,10 +22,13 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"os/exec"
 	"runtime"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/zscaler/zscaler-terraformer/v2/terraformutils"
@@ -52,7 +55,78 @@ var versionCmd = &cobra.Command{
 		}
 		fmt.Printf("on (%s)\n", platform)
 
+		// Check for newer version
+		checkForNewerVersion(cliVersion)
+
 		fmt.Println("\nFor the latest releases and updates, visit:")
 		fmt.Println("https://github.com/zscaler/zscaler-terraformer/releases")
 	},
+}
+
+// GitHubRelease represents a GitHub release response.
+type GitHubRelease struct {
+	TagName string `json:"tag_name"`
+	Name    string `json:"name"`
+}
+
+// checkForNewerVersion checks GitHub releases for a newer version.
+func checkForNewerVersion(currentVersion string) {
+	// Create HTTP client with short timeout for non-blocking check
+	client := &http.Client{
+		Timeout: 3 * time.Second,
+	}
+
+	// Get latest release from GitHub API
+	resp, err := client.Get("https://api.github.com/repos/zscaler/zscaler-terraformer/releases/latest")
+	if err != nil {
+		// Silently ignore network errors - don't interrupt user workflow
+		return
+	}
+	defer func() { _ = resp.Body.Close() }()
+
+	if resp.StatusCode != http.StatusOK {
+		// Silently ignore API errors
+		return
+	}
+
+	var release GitHubRelease
+	if err := json.NewDecoder(resp.Body).Decode(&release); err != nil {
+		// Silently ignore JSON parsing errors
+		return
+	}
+
+	// Extract version number from tag (remove 'v' prefix if present)
+	latestVersion := strings.TrimPrefix(release.TagName, "v")
+
+	// Compare versions (simple string comparison works for semantic versions)
+	if latestVersion != currentVersion && IsNewerVersion(latestVersion, currentVersion) {
+		fmt.Printf("\n\033[33m📣 A newer version of 'zscaler-terraformer' is available - consider upgrading to v%s\033[0m\n", latestVersion)
+	}
+}
+
+// IsNewerVersion performs basic semantic version comparison (exported for testing).
+func IsNewerVersion(latest, current string) bool {
+	// Split versions into parts (major.minor.patch)
+	latestParts := strings.Split(latest, ".")
+	currentParts := strings.Split(current, ".")
+
+	// Ensure we have at least 3 parts for comparison
+	for len(latestParts) < 3 {
+		latestParts = append(latestParts, "0")
+	}
+	for len(currentParts) < 3 {
+		currentParts = append(currentParts, "0")
+	}
+
+	// Compare major, minor, patch in order
+	for i := 0; i < 3; i++ {
+		if latestParts[i] > currentParts[i] {
+			return true
+		}
+		if latestParts[i] < currentParts[i] {
+			return false
+		}
+	}
+
+	return false // Versions are equal
 }

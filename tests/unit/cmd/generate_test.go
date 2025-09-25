@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 	"testing"
+
+	"github.com/zscaler/zscaler-terraformer/v2/cmd"
 )
 
 func TestResourceGeneration(t *testing.T) {
@@ -318,4 +320,60 @@ func mockGenerateHCL(resourceType string, data map[string]interface{}) string {
 
 	result += "}\n"
 	return result
+}
+
+func TestVersionComparison(t *testing.T) {
+	tests := []struct {
+		name     string
+		latest   string
+		current  string
+		expected bool
+	}{
+		{
+			name:     "Newer major version",
+			latest:   "3.0.0",
+			current:  "2.1.0",
+			expected: true,
+		},
+		{
+			name:     "Newer minor version",
+			latest:   "2.2.0",
+			current:  "2.1.0",
+			expected: true,
+		},
+		{
+			name:     "Newer patch version",
+			latest:   "2.1.1",
+			current:  "2.1.0",
+			expected: true,
+		},
+		{
+			name:     "Same version",
+			latest:   "2.1.0",
+			current:  "2.1.0",
+			expected: false,
+		},
+		{
+			name:     "Older version",
+			latest:   "2.0.19",
+			current:  "2.1.0",
+			expected: false,
+		},
+		{
+			name:     "Short version format",
+			latest:   "2.2",
+			current:  "2.1.0",
+			expected: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := cmd.IsNewerVersion(tt.latest, tt.current)
+			if result != tt.expected {
+				t.Errorf("IsNewerVersion(%s, %s) = %v, expected %v",
+					tt.latest, tt.current, result, tt.expected)
+			}
+		})
+	}
 }
