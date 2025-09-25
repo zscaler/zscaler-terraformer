@@ -144,6 +144,11 @@ jobs:
         run: |
           cd chocolatey-packages/zscaler-terraformer
           
+          # Clean up old .nupkg files first
+          Write-Host "🧹 Cleaning up old .nupkg files..."
+          Get-ChildItem -Filter "zscaler-terraformer.*.nupkg" | Remove-Item -Force
+          Write-Host "✅ Removed old package files"
+          
           # Build the package
           Write-Host "📦 Building Chocolatey package..."
           choco pack
@@ -152,8 +157,8 @@ jobs:
           Write-Host "🔑 Setting Chocolatey API key..."
           choco apikey --key ${{ secrets.CHOCOLATEY_API_KEY }} --source https://push.chocolatey.org
           
-          # Find the generated .nupkg file
-          $nupkgFile = Get-ChildItem -Filter "zscaler-terraformer.*.nupkg" | Select-Object -First 1
+          # Find the newly generated .nupkg file (most recent)
+          $nupkgFile = Get-ChildItem -Filter "zscaler-terraformer.*.nupkg" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
           
           if ($nupkgFile) {
             Write-Host "📤 Pushing $($nupkgFile.Name) to Chocolatey.org..."
