@@ -66,7 +66,7 @@ jobs:
         run: |
           cd chocolatey-packages/zscaler-terraformer
           
-          # Update version.txt
+          # Update version.txt with release version
           "${{ steps.release_info.outputs.version }}" | Out-File -FilePath "version.txt" -Encoding UTF8 -NoNewline
           Write-Host "✅ Updated version.txt to ${{ steps.release_info.outputs.version }}"
           
@@ -90,9 +90,8 @@ jobs:
           # Define package details
           `$packageName = 'zscaler-terraformer'
           
-          # Read version from version.txt file
-          `$versionFile = Join-Path (Split-Path `$MyInvocation.MyCommand.Definition -Parent) "..\version.txt"
-          `$version = (Get-Content `$versionFile).Trim()
+          # Use the release version directly (from GitHub tag)
+          `$version = "${{ steps.release_info.outputs.version }}"
           
           # URL and checksum for the 64-bit .zip file
           `$url64bit = "https://github.com/zscaler/zscaler-terraformer/releases/download/v`$version/zscaler-terraformer_`$version``_windows_amd64.zip"
@@ -141,7 +140,7 @@ jobs:
           choco apikey --key ${{ secrets.CHOCOLATEY_API_KEY }} --source https://push.chocolatey.org
           
           # Find the generated .nupkg file
-          $nupkgFile = Get-ChildItem -Filter "zscaler-terraformer.${{ steps.release_info.outputs.version }}.nupkg" | Select-Object -First 1
+          $nupkgFile = Get-ChildItem -Filter "zscaler-terraformer.*.nupkg" | Select-Object -First 1
           
           if ($nupkgFile) {
             Write-Host "📤 Pushing $($nupkgFile.Name) to Chocolatey.org..."
