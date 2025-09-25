@@ -39,15 +39,17 @@ jobs:
           curl -L "${{ steps.release_info.outputs.download_url }}/zscaler-terraformer_${{ steps.release_info.outputs.version }}_SHA256SUMS" \
             -o SHA256SUMS
           
-          # Extract checksums for each platform
+          # Extract checksums for ALL 5 platform variants
           DARWIN_AMD64_SHA=$(grep "darwin_amd64" SHA256SUMS | cut -d' ' -f1)
           DARWIN_ARM64_SHA=$(grep "darwin_arm64" SHA256SUMS | cut -d' ' -f1)
           LINUX_AMD64_SHA=$(grep "linux_amd64" SHA256SUMS | cut -d' ' -f1)
-          LINUX_ARM64_SHA=$(grep "linux_arm64" SHA256SUMS | cut -d' ' -f1)
+          LINUX_ARM_SHA=$(grep "linux_arm.zip" SHA256SUMS | cut -d' ' -f1)     # 32-bit ARM
+          LINUX_ARM64_SHA=$(grep "linux_arm64" SHA256SUMS | cut -d' ' -f1)     # 64-bit ARM
           
           echo "darwin_amd64_sha=$DARWIN_AMD64_SHA" >> $GITHUB_OUTPUT
           echo "darwin_arm64_sha=$DARWIN_ARM64_SHA" >> $GITHUB_OUTPUT
           echo "linux_amd64_sha=$LINUX_AMD64_SHA" >> $GITHUB_OUTPUT
+          echo "linux_arm_sha=$LINUX_ARM_SHA" >> $GITHUB_OUTPUT
           echo "linux_arm64_sha=$LINUX_ARM64_SHA" >> $GITHUB_OUTPUT
 
       - name: Generate Homebrew formula
@@ -55,22 +57,32 @@ jobs:
         run: |
           cat > zscaler-terraformer.rb << 'EOF'
           class ZscalerTerraformer < Formula
-            desc "Generate Terraform configurations from existing Zscaler ZIA/ZPA resources"
+            desc "CLI tool to generate terraform files from existing ZPA and ZIA"
             homepage "https://github.com/zscaler/zscaler-terraformer"
             version "${{ steps.release_info.outputs.version }}"
-            license "MIT"
 
             if OS.mac? && Hardware::CPU.intel?
-              url "${{ steps.release_info.outputs.download_url }}/zscaler-terraformer_${{ steps.release_info.outputs.version }}_darwin_amd64.zip"
+              url "https://github.com/zscaler/zscaler-terraformer/releases/download/v#{version}/zscaler-terraformer_#{version}_darwin_amd64.zip"
               sha256 "${{ steps.checksums.outputs.darwin_amd64_sha }}"
-            elsif OS.mac? && Hardware::CPU.arm?
-              url "${{ steps.release_info.outputs.download_url }}/zscaler-terraformer_${{ steps.release_info.outputs.version }}_darwin_arm64.zip"
+            end
+
+            if OS.mac? && Hardware::CPU.arm?
+              url "https://github.com/zscaler/zscaler-terraformer/releases/download/v#{version}/zscaler-terraformer_#{version}_darwin_arm64.zip"
               sha256 "${{ steps.checksums.outputs.darwin_arm64_sha }}"
-            elsif OS.linux? && Hardware::CPU.intel?
-              url "${{ steps.release_info.outputs.download_url }}/zscaler-terraformer_${{ steps.release_info.outputs.version }}_linux_amd64.zip"
+            end
+
+            if OS.linux? && Hardware::CPU.intel?
+              url "https://github.com/zscaler/zscaler-terraformer/releases/download/v#{version}/zscaler-terraformer_#{version}_linux_amd64.zip"
               sha256 "${{ steps.checksums.outputs.linux_amd64_sha }}"
-            elsif OS.linux? && Hardware::CPU.arm?
-              url "${{ steps.release_info.outputs.download_url }}/zscaler-terraformer_${{ steps.release_info.outputs.version }}_linux_arm64.zip"
+            end
+
+            if OS.linux? && Hardware::CPU.arm? && !Hardware::CPU.is_64_bit?
+              url "https://github.com/zscaler/zscaler-terraformer/releases/download/v#{version}/zscaler-terraformer_#{version}_linux_arm.zip"
+              sha256 "${{ steps.checksums.outputs.linux_arm_sha }}"
+            end
+
+            if OS.linux? && Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
+              url "https://github.com/zscaler/zscaler-terraformer/releases/download/v#{version}/zscaler-terraformer_#{version}_linux_arm64.zip"
               sha256 "${{ steps.checksums.outputs.linux_arm64_sha }}"
             end
 
@@ -103,10 +115,52 @@ jobs:
             cp ../zscaler-terraformer.rb Formula/
           fi
           
-          # Update Casks directory (if it exists, though typically not needed for CLI tools)
+          # Update Casks directory with proper cask format
           if [ -d "Casks" ]; then
-            # Use the same formula format since it's a CLI tool, not a GUI app
-            cp ../zscaler-terraformer.rb Casks/
+            cat > Casks/zscaler-terraformer.rb << 'EOF'
+          # Copyright (c) Zscaler, Inc.
+          # MIT License
+
+          cask "zscaler-terraformer" do
+            name "zscaler-terraformer"
+            homepage "https://github.com/zscaler/zscaler-terraformer"
+            desc "CLI tool to generate terraform files from existing ZPA and ZIA"
+            version "${{ steps.release_info.outputs.version }}"
+
+            livecheck do
+              url "https://github.com/zscaler/zscaler-terraformer/releases.atom"
+              strategy :page_match
+              regex(%r{href=.*?/tag/v?(\d+(?:\.\d+)+)["']}i)
+            end
+
+            if OS.mac? && Hardware::CPU.intel?
+              url "https://github.com/zscaler/zscaler-terraformer/releases/download/v#{version}/zscaler-terraformer_#{version}_darwin_amd64.zip"
+              sha256 "${{ steps.checksums.outputs.darwin_amd64_sha }}"
+            end
+
+            if OS.mac? && Hardware::CPU.arm?
+              url "https://github.com/zscaler/zscaler-terraformer/releases/download/v#{version}/zscaler-terraformer_#{version}_darwin_arm64.zip"
+              sha256 "${{ steps.checksums.outputs.darwin_arm64_sha }}"
+            end
+
+            if OS.linux? && Hardware::CPU.intel?
+              url "https://github.com/zscaler/zscaler-terraformer/releases/download/v#{version}/zscaler-terraformer_#{version}_linux_amd64.zip"
+              sha256 "${{ steps.checksums.outputs.linux_amd64_sha }}"
+            end
+
+            if OS.linux? && Hardware::CPU.arm? && !Hardware::CPU.is_64_bit?
+              url "https://github.com/zscaler/zscaler-terraformer/releases/download/v#{version}/zscaler-terraformer_#{version}_linux_arm.zip"
+              sha256 "${{ steps.checksums.outputs.linux_arm_sha }}"
+            end
+
+            if OS.linux? && Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
+              url "https://github.com/zscaler/zscaler-terraformer/releases/download/v#{version}/zscaler-terraformer_#{version}_linux_arm64.zip"
+              sha256 "${{ steps.checksums.outputs.linux_arm64_sha }}"
+            end
+
+            binary "zscaler-terraformer"
+          end
+          EOF
           fi
 
       - name: Commit directly to homebrew-tap
@@ -134,7 +188,8 @@ jobs:
             - macOS Intel: ${{ steps.checksums.outputs.darwin_amd64_sha }}
             - macOS ARM: ${{ steps.checksums.outputs.darwin_arm64_sha }}
             - Linux Intel: ${{ steps.checksums.outputs.linux_amd64_sha }}
-            - Linux ARM: ${{ steps.checksums.outputs.linux_arm64_sha }}"
+            - Linux ARM (32-bit): ${{ steps.checksums.outputs.linux_arm_sha }}
+            - Linux ARM (64-bit): ${{ steps.checksums.outputs.linux_arm64_sha }}"
             
             git push origin master
             echo "✅ Homebrew tap updated successfully!"
