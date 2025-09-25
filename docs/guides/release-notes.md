@@ -12,9 +12,47 @@ Track all Zscaler Terraformer Tool releases. New resources, features, and bug fi
 
 ---
 
-``Last updated: v2.0.19``
+``Last updated: v2.1.0``
 
 ---
+
+## 2.1.0 (September, 24 2025)
+
+### Notes
+
+- Release date: **(September,24 2025)**
+- Supported Terraform version: **v1.x.x**
+
+### Enhancements
+
+## **🐛 Bug Fixes**
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **fix**: Resolved terraform drift issues by avoiding unnecessary data source creation for imported resources
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **fix**: Fixed `workload_groups` attribute missing `id` field in non-dlp resource types
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **fix**: Added automatic cleanup of empty data source attribute blocks that caused validation errors
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **fix**: Fixed ZPA license error detection to properly identify `authz.featureflag.permission.denied` errors and skip unlicensed resources
+
+## **✨ Enhancements**
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **feat**: Added automatic data source ID replacement system for attribute references
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **feat**: Implemented configurable attribute-to-data-source mapping system for easy extensibility
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **feat**: Added automatic generation of `datasource.tf` file with required data sources
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **feat**: Implemented intelligent reference resolution (resource refs vs data source refs)
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **feat**: Added special handling for `workload_groups` attribute with both `id` and `name` field replacement
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **feat**: Extended `workload_groups` support to all resource types (zia_firewall_filtering_rule, zia_dlp_web_rules, zia_url_filtering_rules, zia_ssl_inspection_rules)
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **perf**: Optimized post-processing to run once at import completion instead of per-resource
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **perf**: Added timeout protection and performance safeguards to prevent hanging
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **feat**: Implemented comprehensive import summary report with statistics and emoji styling
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **improvement**: Enhanced logging with emojis and removed debug noise for better user experience
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **feat**: Added comprehensive ZPA policy data source mapping for complex operand conditions with object type support (SCIM, SAML, POSTURE, TRUSTED_NETWORK, MACHINE_GRP)
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **feat**: Added support for new ZPA resources: `zpa_policy_inspection_rule`, `zpa_policy_isolation_rule`, `zpa_pra_credential_pool`, `zpa_user_portal_controller`, `zpa_user_portal_link`, `zpa_c2c_ip_ranges`, `zpa_private_cloud_group`
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **feat**: Added support for new ZIA resources: `zia_nat_control_rules`, `zia_mobile_malware_protection_policy`, `zia_ftp_control_policy`, `zia_virtual_service_edge_cluster`, `zia_virtual_service_edge_node`, `zia_risk_profiles`, `zia_workload_groups`, `zia_subscription_alert`, `zia_forwarding_control_proxies`
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **feat**: Extended data source mapping support for `services` and `nw_services` attributes to `zia_firewall_filtering_network_service`
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **feat**: Added ZPA Cloud Browser Isolation support with `banner_id`, `region_ids` data source mappings for `zpa_cloud_browser_isolation_external_profile`
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **feat**: Added ZPA Service Edge Group support with `service_edges` and `trusted_networks` data source mappings
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **feat**: Added `--support` flag to display regional Zscaler support contact information
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **feat**: Added `--collect-logs` flag for automatic SDK debug logging with silent console operation
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **feat**: Added `--validate` flag for automatic terraform validation with enhanced error handling
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **feat**: Made colored progress bar the default behavior with `--no-progress` flag to disable and `--verbose` for detailed logs
+- [PR #329](https://github.com/zscaler/zscaler-terraformer/pull/329) - **feat**: Added `--prefix` flag for shorter terraform resource names (e.g., `sgio_14669` vs `zpa_pra_credential_controller_14669`)
 
 ## 2.0.19 (September, 11 2025)
 

@@ -1,10 +1,10 @@
 # Changelog
 
-## 2.1.0 (September, xx 2025)
+## 2.1.0 (September, 24 2025)
 
 ### Notes
 
-- Release date: **(September,xx 2025)**
+- Release date: **(September,24 2025)**
 - Supported Terraform version: **v1.x.x**
 
 ### Enhancements
