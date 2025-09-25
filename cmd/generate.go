@@ -44,6 +44,8 @@ import (
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/advanced_settings"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/advancedthreatsettings"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/alerts"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/cloudapplications/risk_profiles"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/dlp/dlp_engines"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/dlp/dlp_notification_templates"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/dlp/dlp_web_rules"
@@ -59,9 +61,13 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/firewallpolicies/networkservicegroups"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/firewallpolicies/networkservices"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/forwarding_control_policy/forwarding_rules"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/forwarding_control_policy/proxies"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/forwarding_control_policy/zpa_gateways"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/ftp_control_policy"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/location/locationmanagement"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/malware_protection"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/mobile_threat_settings"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/nat_control_policies"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/rule_labels"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/sandbox/sandbox_rules"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/sandbox/sandbox_settings"
@@ -73,12 +79,16 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/urlcategories"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/urlfilteringpolicies"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/user_authentication_settings"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/vzen_clusters"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/vzen_nodes"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/workloadgroups"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/appconnectorgroup"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/applicationsegment"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/applicationsegmentbrowseraccess"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/applicationsegmentinspection"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/applicationsegmentpra"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/appservercontroller"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/c2c_ip_ranges"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/cloudbrowserisolation/cbibannercontroller"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/cloudbrowserisolation/cbicertificatecontroller"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/cloudbrowserisolation/cbiprofilecontroller"
@@ -86,14 +96,18 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/lssconfigcontroller"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/microtenants"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/policysetcontroller"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/private_cloud_group"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/privilegedremoteaccess/praapproval"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/privilegedremoteaccess/praconsole"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/privilegedremoteaccess/pracredential"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/privilegedremoteaccess/pracredentialpool"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/privilegedremoteaccess/praportal"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/provisioningkey"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/segmentgroup"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/servergroup"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/serviceedgegroup"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/userportal/portal_controller"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/userportal/portal_link"
 	"github.com/zscaler/zscaler-terraformer/v2/terraformutils/conversion"
 	"github.com/zscaler/zscaler-terraformer/v2/terraformutils/helpers"
 	"github.com/zscaler/zscaler-terraformer/v2/terraformutils/nesting"
@@ -120,12 +134,17 @@ var allGeneratableResources = []string{
 	"zpa_pra_approval_controller",
 	"zpa_pra_console_controller",
 	"zpa_pra_credential_controller",
+	"zpa_pra_credential_pool",
 	"zpa_pra_portal_controller",
 	"zpa_provisioning_key",
 	"zpa_service_edge_group",
 	"zpa_lss_config_controller",
 	"zpa_inspection_custom_controls",
 	"zpa_microtenant_controller",
+	"zpa_user_portal_controller",
+	"zpa_user_portal_link",
+	"zpa_c2c_ip_ranges",
+	"zpa_private_cloud_group",
 
 	// ZIA Resources
 	"zia_dlp_dictionaries",
@@ -144,6 +163,7 @@ var allGeneratableResources = []string{
 	"zia_location_management",
 	"zia_url_categories",
 	"zia_url_filtering_rules",
+	"zia_nat_control_rules",
 	"zia_rule_labels",
 	"zia_auth_settings_urls",
 	"zia_sandbox_behavioral_analysis",
@@ -165,6 +185,14 @@ var allGeneratableResources = []string{
 	"zia_atp_malicious_urls",
 	"zia_url_filtering_and_cloud_app_settings",
 	"zia_end_user_notification",
+	"zia_virtual_service_edge_cluster",
+	"zia_virtual_service_edge_node",
+	"zia_risk_profiles",
+	"zia_workload_groups",
+	"zia_ftp_control_policy",
+	"zia_subscription_alert",
+	"zia_forwarding_control_proxies",
+	"zia_mobile_malware_protection_policy",
 }
 
 func init() {
@@ -197,19 +225,97 @@ func generateResources() func(cmd *cobra.Command, args []string) {
 
 			excludedResourcesTypes := strings.Split(excludedResources, ",")
 
+			// Filter out excluded resources for accurate progress count
+			filteredResourceTypes := []string{}
 			for _, rt := range resourceTypes {
 				resourceTyp := strings.Trim(rt, " ")
-				if helpers.IsInList(resourceTyp, excludedResourcesTypes) {
-					continue
+				if !helpers.IsInList(resourceTyp, excludedResourcesTypes) {
+					filteredResourceTypes = append(filteredResourceTypes, resourceTyp)
 				}
+			}
 
+			// Initialize progress tracker if enabled
+			if progress && len(filteredResourceTypes) > 0 {
+				progressTracker = NewProgressTracker(len(filteredResourceTypes))
+				fmt.Printf("🎯 Starting generation of \033[33m%d resources\033[0m with progress tracking\n\n", len(filteredResourceTypes))
+			}
+
+			for _, resourceTyp := range filteredResourceTypes {
+				if progress {
+					progressTracker.UpdateWithOutput(fmt.Sprintf("Generating %s", resourceTyp))
+				}
 				// Pass cmd.Context() as the new ctx argument:
 				generate(cmd.Context(), cmd, cmd.OutOrStdout(), resourceTyp)
 			}
+
+			// Finish progress tracking for generation
+			if progress && len(filteredResourceTypes) > 0 {
+				progressTracker.Finish()
+			}
+
+			// Set up log collection and run validation if requested and we generated resources
+			if len(filteredResourceTypes) > 0 {
+				// Get working directory from first resource type
+				_, _, workingDir := initTf(cmd.Context(), filteredResourceTypes[0])
+
+				// Set up log collection if enabled (now that we know the working directory)
+				if collectLogs {
+					setupLogCollection(workingDir)
+				}
+
+				// Run terraform validate if requested
+				if validateTerraform {
+					err := validateGeneratedFiles(workingDir)
+					if err != nil {
+						log.Printf("⚠️  Validation completed with errors: %v", err)
+					}
+				}
+			}
+
+			// Cleanup log collection if it was enabled
+			if collectLogs {
+				cleanupLogCollection()
+			}
 			return
 		}
-		// Similarly here:
-		generate(cmd.Context(), cmd, cmd.OutOrStdout(), resourceType_)
+
+		// Set up log collection, progress tracking and validation for single resource generation
+		if resourceType_ != "" {
+			_, _, workingDir := initTf(cmd.Context(), resourceType_)
+
+			// Set up log collection if enabled
+			if collectLogs {
+				setupLogCollection(workingDir)
+			}
+
+			// Initialize progress tracker for single resource generation
+			if progress {
+				progressTracker = NewProgressTracker(1) // Single resource
+				fmt.Printf("🎯 Starting single resource generation with progress tracking\n\n")
+				progressTracker.UpdateWithOutput(fmt.Sprintf("Generating %s", resourceType_))
+			}
+
+			// Generate the resource
+			generate(cmd.Context(), cmd, cmd.OutOrStdout(), resourceType_)
+
+			// Finish progress tracking for single resource
+			if progress {
+				progressTracker.Finish()
+			}
+
+			// Run terraform validate if requested
+			if validateTerraform {
+				err := validateGeneratedFiles(workingDir)
+				if err != nil {
+					log.Printf("⚠️  Validation completed with errors: %v", err)
+				}
+			}
+		}
+
+		// Cleanup log collection if it was enabled
+		if collectLogs {
+			cleanupLogCollection()
+		}
 	}
 }
 
@@ -224,30 +330,62 @@ func buildResourceName(resourceType string, structData map[string]interface{}) s
 		shortUUID = uuid.New().String()[:8]
 	}
 
-	// Construct the resource ID using only the short UUID for specific resources, or use the existing logic for others.
+	// Construct the resource ID based on whether custom prefix is provided
 	var resID string
-	if shortUUID != "" {
-		resID = fmt.Sprintf("resource_%s", shortUUID)
-	} else if structData["id"] != nil {
-		var resourceID string
-		switch structData["id"].(type) {
-		case float64:
-			resourceID = fmt.Sprintf("%d", int64(structData["id"].(float64)))
-		default:
-			resourceID = structData["id"].(string)
-		}
-		resID = fmt.Sprintf("resource_%s_%s", resourceType, resourceID)
-	} else if structData["name"] != nil {
-		name := structData["name"].(string)
-		if name != "" {
-			id := strings.ReplaceAll(strings.ToLower(helpers.Strip(name)), " ", "_")
-			resID = fmt.Sprintf("resource_%s_%s", resourceType, id)
-		}
-	}
 
-	if resID == "" {
-		// Fallback to using the short UUID if no other identifier is available.
-		resID = fmt.Sprintf("resource_%s", shortUUID)
+	if resourcePrefix != "" {
+		// Custom prefix mode: prefix_ID (much shorter, cleaner names)
+		sanitizedPrefix := sanitizePrefix(resourcePrefix)
+
+		if shortUUID != "" {
+			resID = fmt.Sprintf("%s_%s", sanitizedPrefix, shortUUID)
+		} else if structData["id"] != nil {
+			var resourceID string
+			switch structData["id"].(type) {
+			case float64:
+				resourceID = fmt.Sprintf("%d", int64(structData["id"].(float64)))
+			default:
+				resourceID = structData["id"].(string)
+			}
+			resID = fmt.Sprintf("%s_%s", sanitizedPrefix, resourceID)
+		} else if structData["name"] != nil {
+			name := structData["name"].(string)
+			if name != "" {
+				id := strings.ReplaceAll(strings.ToLower(helpers.Strip(name)), " ", "_")
+				resID = fmt.Sprintf("%s_%s", sanitizedPrefix, id)
+			}
+		}
+
+		if resID == "" {
+			resID = fmt.Sprintf("%s_%s", sanitizedPrefix, shortUUID)
+		}
+	} else {
+		// Default mode: current approach (resourceType_ID)
+		if shortUUID != "" {
+			resID = fmt.Sprintf("%s_%s", resourceType, shortUUID)
+		} else if structData["id"] != nil {
+			var resourceID string
+			switch structData["id"].(type) {
+			case float64:
+				resourceID = fmt.Sprintf("%d", int64(structData["id"].(float64)))
+			default:
+				resourceID = structData["id"].(string)
+			}
+
+			// Use the current approach: resourceType_ID
+			resID = fmt.Sprintf("%s_%s", resourceType, resourceID)
+		} else if structData["name"] != nil {
+			name := structData["name"].(string)
+			if name != "" {
+				id := strings.ReplaceAll(strings.ToLower(helpers.Strip(name)), " ", "_")
+				resID = fmt.Sprintf("%s_%s", resourceType, id)
+			}
+		}
+
+		if resID == "" {
+			// Fallback to using the short UUID if no other identifier is available.
+			resID = fmt.Sprintf("%s_%s", resourceType, shortUUID)
+		}
 	}
 
 	resID = strings.ReplaceAll(resID, `"`, "")
@@ -258,7 +396,66 @@ func buildResourceName(resourceType string, structData map[string]interface{}) s
 	return resID
 }
 
-func initTf(resourceType string) (tf *tfexec.Terraform, r *tfjson.Schema, workingDir string) {
+// sanitizePrefix ensures the custom prefix follows terraform naming conventions.
+func sanitizePrefix(prefix string) string {
+	if prefix == "" {
+		return "resource"
+	}
+
+	// Convert to lowercase and replace invalid characters
+	sanitized := strings.ToLower(prefix)
+	sanitized = strings.ReplaceAll(sanitized, " ", "_")
+	sanitized = strings.ReplaceAll(sanitized, "-", "_")
+	sanitized = strings.ReplaceAll(sanitized, ".", "_")
+	sanitized = strings.ReplaceAll(sanitized, "@", "_")
+	sanitized = strings.ReplaceAll(sanitized, "!", "_")
+	sanitized = strings.ReplaceAll(sanitized, "#", "_")
+	sanitized = strings.ReplaceAll(sanitized, "$", "_")
+	sanitized = strings.ReplaceAll(sanitized, "%", "_")
+	sanitized = strings.ReplaceAll(sanitized, "^", "_")
+	sanitized = strings.ReplaceAll(sanitized, "&", "_")
+	sanitized = strings.ReplaceAll(sanitized, "*", "_")
+	sanitized = strings.ReplaceAll(sanitized, "(", "_")
+	sanitized = strings.ReplaceAll(sanitized, ")", "_")
+	sanitized = strings.ReplaceAll(sanitized, "+", "_")
+	sanitized = strings.ReplaceAll(sanitized, "=", "_")
+	sanitized = strings.ReplaceAll(sanitized, "[", "_")
+	sanitized = strings.ReplaceAll(sanitized, "]", "_")
+	sanitized = strings.ReplaceAll(sanitized, "{", "_")
+	sanitized = strings.ReplaceAll(sanitized, "}", "_")
+	sanitized = strings.ReplaceAll(sanitized, "|", "_")
+	sanitized = strings.ReplaceAll(sanitized, "\\", "_")
+	sanitized = strings.ReplaceAll(sanitized, ":", "_")
+	sanitized = strings.ReplaceAll(sanitized, ";", "_")
+	sanitized = strings.ReplaceAll(sanitized, "\"", "_")
+	sanitized = strings.ReplaceAll(sanitized, "'", "_")
+	sanitized = strings.ReplaceAll(sanitized, "<", "_")
+	sanitized = strings.ReplaceAll(sanitized, ">", "_")
+	sanitized = strings.ReplaceAll(sanitized, ",", "_")
+	sanitized = strings.ReplaceAll(sanitized, "?", "_")
+	sanitized = strings.ReplaceAll(sanitized, "/", "_")
+	sanitized = strings.ReplaceAll(sanitized, "`", "_")
+
+	// Remove multiple consecutive underscores
+	sanitized = strings.ReplaceAll(sanitized, "__", "_")
+
+	// Trim leading/trailing underscores
+	sanitized = strings.Trim(sanitized, "_")
+
+	// Ensure it's not empty after sanitization
+	if sanitized == "" {
+		return "resource"
+	}
+
+	// Ensure it doesn't start with a number (terraform requirement)
+	if len(sanitized) > 0 && sanitized[0] >= '0' && sanitized[0] <= '9' {
+		sanitized = "prefix_" + sanitized
+	}
+
+	return sanitized
+}
+
+func initTf(ctx context.Context, resourceType string) (tf *tfexec.Terraform, r *tfjson.Schema, workingDir string) {
 	// [1] Install or locate terraform as before
 	execPath, err := exec.LookPath("terraform")
 	if err != nil {
@@ -325,7 +522,8 @@ provider "%s" {
 	// [4] Now handle credentials or advanced fields:
 	// useLegacy := viper.GetString("use_legacy_client")
 
-	if cloudType == "zpa" {
+	switch cloudType {
+	case "zpa":
 		zpaClientID := viper.GetString("zpa_client_id")
 		zpaClientSecret := viper.GetString("zpa_client_secret")
 		zpaCustomerID := viper.GetString("zpa_customer_id")
@@ -396,8 +594,7 @@ provider "%s" {
 			}
 		}
 
-	} else if cloudType == "zia" {
-
+	case "zia":
 		ziaUsername := viper.GetString("zia_username")
 		ziaPassword := viper.GetString("zia_password")
 		ziaApiKey := viper.GetString("zia_api_key")
@@ -476,12 +673,12 @@ provider "%s" {
 	}
 
 	// [6] Now init the Terraform config
-	err = tf.Init(context.Background(), tfexec.Upgrade(true))
+	err = tf.Init(ctx, tfexec.Upgrade(true))
 	if err != nil {
 		log.Fatal("tf init failed ", err)
 	}
 
-	ps, err := tf.ProvidersSchema(context.Background())
+	ps, err := tf.ProvidersSchema(ctx)
 	if err != nil {
 		log.Fatal("failed to read provider schema", err)
 	}
@@ -505,7 +702,7 @@ provider "%s" {
 	}
 	r = s.ResourceSchemas[resourceType]
 	if displayReleaseVersion {
-		tfVrsion, providerVersions, err := tf.Version(context.Background(), false)
+		tfVrsion, providerVersions, err := tf.Version(ctx, false)
 		if err == nil {
 			if tfVrsion != nil {
 				log.Infof("Terraform Version: %s", tfVrsion.String())
@@ -522,8 +719,10 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 	if resourceType == "" {
 		log.Fatal("you must define a resource type to generate")
 	}
-	tf, r, workingDir := initTf(resourceType) // Ensure workingDir is obtained
+	tf, r, workingDir := initTf(ctx, resourceType) // Ensure workingDir is obtained
 	log.Debugf("beginning to read and build %s resources", resourceType)
+
+	// Note: Reference replacement is now handled in post-processing after all imports
 
 	// Initialise `resourceCount` outside of the switch for supported resources
 	// to allow it to be referenced further down in the loop that outputs the
@@ -746,6 +945,33 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		m, _ := json.Marshal(jsonPayload)
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
+	case "zpa_pra_credential_pool":
+		if api.ZPAService == nil {
+			log.Fatal("ZPA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZPAService
+
+		// Get all credential pools first (for the list)
+		allPools, _, err := pracredentialpool.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// Get full details for each pool (including credentials attribute)
+		for _, pool := range allPools {
+			poolDetails, _, err := pracredentialpool.Get(ctx, service, pool.ID)
+			if err != nil {
+				log.Printf("error retrieving credential pool %s: %v", pool.ID, err)
+				continue
+			}
+			data, _ := json.Marshal(poolDetails)
+			var poolMap map[string]interface{}
+			_ = json.Unmarshal(data, &poolMap)
+			jsonStructData = append(jsonStructData, poolMap)
+		}
+
+		resourceCount = len(jsonStructData)
 	case "zpa_pra_portal_controller":
 		if api.ZPAService == nil {
 			log.Fatal("ZPA service is not initialized")
@@ -753,6 +979,58 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		// EXACTLY like the TF pattern:
 		service := api.ZPAService
 		jsonPayload, _, err := praportal.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		m, _ := json.Marshal(jsonPayload)
+		resourceCount = len(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zpa_user_portal_controller":
+		if api.ZPAService == nil {
+			log.Fatal("ZPA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZPAService
+		jsonPayload, _, err := portal_controller.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		m, _ := json.Marshal(jsonPayload)
+		resourceCount = len(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zpa_user_portal_link":
+		if api.ZPAService == nil {
+			log.Fatal("ZPA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZPAService
+		jsonPayload, _, err := portal_link.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		m, _ := json.Marshal(jsonPayload)
+		resourceCount = len(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zpa_c2c_ip_ranges":
+		if api.ZPAService == nil {
+			log.Fatal("ZPA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZPAService
+		jsonPayload, _, err := c2c_ip_ranges.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		m, _ := json.Marshal(jsonPayload)
+		resourceCount = len(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zpa_private_cloud_group":
+		if api.ZPAService == nil {
+			log.Fatal("ZPA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZPAService
+		jsonPayload, _, err := private_cloud_group.GetAll(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -795,6 +1073,7 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 			if i.Name == "Zscaler Deception" {
 				continue
 			}
+
 			i.Applications = nil // Suppress the applications block
 			jsonPayload = append(jsonPayload, i)
 		}
@@ -1067,6 +1346,26 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		m, _ := json.Marshal(rulesFiltered)
 		resourceCount = len(rulesFiltered)
 		_ = json.Unmarshal(m, &jsonStructData)
+	case "zia_nat_control_rules":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		jsonPayload, err := nat_control_policies.GetAll(ctx, service)
+		if err != nil {
+			shouldSkip, message := helpers.HandleZIAAPIError(err, resourceType)
+			if shouldSkip {
+				log.Printf("[WARN] Skipping resource import for %s: %s", resourceType, message)
+				return
+			}
+			// If not a handled error, log it and skip gracefully
+			log.Printf("[ERROR] error occurred while fetching resource %s: %v", resourceType, err)
+			return
+		}
+		m, _ := json.Marshal(jsonPayload)
+		resourceCount = len(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_firewall_filtering_destination_groups":
 		if api.ZIAService == nil {
 			log.Fatal("ZIA service is not initialized")
@@ -1228,22 +1527,6 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		jsonStructData = append(jsonStructData, subJsonStructData...)
 
 		resourceCount += subResourceCount
-		// case "zia_url_categories":
-		// 	if api.ZIAService == nil {
-		// 		log.Fatal("ZIA service is not initialized")
-		// 	}
-		// 	// EXACTLY like the TF pattern:
-		// 	service := api.ZIAService
-		// 	log.Debugf("Fetching URL categories with customOnly=true...")
-		// 	jsonPayload, err := urlcategories.GetAll(ctx, service, true, false)
-		// 	if err != nil {
-		// 		log.Fatal(err)
-		// 	}
-		// 	log.Debugf("Retrieved %d URL categories", len(jsonPayload))
-		// 	resourceCount = len(jsonPayload)
-		// 	m, _ := json.Marshal(jsonPayload)
-		// 	_ = json.Unmarshal(m, &jsonStructData)
-		// 	log.Debugf("Successfully processed URL categories data")
 
 	case "zia_url_categories":
 		if api.ZIAService == nil {
@@ -1348,6 +1631,26 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 			dataMap := jsonStructData[0].(map[string]interface{})
 			dataMap["id"] = "all_urls"
 		}
+	case "zia_forwarding_control_proxies":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		rules, err := proxies.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		rulesFiltered := []proxies.Proxies{}
+		for _, rule := range rules {
+			if helpers.IsInList(rule.Name, []string{}) {
+				continue
+			}
+			rulesFiltered = append(rulesFiltered, rule)
+		}
+		resourceCount = len(rulesFiltered)
+		m, _ := json.Marshal(rulesFiltered)
+		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_forwarding_control_rule":
 		if api.ZIAService == nil {
 			log.Fatal("ZIA service is not initialized")
@@ -1664,6 +1967,24 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 			dataMap := jsonStructData[0].(map[string]interface{})
 			dataMap["id"] = "app_setting"
 		}
+	case "zia_ftp_control_policy":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		ftpControl, err := ftp_control_policy.GetFTPControlPolicy(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		jsonPayload := []*ftp_control_policy.FTPControlPolicy{ftpControl}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+		if len(jsonStructData) > 0 {
+			dataMap := jsonStructData[0].(map[string]interface{})
+			dataMap["id"] = "ftp_control"
+		}
 	case "zia_end_user_notification":
 		if api.ZIAService == nil {
 			log.Fatal("ZIA service is not initialized")
@@ -1682,13 +2003,97 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 			dataMap := jsonStructData[0].(map[string]interface{})
 			dataMap["id"] = "enduser_notification"
 		}
+	case "zia_mobile_malware_protection_policy":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		mobileSettings, err := mobile_threat_settings.GetMobileThreatSettings(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		jsonPayload := []*mobile_threat_settings.MobileAdvanceThreatSettings{mobileSettings}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+		if len(jsonStructData) > 0 {
+			dataMap := jsonStructData[0].(map[string]interface{})
+			dataMap["id"] = "mobile_settings"
+		}
+	case "zia_virtual_service_edge_cluster":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		jsonPayload, err := vzen_clusters.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zia_virtual_service_edge_node":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		jsonPayload, err := vzen_nodes.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+
+	case "zia_risk_profiles":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		jsonPayload, err := risk_profiles.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zia_workload_groups":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		jsonPayload, err := workloadgroups.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zia_subscription_alert":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		jsonPayload, err := alerts.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
 	default:
-		fmt.Fprintf(cmd.OutOrStdout(), "%q is not yet supported for automatic generation", resourceType)
+		_, _ = fmt.Fprintf(cmd.OutOrStdout(), "%q is not yet supported for automatic generation", resourceType)
 		return
 	}
 
 	if resourceCount == 0 {
-		fmt.Fprintf(cmd.OutOrStdout(), "no resources found to generate.")
+		_, _ = fmt.Fprintf(cmd.OutOrStdout(), "no resources found to generate.")
 		return
 	}
 
@@ -1704,6 +2109,9 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		} else {
 			resourceID = buildResourceName(resourceType, structData)
 		}
+
+		// Note: Reference replacement is now handled in post-processing after all imports
+
 		resourceName := ""
 		if structData["name"] != nil {
 			resourceName = structData["name"].(string)
@@ -1729,9 +2137,7 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		}
 
 		sort.Strings(sortedBlockAttributes)
-
 		for _, attrName := range sortedBlockAttributes {
-
 			apiAttrName := nesting.MapTfFieldNameToAPI(resourceType, attrName)
 			if attrName == "id" || attrName == "tcp_port_ranges" || attrName == "udp_port_ranges" || attrName == "rule_order" || (resourceType == "zia_url_categories" && attrName == "val") {
 				continue
@@ -1972,10 +2378,27 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		helpers.GenerateOutputs(resourceType, resourceID, workingDir)
 	}
 
-	output, err := tf.FormatString(context.Background(), output)
+	formattedOutput, err := tf.FormatString(ctx, output)
 	if err != nil {
 		log.Printf("failed to format output: %s", err)
 	}
 
-	fmt.Fprint(writer, output)
+	// Write output to both stdout and file
+	_, _ = fmt.Fprint(writer, formattedOutput)
+
+	// Also write to file for post-processing
+	filename := fmt.Sprintf("%s/%s.tf", workingDir, resourceType)
+	file, err := os.Create(filename)
+	if err != nil {
+		log.Printf("[WARNING] Failed to create file %s: %v", filename, err)
+	} else {
+		_, err = file.WriteString(formattedOutput)
+		if err != nil {
+			log.Printf("[WARNING] Failed to write to file %s: %v", filename, err)
+		}
+		func() { _ = file.Close() }()
+	}
+
+	// Note: Post-processing is now handled centrally after all imports are complete
+	// This improves performance by avoiding multiple file scans during generation
 }

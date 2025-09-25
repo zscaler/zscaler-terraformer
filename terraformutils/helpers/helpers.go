@@ -26,7 +26,6 @@ package helpers
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"regexp"
@@ -105,6 +104,8 @@ func GenerateOutputs(resourceType string, resourceID string, workingDir string) 
 		"zia_atp_malware_policy",
 		"zia_url_filtering_and_cloud_app_settings",
 		"zia_end_user_notification",
+		"zia_ftp_control_policy",
+		"zia_mobile_malware_protection_policy",
 	}
 
 	// Check if the resourceType is in the excluded list.
@@ -141,7 +142,7 @@ func GenerateOutputs(resourceType string, resourceID string, workingDir string) 
 	if err != nil {
 		log.Fatalf("failed to open outputs file: %s", err)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	// Write the output block to the file.
 	if _, err := f.WriteString(outputBlock); err != nil {
@@ -152,7 +153,7 @@ func GenerateOutputs(resourceType string, resourceID string, workingDir string) 
 // / Custom function to Removes attributes from ZPA StateFile.
 func RemoveTcpPortRangesFromState(stateFile string) {
 	// Read the state file
-	stateData, err := ioutil.ReadFile(stateFile)
+	stateData, err := os.ReadFile(stateFile)
 	if err != nil {
 		log.Fatalf("failed to read state file: %s", err)
 	}
@@ -204,7 +205,7 @@ func RemoveTcpPortRangesFromState(stateFile string) {
 	}
 
 	// Write the modified state back to the file
-	if err := ioutil.WriteFile(stateFile, modifiedStateData, 0600); err != nil {
+	if err := os.WriteFile(stateFile, modifiedStateData, 0600); err != nil {
 		log.Fatalf("failed to write modified state file: %s", err)
 	}
 }
@@ -336,7 +337,14 @@ func ListIdsStringBlock(fieldName string, obj interface{}) string {
 		if !ok || id == "" {
 			continue
 		}
-		validItems = append(validItems, "\""+id+"\"")
+		// Check if this is a Terraform reference (contains dots and doesn't start with quotes)
+		if strings.Contains(id, ".") && !strings.HasPrefix(id, "\"") {
+			// This is a Terraform reference, don't add quotes
+			validItems = append(validItems, id)
+		} else {
+			// This is a regular ID, add quotes
+			validItems = append(validItems, "\""+id+"\"")
+		}
 	}
 
 	// If no valid items, don't generate the block
@@ -639,6 +647,10 @@ func MapSpecialFieldNames(resourceType, fieldName string) string {
 		},
 		"zia_location_management": {
 			"state": "state",
+		},
+		"zia_end_user_notification": {
+			"display_company_name": "displayCompName",
+			"display_company_logo": "displayCompLogo",
 		},
 	}
 

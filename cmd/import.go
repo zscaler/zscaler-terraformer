@@ -37,6 +37,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/advanced_settings"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/advancedthreatsettings"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/alerts"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/cloudapplications/risk_profiles"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/dlp/dlp_engines"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/dlp/dlp_notification_templates"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/dlp/dlp_web_rules"
@@ -52,9 +54,13 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/firewallpolicies/networkservicegroups"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/firewallpolicies/networkservices"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/forwarding_control_policy/forwarding_rules"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/forwarding_control_policy/proxies"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/forwarding_control_policy/zpa_gateways"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/ftp_control_policy"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/location/locationmanagement"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/malware_protection"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/mobile_threat_settings"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/nat_control_policies"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/rule_labels"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/sandbox/sandbox_rules"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/sandbox/sandbox_settings"
@@ -66,12 +72,16 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/urlcategories"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/urlfilteringpolicies"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/user_authentication_settings"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/vzen_clusters"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/vzen_nodes"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/workloadgroups"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/appconnectorgroup"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/applicationsegment"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/applicationsegmentbrowseraccess"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/applicationsegmentinspection"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/applicationsegmentpra"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/appservercontroller"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/c2c_ip_ranges"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/cloudbrowserisolation/cbibannercontroller"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/cloudbrowserisolation/cbicertificatecontroller"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/cloudbrowserisolation/cbiprofilecontroller"
@@ -79,14 +89,18 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/lssconfigcontroller"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/microtenants"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/policysetcontroller"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/private_cloud_group"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/privilegedremoteaccess/praapproval"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/privilegedremoteaccess/praconsole"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/privilegedremoteaccess/pracredential"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/privilegedremoteaccess/pracredentialpool"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/privilegedremoteaccess/praportal"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/provisioningkey"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/segmentgroup"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/servergroup"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/serviceedgegroup"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/userportal/portal_controller"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/userportal/portal_link"
 	"github.com/zscaler/zscaler-terraformer/v2/terraformutils/helpers"
 )
 
@@ -111,6 +125,7 @@ var resourceImportStringFormats = map[string]string{
 	"zpa_policy_isolation_rule":                         ":id",
 	"zpa_pra_approval_controller":                       ":id",
 	"zpa_pra_credential_controller":                     ":id",
+	"zpa_pra_credential_pool":                           ":id",
 	"zpa_pra_console_controller":                        ":id",
 	"zpa_pra_portal_controller":                         ":id",
 	"zpa_provisioning_key":                              ":id",
@@ -118,6 +133,10 @@ var resourceImportStringFormats = map[string]string{
 	"zpa_lss_config_controller":                         ":id",
 	"zpa_inspection_custom_controls":                    ":id",
 	"zpa_microtenant_controller":                        ":id",
+	"zpa_user_portal_controller":                        ":id",
+	"zpa_user_portal_link":                              ":id",
+	"zpa_c2c_ip_ranges":                                 ":id",
+	"zpa_private_cloud_group":                           ":id",
 	"zia_dlp_dictionaries":                              ":id",
 	"zia_dlp_engines":                                   ":id",
 	"zia_dlp_notification_templates":                    ":id",
@@ -129,6 +148,7 @@ var resourceImportStringFormats = map[string]string{
 	"zia_firewall_filtering_network_service_groups":     ":id",
 	"zia_firewall_filtering_network_application_groups": ":id",
 	"zia_forwarding_control_rule":                       ":id",
+	"zia_nat_control_rules":                             ":id",
 	"zia_forwarding_control_zpa_gateway":                ":id",
 	"zia_traffic_forwarding_static_ip":                  ":id",
 	"zia_traffic_forwarding_vpn_credentials":            ":id",
@@ -155,6 +175,14 @@ var resourceImportStringFormats = map[string]string{
 	"zia_atp_malware_policy":                            ":id",
 	"zia_url_filtering_and_cloud_app_settings":          ":id",
 	"zia_end_user_notification":                         ":id",
+	"zia_virtual_service_edge_cluster":                  ":id",
+	"zia_virtual_service_edge_node":                     ":id",
+	"zia_risk_profiles":                                 ":id",
+	"zia_workload_groups":                               ":id",
+	"zia_ftp_control_policy":                            ":id",
+	"zia_subscription_alert":                            ":id",
+	"zia_forwarding_control_proxies":                    ":id",
+	"zia_mobile_malware_protection_policy":              ":id",
 }
 
 func init() {
@@ -189,7 +217,11 @@ func isLicenseError(err error) (bool, string) {
 			if jsonErr := json.Unmarshal([]byte(jsonStr), &apiErr); jsonErr == nil {
 				// Check if it's a feature flag permission denied error
 				if apiErr.ID == "authz.featureflag.permission.denied" {
-					// Check if any param starts with "feature."
+					// Check if the reason contains feature flag information
+					if strings.Contains(apiErr.Reason, "feature.") || strings.Contains(apiErr.Reason, "Feature flag") {
+						return true, apiErr.Reason
+					}
+					// Also check params if they exist
 					for _, param := range apiErr.Params {
 						if strings.HasPrefix(param, "feature.") {
 							return true, apiErr.Reason
@@ -208,56 +240,174 @@ func runImport() func(cmd *cobra.Command, args []string) {
 		includedSensitiveResources := make(map[string]bool)
 		if resources != "" {
 			var resourceTypes []string
-			if resources == "*" {
+			switch resources {
+			case "*":
 				for resource := range resourceImportStringFormats {
 					resourceTypes = append(resourceTypes, resource)
 				}
-			} else if resources == "zia" || resources == "zpa" {
+			case "zia", "zpa":
 				for resource := range resourceImportStringFormats {
 					if strings.HasPrefix(resource, resources) {
 						resourceTypes = append(resourceTypes, resource)
 					}
 				}
-			} else {
+			default:
 				resourceTypes = strings.Split(resources, ",")
 			}
 			excludedResourcesTypes := strings.Split(excludedResources, ",")
 
+			// Filter out excluded resources for accurate progress count
+			filteredResourceTypes := []string{}
 			for _, rt := range resourceTypes {
 				resourceTyp := strings.Trim(rt, " ")
-				if helpers.IsInList(resourceTyp, excludedResourcesTypes) {
-					continue
+				if !helpers.IsInList(resourceTyp, excludedResourcesTypes) {
+					filteredResourceTypes = append(filteredResourceTypes, resourceTyp)
+				}
+			}
+
+			// Initialize progress tracker if enabled (resource imports + 3 post-processing steps)
+			if progress && len(filteredResourceTypes) > 0 {
+				totalSteps := len(filteredResourceTypes) + 3 // +3 for post-processing steps
+				progressTracker = NewProgressTracker(totalSteps)
+				fmt.Printf("🎯 Starting import of \033[33m%d resources\033[0m with progress tracking\n\n", len(filteredResourceTypes))
+			}
+
+			for _, resourceTyp := range filteredResourceTypes {
+				if progress {
+					progressTracker.UpdateWithOutput(fmt.Sprintf("Importing %s", resourceTyp))
 				}
 				importResource(cmd.Context(), cmd, cmd.OutOrStdout(), resourceTyp, managedResourceTypes, includedSensitiveResources)
-
 			}
+
+			// Post-process reference replacement after all imports are complete
+			// This includes both requested resources and automatically imported referenced resources
+			if len(resourceTypes) > 0 {
+				// Get the working directory from the first resource type
+				_, _, workingDir := initTf(cmd.Context(), resourceTypes[0])
+
+				// Set up log collection if enabled (now that we know the working directory)
+				if collectLogs {
+					setupLogCollection(workingDir)
+				}
+
+				if !progress {
+					log.Printf("🔄 Running final post-processing after all imports are complete...")
+				}
+
+				// First: Process resource-to-resource references
+				if progress {
+					progressTracker.UpdateWithOutput("Processing resource references")
+				}
+				err := helpers.PostProcessReferences(workingDir, verbose)
+				if err != nil {
+					log.Printf("⚠️  Resource post-processing failed: %v", err)
+				}
+
+				// Second: Parse the resource map first
+				if !progress {
+					log.Printf("🔄 Parsing resource outputs for intelligent reference resolution...")
+				}
+				resourceMap, parseErr := helpers.ParseOutputsFile(workingDir)
+				if parseErr != nil {
+					log.Printf("[WARNING] Failed to parse outputs.tf: %v", parseErr)
+					resourceMap = make(map[string]string)
+				}
+
+				// Third: Process data source references (only once, at the very end) with resource map
+				if progress {
+					progressTracker.UpdateWithOutput("Processing data source references")
+				}
+				if !progress {
+					log.Printf("🔄 Running data source post-processing after all imports are complete...")
+				}
+				err = helpers.PostProcessDataSourcesWithResourceMap(workingDir, resourceMap, verbose)
+				if err != nil {
+					log.Printf("⚠️  Data source post-processing failed: %v", err)
+				}
+
+				// Fourth: Process ZPA policy data source references (isolated processing)
+				if progress {
+					progressTracker.UpdateWithOutput("Processing ZPA policy references")
+				}
+				err = helpers.PostProcessZPAPolicyDataSources(workingDir, resourceMap, verbose)
+				if err != nil {
+					log.Printf("⚠️  ZPA policy data source post-processing failed: %v", err)
+				}
+
+				// Finish progress tracking
+				if progress {
+					progressTracker.Finish()
+				}
+			}
+
 			if len(managedResourceTypes) > 0 {
 				fmt.Println("\033[33mThe following resources are already managed by Terraform:\033[0m")
 				for resource := range managedResourceTypes {
 					fmt.Println(resource)
 				}
-			} else {
-				fmt.Println("\033[32mImport successful!\033[0m")
-				fmt.Println("\033[32mThe resources imported via Zscaler Terraformer are shown above.\033[0m")
-				fmt.Println("\033[32mThese resources are now in your Terraform state and will be managed by Terraform.\033[0m")
+			}
+
+			// Generate and display comprehensive import summary
+			if len(resourceTypes) > 0 {
+				_, _, workingDir := initTf(cmd.Context(), resourceTypes[0])
+				helpers.PrintImportSummary(workingDir)
+
+				// Run terraform validate if requested
+				if validateTerraform {
+					err := validateGeneratedFiles(workingDir)
+					if err != nil {
+						log.Printf("⚠️  Validation completed with errors: %v", err)
+					}
+				}
 			}
 			if includedSensitiveResources["zpa_pra_credential_controller"] {
 				fmt.Println("\033[33mThe resource zpa_pra_credential_controller contains sensitive values not included in the generated code.\033[0m")
 			}
+
+			// Cleanup log collection if it was enabled
+			if collectLogs {
+				cleanupLogCollection()
+			}
 			return
 		}
+
+		// Set up log collection and progress tracking for single resource import if enabled
+		_, _, workingDir := initTf(cmd.Context(), resourceType_)
+
+		if collectLogs {
+			setupLogCollection(workingDir)
+		}
+
+		// Initialize progress tracker for single resource import
+		if progress {
+			progressTracker = NewProgressTracker(1) // Single resource
+			fmt.Printf("🎯 Starting single resource import with progress tracking\n\n")
+			progressTracker.UpdateWithOutput(fmt.Sprintf("Importing %s", resourceType_))
+		}
+
 		importResource(cmd.Context(), cmd, cmd.OutOrStdout(), resourceType_, managedResourceTypes, includedSensitiveResources)
+
+		// Finish progress tracking for single resource
+		if progress {
+			progressTracker.Finish()
+		}
+
+		// Cleanup log collection if it was enabled for single resource import
+		if collectLogs {
+			cleanupLogCollection()
+		}
+
+		// Post-processing is handled by the main runImport function after all imports are complete
 
 		if len(managedResourceTypes) > 0 {
 			fmt.Println("\033[33mThe following resources are already managed by Terraform:\033[0m")
 			for resource := range managedResourceTypes {
 				fmt.Println(resource)
 			}
-		} else {
-			fmt.Println("\033[32mImport successful!\033[0m")
-			fmt.Println("\033[32mThe resources imported via Zscaler Terraformer are shown above.\033[0m")
-			fmt.Println("\033[32mThese resources are now in your Terraform state and will be managed by Terraform.\033[0m")
 		}
+
+		// Generate and display comprehensive import summary for single resource (reuse workingDir)
+		helpers.PrintImportSummary(workingDir)
 		if includedSensitiveResources["zpa_pra_credential_controller"] {
 			fmt.Println("\033[33mThe resource zpa_pra_credential_controller contains sensitive values not included in the generated code.\033[0m")
 		}
@@ -282,6 +432,7 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 			// If it's a license error, log and continue, otherwise, terminate.
 			if isLicErr {
 				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+				return
 			} else {
 				log.Fatal(err)
 			}
@@ -306,7 +457,14 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 
 		jsonPayload, _, err := appservercontroller.GetAll(ctx, service)
 		if err != nil {
-			log.Fatal(err)
+			isLicErr, reason := isLicenseError(err)
+			// If it's a license error, log and continue, otherwise, terminate.
+			if isLicErr {
+				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+				return
+			} else {
+				log.Fatal(err)
+			}
 		}
 		m, _ := json.Marshal(jsonPayload)
 		resourceCount = len(jsonPayload)
@@ -319,7 +477,14 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		service := api.ZPAService
 		jsonPayload, _, err := applicationsegment.GetAll(ctx, service)
 		if err != nil {
-			log.Fatal(err)
+			isLicErr, reason := isLicenseError(err)
+			// If it's a license error, log and continue, otherwise, terminate.
+			if isLicErr {
+				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+				return
+			} else {
+				log.Fatal(err)
+			}
 		}
 		jsonStructData = make([]interface{}, len(jsonPayload))
 		for i, item := range jsonPayload {
@@ -337,7 +502,14 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		service := api.ZPAService
 		jsonPayload, _, err := applicationsegmentbrowseraccess.GetAll(ctx, service)
 		if err != nil {
-			log.Fatal(err)
+			isLicErr, reason := isLicenseError(err)
+			// If it's a license error, log and continue, otherwise, terminate.
+			if isLicErr {
+				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+				return
+			} else {
+				log.Fatal(err)
+			}
 		}
 		jsonStructData = make([]interface{}, len(jsonPayload))
 		for i, item := range jsonPayload {
@@ -355,7 +527,14 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		service := api.ZPAService
 		jsonPayload, _, err := applicationsegmentinspection.GetAll(ctx, service)
 		if err != nil {
-			log.Fatal(err)
+			isLicErr, reason := isLicenseError(err)
+			// If it's a license error, log and continue, otherwise, terminate.
+			if isLicErr {
+				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+				return
+			} else {
+				log.Fatal(err)
+			}
 		}
 		m, _ := json.Marshal(jsonPayload)
 		resourceCount = len(jsonPayload)
@@ -497,6 +676,7 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 			// If it's a license error, log and continue, otherwise, terminate.
 			if isLicErr {
 				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+				return
 			} else {
 				log.Fatal(err)
 			}
@@ -516,6 +696,7 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 			// If it's a license error, log and continue, otherwise, terminate.
 			if isLicErr {
 				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+				return
 			} else {
 				log.Fatal(err)
 			}
@@ -535,6 +716,28 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 			// If it's a license error, log and continue, otherwise, terminate.
 			if isLicErr {
 				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+				return
+			} else {
+				log.Fatal(err)
+			}
+		}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+		includedSensitiveResources[resourceType] = true
+	case "zpa_pra_credential_pool":
+		if api.ZPAService == nil {
+			log.Fatal("ZPA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZPAService
+		jsonPayload, _, err := pracredentialpool.GetAll(ctx, service)
+		if err != nil {
+			isLicErr, reason := isLicenseError(err)
+			// If it's a license error, log and continue, otherwise, terminate.
+			if isLicErr {
+				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+				return
 			} else {
 				log.Fatal(err)
 			}
@@ -555,6 +758,66 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 			// If it's a license error, log and continue, otherwise, terminate.
 			if isLicErr {
 				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+				return
+			} else {
+				log.Fatal(err)
+			}
+		}
+		m, _ := json.Marshal(jsonPayload)
+		resourceCount = len(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zpa_user_portal_controller":
+		if api.ZPAService == nil {
+			log.Fatal("ZPA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZPAService
+		jsonPayload, _, err := portal_controller.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		m, _ := json.Marshal(jsonPayload)
+		resourceCount = len(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zpa_user_portal_link":
+		if api.ZPAService == nil {
+			log.Fatal("ZPA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZPAService
+		jsonPayload, _, err := portal_link.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		m, _ := json.Marshal(jsonPayload)
+		resourceCount = len(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zpa_c2c_ip_ranges":
+		if api.ZPAService == nil {
+			log.Fatal("ZPA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZPAService
+		jsonPayload, _, err := c2c_ip_ranges.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		m, _ := json.Marshal(jsonPayload)
+		resourceCount = len(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zpa_private_cloud_group":
+		if api.ZPAService == nil {
+			log.Fatal("ZPA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZPAService
+		jsonPayload, _, err := private_cloud_group.GetAll(ctx, service)
+		if err != nil {
+			isLicErr, reason := isLicenseError(err)
+			// If it's a license error, log and continue, otherwise, terminate.
+			if isLicErr {
+				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+				return
 			} else {
 				log.Fatal(err)
 			}
@@ -568,6 +831,7 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		}
 		// EXACTLY like the TF pattern:
 		service := api.ZPAService
+
 		list, _, err := segmentgroup.GetAll(ctx, service)
 		if err != nil {
 			log.Fatal(err)
@@ -761,6 +1025,7 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 			// If it's a license error, log and continue, otherwise, terminate.
 			if isLicErr {
 				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+				return
 			} else {
 				log.Fatal(err)
 			}
@@ -780,6 +1045,7 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 			// If it's a license error, log and continue, otherwise, terminate.
 			if isLicErr {
 				log.Printf("[WARNING] License error encountered: %s. Continuing with the import.", reason)
+				return
 			} else {
 				log.Fatal(err)
 			}
@@ -913,6 +1179,26 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		}
 		m, _ := json.Marshal(rulesFiltered)
 		resourceCount = len(rulesFiltered)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zia_nat_control_rules":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		jsonPayload, err := nat_control_policies.GetAll(ctx, service)
+		if err != nil {
+			shouldSkip, message := helpers.HandleZIAAPIError(err, resourceType)
+			if shouldSkip {
+				log.Printf("[WARN] Skipping resource import for %s: %s", resourceType, message)
+				return
+			}
+			// If not a handled error, log it and skip gracefully
+			log.Printf("[ERROR] error occurred while fetching resource %s: %v", resourceType, err)
+			return
+		}
+		m, _ := json.Marshal(jsonPayload)
+		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_firewall_filtering_destination_groups":
 		if api.ZIAService == nil {
@@ -1295,6 +1581,26 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 			dataMap := jsonStructData[0].(map[string]interface{})
 			dataMap["id"] = "all_urls"
 		}
+	case "zia_forwarding_control_proxies":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		rules, err := proxies.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		rulesFiltered := []proxies.Proxies{}
+		for _, rule := range rules {
+			if helpers.IsInList(rule.Name, []string{}) {
+				continue
+			}
+			rulesFiltered = append(rulesFiltered, rule)
+		}
+		resourceCount = len(rulesFiltered)
+		m, _ := json.Marshal(rulesFiltered)
+		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_forwarding_control_rule":
 		if api.ZIAService == nil {
 			log.Fatal("ZIA service is not initialized")
@@ -1638,6 +1944,107 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 			dataMap := jsonStructData[0].(map[string]interface{})
 			dataMap["id"] = "enduser_notification"
 		}
+	case "zia_mobile_malware_protection_policy":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		mobileSettings, err := mobile_threat_settings.GetMobileThreatSettings(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		jsonPayload := []*mobile_threat_settings.MobileAdvanceThreatSettings{mobileSettings}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+		if len(jsonStructData) > 0 {
+			dataMap := jsonStructData[0].(map[string]interface{})
+			dataMap["id"] = "mobile_settings"
+		}
+	case "zia_ftp_control_policy":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		ftpControl, err := ftp_control_policy.GetFTPControlPolicy(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		jsonPayload := []*ftp_control_policy.FTPControlPolicy{ftpControl}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+		if len(jsonStructData) > 0 {
+			dataMap := jsonStructData[0].(map[string]interface{})
+			dataMap["id"] = "ftp_control"
+		}
+	case "zia_virtual_service_edge_cluster":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		jsonPayload, err := vzen_clusters.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zia_virtual_service_edge_node":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		jsonPayload, err := vzen_nodes.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zia_risk_profiles":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		jsonPayload, err := risk_profiles.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zia_workload_groups":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		jsonPayload, err := workloadgroups.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zia_subscription_alert":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		jsonPayload, err := alerts.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
 	default:
 		log.Printf("%q is not yet supported for state import", resourceType)
 		return
@@ -1647,7 +2054,7 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		return
 	}
 
-	tf, _, workingDir := initTf(resourceType)
+	tf, _, workingDir := initTf(ctx, resourceType)
 	f, err := os.Create(strings.TrimSuffix(workingDir, "/") + "/" + resourceType + ".tf")
 	if err != nil {
 		log.Fatal(err)
@@ -1675,8 +2082,11 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		}
 		if resourceID != "" {
 			name := buildResourceName(resourceType, structData)
-			fmt.Fprint(writer, buildCompositeID(resourceType, resourceID, name))
-			err := tf.Import(cmd.Context(), resourceType+"."+name, resourceID)
+			// Only print terraform import commands when progress bar is disabled
+			if !progress || noProgress {
+				_, _ = fmt.Fprint(writer, buildCompositeID(resourceType, resourceID, name))
+			}
+			err := tf.Import(ctx, resourceType+"."+name, resourceID)
 			if err != nil {
 				if strings.Contains(err.Error(), "Resource already managed by Terraform") {
 					managedResourceTypes[resourceType] = true
@@ -1687,9 +2097,108 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		}
 	}
 
+	// Automatically import referenced resources
+	// TEMPORARILY DISABLED to prevent recursive loops and multiple post-processing runs
+	// importReferencedResources(ctx, cmd, writer, resourceType, jsonStructData, managedResourceTypes, includedSensitiveResources)
+
 	stateFile := workingDir + "/terraform.tfstate"
 	helpers.RemoveTcpPortRangesFromState(stateFile)
+}
 
+// importReferencedResources is currently unused but kept for potential future use
+//
+//nolint:unused // importReferencedResources automatically imports resources that are referenced by the imported resource
+func importReferencedResources(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourceType string, jsonStructData []interface{}, managedResourceTypes map[string]bool, includedSensitiveResources map[string]bool) {
+	// Define resource reference mappings (using API field names)
+	referenceMappings := map[string]map[string]string{
+		"zpa_server_group": {
+			"appConnectorGroups": "zpa_app_connector_group",
+		},
+		"zpa_application_segment": {
+			"serverGroups": "zpa_server_group",
+		},
+	}
+
+	// Get the reference mappings for this resource type
+	mappings, exists := referenceMappings[resourceType]
+	if !exists {
+		return // No referenced resources to import
+	}
+
+	// Collect all referenced resource IDs
+	referencedResourceIDs := make(map[string][]string) // resourceType -> []resourceIDs
+
+	for _, data := range jsonStructData {
+		structData := data.(map[string]interface{})
+
+		// Check each reference mapping
+		for attributeName, referencedResourceType := range mappings {
+			if referencedData, exists := structData[attributeName]; exists {
+				// Handle both single objects and arrays
+				var referencedItems []interface{}
+				if referencedArray, ok := referencedData.([]interface{}); ok {
+					referencedItems = referencedArray
+				} else if referencedObject, ok := referencedData.(map[string]interface{}); ok {
+					referencedItems = []interface{}{referencedObject}
+				}
+
+				// Extract IDs from referenced items
+				for _, item := range referencedItems {
+					if itemMap, ok := item.(map[string]interface{}); ok {
+						if id, exists := itemMap["id"]; exists {
+							var resourceID string
+							switch v := id.(type) {
+							case string:
+								resourceID = v
+							case int:
+								resourceID = strconv.Itoa(v)
+							case float64:
+								resourceID = strconv.FormatInt(int64(v), 10)
+							}
+							if resourceID != "" {
+								referencedResourceIDs[referencedResourceType] = append(referencedResourceIDs[referencedResourceType], resourceID)
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// Import each referenced resource type
+	for referencedResourceType, resourceIDs := range referencedResourceIDs {
+		// Remove duplicates
+		uniqueIDs := make(map[string]bool)
+		var uniqueResourceIDs []string
+		for _, id := range resourceIDs {
+			if !uniqueIDs[id] {
+				uniqueIDs[id] = true
+				uniqueResourceIDs = append(uniqueResourceIDs, id)
+			}
+		}
+
+		if len(uniqueResourceIDs) > 0 {
+			log.Printf("[INFO] Auto-importing %d referenced %s resources", len(uniqueResourceIDs), referencedResourceType)
+			// Import the referenced resources directly without calling importResource
+			// to prevent recursive loops and multiple post-processing runs
+			directImportReferencedResource(ctx, cmd, writer, referencedResourceType, uniqueResourceIDs, managedResourceTypes, includedSensitiveResources)
+		}
+	}
+
+	// Post-processing will be handled by the main runImport function after all resource types are processed
+}
+
+// This prevents recursive loops when importing referenced resources.
+//
+//nolint:unused // directImportReferencedResource imports referenced resources directly without triggering automatic reference detection
+func directImportReferencedResource(_ context.Context, _ *cobra.Command, _ io.Writer, resourceType string, resourceIDs []string, _ map[string]bool, _ map[string]bool) {
+	// For now, just log that we would import these resources
+	// The actual import logic will be handled by the main importResource function
+	// This prevents the recursive loop while still allowing the referenced resources to be imported
+	log.Printf("[DEBUG] Would import %d %s resources with IDs: %v", len(resourceIDs), resourceType, resourceIDs)
+
+	// The referenced resources will be imported when the user explicitly imports them
+	// or when they are imported as part of a broader import command
 }
 
 func buildCompositeID(resourceType, resourceID, name string) string {

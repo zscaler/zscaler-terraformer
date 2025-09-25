@@ -20,10 +20,10 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: ~/go/pkg/mod
-          key: go1.23-${{ hashFiles('**/go.sum') }}
+          key: go1.24-${{ hashFiles('**/go.sum') }}
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v8
         with:
-          version: v2.1.6
+          version: latest
           only-new-issues: true
           skip-cache: true

@@ -79,18 +79,18 @@ func NewClient() (*Client, error) {
 	var svc *zscaler.Service
 
 	if cfg.useLegacyClient {
-		logrus.Infof("[INFO] Initializing legacy V2 client...")
+		logrus.Infof("[INFO] Initializing Legacy client...")
 		legacySvc, err := zscalerSDKV2Client(cfg)
 		if err != nil {
-			return nil, fmt.Errorf("failed to initialize V2 client: %w", err)
+			return nil, fmt.Errorf("failed to initialize Legacy client: %w", err)
 		}
 		// Wrap the underlying client in zscaler.Service so usage is consistent.
 		svc = zscaler.NewService(legacySvc.Client, nil)
 	} else {
-		logrus.Infof("[INFO] Initializing V3 client...")
+		logrus.Infof("[INFO] Initializing Zscaler ONEAPI client...")
 		v3Client, err := zscalerSDKV3Client(cfg)
 		if err != nil {
-			return nil, fmt.Errorf("failed to initialize V3 client: %w", err)
+			return nil, fmt.Errorf("failed to initialize Zscaler ONEAPI client: %w", err)
 		}
 		// Wrap the underlying client in zscaler.Service so usage is consistent.
 		svc = zscaler.NewService(v3Client, nil)
@@ -254,17 +254,17 @@ func zscalerSDKV2Client(c *Config) (*zscaler.Service, error) {
 
 	ziaCfg, err := zia.NewConfiguration(setters...)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create ZIA V2 configuration: %w", err)
+		return nil, fmt.Errorf("failed to create Legacy ZIA configuration: %w", err)
 	}
 	ziaCfg.UserAgent = customUserAgent
 
 	// Now wrap it in a zscaler.Service so usage is uniform.
 	wrappedV2Client, err := zscaler.NewLegacyZiaClient(ziaCfg)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create legacy ZIA client: %w", err)
+		return nil, fmt.Errorf("failed to create Legacy ZIA client: %w", err)
 	}
 
-	log.Println("[INFO] Successfully initialized ZIA V2 client")
+	log.Println("[INFO] Successfully initialized Legacy ZIA client")
 	return wrappedV2Client, nil
 }
 
@@ -334,16 +334,16 @@ func zscalerSDKV3Client(c *Config) (*zscaler.Client, error) {
 
 	conf, err := zscaler.NewConfiguration(setters...)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create V3 configuration: %w", err)
+		return nil, fmt.Errorf("failed to create Zscaler ONEAPI configuration: %w", err)
 	}
 	conf.UserAgent = customUserAgent
 
 	// Build the client.
 	v3Client, err := zscaler.NewOneAPIClient(conf)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create Zscaler OneAPI client: %w", err)
+		return nil, fmt.Errorf("failed to create Zscaler ONEAPI client: %w", err)
 	}
 
-	log.Println("[INFO] Successfully initialized ZIA V3 client")
+	log.Println("[INFO] Successfully initialized ZIA Zscaler ONEAPI client")
 	return v3Client.Client, nil
 }

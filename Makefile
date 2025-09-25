@@ -29,8 +29,13 @@ help:
 	@echo "$(COLOR_WARNING)Install$(COLOR_NONE)"
 	@echo "$(COLOR_OK)  build                 	Builds and Installs The Binary For The Current Platform and Architecture$(COLOR_NONE)"
 	@echo "$(COLOR_WARNING)test$(COLOR_NONE)"
-	@echo "$(COLOR_OK)  test_zia        	Run only zia integration tests$(COLOR_NONE)"
-	@echo "$(COLOR_OK)  test_zpa        	Run only zpa integration tests$(COLOR_NONE)"
+	@echo "$(COLOR_OK)  test               	Run all unit tests$(COLOR_NONE)"
+	@echo "$(COLOR_OK)  test-unit          	Run unit tests with verbose output$(COLOR_NONE)"
+	@echo "$(COLOR_OK)  test-coverage      	Run unit tests with coverage report$(COLOR_NONE)"
+	@echo "$(COLOR_OK)  test-fresh         	Run unit tests without cache$(COLOR_NONE)"
+	@echo "$(COLOR_OK)  test-clean         	Clean test cache and artifacts$(COLOR_NONE)"
+	@echo "$(COLOR_OK)  test_zia           	Run only zia integration tests$(COLOR_NONE)"
+	@echo "$(COLOR_OK)  test_zpa           	Run only zpa integration tests$(COLOR_NONE)"
 
 
 TEST ?= $(shell go list ./...)
@@ -88,6 +93,45 @@ test_zpa:
 		ZPA_CLOUD="$(ZPA_CLOUD)" \
 		go test $(TEST) -timeout 120m -v $(TESTARGS)
 
+# All Tests
+test:
+	@echo "$(COLOR_ZSCALER)🧪 Running All Tests...$(COLOR_NONE)"
+	@go test ./tests/... -timeout 30s
+	@echo "$(COLOR_OK)✅ All tests completed$(COLOR_NONE)"
+
+test-unit:
+	@echo "$(COLOR_ZSCALER)🧪 Running Unit Tests (Verbose)...$(COLOR_NONE)"
+	@go test -v ./tests/unit/... -timeout 30s
+	@echo "$(COLOR_OK)✅ Unit tests completed$(COLOR_NONE)"
+
+test-coverage:
+	@echo "$(COLOR_ZSCALER)📊 Running All Tests with Coverage...$(COLOR_NONE)"
+	@go test -cover -coverprofile=coverage.out ./tests/... -timeout 30s
+	@go tool cover -func=coverage.out
+	@echo "$(COLOR_OK)✅ Coverage report completed$(COLOR_NONE)"
+	@echo "$(COLOR_WARNING)📄 Coverage details saved to coverage.out$(COLOR_NONE)"
+
+test-coverage-html:
+	@echo "$(COLOR_ZSCALER)📊 Generating HTML Coverage Report...$(COLOR_NONE)"
+	@go test -cover -coverprofile=coverage.out ./tests/... -timeout 30s
+	@go tool cover -html=coverage.out -o coverage.html
+	@echo "$(COLOR_OK)✅ HTML coverage report generated: coverage.html$(COLOR_NONE)"
+
+test-fresh:
+	@echo "$(COLOR_ZSCALER)🧪 Running Fresh Tests (no cache)...$(COLOR_NONE)"
+	@go clean -testcache
+	@go test ./tests/... -timeout 30s
+	@echo "$(COLOR_OK)✅ Fresh tests completed$(COLOR_NONE)"
+
+test-clean:
+	@echo "$(COLOR_ZSCALER)🧹 Cleaning test artifacts...$(COLOR_NONE)"
+	@rm -f coverage.out coverage.html
+	@rm -f tests/fixtures/temp_*
+	@go clean -testcache
+	@echo "$(COLOR_OK)✅ Test artifacts and cache cleaned$(COLOR_NONE)"
+
+
+# Integration Tests
 test_zia:
 	@CI=true \
 		USE_STATIC_RESOURCE_IDS=true \
@@ -136,4 +180,4 @@ print-version:
 	@echo "VERSION = $(VERSION)"
 	@echo "LD_FLAGS = $(LD_FLAGS)"
 
-.PHONY: build install build_all test_zpa test_zia vet imports fmt fmtcheck errcheck lint tools tools-update validate-tf
+.PHONY: build install build_all test test-unit test-coverage test-coverage-html test-fresh test-all test-clean test_zpa test_zia vet imports fmt fmtcheck errcheck lint tools tools-update validate-tf

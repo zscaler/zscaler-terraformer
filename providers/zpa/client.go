@@ -41,7 +41,7 @@ import (
 )
 
 // Client is the high-level client returned by NewClient().
-// We only keep one Service pointer, and at runtime
+// We only keep one Service pointer, and at runtime.
 // it will be backed by either the legacy (V2) client or the new (V3) client.
 type Client struct {
 	Service *zscaler.Service
@@ -81,18 +81,18 @@ func NewClient() (*Client, error) {
 	var svc *zscaler.Service
 
 	if cfg.useLegacyClient {
-		logrus.Infof("[INFO] Initializing legacy V2 client...")
+		logrus.Infof("[INFO] Initializing Legacy ZPA client...")
 		legacySvc, err := zscalerSDKV2Client(cfg)
 		if err != nil {
-			return nil, fmt.Errorf("failed to initialize V2 client: %w", err)
+			return nil, fmt.Errorf("failed to initialize Legacy ZPA client: %w", err)
 		}
 		// Wrap the underlying client in zscaler.Service so usage is consistent.
 		svc = zscaler.NewService(legacySvc.Client, nil)
 	} else {
-		logrus.Infof("[INFO] Initializing V3 client...")
+		logrus.Infof("[INFO] Initializing Zscaler ONEAPI client...")
 		v3Client, err := zscalerSDKV3Client(cfg)
 		if err != nil {
-			return nil, fmt.Errorf("failed to initialize V3 client: %w", err)
+			return nil, fmt.Errorf("failed to initialize Zscaler ONEAPI client: %w", err)
 		}
 		// Wrap the underlying client in zscaler.Service so usage is consistent.
 		svc = zscaler.NewService(v3Client, nil)
@@ -268,17 +268,17 @@ func zscalerSDKV2Client(c *Config) (*zscaler.Service, error) {
 
 	zpaCfg, err := zpa.NewConfiguration(setters...)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create ZPA V2 configuration: %w", err)
+		return nil, fmt.Errorf("failed to create Legacy ZPA configuration: %w", err)
 	}
 	zpaCfg.UserAgent = customUserAgent
 
 	// Now wrap it in a zscaler.Service so usage is uniform.
 	wrappedV2Client, err := zscaler.NewLegacyZpaClient(zpaCfg)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create legacy ZPA client: %w", err)
+		return nil, fmt.Errorf("failed to create Legacy ZPA client: %w", err)
 	}
 
-	log.Println("[INFO] Successfully initialized ZPA V2 client")
+	log.Println("[INFO] Successfully initialized Legacy ZPA client")
 	return wrappedV2Client, nil
 }
 
@@ -352,7 +352,7 @@ func zscalerSDKV3Client(c *Config) (*zscaler.Client, error) {
 
 	conf, err := zscaler.NewConfiguration(setters...)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create V3 configuration: %w", err)
+		return nil, fmt.Errorf("failed to create Zscaler ONEAPI configuration: %w", err)
 	}
 	conf.UserAgent = customUserAgent
 
@@ -362,6 +362,6 @@ func zscalerSDKV3Client(c *Config) (*zscaler.Client, error) {
 		return nil, fmt.Errorf("failed to create Zscaler OneAPI client: %w", err)
 	}
 
-	log.Println("[INFO] Successfully initialized ZPA V3 client")
+	log.Println("[INFO] Successfully initialized Zscaler ONEAPI client")
 	return v3Client.Client, nil
 }

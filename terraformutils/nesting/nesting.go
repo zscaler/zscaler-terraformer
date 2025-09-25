@@ -125,8 +125,9 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 			continue
 		}
 
-		// Special handling for workload_groups in zia_dlp_web_rules to include both id and name
-		if resourceType == "zia_dlp_web_rules" && block == "workload_groups" {
+		// Special handling for workload_groups to include both id and name
+		// This applies to all resource types that have workload_groups blocks
+		if block == "workload_groups" {
 			output += helpers.WorkloadGroupsBlock(block, structData[MapTfFieldNameToAPI(resourceType, block)])
 			continue
 		}
@@ -222,8 +223,9 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 			}
 			output += "}\n"
 			continue
-		} else if helpers.IsInList(resourceType, []string{"zia_firewall_filtering_network_service_groups", "zia_firewall_filtering_rule", "zia_url_filtering_rules", "zia_dlp_web_rules", "zia_ssl_inspection_rules", "zia_firewall_dns_rule", "zia_firewall_ips_rule", "zia_file_type_control_rules", "zia_sandbox_rules", "zia_forwarding_control_rule"}) && helpers.IsInList(block, []string{"departments",
+		} else if helpers.IsInList(resourceType, []string{"zia_bandwidth_control_rule", "zia_firewall_filtering_network_service_groups", "zia_firewall_filtering_rule", "zia_url_filtering_rules", "zia_dlp_web_rules", "zia_ssl_inspection_rules", "zia_firewall_dns_rule", "zia_firewall_ips_rule", "zia_file_type_control_rules", "zia_sandbox_rules", "zia_forwarding_control_rule", "zia_nat_control_rules"}) && helpers.IsInList(block, []string{"departments",
 			"groups",
+			"departments",
 			"locations",
 			"dlp_engines",
 			"location_groups",
@@ -238,6 +240,13 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 			"source_ip_groups",
 			"proxy_gateways",
 			"app_service_groups",
+			"src_ip_groups",
+			"nw_service_groups",
+			"nw_application_groups",
+			"time_windows",
+			"dest_ip_groups",
+			"nw_services",
+			"bandwidth_classes",
 		}) {
 			output += helpers.ListIdsIntBlock(block, structData[MapTfFieldNameToAPI(resourceType, block)])
 			continue
@@ -252,6 +261,9 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 		}) {
 			output += helpers.ListIdsIntBlock(block, structData[MapTfFieldNameToAPI(resourceType, block)])
 			continue
+		} else if helpers.IsInList(resourceType, []string{"zia_virtual_service_edge_cluster"}) && helpers.IsInList(block, []string{"virtual_zen_nodes"}) {
+			output += helpers.ListIdsIntBlock(block, structData[MapTfFieldNameToAPI(resourceType, block)])
+			continue
 		} else if helpers.IsInList(resourceType, []string{"zpa_application_segment"}) && block == "server_groups" {
 			output += helpers.ListIdsStringBlock(block, structData["serverGroups"])
 			continue
@@ -259,16 +271,18 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 			output += helpers.ListIdsStringBlock(block, structData["serverGroups"])
 			continue
 		} else if helpers.IsInList(resourceType, []string{"zpa_application_segment_pra"}) {
-			if block == "server_groups" {
+			switch block {
+			case "server_groups":
 				output += helpers.ListIdsStringBlock(block, structData["serverGroups"])
-			} else if block == "common_apps_dto" {
+			case "common_apps_dto":
 				output += helpers.ListNestedBlock(block, structData["praApps"])
 			}
 			continue
 		} else if helpers.IsInList(resourceType, []string{"zpa_application_segment_inspection"}) {
-			if block == "server_groups" {
+			switch block {
+			case "server_groups":
 				output += helpers.ListIdsStringBlock(block, structData["serverGroups"])
-			} else if block == "common_apps_dto" {
+			case "common_apps_dto":
 				output += helpers.ListNestedBlock(block, structData["inspectionApps"])
 			}
 			continue
@@ -280,6 +294,12 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 			continue
 		} else if helpers.IsInList(resourceType, []string{"zpa_pra_console_controller"}) && block == "pra_application" {
 			output += helpers.TypeSetNestedBlock(block, structData["praApplication"])
+			continue
+		} else if helpers.IsInList(resourceType, []string{"zpa_user_portal_link"}) && block == "user_portals" {
+			output += helpers.ListIdsStringBlock(block, structData["userPortals"])
+			continue
+		} else if helpers.IsInList(resourceType, []string{"zpa_pra_credential_pool"}) && block == "credentials" {
+			output += helpers.ListIdsStringBlock(block, structData["credentials"])
 			continue
 		} else if helpers.IsInList(resourceType, []string{"zpa_server_group", "zpa_policy_access_rule"}) && block == "app_connector_groups" {
 			output += helpers.ListIdsStringBlock(block, structData["appConnectorGroups"])
@@ -476,8 +496,20 @@ func WriteNestedBlock(resourceType string, attributes []string, schemaBlock *tfj
 		}
 
 		// Exclude specific computed attributes.
-		// Special exception: allow 'id' attribute for receiver and tenant blocks in zia_dlp_web_rules.
-		skipIDAttribute := attrName == "id" && (resourceType != "zia_dlp_web_rules" || (!isReceiverBlock(attrStruct) && !isTenantBlock(attrStruct)))
+		// Special exception: allow 'id' attribute for:
+		// 1. receiver and tenant blocks in zia_dlp_web_rules
+		// 2. workload_groups blocks in all resource types (since they need both id and name)
+		isWorkloadGroupsBlock := func(attrStruct map[string]interface{}) bool {
+			// Check if this looks like a workload_groups block (has both id and name)
+			_, hasID := attrStruct["id"]
+			_, hasName := attrStruct["name"]
+			return hasID && hasName
+		}
+
+		skipIDAttribute := attrName == "id" &&
+			(resourceType != "zia_dlp_web_rules" || (!isReceiverBlock(attrStruct) && !isTenantBlock(attrStruct))) &&
+			!isWorkloadGroupsBlock(attrStruct)
+
 		if skipIDAttribute || attrName == "appId" || attrName == "portal" || attrName == "hidden" || attrName == "certificate_name" || (resourceType == "zia_url_categories" && attrName == "val") {
 			continue
 		}
@@ -507,7 +539,6 @@ func WriteNestedBlock(resourceType string, attributes []string, schemaBlock *tfj
 // WriteAttrLine outputs a line of HCL configuration with a configurable depth.
 // for known types.
 func WriteAttrLine(key string, value interface{}, usedInBlock bool) string {
-
 	// General handling for attributes that are returned as nil.
 	if value == nil {
 		return ""
@@ -615,6 +646,12 @@ func WriteAttrLine(key string, value interface{}, usedInBlock bool) string {
 
 		if len(interfaceItems) > 0 {
 			return WriteAttrLine(key, interfaceItems, false)
+		}
+
+		// Special handling for empty arrays that should be written to HCL to prevent drift
+		// This applies to attributes like debug_mode in zpa_cloud_browser_isolation_external_profile
+		if key == "debug_mode" && len(value.([]interface{})) == 0 {
+			return fmt.Sprintf("%s = []\n", key)
 		}
 
 	case []map[string]interface{}:
@@ -749,6 +786,15 @@ func MapTfFieldNameToAPI(resourceType, fieldName string) string {
 			return "surrogateIP"
 		case "surrogate_ip_enforced_for_known_browsers":
 			return "surrogateIPEnforcedForKnownBrowsers"
+		}
+	}
+
+	if resourceType == "zpa_application_segment" {
+		switch fieldName {
+		case "is_incomplete_dr_config":
+			return "isIncompleteDRConfig"
+		case "use_in_dr_mode":
+			return "useInDrMode"
 		}
 	}
 
