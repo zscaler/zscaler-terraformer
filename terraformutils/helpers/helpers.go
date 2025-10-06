@@ -573,10 +573,27 @@ func HandleZIAAPIError(err error, resourceType string) (bool, string) {
 			case "NOT_SUBSCRIBED":
 				// Handle subscription-related errors that should be skipped gracefully
 				return true, fmt.Sprintf("Subscription required but not active: %s", ziaErr.Message)
+			case "ONLY_ONEAPI_SUPPORTED":
+				// Handle OneAPI-only endpoints that require specific access tokens
+				return true, fmt.Sprintf("Resource requires OneAPI access: %s", ziaErr.Message)
 			default:
 				return false, fmt.Sprintf("Unhandled ZIA error: %s - %s", ziaErr.Code, ziaErr.Message)
 			}
 		}
+	}
+
+	// Check for specific error patterns in the error string
+	if strings.Contains(errorString, "ONLY_ONEAPI_SUPPORTED") {
+		return true, "Resource requires OneAPI access, skipping import"
+	}
+	if strings.Contains(errorString, "This API endpoint can be accessed only through Zscaler OneAPI") {
+		return true, "Resource requires OneAPI access, skipping import"
+	}
+	if strings.Contains(errorString, "not licensed") || strings.Contains(errorString, "not authorized") {
+		return true, "Resource not licensed or authorized, skipping import"
+	}
+	if strings.Contains(errorString, "feature is not enabled") {
+		return true, "Required feature not enabled, skipping import"
 	}
 
 	// If no subscription-related error detected, return false to indicate this is a real error

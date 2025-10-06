@@ -12,9 +12,21 @@ Track all Zscaler Terraformer Tool releases. New resources, features, and bug fi
 
 ---
 
-``Last updated: v2.1.0``
+``Last updated: v2.1.1``
 
 ---
+
+## 2.1.1 (October, 6 2025)
+
+### Notes
+
+- Release date: **(October,6 2025)**
+- Supported Terraform version: **v1.x.x**
+
+### Enhancements
+
+## **🐛 Bug Fixes**
+- [PR #334](https://github.com/zscaler/zscaler-terraformer/pull/334) - Fixed ZIA resource import failures due to license/authorization errors. Now gracefully skips resources that require OneAPI access or are not licensed, allowing import to continue with other resources instead of failing entirely.
 
 ## 2.1.0 (September, 24 2025)
 
