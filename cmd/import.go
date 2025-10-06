@@ -1589,7 +1589,14 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		service := api.ZIAService
 		rules, err := proxies.GetAll(ctx, service)
 		if err != nil {
-			log.Fatal(err)
+			shouldSkip, message := helpers.HandleZIAAPIError(err, resourceType)
+			if shouldSkip {
+				log.Printf("[WARN] Skipping resource import for %s: %s", resourceType, message)
+				return
+			}
+			// If not a handled error, log it and skip gracefully
+			log.Printf("[ERROR] error occurred while fetching resource %s: %v", resourceType, err)
+			return
 		}
 		rulesFiltered := []proxies.Proxies{}
 		for _, rule := range rules {
@@ -1639,7 +1646,14 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		service := api.ZIAService
 		gws, err := zpa_gateways.GetAll(ctx, service)
 		if err != nil {
-			log.Fatal(err)
+			shouldSkip, message := helpers.HandleZIAAPIError(err, resourceType)
+			if shouldSkip {
+				log.Printf("[WARN] Skipping resource import for %s: %s", resourceType, message)
+				return
+			}
+			// If not a handled error, log it and skip gracefully
+			log.Printf("[ERROR] error occurred while fetching resource %s: %v", resourceType, err)
+			return
 		}
 		gwsFiltered := []zpa_gateways.ZPAGateways{}
 		for _, gw := range gws {
@@ -1661,7 +1675,14 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		service := api.ZIAService
 		rules, err := sandbox_rules.GetAll(ctx, service)
 		if err != nil {
-			log.Fatal(err)
+			shouldSkip, message := helpers.HandleZIAAPIError(err, resourceType)
+			if shouldSkip {
+				log.Printf("[WARN] Skipping resource import for %s: %s", resourceType, message)
+				return
+			}
+			// If not a handled error, log it and skip gracefully
+			log.Printf("[ERROR] error occurred while fetching resource %s: %v", resourceType, err)
+			return
 		}
 		rulesFiltered := []sandbox_rules.SandboxRules{}
 		for _, rule := range rules {
@@ -1682,7 +1703,14 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		service := api.ZIAService
 		rules, err := sslinspection.GetAll(ctx, service)
 		if err != nil {
-			log.Fatal(err)
+			shouldSkip, message := helpers.HandleZIAAPIError(err, resourceType)
+			if shouldSkip {
+				log.Printf("[WARN] Skipping resource import for %s: %s", resourceType, message)
+				return
+			}
+			// If not a handled error, log it and skip gracefully
+			log.Printf("[ERROR] error occurred while fetching resource %s: %v", resourceType, err)
+			return
 		}
 		rulesFiltered := []sslinspection.SSLInspectionRules{}
 		for _, rule := range rules {
@@ -1704,7 +1732,14 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		service := api.ZIAService
 		jsonPayload, err := filetypecontrol.GetAll(ctx, service)
 		if err != nil {
-			log.Fatal(err)
+			shouldSkip, message := helpers.HandleZIAAPIError(err, resourceType)
+			if shouldSkip {
+				log.Printf("[WARN] Skipping resource import for %s: %s", resourceType, message)
+				return
+			}
+			// If not a handled error, log it and skip gracefully
+			log.Printf("[ERROR] error occurred while fetching resource %s: %v", resourceType, err)
+			return
 		}
 		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
@@ -1717,7 +1752,14 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		service := api.ZIAService
 		rules, err := firewallipscontrolpolicies.GetAll(ctx, service)
 		if err != nil {
-			log.Fatal(err)
+			shouldSkip, message := helpers.HandleZIAAPIError(err, resourceType)
+			if shouldSkip {
+				log.Printf("[WARN] Skipping resource import for %s: %s", resourceType, message)
+				return
+			}
+			// If not a handled error, log it and skip gracefully
+			log.Printf("[ERROR] error occurred while fetching resource %s: %v", resourceType, err)
+			return
 		}
 		rulesFiltered := []firewallipscontrolpolicies.FirewallIPSRules{}
 		for _, rule := range rules {
@@ -1737,7 +1779,14 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		service := api.ZIAService
 		rules, err := firewalldnscontrolpolicies.GetAll(ctx, service)
 		if err != nil {
-			log.Fatal(err)
+			shouldSkip, message := helpers.HandleZIAAPIError(err, resourceType)
+			if shouldSkip {
+				log.Printf("[WARN] Skipping resource import for %s: %s", resourceType, message)
+				return
+			}
+			// If not a handled error, log it and skip gracefully
+			log.Printf("[ERROR] error occurred while fetching resource %s: %v", resourceType, err)
+			return
 		}
 		rulesFiltered := []firewalldnscontrolpolicies.FirewallDNSRules{}
 		for _, rule := range rules {
@@ -1764,7 +1813,14 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		service := api.ZIAService
 		advSettings, err := advanced_settings.GetAdvancedSettings(ctx, service)
 		if err != nil {
-			log.Fatal(err)
+			shouldSkip, message := helpers.HandleZIAAPIError(err, resourceType)
+			if shouldSkip {
+				log.Printf("[WARN] Skipping resource import for %s: %s", resourceType, message)
+				return
+			}
+			// If not a handled error, log it and skip gracefully
+			log.Printf("[ERROR] error occurred while fetching resource %s: %v", resourceType, err)
+			return
 		}
 		jsonPayload := []*advanced_settings.AdvancedSettings{advSettings}
 		resourceCount = len(jsonPayload)
@@ -1784,7 +1840,14 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		service := api.ZIAService
 		urls, err := advancedthreatsettings.GetMaliciousURLs(ctx, service)
 		if err != nil {
-			log.Fatal(err)
+			shouldSkip, message := helpers.HandleZIAAPIError(err, resourceType)
+			if shouldSkip {
+				log.Printf("[WARN] Skipping resource import for %s: %s", resourceType, message)
+				return
+			}
+			// If not a handled error, log it and skip gracefully
+			log.Printf("[ERROR] error occurred while fetching resource %s: %v", resourceType, err)
+			return
 		}
 		jsonPayload := []*advancedthreatsettings.MaliciousURLs{urls}
 		resourceCount = len(jsonPayload)
@@ -1803,7 +1866,14 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		service := api.ZIAService
 		urls, err := advancedthreatsettings.GetSecurityExceptions(ctx, service)
 		if err != nil {
-			log.Fatal(err)
+			shouldSkip, message := helpers.HandleZIAAPIError(err, resourceType)
+			if shouldSkip {
+				log.Printf("[WARN] Skipping resource import for %s: %s", resourceType, message)
+				return
+			}
+			// If not a handled error, log it and skip gracefully
+			log.Printf("[ERROR] error occurred while fetching resource %s: %v", resourceType, err)
+			return
 		}
 		jsonPayload := []*advancedthreatsettings.SecurityExceptions{urls}
 		resourceCount = len(jsonPayload)
@@ -1822,7 +1892,14 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		service := api.ZIAService
 		urls, err := advancedthreatsettings.GetAdvancedThreatSettings(ctx, service)
 		if err != nil {
-			log.Fatal(err)
+			shouldSkip, message := helpers.HandleZIAAPIError(err, resourceType)
+			if shouldSkip {
+				log.Printf("[WARN] Skipping resource import for %s: %s", resourceType, message)
+				return
+			}
+			// If not a handled error, log it and skip gracefully
+			log.Printf("[ERROR] error occurred while fetching resource %s: %v", resourceType, err)
+			return
 		}
 		jsonPayload := []*advancedthreatsettings.AdvancedThreatSettings{urls}
 		resourceCount = len(jsonPayload)
@@ -1841,7 +1918,14 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		service := api.ZIAService
 		urls, err := malware_protection.GetATPMalwareInspection(ctx, service)
 		if err != nil {
-			log.Fatal(err)
+			shouldSkip, message := helpers.HandleZIAAPIError(err, resourceType)
+			if shouldSkip {
+				log.Printf("[WARN] Skipping resource import for %s: %s", resourceType, message)
+				return
+			}
+			// If not a handled error, log it and skip gracefully
+			log.Printf("[ERROR] error occurred while fetching resource %s: %v", resourceType, err)
+			return
 		}
 		jsonPayload := []*malware_protection.ATPMalwareInspection{urls}
 		resourceCount = len(jsonPayload)
@@ -1860,7 +1944,14 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		service := api.ZIAService
 		urls, err := malware_protection.GetATPMalwareProtocols(ctx, service)
 		if err != nil {
-			log.Fatal(err)
+			shouldSkip, message := helpers.HandleZIAAPIError(err, resourceType)
+			if shouldSkip {
+				log.Printf("[WARN] Skipping resource import for %s: %s", resourceType, message)
+				return
+			}
+			// If not a handled error, log it and skip gracefully
+			log.Printf("[ERROR] error occurred while fetching resource %s: %v", resourceType, err)
+			return
 		}
 		jsonPayload := []*malware_protection.ATPMalwareProtocols{urls}
 		resourceCount = len(jsonPayload)
@@ -1879,7 +1970,14 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		service := api.ZIAService
 		urls, err := malware_protection.GetATPMalwareSettings(ctx, service)
 		if err != nil {
-			log.Fatal(err)
+			shouldSkip, message := helpers.HandleZIAAPIError(err, resourceType)
+			if shouldSkip {
+				log.Printf("[WARN] Skipping resource import for %s: %s", resourceType, message)
+				return
+			}
+			// If not a handled error, log it and skip gracefully
+			log.Printf("[ERROR] error occurred while fetching resource %s: %v", resourceType, err)
+			return
 		}
 		jsonPayload := []*malware_protection.MalwareSettings{urls}
 		resourceCount = len(jsonPayload)
@@ -1898,7 +1996,14 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		service := api.ZIAService
 		urls, err := malware_protection.GetATPMalwarePolicy(ctx, service)
 		if err != nil {
-			log.Fatal(err)
+			shouldSkip, message := helpers.HandleZIAAPIError(err, resourceType)
+			if shouldSkip {
+				log.Printf("[WARN] Skipping resource import for %s: %s", resourceType, message)
+				return
+			}
+			// If not a handled error, log it and skip gracefully
+			log.Printf("[ERROR] error occurred while fetching resource %s: %v", resourceType, err)
+			return
 		}
 		jsonPayload := []*malware_protection.MalwarePolicy{urls}
 		resourceCount = len(jsonPayload)
@@ -1916,7 +2021,14 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		service := api.ZIAService
 		urls, err := urlfilteringpolicies.GetUrlAndAppSettings(ctx, service)
 		if err != nil {
-			log.Fatal(err)
+			shouldSkip, message := helpers.HandleZIAAPIError(err, resourceType)
+			if shouldSkip {
+				log.Printf("[WARN] Skipping resource import for %s: %s", resourceType, message)
+				return
+			}
+			// If not a handled error, log it and skip gracefully
+			log.Printf("[ERROR] error occurred while fetching resource %s: %v", resourceType, err)
+			return
 		}
 		jsonPayload := []*urlfilteringpolicies.URLAdvancedPolicySettings{urls}
 		resourceCount = len(jsonPayload)
@@ -1934,7 +2046,14 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		service := api.ZIAService
 		notification, err := end_user_notification.GetUserNotificationSettings(ctx, service)
 		if err != nil {
-			log.Fatal(err)
+			shouldSkip, message := helpers.HandleZIAAPIError(err, resourceType)
+			if shouldSkip {
+				log.Printf("[WARN] Skipping resource import for %s: %s", resourceType, message)
+				return
+			}
+			// If not a handled error, log it and skip gracefully
+			log.Printf("[ERROR] error occurred while fetching resource %s: %v", resourceType, err)
+			return
 		}
 		jsonPayload := []*end_user_notification.UserNotificationSettings{notification}
 		resourceCount = len(jsonPayload)
@@ -1952,7 +2071,14 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		service := api.ZIAService
 		mobileSettings, err := mobile_threat_settings.GetMobileThreatSettings(ctx, service)
 		if err != nil {
-			log.Fatal(err)
+			shouldSkip, message := helpers.HandleZIAAPIError(err, resourceType)
+			if shouldSkip {
+				log.Printf("[WARN] Skipping resource import for %s: %s", resourceType, message)
+				return
+			}
+			// If not a handled error, log it and skip gracefully
+			log.Printf("[ERROR] error occurred while fetching resource %s: %v", resourceType, err)
+			return
 		}
 		jsonPayload := []*mobile_threat_settings.MobileAdvanceThreatSettings{mobileSettings}
 		resourceCount = len(jsonPayload)
@@ -1970,7 +2096,14 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		service := api.ZIAService
 		ftpControl, err := ftp_control_policy.GetFTPControlPolicy(ctx, service)
 		if err != nil {
-			log.Fatal(err)
+			shouldSkip, message := helpers.HandleZIAAPIError(err, resourceType)
+			if shouldSkip {
+				log.Printf("[WARN] Skipping resource import for %s: %s", resourceType, message)
+				return
+			}
+			// If not a handled error, log it and skip gracefully
+			log.Printf("[ERROR] error occurred while fetching resource %s: %v", resourceType, err)
+			return
 		}
 		jsonPayload := []*ftp_control_policy.FTPControlPolicy{ftpControl}
 		resourceCount = len(jsonPayload)
@@ -1988,7 +2121,14 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		service := api.ZIAService
 		jsonPayload, err := vzen_clusters.GetAll(ctx, service)
 		if err != nil {
-			log.Fatal(err)
+			shouldSkip, message := helpers.HandleZIAAPIError(err, resourceType)
+			if shouldSkip {
+				log.Printf("[WARN] Skipping resource import for %s: %s", resourceType, message)
+				return
+			}
+			// If not a handled error, log it and skip gracefully
+			log.Printf("[ERROR] error occurred while fetching resource %s: %v", resourceType, err)
+			return
 		}
 		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
@@ -2001,7 +2141,14 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		service := api.ZIAService
 		jsonPayload, err := vzen_nodes.GetAll(ctx, service)
 		if err != nil {
-			log.Fatal(err)
+			shouldSkip, message := helpers.HandleZIAAPIError(err, resourceType)
+			if shouldSkip {
+				log.Printf("[WARN] Skipping resource import for %s: %s", resourceType, message)
+				return
+			}
+			// If not a handled error, log it and skip gracefully
+			log.Printf("[ERROR] error occurred while fetching resource %s: %v", resourceType, err)
+			return
 		}
 		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
@@ -2014,7 +2161,14 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		service := api.ZIAService
 		jsonPayload, err := risk_profiles.GetAll(ctx, service)
 		if err != nil {
-			log.Fatal(err)
+			shouldSkip, message := helpers.HandleZIAAPIError(err, resourceType)
+			if shouldSkip {
+				log.Printf("[WARN] Skipping resource import for %s: %s", resourceType, message)
+				return
+			}
+			// If not a handled error, log it and skip gracefully
+			log.Printf("[ERROR] error occurred while fetching resource %s: %v", resourceType, err)
+			return
 		}
 		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
@@ -2027,7 +2181,14 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		service := api.ZIAService
 		jsonPayload, err := workloadgroups.GetAll(ctx, service)
 		if err != nil {
-			log.Fatal(err)
+			shouldSkip, message := helpers.HandleZIAAPIError(err, resourceType)
+			if shouldSkip {
+				log.Printf("[WARN] Skipping resource import for %s: %s", resourceType, message)
+				return
+			}
+			// If not a handled error, log it and skip gracefully
+			log.Printf("[ERROR] error occurred while fetching resource %s: %v", resourceType, err)
+			return
 		}
 		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
@@ -2040,7 +2201,14 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		service := api.ZIAService
 		jsonPayload, err := alerts.GetAll(ctx, service)
 		if err != nil {
-			log.Fatal(err)
+			shouldSkip, message := helpers.HandleZIAAPIError(err, resourceType)
+			if shouldSkip {
+				log.Printf("[WARN] Skipping resource import for %s: %s", resourceType, message)
+				return
+			}
+			// If not a handled error, log it and skip gracefully
+			log.Printf("[ERROR] error occurred while fetching resource %s: %v", resourceType, err)
+			return
 		}
 		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
