@@ -26,6 +26,22 @@ jobs:
       - name: Set release VERSION
         run: echo "VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
 
+      - name: Auto-update version.go for build
+        run: |
+          TAG_VERSION=${GITHUB_REF#refs/*/}
+          TAG_VERSION=${TAG_VERSION#v}  # Remove 'v' prefix
+          
+          echo "Release tag version: $TAG_VERSION"
+          echo "Current version.go:"
+          grep 'var version = ' terraformutils/version.go
+          
+          # Update version.go to match the tag
+          sed -i "s/var version = \".*\"/var version = \"$TAG_VERSION\"/" terraformutils/version.go
+          
+          echo "Updated version.go:"
+          grep 'var version = ' terraformutils/version.go
+          echo "✅ Version automatically updated to: $TAG_VERSION"
+
       - name: Import GPG key
         id: import_gpg
         uses: paultyng/ghaction-import-gpg@v2.1.0
