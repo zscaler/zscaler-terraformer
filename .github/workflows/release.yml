@@ -3,65 +3,28 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 permissions:
   contents: write
-  pull-requests: write
+  actions: write
 
 jobs:
   goreleaser:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Set up Go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v5
         with:
-          go-version-file: 'go.mod'
+          go-version-file: "go.mod"
 
       - name: Set release VERSION
         run: echo "VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-
-      - name: Auto-update version.go for build
-        run: |
-          TAG_VERSION=${GITHUB_REF#refs/*/}
-          TAG_VERSION=${TAG_VERSION#v}  # Remove 'v' prefix
-          TAG_NAME=${GITHUB_REF#refs/*/}
-          
-          echo "Release tag version: $TAG_VERSION"
-          echo "Current version.go:"
-          grep 'var version = ' terraformutils/version.go
-          
-          # Update version.go to match the tag
-          sed -i "s/var version = \".*\"/var version = \"$TAG_VERSION\"/" terraformutils/version.go
-          
-          echo "Updated version.go:"
-          grep 'var version = ' terraformutils/version.go
-          
-          # Check if there are actual changes
-          if git diff --quiet terraformutils/version.go; then
-            echo "No changes needed - version already matches tag"
-          else
-            # Commit the change so git state is clean for GoReleaser
-            git config --local user.email "github-actions[bot]@users.noreply.github.com"
-            git config --local user.name "github-actions[bot]"
-            git add terraformutils/version.go
-            git commit -m "chore: auto-update version to $TAG_VERSION for release [skip ci]"
-            
-            # Move the tag to the new commit
-            git tag -f $TAG_NAME
-            
-            # Push the updated version.go and moved tag back to the repository
-            # Use PAT to bypass branch protection rules
-            git push https://${{ secrets.GH_PAT }}@github.com/${{ github.repository }} HEAD:master
-            git push https://${{ secrets.GH_PAT }}@github.com/${{ github.repository }} $TAG_NAME --force
-            
-            echo "✅ Version automatically updated, committed, and pushed to master branch"
-          fi
 
       - name: Import GPG key
         id: import_gpg
@@ -74,7 +37,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
-          version: '~> v2'
+          version: "~> v2"
           args: release --clean
         env:
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
