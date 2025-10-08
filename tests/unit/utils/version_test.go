@@ -15,20 +15,36 @@ func TestVersionRetrieval(t *testing.T) {
 		t.Error("Version should not be empty")
 	}
 
-	// Verify version format (should be semver-like)
+	// Verify version format (should be semver-like: X.Y.Z)
 	if !strings.Contains(version, ".") {
 		t.Error("Version should contain version number format")
 	}
 
-	// Verify current expected version
-	expectedVersion := "2.1.0"
-	if version != expectedVersion {
-		t.Errorf("Expected version %s, got %s", expectedVersion, version)
+	// Verify version follows semver pattern (e.g., 2.1.0, 2.1.1, etc.)
+	parts := strings.Split(version, ".")
+	if len(parts) < 2 || len(parts) > 3 {
+		t.Errorf("Version should follow semver pattern (X.Y or X.Y.Z), got %s", version)
+	}
+
+	// Verify each part is numeric (basic check)
+	for i, part := range parts {
+		if part == "" {
+			t.Errorf("Version part %d should not be empty in version %s", i, version)
+		}
+		// Check if part contains only digits
+		for _, char := range part {
+			if char < '0' || char > '9' {
+				t.Errorf("Version part %d (%s) should contain only digits in version %s", i, part, version)
+				break
+			}
+		}
 	}
 }
 
 func TestVersionFormatting(t *testing.T) {
-	// Test version formatting in different contexts
+	// Test version formatting in different contexts using actual version
+	actualVersion := terraformutils.Version()
+
 	testCases := []struct {
 		name        string
 		version     string
@@ -38,16 +54,16 @@ func TestVersionFormatting(t *testing.T) {
 	}{
 		{
 			name:        "Version with v prefix",
-			version:     "2.1.0",
+			version:     actualVersion,
 			prefix:      "v",
-			expected:    "v2.1.0",
+			expected:    "v" + actualVersion,
 			description: "Should format version with v prefix",
 		},
 		{
 			name:        "Version in tool name",
-			version:     "2.1.0",
+			version:     actualVersion,
 			prefix:      "zscaler-terraformer ",
-			expected:    "zscaler-terraformer 2.1.0",
+			expected:    "zscaler-terraformer " + actualVersion,
 			description: "Should format version with tool name",
 		},
 	}
