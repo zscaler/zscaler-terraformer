@@ -17,7 +17,6 @@ jobs:
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
-          ref: master  # Checkout master branch instead of the tag
 
       - name: Set up Go
         uses: actions/setup-go@v6
@@ -26,43 +25,6 @@ jobs:
 
       - name: Set release VERSION
         run: echo "VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-
-      - name: Update version.go on master branch
-        run: |
-          VERSION=${GITHUB_REF#refs/*/}
-          # Remove 'v' prefix if present
-          VERSION=${VERSION#v}
-          
-          # Update version.go file
-          sed -i "s/var version = \".*\"/var version = \"$VERSION\"/" terraformutils/version.go
-          
-          # Verify the change
-          echo "Updated version.go to:"
-          grep "var version" terraformutils/version.go
-          
-          # Configure git
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          
-          # Check if there are changes to commit
-          if git diff --quiet terraformutils/version.go; then
-            echo "No changes to commit - version already up to date"
-          else
-            git add terraformutils/version.go
-            git commit -m "chore: update version to $VERSION [skip ci]"
-            git push origin master
-            echo "Version updated and pushed to master branch"
-          fi
-
-      - name: Checkout the release tag
-        run: |
-          git fetch --tags
-          git checkout ${GITHUB_REF#refs/*/}
-          
-          # Also update version.go in the tag checkout
-          VERSION=${GITHUB_REF#refs/*/}
-          VERSION=${VERSION#v}
-          sed -i "s/var version = \".*\"/var version = \"$VERSION\"/" terraformutils/version.go
 
       - name: Import GPG key
         id: import_gpg
