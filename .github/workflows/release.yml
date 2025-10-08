@@ -40,6 +40,13 @@ jobs:
           
           echo "Updated version.go:"
           grep 'var version = ' terraformutils/version.go
+          
+          # Commit the change so git state is clean for GoReleaser
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add terraformutils/version.go
+          git commit -m "chore: auto-update version to $TAG_VERSION for release [skip ci]" || echo "No changes to commit"
+          
           echo "✅ Version automatically updated to: $TAG_VERSION"
 
       - name: Import GPG key
