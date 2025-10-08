@@ -54,7 +54,12 @@ jobs:
             
             # Move the tag to the new commit
             git tag -f $TAG_NAME
-            echo "✅ Version automatically updated and tag moved to new commit"
+            
+            # Push the updated version.go and moved tag back to the repository
+            git push origin HEAD:master
+            git push origin $TAG_NAME --force
+            
+            echo "✅ Version automatically updated, committed, and pushed to master branch"
           fi
 
       - name: Import GPG key
