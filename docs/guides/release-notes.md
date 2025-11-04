@@ -12,9 +12,19 @@ Track all Zscaler Terraformer Tool releases. New resources, features, and bug fi
 
 ---
 
-``Last updated: v2.1.2``
+``Last updated: v2.1.3``
 
 ---
+
+## 2.1.3 (November, 4 2025)
+
+### Notes
+
+- Release date: **(November, 4 2025)**
+- Supported Terraform version: **v1.x.x**
+
+## **🐛 Bug Fixes**
+- [PR #346](https://github.com/zscaler/zscaler-terraformer/pull/346) - Upgraded to [Zscaler GO SDK v3.8.1](https://github.com/zscaler/zscaler-sdk-go/releases/tag/v3.8.1)
 
 ## 2.1.2 (October, 8 2025)
 
