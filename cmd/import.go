@@ -1260,7 +1260,7 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		}
 		// EXACTLY like the TF pattern:
 		service := api.ZIAService
-		services, err := networkservices.GetAllNetworkServices(ctx, service)
+		services, err := networkservices.GetAllNetworkServices(ctx, service, nil, nil)
 		if err != nil {
 			shouldSkip, message := helpers.HandleZIAAPIError(err, resourceType)
 			if shouldSkip {

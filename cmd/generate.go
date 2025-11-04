@@ -1412,7 +1412,7 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		}
 		// EXACTLY like the TF pattern:
 		service := api.ZIAService
-		services, err := networkservices.GetAllNetworkServices(ctx, service)
+		services, err := networkservices.GetAllNetworkServices(ctx, service, nil, nil)
 		if err != nil {
 			log.Fatal(err)
 		}
