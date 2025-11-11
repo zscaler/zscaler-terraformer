@@ -12,9 +12,19 @@ Track all Zscaler Terraformer Tool releases. New resources, features, and bug fi
 
 ---
 
-``Last updated: v2.1.3``
+``Last updated: v2.1.4``
 
 ---
+
+## 2.1.4 (November, 10 2025)
+
+### Notes
+
+- Release date: **(November, 10 2025)**
+- Supported Terraform version: **v1.x.x**
+
+## **🐛 Bug Fixes**
+- [PR #351](https://github.com/zscaler/zscaler-terraformer/pull/351) - Remove data source match cap so large rule sets process all associations
 
 ## 2.1.3 (November, 4 2025)
 

@@ -667,14 +667,6 @@ func ReplaceDataSourceReferences(workingDir string, dataSourceIDs []CollectedDat
 				continue // No matches for this attribute, skip to next
 			}
 
-			// Limit the number of matches to prevent excessive processing
-			maxMatches := 1000
-			if len(matches) > maxMatches {
-				log.Printf("[WARNING] Too many matches (%d) for attribute %s in %s, limiting to %d",
-					len(matches), attributeName, baseName, maxMatches)
-				matches = matches[:maxMatches]
-			}
-
 			// Process matches in reverse order to avoid index shifting issues
 			for i := len(matches) - 1; i >= 0; i-- {
 				match := matches[i]
