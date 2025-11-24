@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout zscaler-terraformer
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Set up Go
         uses: actions/setup-go@v6
@@ -97,7 +97,7 @@ jobs:
           EOF
 
       - name: Checkout homebrew-tap repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: zscaler/homebrew-tap
           token: ${{ secrets.HOMEBREW_TAP_TOKEN }}

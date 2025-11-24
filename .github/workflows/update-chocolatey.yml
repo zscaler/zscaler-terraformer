@@ -13,7 +13,7 @@ jobs:
     runs-on: windows-latest  # Use Windows runner for Chocolatey
     steps:
       - name: Checkout zscaler-terraformer
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Extract release info
         id: release_info
@@ -56,7 +56,7 @@ jobs:
           }
 
       - name: Checkout chocolatey-packages repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: zscaler/chocolatey-packages
           token: ${{ secrets.CHOCOLATEY_REPO_TOKEN }}
