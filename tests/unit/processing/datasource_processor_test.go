@@ -27,13 +27,13 @@ func TestDataSourceMappingResolution(t *testing.T) {
 
 	// Test data source mapping logic for ZTC
 	ztcMappings := map[string]string{
-		"dest_ip_groups":       "ztc_ip_destination_groups",
-		"src_ip_groups":        "ztc_ip_source_groups",
-		"nw_services":          "ztc_network_services",
-		"nw_service_groups":    "ztc_network_service_groups",
-		"locations":            "ztc_location_management",
-		"src_workload_groups":  "ztc_workload_groups",
-		"proxy_gateway":        "ztc_forwarding_gateway",
+		"dest_ip_groups":      "ztc_ip_destination_groups",
+		"src_ip_groups":       "ztc_ip_source_groups",
+		"nw_services":         "ztc_network_services",
+		"nw_service_groups":   "ztc_network_service_groups",
+		"locations":           "ztc_location_management",
+		"src_workload_groups": "ztc_workload_groups",
+		"proxy_gateway":       "ztc_forwarding_gateway",
 	}
 
 	// Test ZIA mappings
