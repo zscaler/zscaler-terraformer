@@ -2215,7 +2215,6 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		if err != nil {
 			log.Fatal(err)
 		}
-		resourceCount = len(groups)
 		m, _ := json.Marshal(groups)
 		_ = json.Unmarshal(m, &jsonStructData)
 		groupsFiltered := []ztwipsourcegroups.IPSourceGroups{}
@@ -2239,7 +2238,6 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		if err != nil {
 			log.Fatal(err)
 		}
-		resourceCount = len(groups)
 		m, _ := json.Marshal(groups)
 		_ = json.Unmarshal(m, &jsonStructData)
 		groupsFiltered := []ztwipgroups.IPGroups{}

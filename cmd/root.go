@@ -1025,7 +1025,7 @@ func init() {
 		log.Fatalf("failed to bind env: %v", err)
 	}
 
-	rootCmd.PersistentFlags().StringVar(&ziaProviderNamespace, "ztc-provider-namespace", "", "Custom namespace for the ZTC provider")
+	rootCmd.PersistentFlags().StringVar(&ztcProviderNamespace, "ztc-provider-namespace", "", "Custom namespace for the ZTC provider")
 	if err := viper.BindPFlag("ztc-provider-namespace", rootCmd.PersistentFlags().Lookup("ztc-provider-namespace")); err != nil {
 		log.Fatalf("failed to bind flag: %v", err)
 	}

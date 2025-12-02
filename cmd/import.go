@@ -2282,7 +2282,6 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		if err != nil {
 			log.Fatal(err)
 		}
-		resourceCount = len(groups)
 		m, _ := json.Marshal(groups)
 		_ = json.Unmarshal(m, &jsonStructData)
 		groupsFiltered := []ztwipsourcegroups.IPSourceGroups{}

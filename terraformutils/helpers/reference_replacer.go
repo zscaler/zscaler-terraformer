@@ -235,7 +235,7 @@ func ParseOutputsFile(workingDir string) (map[string]string, error) {
 
 // parseRepeatedResourceTypeFormat handles output names where the resource type is repeated
 // e.g., "ztc_ip_destination_groups_ztc_ip_destination_groups_17595967"
-// Returns: resourceType, resourceName, resourceID
+// Returns: resourceType, resourceName, resourceID.
 func parseRepeatedResourceTypeFormat(nameWithoutId string) (string, string, string) {
 	// Common prefixes to try
 	prefixes := []string{"ztc_", "zia_", "zpa_"}

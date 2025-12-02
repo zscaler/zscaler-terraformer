@@ -333,7 +333,7 @@ func CleanupEmptyDataSourceBlocks(workingDir string) error {
 }
 
 // DetectProviderFromFileName extracts the provider prefix (zia, zpa, ztc) from a Terraform file name.
-// File names typically follow the pattern: zia_resource_name.tf, zpa_resource_name.tf, ztc_resource_name.tf
+// File names typically follow the pattern: zia_resource_name.tf, zpa_resource_name.tf, ztc_resource_name.tf.
 func DetectProviderFromFileName(fileName string) string {
 	baseName := filepath.Base(fileName)
 	baseName = strings.TrimSuffix(baseName, ".tf")
