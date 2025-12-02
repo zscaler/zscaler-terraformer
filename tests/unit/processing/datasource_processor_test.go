@@ -8,8 +8,8 @@ import (
 )
 
 func TestDataSourceMappingResolution(t *testing.T) {
-	// Test data source mapping logic
-	testMappings := map[string]string{
+	// Test data source mapping logic for ZIA
+	ziaMappings := map[string]string{
 		"location_groups":      "zia_location_groups",
 		"users":                "zia_user_management",
 		"device_groups":        "zia_device_groups",
@@ -25,9 +25,20 @@ func TestDataSourceMappingResolution(t *testing.T) {
 		"segment_group_id":     "zpa_segment_group",
 	}
 
-	// Test each mapping
-	for attribute, expectedDataSource := range testMappings {
-		t.Run("mapping_"+attribute, func(t *testing.T) {
+	// Test data source mapping logic for ZTC
+	ztcMappings := map[string]string{
+		"dest_ip_groups":       "ztc_ip_destination_groups",
+		"src_ip_groups":        "ztc_ip_source_groups",
+		"nw_services":          "ztc_network_services",
+		"nw_service_groups":    "ztc_network_service_groups",
+		"locations":            "ztc_location_management",
+		"src_workload_groups":  "ztc_workload_groups",
+		"proxy_gateway":        "ztc_forwarding_gateway",
+	}
+
+	// Test ZIA mappings
+	for attribute, expectedDataSource := range ziaMappings {
+		t.Run("zia_mapping_"+attribute, func(t *testing.T) {
 			// Verify mapping exists and is correct
 			if expectedDataSource == "" {
 				t.Errorf("Data source mapping for %s should not be empty", attribute)
@@ -36,6 +47,21 @@ func TestDataSourceMappingResolution(t *testing.T) {
 			// Verify naming conventions
 			if !strings.HasPrefix(expectedDataSource, "zia_") && !strings.HasPrefix(expectedDataSource, "zpa_") {
 				t.Errorf("Data source %s should start with zia_ or zpa_", expectedDataSource)
+			}
+		})
+	}
+
+	// Test ZTC mappings
+	for attribute, expectedDataSource := range ztcMappings {
+		t.Run("ztc_mapping_"+attribute, func(t *testing.T) {
+			// Verify mapping exists and is correct
+			if expectedDataSource == "" {
+				t.Errorf("Data source mapping for %s should not be empty", attribute)
+			}
+
+			// Verify naming conventions
+			if !strings.HasPrefix(expectedDataSource, "ztc_") {
+				t.Errorf("ZTC Data source %s should start with ztc_", expectedDataSource)
 			}
 		})
 	}

@@ -108,6 +108,20 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/serviceedgegroup"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/userportal/portal_controller"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zpa/services/userportal/portal_link"
+	ztwdnsforwardinggw "github.com/zscaler/zscaler-sdk-go/v3/zscaler/ztw/services/forwarding_gateways/dns_forwarding_gateway"
+	ztwziaforwardinggw "github.com/zscaler/zscaler-sdk-go/v3/zscaler/ztw/services/forwarding_gateways/zia_forwarding_gateway"
+	ztwlocationtemplate "github.com/zscaler/zscaler-sdk-go/v3/zscaler/ztw/services/locationmanagement/locationtemplate"
+	ztwaccountgroups "github.com/zscaler/zscaler-sdk-go/v3/zscaler/ztw/services/partner_integrations/account_groups"
+	ztwpubliccloudinfo "github.com/zscaler/zscaler-sdk-go/v3/zscaler/ztw/services/partner_integrations/public_cloud_info"
+	ztwforwardingrules "github.com/zscaler/zscaler-sdk-go/v3/zscaler/ztw/services/policy_management/forwarding_rules"
+	ztwtrafficdnsrules "github.com/zscaler/zscaler-sdk-go/v3/zscaler/ztw/services/policy_management/traffic_dns_rules"
+	ztwtrafficlogrules "github.com/zscaler/zscaler-sdk-go/v3/zscaler/ztw/services/policy_management/traffic_log_rules"
+	ztwipdestinationgroups "github.com/zscaler/zscaler-sdk-go/v3/zscaler/ztw/services/policyresources/ipdestinationgroups"
+	ztwipgroups "github.com/zscaler/zscaler-sdk-go/v3/zscaler/ztw/services/policyresources/ipgroups"
+	ztwipsourcegroups "github.com/zscaler/zscaler-sdk-go/v3/zscaler/ztw/services/policyresources/ipsourcegroups"
+	ztwnetworkservicegroups "github.com/zscaler/zscaler-sdk-go/v3/zscaler/ztw/services/policyresources/networkservicegroups"
+	ztwnetworkservices "github.com/zscaler/zscaler-sdk-go/v3/zscaler/ztw/services/policyresources/networkservices"
+	ztwprovisioningurl "github.com/zscaler/zscaler-sdk-go/v3/zscaler/ztw/services/provisioning/provisioning_url"
 	"github.com/zscaler/zscaler-terraformer/v2/terraformutils/conversion"
 	"github.com/zscaler/zscaler-terraformer/v2/terraformutils/helpers"
 	"github.com/zscaler/zscaler-terraformer/v2/terraformutils/nesting"
@@ -193,6 +207,22 @@ var allGeneratableResources = []string{
 	"zia_subscription_alert",
 	"zia_forwarding_control_proxies",
 	"zia_mobile_malware_protection_policy",
+
+	// ZTC Resources
+	"ztc_ip_destination_groups",
+	"ztc_ip_source_groups",
+	"ztc_ip_pool_groups",
+	"ztc_network_services",
+	"ztc_network_service_groups",
+	"ztc_account_groups",
+	"ztc_public_cloud_info",
+	"ztc_location_template",
+	"ztc_provisioning_url",
+	"ztc_traffic_forwarding_rule",
+	"ztc_traffic_forwarding_dns_rule",
+	"ztc_traffic_forwarding_log_rule",
+	"ztc_forwarding_gateway",
+	"ztc_dns_forwarding_gateway",
 }
 
 func init() {
@@ -213,8 +243,8 @@ func generateResources() func(cmd *cobra.Command, args []string) {
 			switch resources {
 			case "*":
 				resourceTypes = allGeneratableResources
-			case "zia", "zpa":
-				for _, resource := range resourceImportStringFormats {
+			case "zia", "zpa", "ztc":
+				for _, resource := range allGeneratableResources {
 					if strings.HasPrefix(resource, resources) {
 						resourceTypes = append(resourceTypes, resource)
 					}
@@ -467,11 +497,19 @@ func initTf(ctx context.Context, resourceType string) (tf *tfexec.Terraform, r *
 
 	// [2] Determine workingDir from viper config
 	cloudType := ""
-	if strings.HasPrefix(resourceType, "zpa_") {
+	if strings.HasPrefix(resourceType, "zpa_") || resourceType == "zpa" {
 		cloudType = "zpa"
-	} else if strings.HasPrefix(resourceType, "zia_") {
+	} else if strings.HasPrefix(resourceType, "zia_") || resourceType == "zia" {
 		cloudType = "zia"
+	} else if strings.HasPrefix(resourceType, "ztc_") || resourceType == "ztc" {
+		cloudType = "ztc"
 	}
+
+	// Safety check: if cloudType is still empty, we can't proceed
+	if cloudType == "" {
+		log.Fatalf("Unable to determine cloud type from resource type: %s", resourceType)
+	}
+
 	workingDir = viper.GetString(cloudType + "-terraform-install-path")
 	if workingDir == "" {
 		workingDir = viper.GetString("terraform-install-path")
@@ -630,6 +668,64 @@ provider "%s" {
 				}
 			} else {
 				// OneAPI for ZIA:
+				// Typically: client_id + client_secret (or private_key) + vanity_domain, optional zscaler_cloud
+				if clientID != "" {
+					providerConfig += fmt.Sprintf("  client_id      = \"%s\"\n", clientID)
+				}
+				if clientSecret != "" {
+					providerConfig += fmt.Sprintf("  client_secret  = \"%s\"\n", clientSecret)
+				} else if privateKey != "" {
+					providerConfig += fmt.Sprintf("  private_key    = \"%s\"\n", privateKey)
+				}
+				if vanityDomain != "" {
+					providerConfig += fmt.Sprintf("  vanity_domain  = \"%s\"\n", vanityDomain)
+				}
+				if zscalerCloud != "" {
+					providerConfig += fmt.Sprintf("  zscaler_cloud          = \"%s\"\n", zscalerCloud)
+				}
+				if strings.EqualFold(useLegacy, "false") {
+					providerConfig += `  use_legacy_client = false
+`
+				}
+			}
+		}
+
+	case "ztc":
+		ztcUsername := viper.GetString("ztc_username")
+		ztcPassword := viper.GetString("ztc_password")
+		ztcApiKey := viper.GetString("ztc_api_key")
+		ztcCloud := viper.GetString("ztc_cloud")
+		useLegacy := viper.GetString("use_legacy_client")
+
+		clientID := viper.GetString("client_id")
+		clientSecret := viper.GetString("client_secret")
+		privateKey := viper.GetString("private_key")
+		vanityDomain := viper.GetString("vanity_domain")
+		zscalerCloud := viper.GetString("zscaler_cloud")
+
+		if os.Getenv("ZTC_USERNAME") == "" &&
+			os.Getenv("ZTC_PASSWORD") == "" &&
+			os.Getenv("ZTC_API_KEY") == "" &&
+			os.Getenv("ZTC_CLOUD") == "" &&
+			os.Getenv("ZSCALER_CLIENT_ID") == "" &&
+			os.Getenv("ZSCALER_CLIENT_SECRET") == "" &&
+			os.Getenv("ZSCALER_PRIVATE_KEY") == "" &&
+			os.Getenv("ZSCALER_VANITY_DOMAIN") == "" &&
+			os.Getenv("ZSCALER_CLOUD") == "" &&
+			os.Getenv("ZSCALER_USE_LEGACY_CLIENT") == "" {
+			if strings.EqualFold(useLegacy, "true") {
+				// Legacy V2 for ZTC
+				if ztcUsername != "" && ztcPassword != "" && ztcApiKey != "" && ztcCloud != "" {
+					providerConfig += fmt.Sprintf(`
+  username            = "%s"
+  password            = "%s"
+  api_key             = "%s"
+  ztc_cloud           = "%s"
+  use_legacy_client   = true
+`, ztcUsername, ztcPassword, ztcApiKey, ztcCloud)
+				}
+			} else {
+				// OneAPI for ZTC:
 				// Typically: client_id + client_secret (or private_key) + vanity_domain, optional zscaler_cloud
 				if clientID != "" {
 					providerConfig += fmt.Sprintf("  client_id      = \"%s\"\n", clientID)
@@ -1332,7 +1428,7 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		}
 		// EXACTLY like the TF pattern:
 		service := api.ZIAService
-		rules, err := filteringrules.GetAll(ctx, service)
+		rules, err := filteringrules.GetAll(ctx, service, nil)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -1372,7 +1468,7 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		}
 		// EXACTLY like the TF pattern:
 		service := api.ZIAService
-		groups, err := ipdestinationgroups.GetAll(ctx, service)
+		groups, err := ipdestinationgroups.GetAll(ctx, service, "")
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -1534,7 +1630,7 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		}
 		// EXACTLY like the TF pattern:
 		service := api.ZIAService
-		jsonPayload, err := urlcategories.GetAllCustomURLCategories(ctx, service)
+		jsonPayload, err := urlcategories.GetAll(ctx, service, true, false, "ALL")
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -2087,6 +2183,269 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
+
+	case "ztc_ip_destination_groups":
+		if api.ZTCService == nil {
+			log.Fatal("ZTC service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZTCService
+		groups, err := ztwipdestinationgroups.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		groupsFiltered := []ztwipdestinationgroups.IPDestinationGroups{}
+		for _, group := range groups {
+			if helpers.IsInList(group.Name, []string{"All IPv4"}) {
+				continue
+			}
+			groupsFiltered = append(groupsFiltered, group)
+		}
+		resourceCount = len(groupsFiltered)
+		m, _ := json.Marshal(groupsFiltered)
+		_ = json.Unmarshal(m, &jsonStructData)
+
+	case "ztc_ip_source_groups":
+		if api.ZTCService == nil {
+			log.Fatal("ZTC service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZTCService
+		groups, err := ztwipsourcegroups.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		resourceCount = len(groups)
+		m, _ := json.Marshal(groups)
+		_ = json.Unmarshal(m, &jsonStructData)
+		groupsFiltered := []ztwipsourcegroups.IPSourceGroups{}
+		for _, group := range groups {
+			if helpers.IsInList(group.Name, []string{"All IPv4"}) {
+				continue
+			}
+			groupsFiltered = append(groupsFiltered, group)
+		}
+		resourceCount = len(groupsFiltered)
+		m, _ = json.Marshal(groupsFiltered)
+		_ = json.Unmarshal(m, &jsonStructData)
+
+	case "ztc_ip_pool_groups":
+		if api.ZTCService == nil {
+			log.Fatal("ZTC service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZTCService
+		groups, err := ztwipgroups.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		resourceCount = len(groups)
+		m, _ := json.Marshal(groups)
+		_ = json.Unmarshal(m, &jsonStructData)
+		groupsFiltered := []ztwipgroups.IPGroups{}
+		for _, group := range groups {
+			if helpers.IsInList(group.Name, []string{"All IPv4"}) {
+				continue
+			}
+			groupsFiltered = append(groupsFiltered, group)
+		}
+		resourceCount = len(groupsFiltered)
+		m, _ = json.Marshal(groupsFiltered)
+		_ = json.Unmarshal(m, &jsonStructData)
+
+	case "ztc_network_services":
+		if api.ZTCService == nil {
+			log.Fatal("ZTC service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZTCService
+		services, err := ztwnetworkservices.GetAllNetworkServices(ctx, service)
+		if err != nil {
+			shouldSkip, message := helpers.HandleZIAAPIError(err, resourceType)
+			if shouldSkip {
+				log.Printf("[WARN] Skipping resource import for %s: %s", resourceType, message)
+				return
+			}
+			// If not a handled error, log it and skip gracefully
+			log.Printf("[ERROR] error occurred while fetching resource %s: %v", resourceType, err)
+			return
+		}
+		servicesFiltered := []ztwnetworkservices.NetworkServices{}
+		for _, service := range services {
+			if helpers.IsInList(service.Type, []string{"STANDARD", "PREDEFINED"}) {
+				continue
+			}
+			servicesFiltered = append(servicesFiltered, service)
+		}
+		m, _ := json.Marshal(servicesFiltered)
+		resourceCount = len(servicesFiltered)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "ztc_network_service_groups":
+		if api.ZTCService == nil {
+			log.Fatal("ZTC service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZTCService
+		jsonPayload, err := ztwnetworkservicegroups.GetAllNetworkServiceGroups(ctx, service)
+		if err != nil {
+			shouldSkip, message := helpers.HandleZIAAPIError(err, resourceType)
+			if shouldSkip {
+				log.Printf("[WARN] Skipping resource import for %s: %s", resourceType, message)
+				return
+			}
+			// If not a handled error, log it and skip gracefully
+			log.Printf("[ERROR] error occurred while fetching resource %s: %v", resourceType, err)
+			return
+		}
+		m, _ := json.Marshal(jsonPayload)
+		resourceCount = len(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+
+	case "ztc_location_template":
+		if api.ZTCService == nil {
+			log.Fatal("ZTC service is not initialized")
+		}
+		service := api.ZTCService
+		templates, err := ztwlocationtemplate.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		resourceCount = len(templates)
+		m, _ := json.Marshal(templates)
+		_ = json.Unmarshal(m, &jsonStructData)
+
+	case "ztc_provisioning_url":
+		if api.ZTCService == nil {
+			log.Fatal("ZTC service is not initialized")
+		}
+		service := api.ZTCService
+		provURLs, err := ztwprovisioningurl.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		resourceCount = len(provURLs)
+		m, _ := json.Marshal(provURLs)
+		_ = json.Unmarshal(m, &jsonStructData)
+
+	case "ztc_traffic_forwarding_rule":
+		if api.ZTCService == nil {
+			log.Fatal("ZTC service is not initialized")
+		}
+		service := api.ZTCService
+		rules, err := ztwforwardingrules.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		// Filter out default rules
+		rulesFiltered := []ztwforwardingrules.ForwardingRules{}
+		for _, rule := range rules {
+			if helpers.IsInList(rule.Name, []string{"Client Connector to ZPA", "ZPA Forwarding Rule", "ZPA Pool For Stray Traffic", "Default Forwarding Rule"}) {
+				continue
+			}
+			// Process dest_countries to remove "COUNTRY_" prefix
+			for i, country := range rule.DestCountries {
+				rule.DestCountries[i] = strings.TrimPrefix(country, "COUNTRY_")
+			}
+			rulesFiltered = append(rulesFiltered, rule)
+		}
+		resourceCount = len(rulesFiltered)
+		m, _ := json.Marshal(rulesFiltered)
+		_ = json.Unmarshal(m, &jsonStructData)
+
+	case "ztc_traffic_forwarding_dns_rule":
+		if api.ZTCService == nil {
+			log.Fatal("ZTC service is not initialized")
+		}
+		service := api.ZTCService
+		rules, err := ztwtrafficdnsrules.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		// Filter out default/predefined rules
+		rulesFiltered := []ztwtrafficdnsrules.ECDNSRules{}
+		for _, rule := range rules {
+			if rule.DefaultRule || rule.Predefined {
+				continue
+			}
+			rulesFiltered = append(rulesFiltered, rule)
+		}
+		resourceCount = len(rulesFiltered)
+		m, _ := json.Marshal(rulesFiltered)
+		_ = json.Unmarshal(m, &jsonStructData)
+
+	case "ztc_traffic_forwarding_log_rule":
+		if api.ZTCService == nil {
+			log.Fatal("ZTC service is not initialized")
+		}
+		service := api.ZTCService
+		rules, err := ztwtrafficlogrules.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		// Filter out default rules
+		rulesFiltered := []ztwtrafficlogrules.ECTrafficLogRules{}
+		for _, rule := range rules {
+			if rule.DefaultRule {
+				continue
+			}
+			rulesFiltered = append(rulesFiltered, rule)
+		}
+		resourceCount = len(rulesFiltered)
+		m, _ := json.Marshal(rulesFiltered)
+		_ = json.Unmarshal(m, &jsonStructData)
+
+	case "ztc_forwarding_gateway":
+		if api.ZTCService == nil {
+			log.Fatal("ZTC service is not initialized")
+		}
+		service := api.ZTCService
+		gateways, err := ztwziaforwardinggw.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		resourceCount = len(gateways)
+		m, _ := json.Marshal(gateways)
+		_ = json.Unmarshal(m, &jsonStructData)
+
+	case "ztc_dns_forwarding_gateway":
+		if api.ZTCService == nil {
+			log.Fatal("ZTC service is not initialized")
+		}
+		service := api.ZTCService
+		gateways, err := ztwdnsforwardinggw.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		resourceCount = len(gateways)
+		m, _ := json.Marshal(gateways)
+		_ = json.Unmarshal(m, &jsonStructData)
+
+	case "ztc_account_groups":
+		if api.ZTCService == nil {
+			log.Fatal("ZTC service is not initialized")
+		}
+		service := api.ZTCService
+		groups, err := ztwaccountgroups.GetAllAccountGroups(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		resourceCount = len(groups)
+		m, _ := json.Marshal(groups)
+		_ = json.Unmarshal(m, &jsonStructData)
+
+	case "ztc_public_cloud_info":
+		if api.ZTCService == nil {
+			log.Fatal("ZTC service is not initialized")
+		}
+		service := api.ZTCService
+		cloudInfo, err := ztwpubliccloudinfo.GetAllPublicCloudInfo(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		resourceCount = len(cloudInfo)
+		m, _ := json.Marshal(cloudInfo)
+		_ = json.Unmarshal(m, &jsonStructData)
+
 	default:
 		_, _ = fmt.Fprintf(cmd.OutOrStdout(), "%q is not yet supported for automatic generation", resourceType)
 		return
@@ -2139,7 +2498,7 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		sort.Strings(sortedBlockAttributes)
 		for _, attrName := range sortedBlockAttributes {
 			apiAttrName := nesting.MapTfFieldNameToAPI(resourceType, attrName)
-			if attrName == "id" || attrName == "tcp_port_ranges" || attrName == "udp_port_ranges" || attrName == "rule_order" || (resourceType == "zia_url_categories" && attrName == "val") {
+			if attrName == "id" || attrName == "tcp_port_ranges" || attrName == "udp_port_ranges" || attrName == "rule_order" || (resourceType == "zia_url_categories" && attrName == "val") || (resourceType == "ztc_provisioning_url" && attrName == "prov_url") || (resourceType == "ztc_location_template" && attrName == "template_id") {
 				continue
 			}
 

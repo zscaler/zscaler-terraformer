@@ -264,6 +264,18 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 		} else if helpers.IsInList(resourceType, []string{"zia_virtual_service_edge_cluster"}) && helpers.IsInList(block, []string{"virtual_zen_nodes"}) {
 			output += helpers.ListIdsIntBlock(block, structData[MapTfFieldNameToAPI(resourceType, block)])
 			continue
+		} else if helpers.IsInList(resourceType, []string{"ztc_traffic_forwarding_rule", "ztc_traffic_forwarding_dns_rule", "ztc_traffic_forwarding_log_rule", "ztc_location_management", "ztc_ip_destination_groups", "ztc_ip_source_groups", "ztc_ip_pool_groups", "ztc_network_services", "ztc_network_service_groups"}) && helpers.IsInList(block, []string{
+			"dest_ip_groups",
+			"nw_services",
+			"nw_service_groups",
+			"src_workload_groups",
+			"src_ip_groups",
+			"locations",
+			"location_groups",
+			"services",
+		}) {
+			output += helpers.ListIdsIntBlock(block, structData[MapTfFieldNameToAPI(resourceType, block)])
+			continue
 		} else if helpers.IsInList(resourceType, []string{"zpa_application_segment"}) && block == "server_groups" {
 			output += helpers.ListIdsStringBlock(block, structData["serverGroups"])
 			continue

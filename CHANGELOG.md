@@ -1,5 +1,26 @@
 # Changelog
 
+## 2.1.5 (December, 1 2025)
+
+### Notes
+
+- Release date: **(December, 1 2025)**
+- Supported Terraform version: **v1.x.x**
+
+## **🎉 New Features**
+
+- [PR #356](https://github.com/zscaler/zscaler-terraformer/pull/356) - Added full support for ZTC (Zscaler Threat Protection Cloud Connector) provider with 14 resources: `ztc_ip_destination_groups`, `ztc_ip_source_groups`, `ztc_ip_pool_groups`, `ztc_network_services`, `ztc_network_service_groups`, `ztc_account_groups`, `ztc_public_cloud_info`, `ztc_location_template`, `ztc_provisioning_url`, `ztc_traffic_forwarding_rule`, `ztc_traffic_forwarding_dns_rule`, `ztc_traffic_forwarding_log_rule`, `ztc_forwarding_gateway`, `ztc_dns_forwarding_gateway`
+
+## **🐛 Bug Fixes**
+
+- [PR #356](https://github.com/zscaler/zscaler-terraformer/pull/356) - Added context-aware data source and resource mappings to prevent attribute name collisions between ZIA and ZTC providers (e.g., `dest_ip_groups`, `src_ip_groups`, `nw_services` now correctly map to provider-specific resources)
+- [PR #356](https://github.com/zscaler/zscaler-terraformer/pull/356) - Added `proxy_gateway` attribute mapping support for `ztc_traffic_forwarding_rule` with proper set-style block handling (id and name)
+- [PR #356](https://github.com/zscaler/zscaler-terraformer/pull/356) - Excluded computed attributes `prov_url` and `template_id` from HCL generation to prevent "Value for unconfigurable attribute" errors
+- [PR #356](https://github.com/zscaler/zscaler-terraformer/pull/356) - Fixed state file reading to gracefully handle missing state files instead of crashing with fatal error
+- [PR #356](https://github.com/zscaler/zscaler-terraformer/pull/356) - Optimized ZPA policy post-processing to only run when ZPA resources are being imported (skipped for ZIA/ZTC-only imports)
+- [PR #356](https://github.com/zscaler/zscaler-terraformer/pull/356) - Added nesting block support for ZTC forwarding rules with proper attribute formatting for `dest_ip_groups`, `nw_services`, `nw_service_groups`, `src_workload_groups`, `src_ip_groups`, `locations`, `location_groups`
+- [PR #356](https://github.com/zscaler/zscaler-terraformer/pull/356) - Fixed resource reference replacement to prioritize managed resource imports over data source references when both are available
+
 ## 2.1.4 (November, 10 2025)
 
 ### Notes

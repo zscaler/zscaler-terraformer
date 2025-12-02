@@ -880,6 +880,35 @@ zscaler-terraformer --supported-resources="zia"
 | [zia_workload_groups](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_workload_groups) | Workload Management | ✅ | ✅ |
 | [zia_subscription_alert](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_subscription_alert) | Alerts | ✅ | ✅ |
 
+## ZTC Supported Resources
+
+Any resources not listed are currently not supported.
+
+Last updated December 1, 2025
+
+Use the following command once the tool is installed to visualize the table of supported ZTC resources:
+
+```shell
+zscaler-terraformer --supported-resources="ztc"
+```
+
+| Resource | Resource Scope | Generate Supported | Import Supported |
+|----------|-----------|----------|----------|
+| [ztc_ip_destination_groups](https://registry.terraform.io/providers/zscaler/ztc/latest/docs/resources/ztc_ip_destination_groups) | Policy Resources | ✅ | ✅ |
+| [ztc_ip_source_groups](https://registry.terraform.io/providers/zscaler/ztc/latest/docs/resources/ztc_ip_source_groups) | Policy Resources | ✅ | ✅ |
+| [ztc_ip_pool_groups](https://registry.terraform.io/providers/zscaler/ztc/latest/docs/resources/ztc_ip_pool_groups) | Policy Resources | ✅ | ✅ |
+| [ztc_network_services](https://registry.terraform.io/providers/zscaler/ztc/latest/docs/resources/ztc_network_services) | Policy Resources | ✅ | ✅ |
+| [ztc_network_service_groups](https://registry.terraform.io/providers/zscaler/ztc/latest/docs/resources/ztc_network_service_groups) | Policy Resources | ✅ | ✅ |
+| [ztc_account_groups](https://registry.terraform.io/providers/zscaler/ztc/latest/docs/resources/ztc_account_groups) | Account Management | ✅ | ✅ |
+| [ztc_public_cloud_info](https://registry.terraform.io/providers/zscaler/ztc/latest/docs/resources/ztc_public_cloud_info) | Cloud Info | ✅ | ✅ |
+| [ztc_location_template](https://registry.terraform.io/providers/zscaler/ztc/latest/docs/resources/ztc_location_template) | Location Management | ✅ | ✅ |
+| [ztc_provisioning_url](https://registry.terraform.io/providers/zscaler/ztc/latest/docs/resources/ztc_provisioning_url) | Provisioning | ✅ | ✅ |
+| [ztc_traffic_forwarding_rule](https://registry.terraform.io/providers/zscaler/ztc/latest/docs/resources/ztc_traffic_forwarding_rule) | Traffic Forwarding | ✅ | ✅ |
+| [ztc_traffic_forwarding_dns_rule](https://registry.terraform.io/providers/zscaler/ztc/latest/docs/resources/ztc_traffic_forwarding_dns_rule) | Traffic Forwarding | ✅ | ✅ |
+| [ztc_traffic_forwarding_log_rule](https://registry.terraform.io/providers/zscaler/ztc/latest/docs/resources/ztc_traffic_forwarding_log_rule) | Traffic Forwarding | ✅ | ✅ |
+| [ztc_forwarding_gateway](https://registry.terraform.io/providers/zscaler/ztc/latest/docs/resources/ztc_forwarding_gateway) | Gateway Management | ✅ | ✅ |
+| [ztc_dns_forwarding_gateway](https://registry.terraform.io/providers/zscaler/ztc/latest/docs/resources/ztc_dns_forwarding_gateway) | Gateway Management | ✅ | ✅ |
+
 ## Testing
 
 To ensure changes don't introduce regressions this tool uses an automated test

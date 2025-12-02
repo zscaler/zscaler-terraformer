@@ -152,28 +152,38 @@ func GenerateOutputs(resourceType string, resourceID string, workingDir string) 
 
 // / Custom function to Removes attributes from ZPA StateFile.
 func RemoveTcpPortRangesFromState(stateFile string) {
+	// Check if the state file exists first
+	if _, err := os.Stat(stateFile); os.IsNotExist(err) {
+		log.Printf("[DEBUG] State file %s does not exist, skipping tcp_port_ranges removal", stateFile)
+		return
+	}
+
 	// Read the state file
 	stateData, err := os.ReadFile(stateFile)
 	if err != nil {
-		log.Fatalf("failed to read state file: %s", err)
+		log.Printf("[WARNING] Failed to read state file %s: %s", stateFile, err)
+		return
 	}
 
 	// Unmarshal the JSON data
 	var state map[string]interface{}
 	if err := json.Unmarshal(stateData, &state); err != nil {
-		log.Fatalf("failed to unmarshal state file: %s", err)
+		log.Printf("[WARNING] Failed to unmarshal state file: %s", err)
+		return
 	}
 
 	// Traverse the state file structure to remove tcp_port_ranges.
 	resources, ok := state["resources"].([]interface{})
 	if !ok {
-		log.Fatalf("unexpected structure in state file: resources not found or not a list")
+		log.Printf("[DEBUG] State file has no resources or unexpected structure, skipping")
+		return
 	}
 
 	for _, resource := range resources {
 		resourceMap, ok := resource.(map[string]interface{})
 		if !ok {
-			log.Fatalf("unexpected structure in state file: resource is not a map")
+			log.Printf("[WARNING] Unexpected structure in state file: resource is not a map, skipping")
+			continue
 		}
 
 		instances, ok := resourceMap["instances"].([]interface{})
@@ -201,12 +211,14 @@ func RemoveTcpPortRangesFromState(stateFile string) {
 	// Marshal the modified state back to JSON.
 	modifiedStateData, err := json.MarshalIndent(state, "", "  ")
 	if err != nil {
-		log.Fatalf("failed to marshal modified state file: %s", err)
+		log.Printf("[WARNING] Failed to marshal modified state file: %s", err)
+		return
 	}
 
 	// Write the modified state back to the file
 	if err := os.WriteFile(stateFile, modifiedStateData, 0600); err != nil {
-		log.Fatalf("failed to write modified state file: %s", err)
+		log.Printf("[WARNING] Failed to write modified state file: %s", err)
+		return
 	}
 }
 

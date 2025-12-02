@@ -38,6 +38,7 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler"
 	zia "github.com/zscaler/zscaler-terraformer/v2/providers/zia"
 	zpa "github.com/zscaler/zscaler-terraformer/v2/providers/zpa"
+	ztc "github.com/zscaler/zscaler-terraformer/v2/providers/ztc"
 	"github.com/zscaler/zscaler-terraformer/v2/terraformutils"
 )
 
@@ -65,6 +66,12 @@ var ziaPassword string // required
 var ziaAPIKey string   // required
 var ziaCloud string    // required
 
+// ZTC Legacy Fields.
+var ztcUsername string // required
+var ztcPassword string // required
+var ztcAPIKey string   // required
+var ztcCloud string    // required
+
 var useLegacyClient bool
 var verbose, displayReleaseVersion, support, collectLogs, validateTerraform, progress, noProgress bool
 var supportedResources string
@@ -74,11 +81,12 @@ var resourceType_, resources, excludedResources string
 
 var api *Client
 var terraformImportCmdPrefix = "terraform import"
-var zpaProviderNamespace, ziaProviderNamespace string
+var zpaProviderNamespace, ziaProviderNamespace, ztcProviderNamespace string
 
 type Client struct {
 	ZPAService *zscaler.Service
 	ZIAService *zscaler.Service
+	ZTCService *zscaler.Service
 }
 
 var allSupportedResources = []string{
@@ -158,6 +166,20 @@ var allSupportedResources = []string{
 	"zia_subscription_alert",
 	"zia_forwarding_control_proxies",
 	"zia_mobile_malware_protection_policy",
+	"ztc_ip_destination_groups",
+	"ztc_ip_source_groups",
+	"ztc_ip_pool_groups",
+	"ztc_network_services",
+	"ztc_network_service_groups",
+	"ztc_account_groups",
+	"ztc_public_cloud_info",
+	"ztc_location_template",
+	"ztc_provisioning_url",
+	"ztc_traffic_forwarding_rule",
+	"ztc_traffic_forwarding_dns_rule",
+	"ztc_traffic_forwarding_log_rule",
+	"ztc_forwarding_gateway",
+	"ztc_dns_forwarding_gateway",
 }
 
 // SupportContact represents support contact information for a specific region/country.
@@ -893,6 +915,41 @@ func init() {
 	}
 
 	// -----------------------
+	// ZTC Legacy flags (V2)
+	// -----------------------
+	rootCmd.PersistentFlags().StringVar(&ziaUsername, "ztc_username", "", "ZTC legacy username (required if using legacy mode for ZIA resources)")
+	if err := viper.BindPFlag("ztc_username", rootCmd.PersistentFlags().Lookup("ztc_username")); err != nil {
+		log.Fatalf("failed to bind flag: %v", err)
+	}
+	if err := viper.BindEnv("ztc_username", "ZTC_USERNAME"); err != nil {
+		log.Fatalf("failed to bind env: %v", err)
+	}
+
+	rootCmd.PersistentFlags().StringVar(&ziaPassword, "ztc_password", "", "ZTC legacy password (required)")
+	if err := viper.BindPFlag("ztc_password", rootCmd.PersistentFlags().Lookup("ztc_password")); err != nil {
+		log.Fatalf("failed to bind flag: %v", err)
+	}
+	if err := viper.BindEnv("ztc_password", "ZTC_PASSWORD"); err != nil {
+		log.Fatalf("failed to bind env: %v", err)
+	}
+
+	rootCmd.PersistentFlags().StringVar(&ziaAPIKey, "ztc_api_key", "", "ZTC legacy api_key (required)")
+	if err := viper.BindPFlag("ztc_api_key", rootCmd.PersistentFlags().Lookup("ztc_api_key")); err != nil {
+		log.Fatalf("failed to bind flag: %v", err)
+	}
+	if err := viper.BindEnv("ztc_api_key", "ZTC_API_KEY"); err != nil {
+		log.Fatalf("failed to bind env: %v", err)
+	}
+
+	rootCmd.PersistentFlags().StringVar(&ziaCloud, "ztc_cloud", "", "ZTC Cloud environment (required for ZTC legacy, e.g. zscalerthree)")
+	if err := viper.BindPFlag("ztc_cloud", rootCmd.PersistentFlags().Lookup("ztc_cloud")); err != nil {
+		log.Fatalf("failed to bind flag: %v", err)
+	}
+	if err := viper.BindEnv("ztc_cloud", "ZTC_CLOUD"); err != nil {
+		log.Fatalf("failed to bind env: %v", err)
+	}
+
+	// -----------------------
 	// Global toggle
 	// -----------------------
 	rootCmd.PersistentFlags().BoolVar(&useLegacyClient, "use_legacy_client", false, "Enable Legacy Mode (true/false)")
@@ -944,6 +1001,14 @@ func init() {
 		log.Fatalf("failed to bind env: %v", err)
 	}
 
+	rootCmd.PersistentFlags().StringVar(&terraformInstallPath, "ztc-terraform-install-path", ".", "Path to the ZTC Terraform installation")
+	if err := viper.BindPFlag("ztc-terraform-install-path", rootCmd.PersistentFlags().Lookup("ztc-terraform-install-path")); err != nil {
+		log.Fatalf("failed to bind flag: %v", err)
+	}
+	if err := viper.BindEnv("ztc-terraform-install-path", "ZSCALER_ZTC_TERRAFORM_INSTALL_PATH"); err != nil {
+		log.Fatalf("failed to bind env: %v", err)
+	}
+
 	rootCmd.PersistentFlags().StringVar(&zpaProviderNamespace, "zpa-provider-namespace", "", "Custom namespace for the ZPA provider")
 	if err := viper.BindPFlag("zpa-provider-namespace", rootCmd.PersistentFlags().Lookup("zpa-provider-namespace")); err != nil {
 		log.Fatalf("failed to bind flag: %v", err)
@@ -957,6 +1022,14 @@ func init() {
 		log.Fatalf("failed to bind flag: %v", err)
 	}
 	if err := viper.BindEnv("zia-provider-namespace", "ZIA_PROVIDER_NAMESPACE"); err != nil {
+		log.Fatalf("failed to bind env: %v", err)
+	}
+
+	rootCmd.PersistentFlags().StringVar(&ziaProviderNamespace, "ztc-provider-namespace", "", "Custom namespace for the ZTC provider")
+	if err := viper.BindPFlag("ztc-provider-namespace", rootCmd.PersistentFlags().Lookup("ztc-provider-namespace")); err != nil {
+		log.Fatalf("failed to bind flag: %v", err)
+	}
+	if err := viper.BindEnv("ztc-provider-namespace", "ZTC_PROVIDER_NAMESPACE"); err != nil {
 		log.Fatalf("failed to bind env: %v", err)
 	}
 }
@@ -999,6 +1072,12 @@ func initConfig() {
 	ziaAPIKey = viper.GetString("zia_api_key")
 	ziaCloud = viper.GetString("zia_cloud")
 
+	// ZTC legacy
+	ztcUsername = viper.GetString("ztc_username")
+	ztcPassword = viper.GetString("ztc_password")
+	ztcAPIKey = viper.GetString("ztc_api_key")
+	ztcCloud = viper.GetString("ztc_cloud")
+
 	// Debug logs of what we got
 	// log.Debugf("use_legacy_client=%v", useLegacyClient)
 	// log.Debugf("[ONEAPI] client_id=%s, client_secret=%s, vanity_domain=%s, customer_id=%s, microtenant_id=%s, zscaler_cloud=%s",
@@ -1035,6 +1114,12 @@ func initConfig() {
 	viper.Set("api_key", ziaAPIKey)
 	viper.Set("zia_cloud", ziaCloud) // some code calls viper.GetString("zia_cloud")
 
+	// For ZTC Legacy (providers/ztc/client.go or similar):
+	viper.Set("username", ztcUsername) // your code calls viper.GetString("username")
+	viper.Set("password", ztcPassword)
+	viper.Set("api_key", ztcAPIKey)
+	viper.Set("ztc_cloud", ztcCloud) // some code calls viper.GetString("ztc_cloud")
+
 	// Also set the legacy toggle for the second layer:
 	viper.Set("use_legacy_client", useLegacyClient)
 }
@@ -1057,6 +1142,14 @@ func sharedPreRun(cmd *cobra.Command, args []string) {
 		}
 		api.ZIAService = ziaCli.Service
 	}
+
+	if wantsZTC(resourceType_, resources) {
+		ztcCli, err := ztc.NewClient()
+		if err != nil {
+			log.Fatal("failed to initialize ZTC client:", err)
+		}
+		api.ZTCService = ztcCli.Service
+	}
 }
 
 func wantsZPA(rt, rs string) bool {
@@ -1069,6 +1162,12 @@ func wantsZIA(rt, rs string) bool {
 	return strings.HasPrefix(rt, "zia_") ||
 		strings.Contains(rs, "zia_") ||
 		rs == "*" || rs == "zia"
+}
+
+func wantsZTC(rt, rs string) bool {
+	return strings.HasPrefix(rt, "ztc_") ||
+		strings.Contains(rs, "ztc_") ||
+		rs == "*" || rs == "ztc"
 }
 
 func listSupportedResources(prefix string) {
