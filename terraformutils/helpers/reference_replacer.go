@@ -40,9 +40,18 @@ type ResourceReference struct {
 }
 
 // GetResourceReferences returns the mapping of attribute names to resource types.
+// NOTE: This function returns ZIA mappings by default for backwards compatibility.
+// For context-aware mappings, use GetResourceReferencesForProvider().
 func GetResourceReferences() []ResourceReference {
-	return []ResourceReference{
-		// ZPA Resource Mappings
+	return GetResourceReferencesForProvider("")
+}
+
+// GetResourceReferencesForProvider returns the mapping of attribute names to resource types
+// based on the provider context. This ensures that attributes with the same names (e.g., dest_ip_groups)
+// are mapped to the correct provider-specific resources.
+func GetResourceReferencesForProvider(providerPrefix string) []ResourceReference {
+	// Common ZPA mappings (provider-agnostic)
+	zpaMappings := []ResourceReference{
 		{"appConnectorGroups", "zpa_app_connector_group"},
 		{"zcomponentId", "zpa_app_connector_group"},
 		{"serverGroups", "zpa_server_group"},
@@ -56,7 +65,38 @@ func GetResourceReferences() []ResourceReference {
 		{"praPortals", "zpa_pra_portal_controller"},
 		{"praApplications", "zpa_application_segment"},
 		{"praApplication", "zpa_application_segment"},
+	}
 
+	// ZTC-specific mappings for attributes that overlap with ZIA
+	ztcMappings := []ResourceReference{
+		// ZTC Location Mappings
+		{"locations", "ztc_location_management"},
+
+		// ZTC IP Group Mappings
+		{"src_ip_groups", "ztc_ip_source_groups"},
+		{"srcIpGroups", "ztc_ip_source_groups"},
+		{"dest_ip_groups", "ztc_ip_destination_groups"},
+		{"destIpGroups", "ztc_ip_destination_groups"},
+
+		// ZTC Network Service Mappings
+		{"nw_services", "ztc_network_services"},
+		{"nwServices", "ztc_network_services"},
+		{"services", "ztc_network_services"},
+		{"nw_service_groups", "ztc_network_service_groups"},
+		{"nwServiceGroups", "ztc_network_service_groups"},
+
+		// ZTC Workload Mappings
+		{"src_workload_groups", "ztc_workload_groups"},
+		{"workload_groups", "ztc_workload_groups"},
+
+		// ZTC User/Group Mappings
+		{"departments", "ztc_department"},
+		{"groups", "ztc_group"},
+		{"users", "ztc_user_management"},
+	}
+
+	// ZIA-specific mappings (default for backwards compatibility)
+	ziaMappings := []ResourceReference{
 		// ZIA Resource Mappings
 		{"departments", "zia_department"},
 		{"groups", "zia_group"},
@@ -75,7 +115,6 @@ func GetResourceReferences() []ResourceReference {
 
 		// ZIA Firewall Filtering Rule Attribute Mappings
 		{"nw_application_groups", "zia_firewall_filtering_network_application_groups"},
-		//{"app_service_groups", "zia_firewall_filtering_network_service_groups"},
 		{"nw_service_groups", "zia_firewall_filtering_network_service_groups"},
 		{"nw_services", "zia_firewall_filtering_network_service"},
 		{"bandwidth_classes", "zia_bandwidth_classes"},
@@ -92,6 +131,22 @@ func GetResourceReferences() []ResourceReference {
 		{"adminUsers", "zia_admin_users"},
 		{"securitySettings", "zia_security_settings"},
 		{"ruleLabels", "zia_rule_labels"},
+	}
+
+	// Return provider-specific mappings based on context
+	switch providerPrefix {
+	case "ztc":
+		// For ZTC resources: use ZTC mappings first, then ZPA (shared), skip ZIA duplicates
+		return append(ztcMappings, zpaMappings...)
+	case "zpa":
+		// For ZPA resources: use ZPA mappings only
+		return zpaMappings
+	case "zia":
+		// For ZIA resources: use ZIA mappings first, then ZPA (shared)
+		return append(ziaMappings, zpaMappings...)
+	default:
+		// Default: ZIA mappings first, then ZPA, then ZTC (backwards compatibility)
+		return append(append(ziaMappings, zpaMappings...), ztcMappings...)
 	}
 }
 
@@ -119,6 +174,7 @@ func ParseOutputsFile(workingDir string) (map[string]string, error) {
 	scanner := bufio.NewScanner(file)
 
 	// Regex to match output lines like: output "zpa_server_group_resource_zpa_server_group_72058304855144105_id"
+	// OR the newer format: output "ztc_ip_destination_groups_ztc_ip_destination_groups_17595967_id"
 	outputRegex := regexp.MustCompile(`output\s+"([^"]+)"`)
 
 	for scanner.Scan() {
@@ -129,8 +185,8 @@ func ParseOutputsFile(workingDir string) (map[string]string, error) {
 			outputName := matches[1]
 
 			// Parse the output name to extract resource type, name, and ID
-			// Format: zpa_app_connector_group_resource_zpa_app_connector_group_72058304855047746_id
-			// We need to extract: resourceType="zpa_app_connector_group", resourceName="resource_zpa_app_connector_group_72058304855047746", resourceID="72058304855047746"
+			// Format 1: zpa_app_connector_group_resource_zpa_app_connector_group_72058304855047746_id (with "resource")
+			// Format 2: ztc_ip_destination_groups_ztc_ip_destination_groups_17595967_id (resource type repeated)
 
 			// Find the last occurrence of "_id" to identify the end
 			if strings.HasSuffix(outputName, "_id") {
@@ -138,17 +194,11 @@ func ParseOutputsFile(workingDir string) (map[string]string, error) {
 				parts := strings.Split(nameWithoutId, "_")
 
 				if len(parts) >= 4 {
-					// Find the resource type by looking for the pattern: zpa_*_group
-					// The resource type is typically the first 3 parts: zpa_app_connector_group
 					resourceType := ""
 					resourceID := ""
 					resourceName := ""
 
-					// The structure is: zpa_server_group_resource_zpa_server_group_72058304855144105
-					// For zpa_server_group: resourceType="zpa_server_group", resourceName="resource_zpa_server_group_72058304855144105"
-					// For zpa_app_connector_group: resourceType="zpa_app_connector_group", resourceName="resource_zpa_app_connector_group_72058304855047746"
-
-					// Find where "resource" appears - this marks the boundary between resource type and resource name
+					// Try Format 1: Find where "resource" appears
 					resourceIndex := -1
 					for i, part := range parts {
 						if part == "resource" {
@@ -158,17 +208,22 @@ func ParseOutputsFile(workingDir string) (map[string]string, error) {
 					}
 
 					if resourceIndex > 0 && resourceIndex < len(parts)-1 {
-						// Resource type is everything before "resource"
+						// Format 1: Resource type is everything before "resource"
 						resourceType = strings.Join(parts[0:resourceIndex], "_")
 						// Resource name is everything from "resource" onwards
 						resourceName = strings.Join(parts[resourceIndex:], "_")
 						// Resource ID is the last part
 						resourceID = parts[len(parts)-1]
+					} else {
+						// Format 2: Resource type is repeated (e.g., ztc_ip_destination_groups_ztc_ip_destination_groups_17595967)
+						// We need to find where the resource type is repeated
+						resourceType, resourceName, resourceID = parseRepeatedResourceTypeFormat(nameWithoutId)
 					}
 
 					if resourceType != "" && resourceID != "" && resourceName != "" {
 						// Store the mapping: resourceID -> resourceType.resourceName.id
 						resourceMap[resourceID] = fmt.Sprintf("%s.%s.id", resourceType, resourceName)
+						log.Printf("[DEBUG] ParseOutputsFile: Mapped ID %s -> %s.%s.id", resourceID, resourceType, resourceName)
 					}
 				}
 			}
@@ -176,6 +231,38 @@ func ParseOutputsFile(workingDir string) (map[string]string, error) {
 	}
 
 	return resourceMap, scanner.Err()
+}
+
+// parseRepeatedResourceTypeFormat handles output names where the resource type is repeated
+// e.g., "ztc_ip_destination_groups_ztc_ip_destination_groups_17595967"
+// Returns: resourceType, resourceName, resourceID.
+func parseRepeatedResourceTypeFormat(nameWithoutId string) (string, string, string) {
+	// Common prefixes to try
+	prefixes := []string{"ztc_", "zia_", "zpa_"}
+
+	for _, prefix := range prefixes {
+		if strings.HasPrefix(nameWithoutId, prefix) {
+			// Find where the prefix appears again (marks start of resource name)
+			firstOccurrence := strings.Index(nameWithoutId, prefix)
+			remaining := nameWithoutId[firstOccurrence+len(prefix):]
+			secondOccurrence := strings.Index(remaining, prefix)
+
+			if secondOccurrence > 0 {
+				// Resource type is from start to second occurrence
+				resourceType := nameWithoutId[:firstOccurrence+len(prefix)+secondOccurrence-1]
+				// Resource name is from second occurrence to end
+				resourceName := remaining[secondOccurrence:]
+				// Resource ID is the last part (after the last underscore)
+				lastUnderscore := strings.LastIndex(resourceName, "_")
+				if lastUnderscore > 0 {
+					resourceID := resourceName[lastUnderscore+1:]
+					return resourceType, resourceName, resourceID
+				}
+			}
+		}
+	}
+
+	return "", "", ""
 }
 
 // ExtractResourceIDFromName extracts the resource ID from a Terraform resource name.

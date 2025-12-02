@@ -21,7 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-package zia
+package ztc
 
 import (
 	"fmt"
@@ -37,7 +37,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler"
-	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/ztw"
 	"github.com/zscaler/zscaler-terraformer/v2/terraformutils/helpers"
 )
 
@@ -64,7 +64,7 @@ type Config struct {
 	Username   string
 	Password   string
 	APIKey     string
-	ZIABaseURL string
+	ZTCBaseURL string
 
 	httpProxy      string
 	requestTimeout int
@@ -143,23 +143,23 @@ func newConfigFromEnv() *Config {
 
 	// For the legacy V2 approach.
 	Username := viper.GetString("username")
-	if Username == "" && os.Getenv("ZIA_USERNAME") != "" {
-		Username = os.Getenv("ZIA_USERNAME")
+	if Username == "" && os.Getenv("ZTC_USERNAME") != "" {
+		Username = os.Getenv("ZTC_USERNAME")
 	}
 
 	Password := viper.GetString("password")
-	if Password == "" && os.Getenv("ZIA_PASSWORD") != "" {
-		Password = os.Getenv("ZIA_PASSWORD")
+	if Password == "" && os.Getenv("ZTC_PASSWORD") != "" {
+		Password = os.Getenv("ZTC_PASSWORD")
 	}
 
 	APIKey := viper.GetString("api_key")
-	if APIKey == "" && os.Getenv("ZIA_API_KEY") != "" {
-		APIKey = os.Getenv("ZIA_API_KEY")
+	if APIKey == "" && os.Getenv("ZTC_API_KEY") != "" {
+		APIKey = os.Getenv("ZTC_API_KEY")
 	}
 
-	ZIABaseURL := viper.GetString("zia_cloud")
-	if ZIABaseURL == "" && os.Getenv("ZIA_CLOUD") != "" {
-		ZIABaseURL = os.Getenv("ZIA_CLOUD")
+	ZTCBaseURL := viper.GetString("ztc_cloud")
+	if ZTCBaseURL == "" && os.Getenv("ZTC_CLOUD") != "" {
+		ZTCBaseURL = os.Getenv("ZTC_CLOUD")
 	}
 
 	httpProxy := viper.GetString("zscaler_http_proxy")
@@ -210,7 +210,7 @@ func newConfigFromEnv() *Config {
 		Username:   Username,
 		Password:   Password,
 		APIKey:     APIKey,
-		ZIABaseURL: ZIABaseURL,
+		ZTCBaseURL: ZTCBaseURL,
 
 		httpProxy:      httpProxy,
 		retryCount:     retryCount,
@@ -220,21 +220,21 @@ func newConfigFromEnv() *Config {
 	return config
 }
 
-// zscalerSDKV2Client initializes the legacy ZIA client (V2).
+// zscalerSDKV2Client initializes the legacy ZTC client (V2).
 func zscalerSDKV2Client(c *Config) (*zscaler.Service, error) {
 	// You can set a custom user agent if desired.
 	customUserAgent := helpers.GenerateUserAgent()
 
-	// Start building config setters for the V2 zia library.
-	setters := []zia.ConfigSetter{
-		zia.WithCache(false),
-		zia.WithHttpClientPtr(http.DefaultClient),
-		zia.WithRateLimitMaxRetries(int32(c.retryCount)),
-		zia.WithRequestTimeout(time.Duration(c.requestTimeout) * time.Second),
-		zia.WithZiaUsername(c.Username),
-		zia.WithZiaPassword(c.Password),
-		zia.WithZiaAPIKey(c.APIKey),
-		zia.WithZiaCloud(c.ZIABaseURL),
+	// Start building config setters for the V2 ztc library.
+	setters := []ztw.ConfigSetter{
+		ztw.WithCache(false),
+		ztw.WithHttpClientPtr(http.DefaultClient),
+		ztw.WithRateLimitMaxRetries(int32(c.retryCount)),
+		ztw.WithRequestTimeout(time.Duration(c.requestTimeout) * time.Second),
+		ztw.WithZtwUsername(c.Username),
+		ztw.WithZtwPassword(c.Password),
+		ztw.WithZtwAPIKey(c.APIKey),
+		ztw.WithZtwCloud(c.ZTCBaseURL),
 	}
 
 	// Proxy.
@@ -243,7 +243,7 @@ func zscalerSDKV2Client(c *Config) (*zscaler.Service, error) {
 		if err != nil {
 			return nil, fmt.Errorf("invalid proxy URL: %w", err)
 		}
-		setters = append(setters, zia.WithProxyHost(parsedURL.Hostname()))
+		setters = append(setters, ztw.WithProxyHost(parsedURL.Hostname()))
 
 		sPort := parsedURL.Port()
 		if sPort == "" {
@@ -256,22 +256,22 @@ func zscalerSDKV2Client(c *Config) (*zscaler.Service, error) {
 		if port64 < 1 || port64 > 65535 {
 			return nil, fmt.Errorf("invalid port number: must be between 1 and 65535, got: %d", port64)
 		}
-		setters = append(setters, zia.WithProxyPort(int32(port64)))
+		setters = append(setters, ztw.WithProxyPort(int32(port64)))
 	}
 
-	ziaCfg, err := zia.NewConfiguration(setters...)
+	ztcCfg, err := ztw.NewConfiguration(setters...)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create Legacy ZIA configuration: %w", err)
+		return nil, fmt.Errorf("failed to create Legacy ZTC configuration: %w", err)
 	}
-	ziaCfg.UserAgent = customUserAgent
+	ztcCfg.UserAgent = customUserAgent
 
 	// Now wrap it in a zscaler.Service so usage is uniform.
-	wrappedV2Client, err := zscaler.NewLegacyZiaClient(ziaCfg)
+	wrappedV2Client, err := zscaler.NewLegacyZtwClient(ztcCfg)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create Legacy ZIA client: %w", err)
+		return nil, fmt.Errorf("failed to create Legacy ZTC client: %w", err)
 	}
 
-	log.Println("[INFO] Successfully initialized Legacy ZIA client")
+	log.Println("[INFO] Successfully initialized Legacy ZTC client")
 	return wrappedV2Client, nil
 }
 
@@ -351,6 +351,6 @@ func zscalerSDKV3Client(c *Config) (*zscaler.Client, error) {
 		return nil, fmt.Errorf("failed to create Zscaler ONEAPI client: %w", err)
 	}
 
-	log.Println("[INFO] Successfully initialized ZIA Zscaler ONEAPI client")
+	log.Println("[INFO] Successfully initialized ZTC Zscaler ONEAPI client")
 	return v3Client.Client, nil
 }

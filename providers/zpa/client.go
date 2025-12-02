@@ -26,6 +26,7 @@ package zpa
 import (
 	"fmt"
 	"log"
+	"math"
 	"net/http"
 	"net/url"
 	"os"
@@ -177,13 +178,19 @@ func newConfigFromEnv() *Config {
 	retryCount := viper.GetInt("zscaler_retry_count")
 	if retryCount == 0 {
 		if val := os.Getenv("ZSCALER_RETRY_COUNT"); val != "" {
-			if converted, err := strconv.Atoi(val); err == nil {
-				retryCount = converted
+			// Use ParseInt with bitSize 32 to ensure value fits in int32
+			if parsed, err := strconv.ParseInt(val, 10, 32); err == nil && parsed >= 1 {
+				retryCount = int(parsed)
 			}
 		}
 		if retryCount == 0 {
 			retryCount = 5
 		}
+	}
+	// Ensure that retryCount is a sensible positive value within int32 range.
+	if retryCount < 1 || retryCount > math.MaxInt32 {
+		log.Printf("[WARN] ZSCALER_RETRY_COUNT value %d is out of int32 bounds, using default 5", retryCount)
+		retryCount = 5
 	}
 
 	requestTimeout := viper.GetInt("zscaler_request_timeout")

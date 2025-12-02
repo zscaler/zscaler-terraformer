@@ -36,6 +36,7 @@ help:
 	@echo "$(COLOR_OK)  test-clean         	Clean test cache and artifacts$(COLOR_NONE)"
 	@echo "$(COLOR_OK)  test_zia           	Run only zia integration tests$(COLOR_NONE)"
 	@echo "$(COLOR_OK)  test_zpa           	Run only zpa integration tests$(COLOR_NONE)"
+	@echo "$(COLOR_OK)  test_ztc           	Run only ztc integration tests$(COLOR_NONE)"
 
 
 TEST ?= $(shell go list ./...)

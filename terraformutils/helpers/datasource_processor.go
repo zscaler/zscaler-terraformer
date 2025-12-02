@@ -42,34 +42,18 @@ type DataSourceMapping struct {
 
 // GetDataSourceMappings returns the mapping of attribute names to data source types.
 // This is where you can easily add new mappings as requested by the user.
+// NOTE: This function returns ZIA mappings by default for backwards compatibility.
+// For context-aware mappings, use GetDataSourceMappingsForProvider().
 func GetDataSourceMappings() []DataSourceMapping {
-	return []DataSourceMapping{
-		// ZIA Data Source Mappings for common attributes
-		{"location_groups", "zia_location_groups"},
-		{"time_windows", "zia_firewall_filtering_time_window"},
-		{"users", "zia_user_management"},
-		{"groups", "zia_group_management"},
-		{"departments", "zia_department_management"},
-		{"proxy_gateways", "zia_forwarding_control_proxy_gateway"},
-		{"device_groups", "zia_device_groups"},
-		{"devices", "zia_devices"},
-		{"workload_groups", "zia_workload_groups"},
-		{"nw_services", "zia_firewall_filtering_network_service"},
-		{"services", "zia_firewall_filtering_network_service"},
+	return GetDataSourceMappingsForProvider("")
+}
 
-		// ZIA Firewall and IP Group Mappings
-		{"source_ip_groups", "zia_firewall_filtering_ip_source_groups"},
-		{"src_ip_groups", "zia_firewall_filtering_ip_source_groups"},
-		{"dest_ip_groups", "zia_firewall_filtering_destination_groups"},
-		{"destination_groups", "zia_firewall_filtering_destination_groups"},
-
-		// ZIA Network and Application Group Mappings
-		{"nw_application_groups", "zia_firewall_filtering_network_application_groups"},
-		{"nw_service_groups", "zia_firewall_filtering_network_service_groups"},
-
-		// ZIA Rule and Label Mappings
-		{"labels", "zia_rule_labels"},
-
+// GetDataSourceMappingsForProvider returns the mapping of attribute names to data source types
+// based on the provider context. This ensures that attributes with the same names (e.g., dest_ip_groups)
+// are mapped to the correct provider-specific data sources.
+func GetDataSourceMappingsForProvider(providerPrefix string) []DataSourceMapping {
+	// Common ZPA mappings (provider-agnostic)
+	zpaMappings := []DataSourceMapping{
 		// ZPA Application and Group Mappings
 		{"app_connector_groups", "zpa_app_connector_group"},
 		{"appConnectorGroups", "zpa_app_connector_group"},
@@ -107,9 +91,90 @@ func GetDataSourceMappings() []DataSourceMapping {
 		// ZPA Cloud Browser Isolation Mappings
 		{"banner_id", "zpa_cloud_browser_isolation_banner"},
 		{"region_ids", "zpa_cloud_browser_isolation_region"},
+	}
 
-		// Additional mappings can be easily added here
-		// {"new_attribute", "zia_new_data_source"},
+	// ZTC-specific mappings for attributes that overlap with ZIA
+	ztcMappings := []DataSourceMapping{
+		// ZTC Location and Group Mappings
+		{"locations", "ztc_location_management"},
+		{"location_groups", "ztc_location_groups"},
+
+		// ZTC IP Group Mappings
+		{"source_ip_groups", "ztc_ip_source_groups"},
+		{"src_ip_groups", "ztc_ip_source_groups"},
+		{"srcIpGroups", "ztc_ip_source_groups"},
+		{"dest_ip_groups", "ztc_ip_destination_groups"},
+		{"destIpGroups", "ztc_ip_destination_groups"},
+		{"destination_groups", "ztc_ip_destination_groups"},
+
+		// ZTC Network Service Mappings
+		{"nw_services", "ztc_network_services"},
+		{"nwServices", "ztc_network_services"},
+		{"services", "ztc_network_services"},
+		{"nw_service_groups", "ztc_network_service_groups"},
+		{"nwServiceGroups", "ztc_network_service_groups"},
+
+		// ZTC Workload and Gateway Mappings
+		{"src_workload_groups", "ztc_workload_groups"},
+		{"workload_groups", "ztc_workload_groups"},
+		{"proxy_gateway", "ztc_forwarding_gateway"},
+
+		// ZTC User/Group Mappings (if applicable)
+		{"users", "ztc_user_management"},
+		{"groups", "ztc_group_management"},
+		{"departments", "ztc_department_management"},
+	}
+
+	// ZIA-specific mappings (default for backwards compatibility)
+	ziaMappings := []DataSourceMapping{
+		// ZIA Location and Group Mappings
+		{"locations", "zia_location_management"},
+		{"location_groups", "zia_location_groups"},
+		{"time_windows", "zia_firewall_filtering_time_window"},
+
+		// ZIA User/Group Mappings
+		{"users", "zia_user_management"},
+		{"groups", "zia_group_management"},
+		{"departments", "zia_department_management"},
+
+		// ZIA Device Mappings
+		{"proxy_gateways", "zia_forwarding_control_proxy_gateway"},
+		{"device_groups", "zia_device_groups"},
+		{"devices", "zia_devices"},
+		{"workload_groups", "zia_workload_groups"},
+
+		// ZIA Network Service Mappings
+		{"nw_services", "zia_firewall_filtering_network_service"},
+		{"services", "zia_firewall_filtering_network_service"},
+
+		// ZIA Firewall and IP Group Mappings
+		{"source_ip_groups", "zia_firewall_filtering_ip_source_groups"},
+		{"src_ip_groups", "zia_firewall_filtering_ip_source_groups"},
+		{"dest_ip_groups", "zia_firewall_filtering_destination_groups"},
+		{"destination_groups", "zia_firewall_filtering_destination_groups"},
+
+		// ZIA Network and Application Group Mappings
+		{"nw_application_groups", "zia_firewall_filtering_network_application_groups"},
+		{"nw_service_groups", "zia_firewall_filtering_network_service_groups"},
+
+		// ZIA Rule and Label Mappings
+		{"labels", "zia_rule_labels"},
+	}
+
+	// Return provider-specific mappings based on context
+	switch providerPrefix {
+	case "ztc":
+		// For ZTC resources: use ZTC mappings first, then ZPA (shared), skip ZIA duplicates
+		return append(ztcMappings, zpaMappings...)
+	case "zpa":
+		// For ZPA resources: use ZPA mappings only
+		return zpaMappings
+	case "zia":
+		// For ZIA resources: use ZIA mappings first, then ZPA (shared)
+		return append(ziaMappings, zpaMappings...)
+	default:
+		// Default: ZIA mappings first, then ZPA, then ZTC (backwards compatibility)
+		return append(append(ziaMappings, zpaMappings...), ztcMappings...)
 	}
 }
 
@@ -185,23 +250,22 @@ func processDataSourcesWithTimeout(workingDir string, resourceMap map[string]str
 		return fmt.Errorf("failed to collect data source IDs: %w", err)
 	}
 
-	if len(dataSourceIDs) == 0 {
-		log.Printf("[INFO] No data source IDs found to process")
-		return nil
+	// Step 3: Generate datasource.tf file (only for IDs without resource imports)
+	if len(dataSourceIDs) > 0 {
+		log.Printf("[DEBUG] Step 3: Generating datasource.tf file...")
+		err = GenerateDataSourceFile(workingDir, dataSourceIDs, showVerbose)
+		if err != nil {
+			return fmt.Errorf("failed to generate datasource.tf: %w", err)
+		}
+	} else {
+		log.Printf("[INFO] No data source IDs found to process - all IDs have resource imports")
 	}
 
-	// Step 3: Generate datasource.tf file
-	log.Printf("[DEBUG] Step 3: Generating datasource.tf file...")
-	err = GenerateDataSourceFile(workingDir, dataSourceIDs, showVerbose)
+	// Step 4: Replace IDs with both resource references AND data source references in all .tf files
+	log.Printf("[DEBUG] Step 4: Replacing references (resources and data sources)...")
+	err = ReplaceAllReferences(workingDir, resourceMap, dataSourceIDs, showVerbose)
 	if err != nil {
-		return fmt.Errorf("failed to generate datasource.tf: %w", err)
-	}
-
-	// Step 4: Replace IDs with data source references in all .tf files
-	log.Printf("[DEBUG] Step 4: Replacing data source references...")
-	err = ReplaceDataSourceReferences(workingDir, dataSourceIDs, showVerbose)
-	if err != nil {
-		return fmt.Errorf("failed to replace data source references: %w", err)
+		return fmt.Errorf("failed to replace references: %w", err)
 	}
 
 	return nil
@@ -268,6 +332,22 @@ func CleanupEmptyDataSourceBlocks(workingDir string) error {
 	return nil
 }
 
+// DetectProviderFromFileName extracts the provider prefix (zia, zpa, ztc) from a Terraform file name.
+// File names typically follow the pattern: zia_resource_name.tf, zpa_resource_name.tf, ztc_resource_name.tf.
+func DetectProviderFromFileName(fileName string) string {
+	baseName := filepath.Base(fileName)
+	baseName = strings.TrimSuffix(baseName, ".tf")
+
+	if strings.HasPrefix(baseName, "ztc_") {
+		return "ztc"
+	} else if strings.HasPrefix(baseName, "zpa_") {
+		return "zpa"
+	} else if strings.HasPrefix(baseName, "zia_") {
+		return "zia"
+	}
+	return "" // Unknown provider
+}
+
 // CollectDataSourceIDs scans all .tf files and collects IDs that should be replaced with data source references.
 // It excludes IDs that already have corresponding resource imports (found in resourceMap).
 func CollectDataSourceIDs(workingDir string, resourceMap map[string]string, showVerbose bool) ([]CollectedDataSourceID, error) {
@@ -280,21 +360,24 @@ func CollectDataSourceIDs(workingDir string, resourceMap map[string]string, show
 		return nil, fmt.Errorf("failed to find .tf files: %w", err)
 	}
 
-	// Get data source mappings
-	mappings := GetDataSourceMappings()
-
-	// Create a map for quick lookup
-	attributeToDataSource := make(map[string]string)
-	for _, mapping := range mappings {
-		attributeToDataSource[mapping.AttributeName] = mapping.DataSourceType
-	}
-
 	// Process each .tf file
 	for _, tfFile := range tfFiles {
 		// Skip special files
 		baseName := filepath.Base(tfFile)
 		if baseName == "outputs.tf" || baseName == "datasource.tf" || strings.HasSuffix(baseName, "-provider.tf") {
 			continue
+		}
+
+		// Detect provider from filename for context-aware mapping
+		providerPrefix := DetectProviderFromFileName(tfFile)
+
+		// Get provider-specific data source mappings
+		mappings := GetDataSourceMappingsForProvider(providerPrefix)
+
+		// Create a map for quick lookup (provider-specific)
+		attributeToDataSource := make(map[string]string)
+		for _, mapping := range mappings {
+			attributeToDataSource[mapping.AttributeName] = mapping.DataSourceType
 		}
 
 		// Read the file
@@ -310,9 +393,9 @@ func CollectDataSourceIDs(workingDir string, resourceMap map[string]string, show
 		for attributeName, dataSourceType := range attributeToDataSource {
 			var matches [][]string
 
-			if attributeName == "workload_groups" {
-				// Special pattern for workload_groups: capture both id and name
-				// Pattern: workload_groups { id = 123 name = "NAME" }
+			if attributeName == "workload_groups" || attributeName == "proxy_gateway" {
+				// Special pattern for set-style blocks with id and name: capture both
+				// Pattern: attribute_name { id = 123 name = "NAME" }
 				pattern := fmt.Sprintf(`(?ms)\b%s\s*\{[^}]*?id\s*=\s*(\d+)[^}]*?name\s*=\s*"([^"]+)"[^}]*\}`, regexp.QuoteMeta(attributeName))
 				re := regexp.MustCompile(pattern)
 				matches = re.FindAllStringSubmatch(fileContent, -1)
@@ -340,8 +423,8 @@ func CollectDataSourceIDs(workingDir string, resourceMap map[string]string, show
 					continue
 				}
 
-				if attributeName == "workload_groups" {
-					// For workload_groups, match[1] is the ID and match[2] is the name
+				if attributeName == "workload_groups" || attributeName == "proxy_gateway" {
+					// For set-style blocks (workload_groups, proxy_gateway), match[1] is the ID and match[2] is the name
 					if len(match) >= 3 {
 						id := match[1]
 						name := match[2]
@@ -353,7 +436,7 @@ func CollectDataSourceIDs(workingDir string, resourceMap map[string]string, show
 
 						// Skip if this ID already has a corresponding resource import
 						if resourceRef, exists := resourceMap[id]; exists {
-							log.Printf("[DEBUG] Skipping workload_groups ID %s - already has resource import: %s", id, resourceRef)
+							log.Printf("[DEBUG] Skipping %s ID %s - already has resource import: %s", attributeName, id, resourceRef)
 							continue
 						}
 
@@ -366,7 +449,7 @@ func CollectDataSourceIDs(workingDir string, resourceMap map[string]string, show
 							DataSourceType: dataSourceType,
 							ID:             id,
 							UniqueName:     fmt.Sprintf("this_%s", id),
-							Name:           name, // Store the name for workload_groups
+							Name:           name, // Store the name for set-style blocks
 						})
 						idTracker[uniqueKey] = true
 					}
@@ -523,12 +606,19 @@ func GenerateDataSourceFile(workingDir string, dataSourceIDs []CollectedDataSour
 		return err
 	}
 
+	// Data source types that require both id and name attributes
+	setStyleDataSources := map[string]bool{
+		"zia_workload_groups":    true,
+		"ztc_workload_groups":    true,
+		"ztc_forwarding_gateway": true,
+	}
+
 	// Write each data source
 	for _, dsID := range dataSourceIDs {
 		var dataSourceBlock string
 
-		if dsID.DataSourceType == "zia_workload_groups" && dsID.Name != "" {
-			// For workload_groups, include both id and name (always quote the ID)
+		if setStyleDataSources[dsID.DataSourceType] && dsID.Name != "" {
+			// For set-style data sources, include both id and name (always quote the ID)
 			dataSourceBlock = fmt.Sprintf(`data "%s" "%s" {
   id   = "%s"
   name = "%s"
@@ -558,11 +648,14 @@ func GenerateDataSourceFile(workingDir string, dataSourceIDs []CollectedDataSour
 
 // ReplaceDataSourceReferences replaces IDs with data source references in all .tf files.
 func ReplaceDataSourceReferences(workingDir string, dataSourceIDs []CollectedDataSourceID, showVerbose bool) error {
-	// Create a lookup map: ID -> data source reference
-	idToReference := make(map[string]string)
+	// Create a lookup map: ID -> data source reference (keyed by dataSourceType_id for uniqueness)
+	idToReferenceByType := make(map[string]map[string]string) // dataSourceType -> (id -> reference)
 	for _, dsID := range dataSourceIDs {
 		reference := fmt.Sprintf("data.%s.%s.id", dsID.DataSourceType, dsID.UniqueName)
-		idToReference[dsID.ID] = reference
+		if idToReferenceByType[dsID.DataSourceType] == nil {
+			idToReferenceByType[dsID.DataSourceType] = make(map[string]string)
+		}
+		idToReferenceByType[dsID.DataSourceType][dsID.ID] = reference
 	}
 
 	// Get all .tf files in the working directory
@@ -571,26 +664,39 @@ func ReplaceDataSourceReferences(workingDir string, dataSourceIDs []CollectedDat
 		return fmt.Errorf("failed to find .tf files: %w", err)
 	}
 
-	// Get data source mappings and pre-compile regex patterns for performance
-	mappings := GetDataSourceMappings()
-	attributePatterns := make(map[string]*regexp.Regexp)
-	attributeToDataSource := make(map[string]string)
-
-	for _, mapping := range mappings {
-		attributeName := mapping.AttributeName
-		attributeToDataSource[attributeName] = mapping.DataSourceType
-
-		// Pre-compile regex patterns to avoid recompilation in loops
-		pattern := fmt.Sprintf(`(?ms)(\b%s\s*\{[^}]*id\s*=\s*\[)([^\]]+)(\][^}]*\})`, regexp.QuoteMeta(attributeName))
-		attributePatterns[attributeName] = regexp.MustCompile(pattern)
-	}
-
 	// Process each .tf file
 	for _, tfFile := range tfFiles {
 		// Skip special files
 		baseName := filepath.Base(tfFile)
 		if baseName == "outputs.tf" || baseName == "datasource.tf" || strings.HasSuffix(baseName, "-provider.tf") {
 			continue
+		}
+
+		// Detect provider from filename for context-aware mapping
+		providerPrefix := DetectProviderFromFileName(tfFile)
+
+		// Get provider-specific data source mappings and pre-compile regex patterns
+		mappings := GetDataSourceMappingsForProvider(providerPrefix)
+		attributePatterns := make(map[string]*regexp.Regexp)
+		attributeToDataSource := make(map[string]string)
+
+		for _, mapping := range mappings {
+			attributeName := mapping.AttributeName
+			attributeToDataSource[attributeName] = mapping.DataSourceType
+
+			// Pre-compile regex patterns to avoid recompilation in loops
+			pattern := fmt.Sprintf(`(?ms)(\b%s\s*\{[^}]*id\s*=\s*\[)([^\]]+)(\][^}]*\})`, regexp.QuoteMeta(attributeName))
+			attributePatterns[attributeName] = regexp.MustCompile(pattern)
+		}
+
+		// Build ID to reference map for this provider's data source types
+		idToReference := make(map[string]string)
+		for _, mapping := range mappings {
+			if refs, exists := idToReferenceByType[mapping.DataSourceType]; exists {
+				for id, ref := range refs {
+					idToReference[id] = ref
+				}
+			}
 		}
 
 		// Check file size to prevent processing extremely large files
@@ -820,4 +926,255 @@ func ReplaceDataSourceReferences(workingDir string, dataSourceIDs []CollectedDat
 	}
 
 	return nil
+}
+
+// ReplaceAllReferences replaces IDs with both resource references AND data source references.
+// Resource references take priority over data source references.
+func ReplaceAllReferences(workingDir string, resourceMap map[string]string, dataSourceIDs []CollectedDataSourceID, showVerbose bool) error {
+	// Create lookup maps for both resource references and data source references
+	// Resource references: ID -> resourceType.resourceName.id
+	// Data source references: ID -> data.dataSourceType.uniqueName.id
+
+	// Data source lookup (from collected IDs)
+	dataSourceLookup := make(map[string]string)
+	for _, dsID := range dataSourceIDs {
+		reference := fmt.Sprintf("data.%s.%s.id", dsID.DataSourceType, dsID.UniqueName)
+		dataSourceLookup[dsID.ID] = reference
+	}
+
+	// Get all .tf files in the working directory
+	tfFiles, err := filepath.Glob(filepath.Join(workingDir, "*.tf"))
+	if err != nil {
+		return fmt.Errorf("failed to find .tf files: %w", err)
+	}
+
+	// Process each .tf file
+	for _, tfFile := range tfFiles {
+		// Skip special files
+		baseName := filepath.Base(tfFile)
+		if baseName == "outputs.tf" || baseName == "datasource.tf" || strings.HasSuffix(baseName, "-provider.tf") {
+			continue
+		}
+
+		// Detect provider from filename for context-aware mapping
+		providerPrefix := DetectProviderFromFileName(tfFile)
+
+		// Get provider-specific data source mappings
+		mappings := GetDataSourceMappingsForProvider(providerPrefix)
+
+		// Build attribute patterns
+		attributePatterns := make(map[string]*regexp.Regexp)
+		attributeToDataSource := make(map[string]string)
+
+		for _, mapping := range mappings {
+			attributeName := mapping.AttributeName
+			attributeToDataSource[attributeName] = mapping.DataSourceType
+
+			// Pre-compile regex patterns
+			pattern := fmt.Sprintf(`(?ms)(\b%s\s*\{[^}]*id\s*=\s*\[)([^\]]+)(\][^}]*\})`, regexp.QuoteMeta(attributeName))
+			attributePatterns[attributeName] = regexp.MustCompile(pattern)
+		}
+
+		// Check file size
+		fileInfo, err := os.Stat(tfFile)
+		if err != nil {
+			log.Printf("[WARNING] Failed to get file info %s: %v", tfFile, err)
+			continue
+		}
+
+		maxFileSize := int64(10 * 1024 * 1024) // 10MB
+		if fileInfo.Size() > maxFileSize {
+			log.Printf("[WARNING] Skipping large file %s (%d bytes)", baseName, fileInfo.Size())
+			continue
+		}
+
+		// Read the file
+		content, err := os.ReadFile(tfFile)
+		if err != nil {
+			log.Printf("[WARNING] Failed to read file %s: %v", tfFile, err)
+			continue
+		}
+
+		originalContent := string(content)
+		processedContent := originalContent
+		hasChanges := false
+
+		// Special handling for set-style attributes like proxy_gateway { id = X name = "Y" }
+		setStyleAttributes := map[string]string{
+			"proxy_gateway": "ztc_forwarding_gateway",
+		}
+
+		for attrName, resourceType := range setStyleAttributes {
+			// Pattern: proxy_gateway { id = 12345 name = "Name" }
+			setPattern := fmt.Sprintf(`(?ms)(\b%s\s*\{[^}]*?)id\s*=\s*(\d+)([^}]*?)name\s*=\s*"([^"]+)"([^}]*?\})`, regexp.QuoteMeta(attrName))
+			setRe := regexp.MustCompile(setPattern)
+			setMatches := setRe.FindAllStringSubmatch(processedContent, -1)
+
+			for j := len(setMatches) - 1; j >= 0; j-- {
+				setMatch := setMatches[j]
+				if len(setMatch) < 6 {
+					continue
+				}
+
+				fullSetMatch := setMatch[0]
+				prefix := setMatch[1]
+				id := setMatch[2]
+				middle := setMatch[3]
+				// name := setMatch[4] // Original name (not used directly)
+				suffix := setMatch[5]
+
+				// Check if this ID has a resource import
+				if resourceRef, exists := resourceMap[id]; exists {
+					if strings.Contains(resourceRef, resourceType) {
+						// Extract base reference (remove .id suffix)
+						baseRef := strings.TrimSuffix(resourceRef, ".id")
+						replacement := prefix + "id   = " + baseRef + ".id" + middle + "name = " + baseRef + ".name" + suffix
+						processedContent = strings.Replace(processedContent, fullSetMatch, replacement, 1)
+						hasChanges = true
+						log.Printf("[DEBUG] Replacing %s ID %s with resource reference: %s", attrName, id, baseRef)
+						continue
+					}
+				}
+
+				// Check if this ID has a data source reference
+				if dataSourceRef, exists := dataSourceLookup[id]; exists {
+					if strings.Contains(dataSourceRef, resourceType) {
+						// Extract base reference (remove .id suffix)
+						baseRef := strings.TrimSuffix(dataSourceRef, ".id")
+						replacement := prefix + "id   = " + baseRef + ".id" + middle + "name = " + baseRef + ".name" + suffix
+						processedContent = strings.Replace(processedContent, fullSetMatch, replacement, 1)
+						hasChanges = true
+						log.Printf("[DEBUG] Replacing %s ID %s with data source reference: %s", attrName, id, baseRef)
+					}
+				}
+			}
+		}
+
+		// Process each attribute
+		for attributeName, expectedDataSourceType := range attributeToDataSource {
+			re := attributePatterns[attributeName]
+			matches := re.FindAllStringSubmatch(processedContent, -1)
+
+			if len(matches) == 0 {
+				continue
+			}
+
+			// Process matches in reverse order
+			for i := len(matches) - 1; i >= 0; i-- {
+				match := matches[i]
+
+				if len(match) < 4 {
+					continue
+				}
+
+				fullMatch := match[0]
+				prefix := match[1]
+				idsContent := match[2]
+				suffix := match[3]
+
+				// Extract and process IDs
+				ids := extractIDsFromContent(idsContent)
+				var processedIds []string
+				needsReplacement := false
+
+				for _, id := range ids {
+					// Skip if already a reference
+					if strings.Contains(id, ".") {
+						processedIds = append(processedIds, id)
+						continue
+					}
+
+					// Priority 1: Check if this ID has a resource import (managed resource)
+					if resourceRef, exists := resourceMap[id]; exists {
+						// Verify the resource type matches the expected provider context
+						if isResourceTypeCompatible(resourceRef, providerPrefix, expectedDataSourceType) {
+							processedIds = append(processedIds, resourceRef)
+							needsReplacement = true
+							log.Printf("[DEBUG] Replacing ID %s with resource reference: %s", id, resourceRef)
+							continue
+						}
+					}
+
+					// Priority 2: Check if this ID has a data source reference
+					if dataSourceRef, exists := dataSourceLookup[id]; exists {
+						// Verify the data source type matches
+						if strings.Contains(dataSourceRef, expectedDataSourceType) {
+							processedIds = append(processedIds, dataSourceRef)
+							needsReplacement = true
+							log.Printf("[DEBUG] Replacing ID %s with data source reference: %s", id, dataSourceRef)
+							continue
+						}
+					}
+
+					// No replacement found, keep original ID
+					processedIds = append(processedIds, id)
+				}
+
+				// Replace if changes were made
+				if needsReplacement {
+					replacement := prefix + strings.Join(processedIds, ", ") + suffix
+					processedContent = strings.Replace(processedContent, fullMatch, replacement, 1)
+					hasChanges = true
+				}
+			}
+		}
+
+		// Write back the processed content if changed
+		if hasChanges && processedContent != originalContent {
+			err = os.WriteFile(tfFile, []byte(processedContent), 0644)
+			if err != nil {
+				log.Printf("[WARNING] Failed to write file %s: %v", tfFile, err)
+				continue
+			}
+			if showVerbose {
+				log.Printf("🔗 Updated references in %s", baseName)
+			}
+		}
+	}
+
+	return nil
+}
+
+// isResourceTypeCompatible checks if a resource reference is compatible with the expected provider and data source type.
+func isResourceTypeCompatible(resourceRef, providerPrefix, expectedDataSourceType string) bool {
+	// Extract resource type from reference (e.g., "ztc_ip_destination_groups.resource_name.id" -> "ztc_ip_destination_groups")
+	parts := strings.Split(resourceRef, ".")
+	if len(parts) < 1 {
+		return false
+	}
+	resourceType := parts[0]
+
+	// Check if the resource type starts with the same provider prefix
+	if providerPrefix != "" && !strings.HasPrefix(resourceType, providerPrefix+"_") {
+		return false
+	}
+
+	// Map resource types to their corresponding data source types for validation
+	resourceToDataSourceMap := map[string]string{
+		// ZTC mappings
+		"ztc_ip_destination_groups":  "ztc_ip_destination_groups",
+		"ztc_ip_source_groups":       "ztc_ip_source_groups",
+		"ztc_ip_pool_groups":         "ztc_ip_pool_groups",
+		"ztc_network_services":       "ztc_network_services",
+		"ztc_network_service_groups": "ztc_network_service_groups",
+		"ztc_location_management":    "ztc_location_management",
+		"ztc_workload_groups":        "ztc_workload_groups",
+		"ztc_forwarding_gateway":     "ztc_forwarding_gateway",
+
+		// ZIA mappings
+		"zia_firewall_filtering_destination_groups":     "zia_firewall_filtering_destination_groups",
+		"zia_firewall_filtering_ip_source_groups":       "zia_firewall_filtering_ip_source_groups",
+		"zia_firewall_filtering_network_service":        "zia_firewall_filtering_network_service",
+		"zia_firewall_filtering_network_service_groups": "zia_firewall_filtering_network_service_groups",
+		"zia_location_management":                       "zia_location_management",
+		"zia_workload_groups":                           "zia_workload_groups",
+	}
+
+	// Check if the resource type maps to the expected data source type
+	if mappedDataSource, exists := resourceToDataSourceMap[resourceType]; exists {
+		return mappedDataSource == expectedDataSourceType
+	}
+
+	// If no explicit mapping, check if the resource type matches the expected data source type
+	return resourceType == expectedDataSourceType
 }

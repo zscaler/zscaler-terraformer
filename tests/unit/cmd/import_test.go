@@ -73,6 +73,36 @@ func TestResourceImport(t *testing.T) {
 			expectProcessing: []string{"reference_replacement", "data_source_creation"},
 			description:      "Should import ZIA URL filtering rules with post-processing",
 		},
+
+		// ZTC Resources
+		"ztc traffic forwarding rule": {
+			resourceType:     "ztc_traffic_forwarding_rule",
+			cloudType:        "ztc",
+			expectFiles:      []string{"ztc_traffic_forwarding_rule.tf", "terraform.tfstate"},
+			expectProcessing: []string{"reference_replacement", "data_source_creation"},
+			description:      "Should import ZTC traffic forwarding rule with post-processing",
+		},
+		"ztc location template": {
+			resourceType:     "ztc_location_template",
+			cloudType:        "ztc",
+			expectFiles:      []string{"ztc_location_template.tf", "terraform.tfstate"},
+			expectProcessing: []string{"reference_replacement", "data_source_creation"},
+			description:      "Should import ZTC location template with post-processing",
+		},
+		"ztc provisioning url": {
+			resourceType:     "ztc_provisioning_url",
+			cloudType:        "ztc",
+			expectFiles:      []string{"ztc_provisioning_url.tf", "terraform.tfstate"},
+			expectProcessing: []string{"reference_replacement", "data_source_creation"},
+			description:      "Should import ZTC provisioning URL with post-processing",
+		},
+		"ztc forwarding gateway": {
+			resourceType:     "ztc_forwarding_gateway",
+			cloudType:        "ztc",
+			expectFiles:      []string{"ztc_forwarding_gateway.tf", "terraform.tfstate"},
+			expectProcessing: []string{"reference_replacement", "data_source_creation"},
+			description:      "Should import ZTC forwarding gateway with post-processing",
+		},
 	}
 
 	for name, tc := range tests {
@@ -83,8 +113,8 @@ func TestResourceImport(t *testing.T) {
 			}
 
 			// Test cloud type validation
-			if tc.cloudType != "zpa" && tc.cloudType != "zia" {
-				t.Errorf("%s: Cloud type should be 'zpa' or 'zia', got '%s'", tc.description, tc.cloudType)
+			if tc.cloudType != "zpa" && tc.cloudType != "zia" && tc.cloudType != "ztc" {
+				t.Errorf("%s: Cloud type should be 'zpa', 'zia', or 'ztc', got '%s'", tc.description, tc.cloudType)
 			}
 
 			// Test expected files
@@ -272,7 +302,7 @@ func mockValidateImportParams(resources, _ string) bool {
 	}
 
 	// Valid cloud types
-	if resources == "zpa" || resources == "zia" {
+	if resources == "zpa" || resources == "zia" || resources == "ztc" {
 		return true
 	}
 
@@ -280,6 +310,8 @@ func mockValidateImportParams(resources, _ string) bool {
 	validResources := []string{
 		"zpa_application_segment", "zpa_app_connector_group", "zpa_server_group",
 		"zia_firewall_filtering_rule", "zia_location_management", "zia_dlp_web_rules",
+		"ztc_traffic_forwarding_rule", "ztc_location_template", "ztc_provisioning_url",
+		"ztc_forwarding_gateway", "ztc_ip_destination_groups", "ztc_ip_source_groups",
 	}
 
 	// Check single resource
