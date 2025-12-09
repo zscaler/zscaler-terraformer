@@ -156,6 +156,7 @@ func GetDataSourceMappingsForProvider(providerPrefix string) []DataSourceMapping
 		// ZIA Network and Application Group Mappings
 		{"nw_application_groups", "zia_firewall_filtering_network_application_groups"},
 		{"nw_service_groups", "zia_firewall_filtering_network_service_groups"},
+		{"static_location_groups", "zia_location_groups"},
 
 		// ZIA Rule and Label Mappings
 		{"labels", "zia_rule_labels"},

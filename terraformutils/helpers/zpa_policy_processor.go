@@ -67,13 +67,13 @@ func GetZPAPolicyMappings() []ZPAPolicyOperandMapping {
 		{
 			ObjectType: "POSTURE",
 			FieldMappings: map[string]string{
-				"lhs": "zpa_posture_profile.posture_udid", // Query by id, export posture_udid
+				"lhs": "zpa_posture_profile@name.posture_udid", // Query by name, export posture_udid
 			},
 		},
 		{
 			ObjectType: "TRUSTED_NETWORK",
 			FieldMappings: map[string]string{
-				"lhs": "zpa_trusted_network.network_id", // Query by id, export network_id
+				"lhs": "zpa_trusted_network@name.network_id", // Query by name, export network_id
 			},
 		},
 		{
@@ -88,9 +88,10 @@ func GetZPAPolicyMappings() []ZPAPolicyOperandMapping {
 // ZPACollectedDataSource represents a ZPA data source that needs to be created.
 type ZPACollectedDataSource struct {
 	DataSourceType  string
-	ID              string
+	ID              string // The original ID from the operand (e.g., posture_udid, network_id)
+	QueryValue      string // The actual value to use for querying (e.g., name for POSTURE/TRUSTED_NETWORK)
 	UniqueName      string
-	QueryFieldName  string // Field used to query the data source (usually "id")
+	QueryFieldName  string // Field used to query the data source (e.g., "name", "id")
 	ExportFieldName string // Field to export from the data source (e.g., "posture_udid", "network_id")
 	RequiresIDPName bool   // True if this data source requires idp_name parameter
 	IDPControllerID string // The IDP controller ID to reference for idp_name
@@ -211,24 +212,42 @@ func CollectZPAPolicyDataSourceIDs(workingDir string, resourceMap map[string]str
 						// Determine the field name for special cases
 						var dsFieldName string
 						var exportFieldName string
+						var queryValue string
 
 						if strings.Contains(dataSourceType, "@") {
-							// Handle special syntax like "zpa_saml_attribute@name.name"
+							// Handle special syntax like "zpa_posture_profile@name.posture_udid"
 							// Format: dataSourceType@queryField.exportField
 							parts := strings.Split(dataSourceType, "@")
 							dataSourceType = parts[0]
 							fieldParts := strings.Split(parts[1], ".")
 							dsFieldName = fieldParts[0]     // Query field (e.g., "name")
-							exportFieldName = fieldParts[1] // Export field (e.g., "name")
+							exportFieldName = fieldParts[1] // Export field (e.g., "posture_udid", "network_id")
+
+							// For POSTURE and TRUSTED_NETWORK, we need to extract the name from the operand block
+							if dsFieldName == "name" {
+								namePattern := `name\s*=\s*"([^"]+)"`
+								nameRe := regexp.MustCompile(namePattern)
+								nameMatches := nameRe.FindStringSubmatch(operandBlock)
+								if len(nameMatches) >= 2 {
+									queryValue = nameMatches[1] // Use the name for querying
+								} else {
+									log.Printf("[WARNING] Could not extract name for %s operand, skipping", mapping.ObjectType)
+									continue
+								}
+							} else {
+								queryValue = id // Use the ID for querying (e.g., for SAML)
+							}
 						} else if strings.Contains(dataSourceType, ".") {
 							// Handle special cases like "zpa_posture_profile.posture_udid"
 							parts := strings.Split(dataSourceType, ".")
 							dataSourceType = parts[0]
 							exportFieldName = parts[1] // Field to export from the data source
-							dsFieldName = "id"         // Always query by id
+							dsFieldName = "id"         // Query by id
+							queryValue = id            // Use the ID for querying
 						} else {
 							dsFieldName = "id"     // Default field
 							exportFieldName = "id" // Default export field
+							queryValue = id        // Use the ID for querying
 						}
 
 						// Determine if this data source requires idp_name
@@ -251,6 +270,7 @@ func CollectZPAPolicyDataSourceIDs(workingDir string, resourceMap map[string]str
 						collectedDataSources = append(collectedDataSources, ZPACollectedDataSource{
 							DataSourceType:  dataSourceType,
 							ID:              id,
+							QueryValue:      queryValue,
 							UniqueName:      fmt.Sprintf("this_%s", cleanID),
 							QueryFieldName:  dsFieldName,
 							ExportFieldName: exportFieldName,
@@ -305,11 +325,16 @@ func AppendZPADataSources(workingDir string, zpaDataSources []ZPACollectedDataSo
 
 	// Write IDP controllers first (these are referenced by dependent data sources)
 	for _, zpaDsID := range idpControllers {
+		// Use QueryValue if available, otherwise fall back to ID
+		queryVal := zpaDsID.QueryValue
+		if queryVal == "" {
+			queryVal = zpaDsID.ID
+		}
 		dataSourceBlock := fmt.Sprintf(`data "%s" "%s" {
   id = "%s"
 }
 
-`, zpaDsID.DataSourceType, zpaDsID.UniqueName, zpaDsID.ID)
+`, zpaDsID.DataSourceType, zpaDsID.UniqueName, queryVal)
 
 		_, err = file.WriteString(dataSourceBlock)
 		if err != nil {
@@ -321,6 +346,12 @@ func AppendZPADataSources(workingDir string, zpaDataSources []ZPACollectedDataSo
 	for _, zpaDsID := range dependentDataSources {
 		var dataSourceBlock string
 
+		// Use QueryValue if available, otherwise fall back to ID
+		queryVal := zpaDsID.QueryValue
+		if queryVal == "" {
+			queryVal = zpaDsID.ID
+		}
+
 		if zpaDsID.RequiresIDPName && zpaDsID.IDPControllerID != "" {
 			// Data source requires idp_name parameter - use the appropriate query field
 			dataSourceBlock = fmt.Sprintf(`data "%s" "%s" {
@@ -328,14 +359,14 @@ func AppendZPADataSources(workingDir string, zpaDataSources []ZPACollectedDataSo
   idp_name = data.zpa_idp_controller.this_%s.name
 }
 
-`, zpaDsID.DataSourceType, zpaDsID.UniqueName, zpaDsID.QueryFieldName, zpaDsID.ID, zpaDsID.IDPControllerID)
+`, zpaDsID.DataSourceType, zpaDsID.UniqueName, zpaDsID.QueryFieldName, queryVal, zpaDsID.IDPControllerID)
 		} else {
 			// Standard data source without idp_name - use the appropriate query field
 			dataSourceBlock = fmt.Sprintf(`data "%s" "%s" {
   %s = "%s"
 }
 
-`, zpaDsID.DataSourceType, zpaDsID.UniqueName, zpaDsID.QueryFieldName, zpaDsID.ID)
+`, zpaDsID.DataSourceType, zpaDsID.UniqueName, zpaDsID.QueryFieldName, queryVal)
 		}
 
 		_, err = file.WriteString(dataSourceBlock)
