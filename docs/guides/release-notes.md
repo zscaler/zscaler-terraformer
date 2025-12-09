@@ -12,9 +12,22 @@ Track all Zscaler Terraformer Tool releases. New resources, features, and bug fi
 
 ---
 
-``Last updated: v2.1.5``
+``Last updated: v2.1.6``
 
 ---
+
+## 2.1.6 (December, 9 2025)
+
+### Notes
+
+- Release date: **(December, 9 2025)**
+- Supported Terraform version: **v1.x.x**
+
+## **🐛 Bug Fixes**
+
+- [PR #361](https://github.com/zscaler/zscaler-terraformer/pull/361) - Fixed formatting for the attribute `static_location_groups` in `zia_location_management` 
+- [PR #361](https://github.com/zscaler/zscaler-terraformer/pull/361) - Fixed version setting in `zscaler-terrafromer --version` flag command
+- [PR #361](https://github.com/zscaler/zscaler-terraformer/pull/361) - Fixed `zpa_posture_profile` and `zpa_trusted_network` data source mapping within `zpa_policy_access_rule`
 
 ## 2.1.5 (December, 1 2025)
 
