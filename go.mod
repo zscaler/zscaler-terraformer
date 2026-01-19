@@ -9,11 +9,11 @@ require (
 	github.com/hashicorp/terraform-exec v0.23.1
 	github.com/hashicorp/terraform-json v0.27.2
 	github.com/iancoleman/strcase v0.3.0
-	github.com/sirupsen/logrus v1.9.3
+	github.com/sirupsen/logrus v1.9.4
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
 	github.com/zclconf/go-cty v1.17.0
-	github.com/zscaler/zscaler-sdk-go/v3 v3.8.8
+	github.com/zscaler/zscaler-sdk-go/v3 v3.8.12
 )
 
 require (
@@ -24,7 +24,7 @@ require (
 	github.com/go-jose/go-jose/v3 v3.0.4 // indirect; indirectgit
 	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
 	github.com/golang-jwt/jwt/v5 v5.3.0 // indirect
-	github.com/google/go-querystring v1.1.0 // indirect
+	github.com/google/go-querystring v1.2.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-hclog v1.6.3 // indirect
 	github.com/hashicorp/go-retryablehttp v0.7.8 // indirect
@@ -48,7 +48,7 @@ require (
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/crypto v0.45.0 // indirect
 	golang.org/x/sys v0.38.0 // indirect
-	golang.org/x/text v0.31.0 // indirect
+	golang.org/x/text v0.33.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
