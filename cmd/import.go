@@ -1338,13 +1338,14 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		m, _ := json.Marshal(jsonPayload)
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
+
 	case "zia_firewall_filtering_network_application_groups":
 		if api.ZIAService == nil {
 			log.Fatal("ZIA service is not initialized")
 		}
 		// EXACTLY like the TF pattern:
 		service := api.ZIAService
-		groups, err := networkapplicationgroups.GetAllNetworkApplicationGroups(ctx, service)
+		jsonPayload, err := networkapplicationgroups.GetAllNetworkApplicationGroups(ctx, service)
 		if err != nil {
 			shouldSkip, message := helpers.HandleZIAAPIError(err, resourceType)
 			if shouldSkip {
@@ -1355,16 +1356,10 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 			log.Printf("[ERROR] error occurred while fetching resource %s: %v", resourceType, err)
 			return
 		}
-		groupsFiltered := []networkapplicationgroups.NetworkApplicationGroups{}
-		for _, rule := range groups {
-			if helpers.IsInList(rule.Name, []string{"Microsoft Office365"}) {
-				continue
-			}
-			groupsFiltered = append(groupsFiltered, rule)
-		}
-		m, _ := json.Marshal(groupsFiltered)
-		resourceCount = len(groupsFiltered)
+		m, _ := json.Marshal(jsonPayload)
+		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
+
 	case "zia_traffic_forwarding_gre_tunnel":
 		if api.ZIAService == nil {
 			log.Fatal("ZIA service is not initialized")

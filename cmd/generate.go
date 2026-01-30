@@ -1535,26 +1535,21 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
+
 	case "zia_firewall_filtering_network_application_groups":
 		if api.ZIAService == nil {
 			log.Fatal("ZIA service is not initialized")
 		}
 		// EXACTLY like the TF pattern:
 		service := api.ZIAService
-		groups, err := networkapplicationgroups.GetAllNetworkApplicationGroups(ctx, service)
+		jsonPayload, err := networkapplicationgroups.GetAllNetworkApplicationGroups(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
-		groupsFiltered := []networkapplicationgroups.NetworkApplicationGroups{}
-		for _, group := range groups {
-			if helpers.IsInList(group.Name, []string{"Microsoft Office365"}) {
-				continue
-			}
-			groupsFiltered = append(groupsFiltered, group)
-		}
-		resourceCount = len(groupsFiltered)
-		m, _ := json.Marshal(groupsFiltered)
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
+
 	case "zia_traffic_forwarding_gre_tunnel":
 		if api.ZIAService == nil {
 			log.Fatal("ZIA service is not initialized")
