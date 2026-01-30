@@ -12,9 +12,21 @@ Track all Zscaler Terraformer Tool releases. New resources, features, and bug fi
 
 ---
 
-``Last updated: v2.1.7``
+``Last updated: v2.1.8``
 
 ---
+
+## 2.1.8 (January, 29 2025)
+
+### Notes
+
+- Release date: **(January, 29 2025)**
+- Supported Terraform version: **v1.x.x**
+
+## **🐛 Bug Fixes**
+
+- [PR #371](https://github.com/zscaler/zscaler-terraformer/pull/371) - Upgraded to Go SDK v3.8.15
+- [PR #371](https://github.com/zscaler/zscaler-terraformer/pull/371) - Removed default rule exclusion from the import logic for the resource `zia_firewall_filtering_network_application_groups`
 
 ## 2.1.7 (January, 19 2025)
 
