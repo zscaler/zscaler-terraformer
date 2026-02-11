@@ -616,14 +616,14 @@ func GenerateDataSourceFile(workingDir string, dataSourceIDs []CollectedDataSour
 
 	// Data source types that should be queried by name instead of id for readability.
 	queryByNameDataSources := map[string]bool{
-		"zia_group_management":                 true,
-		"zia_department_management":            true,
-		"zia_user_management":                  true,
-		"zia_location_groups":                  true,
-		"zia_device_groups":                    true,
-		"zia_devices":                          true,
-		"zia_cloud_browser_isolation_profile":  true,
-		"zia_firewall_filtering_time_window":   true,
+		"zia_group_management":                   true,
+		"zia_department_management":              true,
+		"zia_user_management":                    true,
+		"zia_location_groups":                    true,
+		"zia_device_groups":                      true,
+		"zia_devices":                            true,
+		"zia_cloud_browser_isolation_profile":    true,
+		"zia_firewall_filtering_time_window":     true,
 		"zia_firewall_filtering_network_service": true,
 	}
 
