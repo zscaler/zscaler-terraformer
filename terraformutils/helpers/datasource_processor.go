@@ -607,11 +607,24 @@ func GenerateDataSourceFile(workingDir string, dataSourceIDs []CollectedDataSour
 		return err
 	}
 
-	// Data source types that require both id and name attributes
+	// Data source types that require both id and name attributes (set-style blocks).
 	setStyleDataSources := map[string]bool{
 		"zia_workload_groups":    true,
 		"ztc_workload_groups":    true,
 		"ztc_forwarding_gateway": true,
+	}
+
+	// Data source types that should be queried by name instead of id for readability.
+	queryByNameDataSources := map[string]bool{
+		"zia_group_management":                 true,
+		"zia_department_management":            true,
+		"zia_user_management":                  true,
+		"zia_location_groups":                  true,
+		"zia_device_groups":                    true,
+		"zia_devices":                          true,
+		"zia_cloud_browser_isolation_profile":  true,
+		"zia_firewall_filtering_time_window":   true,
+		"zia_firewall_filtering_network_service": true,
 	}
 
 	// Write each data source
@@ -619,15 +632,32 @@ func GenerateDataSourceFile(workingDir string, dataSourceIDs []CollectedDataSour
 		var dataSourceBlock string
 
 		if setStyleDataSources[dsID.DataSourceType] && dsID.Name != "" {
-			// For set-style data sources, include both id and name (always quote the ID)
+			// For set-style data sources, include both id and name (always quote the ID).
 			dataSourceBlock = fmt.Sprintf(`data "%s" "%s" {
   id   = "%s"
   name = "%s"
 }
 
 `, dsID.DataSourceType, dsID.UniqueName, dsID.ID, dsID.Name)
+		} else if queryByNameDataSources[dsID.DataSourceType] {
+			// For data sources that should be queried by name for readability.
+			// Look up the name from the ID-to-name registry.
+			if name, ok := LookupNameByID(dsID.ID); ok {
+				dataSourceBlock = fmt.Sprintf(`data "%s" "%s" {
+  name = "%s"
+}
+
+`, dsID.DataSourceType, dsID.UniqueName, name)
+			} else {
+				// Fallback to querying by id if name is not available.
+				dataSourceBlock = fmt.Sprintf(`data "%s" "%s" {
+  id = "%s"
+}
+
+`, dsID.DataSourceType, dsID.UniqueName, dsID.ID)
+			}
 		} else {
-			// For other data sources, only include id (always quote the ID)
+			// For other data sources, only include id (always quote the ID).
 			dataSourceBlock = fmt.Sprintf(`data "%s" "%s" {
   id = "%s"
 }

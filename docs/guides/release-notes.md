@@ -12,9 +12,21 @@ Track all Zscaler Terraformer Tool releases. New resources, features, and bug fi
 
 ---
 
-``Last updated: v2.1.8``
+``Last updated: v2.1.9``
 
 ---
+
+## 2.1.9 (February, 10 2026)
+
+### Notes
+
+- Release date: **(February, 10 2026)**
+- Supported Terraform version: **v1.x.x**
+
+### Enhancements
+
+- [PR #374](https://github.com/zscaler/zscaler-terraformer/pull/374) - Upgraded to Go SDK v3.8.18
+- [PR #374](https://github.com/zscaler/zscaler-terraformer/pull/374) - Improved data source generation to query by `name` instead of `id` for ZIA referenced resources (`zia_group_management`, `zia_department_management`, `zia_user_management`, `zia_location_groups`, `zia_device_groups`, `zia_devices`, `zia_cloud_browser_isolation_profile`, `zia_firewall_filtering_time_window`, `zia_firewall_filtering_network_service`) for better readability
 
 ## 2.1.8 (January, 29 2025)
 

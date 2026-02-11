@@ -31,10 +31,44 @@ import (
 	"regexp"
 	"runtime"
 	"strings"
+	"sync"
 
 	"github.com/iancoleman/strcase"
 	"github.com/zscaler/zscaler-terraformer/v2/terraformutils"
 )
+
+// idNameRegistry stores a mapping of resource IDs to their human-readable names.
+// This is populated during HCL generation when processing nested attribute blocks
+// (e.g., groups, departments) and consumed when generating datasource.tf.
+var (
+	idNameRegistryMu sync.RWMutex
+	idNameRegistry   = make(map[string]string) // "id" -> "name"
+)
+
+// RegisterIDName stores an ID-to-name mapping for later use in data source generation.
+func RegisterIDName(id, name string) {
+	if id == "" || name == "" {
+		return
+	}
+	idNameRegistryMu.Lock()
+	defer idNameRegistryMu.Unlock()
+	idNameRegistry[id] = name
+}
+
+// LookupNameByID returns the name for a given ID from the registry.
+func LookupNameByID(id string) (string, bool) {
+	idNameRegistryMu.RLock()
+	defer idNameRegistryMu.RUnlock()
+	name, ok := idNameRegistry[id]
+	return name, ok
+}
+
+// ResetIDNameRegistry clears the ID-to-name registry (useful for testing).
+func ResetIDNameRegistry() {
+	idNameRegistryMu.Lock()
+	defer idNameRegistryMu.Unlock()
+	idNameRegistry = make(map[string]string)
+}
 
 func IsInList(item string, list []string) bool {
 	for _, i := range list {
@@ -289,7 +323,7 @@ func WorkloadGroupsBlock(fieldName string, obj interface{}) string {
 }
 
 func ListIdsIntBlock(fieldName string, obj interface{}) string {
-	// Check if the list is empty or nil, and if so, don't generate the block
+	// Check if the list is empty or nil, and if so, don't generate the block.
 	if obj == nil {
 		return ""
 	}
@@ -299,7 +333,7 @@ func ListIdsIntBlock(fieldName string, obj interface{}) string {
 		return ""
 	}
 
-	// Check if all items in the list are valid (have non-zero id)
+	// Check if all items in the list are valid (have non-zero id).
 	validItems := []string{}
 	for _, v := range objList {
 		m, ok := v.(map[string]interface{})
@@ -310,15 +344,21 @@ func ListIdsIntBlock(fieldName string, obj interface{}) string {
 		if !ok || id == 0 {
 			continue
 		}
-		validItems = append(validItems, fmt.Sprintf("%d", int64(id)))
+		idStr := fmt.Sprintf("%d", int64(id))
+		validItems = append(validItems, idStr)
+
+		// Capture the name for data source generation if available.
+		if name, ok := m["name"].(string); ok && name != "" {
+			RegisterIDName(idStr, name)
+		}
 	}
 
-	// If no valid items, don't generate the block
+	// If no valid items, don't generate the block.
 	if len(validItems) == 0 {
 		return ""
 	}
 
-	// Generate the block with valid items
+	// Generate the block with valid items.
 	output := fieldName + " {\n"
 	output += "id=["
 	output += strings.Join(validItems, ",")
