@@ -137,6 +137,7 @@ var allSupportedResources = []string{
 	"zia_url_categories",
 	"zia_url_filtering_rules",
 	"zia_nat_control_rules",
+	"zia_cloud_app_control_rule",
 	"zia_rule_labels",
 	"zia_auth_settings_urls",
 	"zia_sandbox_behavioral_analysis",

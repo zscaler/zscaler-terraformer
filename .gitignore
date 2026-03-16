@@ -34,6 +34,8 @@
 *.tfstate.*
 .terragrunt-cache
 .vscode
+.claude
+.cursor
 .idea
 .idea
 

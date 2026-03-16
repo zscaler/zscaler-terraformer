@@ -38,6 +38,7 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/advanced_settings"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/advancedthreatsettings"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/alerts"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/cloudappcontrol"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/cloudapplications/risk_profiles"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/dlp/dlp_engines"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/dlp/dlp_notification_templates"
@@ -163,6 +164,7 @@ var resourceImportStringFormats = map[string]string{
 	"zia_firewall_filtering_network_application_groups": ":id",
 	"zia_forwarding_control_rule":                       ":id",
 	"zia_nat_control_rules":                             ":id",
+	"zia_cloud_app_control_rule":                        ":id",
 	"zia_forwarding_control_zpa_gateway":                ":id",
 	"zia_traffic_forwarding_static_ip":                  ":id",
 	"zia_traffic_forwarding_vpn_credentials":            ":id",
@@ -1236,6 +1238,33 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		}
 		m, _ := json.Marshal(jsonPayload)
 		resourceCount = len(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+	case "zia_cloud_app_control_rule":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// Cloud App Control API requires rule_type in exact API format (e.g. CONSUMER, HEALTH_CARE).
+		// Do NOT use GetRuleTypeMapping - it returns display names (e.g. "Consumer") which cause API failures.
+		service := api.ZIAService
+		ruleTypes := []string{"AI_ML", "BUSINESS_PRODUCTIVITY", "CONSUMER", "CUSTOM_CAPP", "DNS_OVER_HTTPS", "ENTERPRISE_COLLABORATION", "FILE_SHARE",
+			"FINANCE", "HEALTH_CARE", "HOSTING_PROVIDER", "HUMAN_RESOURCES", "INSTANT_MESSAGING", "IT_SERVICES", "LEGAL", "SALES_AND_MARKETING",
+			"SOCIAL_NETWORKING", "STREAMING_MEDIA", "SYSTEM_AND_DEVELOPMENT", "WEBMAIL"}
+		var allRules []cloudappcontrol.WebApplicationRules
+		for _, ruleType := range ruleTypes {
+			rules, err := cloudappcontrol.GetByRuleType(ctx, service, ruleType)
+			if err != nil {
+				shouldSkip, message := helpers.HandleZIAAPIError(err, resourceType)
+				if shouldSkip {
+					log.Printf("[WARN] Skipping rule type %s for %s: %s", ruleType, resourceType, message)
+					continue
+				}
+				log.Printf("[WARN] Failed to fetch rules for type %s: %v", ruleType, err)
+				continue
+			}
+			allRules = append(allRules, rules...)
+		}
+		m, _ := json.Marshal(allRules)
+		resourceCount = len(allRules)
 		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_firewall_filtering_destination_groups":
 		if api.ZIAService == nil {
@@ -2525,15 +2554,36 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 	for _, data := range jsonStructData {
 		structData := data.(map[string]interface{})
 
-		resourceID, ok := structData["id"].(string)
-		if !ok {
-			resourceIDInt, ok := structData["id"].(int)
-			if ok {
-				resourceID = strconv.Itoa(resourceIDInt)
-			} else {
-				resourceIDFloat64, ok := structData["id"].(float64)
+		resourceID := ""
+		if resourceType == "zia_cloud_app_control_rule" {
+			// Terraform import expects rule_type:rule_id or "rule_type:rule_name".
+			ruleType, _ := structData["type"].(string)
+			if ruleType == "" {
+				continue
+			}
+			var ruleIDStr string
+			switch v := structData["id"].(type) {
+			case string:
+				ruleIDStr = v
+			case float64:
+				ruleIDStr = strconv.FormatInt(int64(v), 10)
+			case int:
+				ruleIDStr = strconv.Itoa(v)
+			default:
+				continue
+			}
+			resourceID = ruleType + ":" + ruleIDStr
+		} else {
+			resourceID, _ = structData["id"].(string)
+			if resourceID == "" {
+				resourceIDInt, ok := structData["id"].(int)
 				if ok {
-					resourceID = strconv.FormatInt(int64(resourceIDFloat64), 10)
+					resourceID = strconv.Itoa(resourceIDInt)
+				} else {
+					resourceIDFloat64, ok := structData["id"].(float64)
+					if ok {
+						resourceID = strconv.FormatInt(int64(resourceIDFloat64), 10)
+					}
 				}
 			}
 		}

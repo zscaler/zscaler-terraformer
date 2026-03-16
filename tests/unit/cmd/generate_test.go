@@ -67,6 +67,12 @@ func TestResourceGeneration(t *testing.T) {
 			expectFiles:  []string{"zia_url_filtering_rules.tf", "outputs.tf"},
 			description:  "Should generate ZIA URL filtering rules files",
 		},
+		"zia cloud app control rule": {
+			resourceType: "zia_cloud_app_control_rule",
+			cloudType:    "zia",
+			expectFiles:  []string{"zia_cloud_app_control_rule.tf", "outputs.tf"},
+			description:  "Should generate ZIA cloud app control rule files",
+		},
 	}
 
 	for name, tc := range tests {
@@ -77,8 +83,8 @@ func TestResourceGeneration(t *testing.T) {
 			}
 
 			// Test cloud type validation
-			if tc.cloudType != "zpa" && tc.cloudType != "zia" {
-				t.Errorf("%s: Cloud type should be 'zpa' or 'zia', got '%s'", tc.description, tc.cloudType)
+			if tc.cloudType != "zpa" && tc.cloudType != "zia" && tc.cloudType != "ztc" {
+				t.Errorf("%s: Cloud type should be 'zpa', 'zia', or 'ztc', got '%s'", tc.description, tc.cloudType)
 			}
 
 			// Test expected files list
@@ -174,6 +180,7 @@ func TestSupportedResourceTypes(t *testing.T) {
 		"zia_location_management",
 		"zia_dlp_web_rules",
 		"zia_url_filtering_rules",
+		"zia_cloud_app_control_rule",
 		"zia_dlp_engines",
 		"zia_rule_labels",
 	}
@@ -281,6 +288,7 @@ func mockValidateGenerateParams(resourceType, resources string) bool {
 		validResources := []string{
 			"zpa_application_segment", "zpa_app_connector_group", "zpa_server_group",
 			"zia_firewall_filtering_rule", "zia_location_management", "zia_dlp_web_rules",
+			"zia_cloud_app_control_rule", "zia_url_filtering_rules",
 		}
 		for _, valid := range validResources {
 			if resourceType == valid {
@@ -292,7 +300,7 @@ func mockValidateGenerateParams(resourceType, resources string) bool {
 
 	if resources != "" {
 		// Check cloud types or resource lists
-		if resources == "zpa" || resources == "zia" {
+		if resources == "zpa" || resources == "zia" || resources == "ztc" {
 			return true
 		}
 		// Check for comma-separated resource list

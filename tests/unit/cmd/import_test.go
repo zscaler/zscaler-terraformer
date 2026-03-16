@@ -73,6 +73,13 @@ func TestResourceImport(t *testing.T) {
 			expectProcessing: []string{"reference_replacement", "data_source_creation"},
 			description:      "Should import ZIA URL filtering rules with post-processing",
 		},
+		"zia cloud app control rule": {
+			resourceType:     "zia_cloud_app_control_rule",
+			cloudType:        "zia",
+			expectFiles:      []string{"zia_cloud_app_control_rule.tf", "terraform.tfstate"},
+			expectProcessing: []string{"reference_replacement", "data_source_creation"},
+			description:      "Should import ZIA cloud app control rule with post-processing",
+		},
 
 		// ZTC Resources
 		"ztc traffic forwarding rule": {
@@ -310,6 +317,7 @@ func mockValidateImportParams(resources, _ string) bool {
 	validResources := []string{
 		"zpa_application_segment", "zpa_app_connector_group", "zpa_server_group",
 		"zia_firewall_filtering_rule", "zia_location_management", "zia_dlp_web_rules",
+		"zia_cloud_app_control_rule", "zia_url_filtering_rules",
 		"ztc_traffic_forwarding_rule", "ztc_location_template", "ztc_provisioning_url",
 		"ztc_forwarding_gateway", "ztc_ip_destination_groups", "ztc_ip_source_groups",
 	}
