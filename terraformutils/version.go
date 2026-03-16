@@ -1,6 +1,6 @@
 package terraformutils
 
-var version = "2.1.6"
+var version = "2.1.10"
 
 // Version returns version of provider.
 func Version() string {

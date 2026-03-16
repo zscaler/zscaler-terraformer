@@ -871,6 +871,7 @@ zscaler-terraformer --supported-resources="zia"
 | [zia_atp_security_exceptions](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_atp_security_exceptions) | Threat Protection | ✅ | ✅ |
 | [zia_atp_malicious_urls](https://registry.terraform.io/providers/zscaler/zia/latest/docs/data-sources/zia_atp_malicious_urls) | Threat Protection | ✅ | ✅ |
 | [zia_url_filtering_and_cloud_app_settings](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_url_filtering_and_cloud_app_settings) | URL | ✅ | ✅ |
+| [zia_cloud_app_control_rule](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_cloud_app_control_rule) | Cloud App Control | ✅ | ✅ |
 | [zia_end_user_notification](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_end_user_notification) | Notification | ✅ | ✅ |
 | [zia_mobile_malware_protection_policy](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_mobile_malware_protection_policy) | Malware Protection | ✅ | ✅ |
 | [zia_ftp_control_policy](https://registry.terraform.io/providers/zscaler/zia/latest/docs/resources/zia_ftp_control_policy) | File Control | ✅ | ✅ |

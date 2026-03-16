@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.1.11 (March, 16 2026)
+
+
+### Notes
+
+- Release date: (February, 16 2026)
+**
+- Supported Terraform version: **v1.x.x**
+
+## **🎉 New Features**
+
+- [PR #386](https://github.com/zscaler/zscaler-terraformer/pull/386) - Added support for `zia_cloud_app_control_rule` resource with composite import ID format `rule_type:rule_id`, API rule type iteration, and proper handling of `tenancy_profile_ids`/`cloud_app_instances` blocks
+
 ## 2.1.10 (February, 16 2026)
 
 

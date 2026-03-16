@@ -45,6 +45,7 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/advanced_settings"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/advancedthreatsettings"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/alerts"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/cloudappcontrol"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/cloudapplications/risk_profiles"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/dlp/dlp_engines"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/dlp/dlp_notification_templates"
@@ -207,6 +208,7 @@ var allGeneratableResources = []string{
 	"zia_subscription_alert",
 	"zia_forwarding_control_proxies",
 	"zia_mobile_malware_protection_policy",
+	"zia_cloud_app_control_rule",
 
 	// ZTC Resources
 	"ztc_ip_destination_groups",
@@ -1462,6 +1464,33 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		m, _ := json.Marshal(jsonPayload)
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
+	case "zia_cloud_app_control_rule":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// Cloud App Control API requires rule_type in exact API format (e.g. CONSUMER, HEALTH_CARE).
+		// Do NOT use GetRuleTypeMapping - it returns display names (e.g. "Consumer") which cause API failures.
+		service := api.ZIAService
+		ruleTypes := []string{"AI_ML", "BUSINESS_PRODUCTIVITY", "CONSUMER", "CUSTOM_CAPP", "DNS_OVER_HTTPS", "ENTERPRISE_COLLABORATION", "FILE_SHARE",
+			"FINANCE", "HEALTH_CARE", "HOSTING_PROVIDER", "HUMAN_RESOURCES", "INSTANT_MESSAGING", "IT_SERVICES", "LEGAL", "SALES_AND_MARKETING",
+			"SOCIAL_NETWORKING", "STREAMING_MEDIA", "SYSTEM_AND_DEVELOPMENT", "WEBMAIL"}
+		var allRules []cloudappcontrol.WebApplicationRules
+		for _, ruleType := range ruleTypes {
+			rules, err := cloudappcontrol.GetByRuleType(ctx, service, ruleType)
+			if err != nil {
+				shouldSkip, message := helpers.HandleZIAAPIError(err, resourceType)
+				if shouldSkip {
+					log.Printf("[WARN] Skipping rule type %s for %s: %s", ruleType, resourceType, message)
+					continue
+				}
+				log.Printf("[WARN] Failed to fetch rules for type %s: %v", ruleType, err)
+				continue
+			}
+			allRules = append(allRules, rules...)
+		}
+		m, _ := json.Marshal(allRules)
+		resourceCount = len(allRules)
+		_ = json.Unmarshal(m, &jsonStructData)
 	case "zia_firewall_filtering_destination_groups":
 		if api.ZIAService == nil {
 			log.Fatal("ZIA service is not initialized")
@@ -2491,7 +2520,7 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		sort.Strings(sortedBlockAttributes)
 		for _, attrName := range sortedBlockAttributes {
 			apiAttrName := nesting.MapTfFieldNameToAPI(resourceType, attrName)
-			if attrName == "id" || attrName == "tcp_port_ranges" || attrName == "udp_port_ranges" || attrName == "rule_order" || (resourceType == "zia_url_categories" && attrName == "val") || (resourceType == "ztc_provisioning_url" && attrName == "prov_url") || (resourceType == "ztc_location_template" && attrName == "template_id") {
+			if attrName == "id" || attrName == "tcp_port_ranges" || attrName == "udp_port_ranges" || attrName == "rule_order" || (resourceType == "zia_url_categories" && attrName == "val") || (resourceType == "ztc_provisioning_url" && attrName == "prov_url") || (resourceType == "ztc_location_template" && attrName == "template_id") || (resourceType == "zia_cloud_app_control_rule" && (attrName == "id" || attrName == "rule_id")) {
 				continue
 			}
 
