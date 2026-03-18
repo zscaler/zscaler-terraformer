@@ -25,7 +25,7 @@ Track all Zscaler Terraformer Tool releases. New resources, features, and bug fi
 **
 - Supported Terraform version: **v1.x.x**
 
-## **🎉 New Features**
+## **🐛 Bug Fixes**
 
 - [PR #388](https://github.com/zscaler/zscaler-terraformer/pull/388) - Upgraded to [Zscaler SDK GO v3.8.28](https://github.com/zscaler/zscaler-sdk-go/releases/tag/v3.8.28)
 
