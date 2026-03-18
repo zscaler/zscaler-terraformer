@@ -11,6 +11,9 @@
 
 ## **🐛 Bug Fixes**
 
+- [PR #388](https://github.com/zscaler/zscaler-terraformer/pull/388) - Added new nested attribute `file_type_categories` to `zia_dlp_web_rules`
+
+
 - [PR #388](https://github.com/zscaler/zscaler-terraformer/pull/388) - Upgraded to [Zscaler SDK GO v3.8.28](https://github.com/zscaler/zscaler-sdk-go/releases/tag/v3.8.28)
 
 ## 2.1.11 (March, 16 2026)
