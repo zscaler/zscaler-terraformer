@@ -136,6 +136,7 @@ func GetDataSourceMappingsForProvider(providerPrefix string) []DataSourceMapping
 		{"users", "zia_user_management"},
 		{"groups", "zia_group_management"},
 		{"departments", "zia_department_management"},
+		{"file_type_categories", "zia_file_type_categories"},
 
 		// ZIA Device Mappings
 		{"proxy_gateways", "zia_forwarding_control_proxy_gateway"},

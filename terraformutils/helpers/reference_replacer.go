@@ -99,6 +99,7 @@ func GetResourceReferencesForProvider(providerPrefix string) []ResourceReference
 	ziaMappings := []ResourceReference{
 		// ZIA Resource Mappings
 		{"departments", "zia_department"},
+		{"file_type_categories", "zia_file_type_categories"},
 		{"groups", "zia_group"},
 		{"locations", "zia_location_management"},
 		{"users", "zia_user_management"},
