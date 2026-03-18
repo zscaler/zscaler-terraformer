@@ -12,9 +12,25 @@ Track all Zscaler Terraformer Tool releases. New resources, features, and bug fi
 
 ---
 
-``Last updated: v2.1.12``
+``Last updated: v2.1.13``
 
 ---
+
+## 2.1.13 (March, 18 2026)
+
+
+### Notes
+
+- Release date: (March, 18  2026)
+**
+- Supported Terraform version: **v1.x.x**
+
+## **🐛 Bug Fixes**
+
+- [PR #389](https://github.com/zscaler/zscaler-terraformer/pull/389) - Added new nested attribute `file_type_categories` to `zia_dlp_web_rules`
+
+
+- [PR #389](https://github.com/zscaler/zscaler-terraformer/pull/389) - Upgraded to [Zscaler SDK GO v3.8.28](https://github.com/zscaler/zscaler-sdk-go/releases/tag/v3.8.28)
 
 ## 2.1.12 (March, 18 2026)
 
