@@ -1867,8 +1867,8 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		rulesFiltered := []sslinspection.SSLInspectionRules{}
 		for _, rule := range rules {
 			if helpers.IsInList(rule.Name, []string{
-				"Office365 Inspection", "Zscaler Recommended Exemptions", "Inspect Remote Users",
-				"Office 365 One Click", "UCaaS One Click", "Default SSL Inspection Rule"}) {
+				"Office365 Inspection", "Zscaler Recommended Exemptions", "Inspect Remote Users", "Smart Isolation One Click Rule",
+				"Office 365 One Click", "UCaaS One Click", "Default SSL Inspection Rule", "Default SSL_TLS Inspection Rule"}) {
 				continue
 			}
 			rulesFiltered = append(rulesFiltered, rule)
