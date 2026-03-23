@@ -351,6 +351,23 @@ func generateResources() func(cmd *cobra.Command, args []string) {
 	}
 }
 
+// expandDLPWebSubRules flattens DLP web rules so that sub-rules (exceptions)
+// become separate top-level resources with parentRule set, instead of being
+// nested inside the parent rule's subRules array.
+func expandDLPWebSubRules(parentRules []dlp_web_rules.WebDLPRules) []dlp_web_rules.WebDLPRules {
+	var allRules []dlp_web_rules.WebDLPRules
+	for _, parent := range parentRules {
+		subRules := parent.SubRules
+		parent.SubRules = nil
+		allRules = append(allRules, parent)
+		for _, sub := range subRules {
+			sub.SubRules = nil
+			allRules = append(allRules, sub)
+		}
+	}
+	return allRules
+}
+
 func buildResourceName(resourceType string, structData map[string]interface{}) string {
 	// Define a variable for the short UUID.
 	var shortUUID string
@@ -1415,12 +1432,12 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		if api.ZIAService == nil {
 			log.Fatal("ZIA service is not initialized")
 		}
-		// EXACTLY like the TF pattern:
 		service := api.ZIAService
 		jsonPayload, err := dlp_web_rules.GetAll(ctx, service)
 		if err != nil {
 			log.Fatal(err)
 		}
+		jsonPayload = expandDLPWebSubRules(jsonPayload)
 		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
@@ -2520,7 +2537,7 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		sort.Strings(sortedBlockAttributes)
 		for _, attrName := range sortedBlockAttributes {
 			apiAttrName := nesting.MapTfFieldNameToAPI(resourceType, attrName)
-			if attrName == "id" || attrName == "tcp_port_ranges" || attrName == "udp_port_ranges" || attrName == "rule_order" || (resourceType == "zia_url_categories" && attrName == "val") || (resourceType == "ztc_provisioning_url" && attrName == "prov_url") || (resourceType == "ztc_location_template" && attrName == "template_id") || (resourceType == "zia_cloud_app_control_rule" && (attrName == "id" || attrName == "rule_id")) {
+			if attrName == "id" || attrName == "tcp_port_ranges" || attrName == "udp_port_ranges" || attrName == "rule_order" || (resourceType == "zia_url_categories" && attrName == "val") || (resourceType == "ztc_provisioning_url" && attrName == "prov_url") || (resourceType == "ztc_location_template" && attrName == "template_id") || (resourceType == "zia_cloud_app_control_rule" && (attrName == "id" || attrName == "rule_id")) || (resourceType == "zia_dlp_web_rules" && attrName == "file_types") {
 				continue
 			}
 
@@ -2558,25 +2575,25 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 			ty := r.Block.Attributes[attrName].AttributeType
 			// If this attribute is "url_categories" and empty/missing, set to ANY
 			// EXCEPT for zia_sandbox_rules where we should not set it unless explicitly present
-			if attrName == "url_categories" && resourceType != "zia_sandbox_rules" {
-				raw := structData[apiAttrName]
-				if raw == nil {
-					// Not present? Force to ANY
-					structData[apiAttrName] = []string{"ANY"}
-				} else {
-					// Convert raw to check emptiness
-					switch val := raw.(type) {
-					case []string:
-						if len(val) == 0 {
-							structData[apiAttrName] = []string{"ANY"}
-						}
-					case []interface{}:
-						if len(val) == 0 {
-							structData[apiAttrName] = []string{"ANY"}
-						}
-					}
-				}
-			}
+			// if attrName == "url_categories" && resourceType != "zia_sandbox_rules" {
+			// 	raw := structData[apiAttrName]
+			// 	if raw == nil {
+			// 		// Not present? Force to ANY
+			// 		structData[apiAttrName] = []string{"ANY"}
+			// 	} else {
+			// 		// Convert raw to check emptiness
+			// 		switch val := raw.(type) {
+			// 		case []string:
+			// 			if len(val) == 0 {
+			// 				structData[apiAttrName] = []string{"ANY"}
+			// 			}
+			// 		case []interface{}:
+			// 			if len(val) == 0 {
+			// 				structData[apiAttrName] = []string{"ANY"}
+			// 			}
+			// 		}
+			// 	}
+			// }
 			// (A) ADD THIS BLOCK:
 			// If this attribute is a boolean in the schema, but structData doesn't have it at all,
 			// default it to false so WriteAttrLine will print "= false".
@@ -2685,7 +2702,7 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 						}
 					}
 
-					if attrName == "parent_id" {
+					if attrName == "parent_id" || attrName == "parent_rule" {
 						intValue, ok := value.(float64)
 						if ok {
 							output += fmt.Sprintf("%s = %d\n", attrName, int64(intValue))

@@ -130,6 +130,8 @@ func GetDataSourceMappingsForProvider(providerPrefix string) []DataSourceMapping
 		// ZIA Location and Group Mappings
 		{"locations", "zia_location_management"},
 		{"location_groups", "zia_location_groups"},
+		{"virtual_zen_clusters", "zia_virtual_service_edge_cluster"},
+		{"virtual_zens", "zia_virtual_service_edge_node"},
 		{"time_windows", "zia_firewall_filtering_time_window"},
 
 		// ZIA User/Group Mappings
@@ -626,6 +628,15 @@ func GenerateDataSourceFile(workingDir string, dataSourceIDs []CollectedDataSour
 		"zia_cloud_browser_isolation_profile":    true,
 		"zia_firewall_filtering_time_window":     true,
 		"zia_firewall_filtering_network_service": true,
+		"zia_file_type_categories":               true,
+		"zia_virtual_service_edge_cluster":       true,
+		"zia_virtual_service_edge_node":          true,
+	}
+
+	// Data source types that require an additional enum filter parameter.
+	// The API requires the enum scope to return results for these data sources.
+	queryWithEnumsDataSources := map[string]string{
+		"zia_file_type_categories": "ZSCALERDLP",
 	}
 
 	// Write each data source
@@ -644,11 +655,20 @@ func GenerateDataSourceFile(workingDir string, dataSourceIDs []CollectedDataSour
 			// For data sources that should be queried by name for readability.
 			// Look up the name from the ID-to-name registry.
 			if name, ok := LookupNameByID(dsID.ID); ok {
-				dataSourceBlock = fmt.Sprintf(`data "%s" "%s" {
+				if enumVal, needsEnum := queryWithEnumsDataSources[dsID.DataSourceType]; needsEnum {
+					dataSourceBlock = fmt.Sprintf(`data "%s" "%s" {
+  name  = "%s"
+  enums = "%s"
+}
+
+`, dsID.DataSourceType, dsID.UniqueName, name, enumVal)
+				} else {
+					dataSourceBlock = fmt.Sprintf(`data "%s" "%s" {
   name = "%s"
 }
 
 `, dsID.DataSourceType, dsID.UniqueName, name)
+				}
 			} else {
 				// Fallback to querying by id if name is not available.
 				dataSourceBlock = fmt.Sprintf(`data "%s" "%s" {

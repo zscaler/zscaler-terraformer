@@ -132,6 +132,8 @@ func GetResourceReferencesForProvider(providerPrefix string) []ResourceReference
 		{"adminUsers", "zia_admin_users"},
 		{"securitySettings", "zia_security_settings"},
 		{"ruleLabels", "zia_rule_labels"},
+		{"virtualZenClusters", "zia_virtual_service_edge_cluster"},
+		{"virtualZens", "zia_virtual_service_edge_node"},
 	}
 
 	// Return provider-specific mappings based on context
