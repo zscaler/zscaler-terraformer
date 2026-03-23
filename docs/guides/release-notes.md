@@ -12,9 +12,24 @@ Track all Zscaler Terraformer Tool releases. New resources, features, and bug fi
 
 ---
 
-``Last updated: v2.1.13``
+``Last updated: v2.1.14``
 
 ---
+
+## 2.1.14 (March, 23 2026)
+
+
+### Notes
+
+- Release date: (March, 23  2026)
+**
+- Supported Terraform version: **v1.x.x**
+
+## **🐛 Bug Fixes**
+
+- [PR #391](https://github.com/zscaler/zscaler-terraformer/pull/391) - `zia_dlp_web_rules`: nested API `subRules` are flattened into separate top-level resources with `parent_rule` set to the parent rule ID (no longer emitted as a nested `sub_rules` block with IDs only).
+- [PR #391](https://github.com/zscaler/zscaler-terraformer/pull/391) - `zia_dlp_web_rules`: `parent_rule` / `parent_id` values are written as decimal integers in generated HCL to avoid scientific notation from JSON unmarshaling.
+- [PR #391](https://github.com/zscaler/zscaler-terraformer/pull/391) - `zia_dlp_web_rules`: same flattening and ID formatting applied in both generate and import flows.
 
 ## 2.1.13 (March, 18 2026)
 

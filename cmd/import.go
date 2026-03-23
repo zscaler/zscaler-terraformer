@@ -1176,7 +1176,6 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		if api.ZIAService == nil {
 			log.Fatal("ZIA service is not initialized")
 		}
-		// EXACTLY like the TF pattern:
 		service := api.ZIAService
 		jsonPayload, err := dlp_web_rules.GetAll(ctx, service)
 		if err != nil {
@@ -1185,10 +1184,10 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 				log.Printf("[WARN] Skipping resource import for %s: %s", resourceType, message)
 				return
 			}
-			// If not a handled error, log it and skip gracefully
 			log.Printf("[ERROR] error occurred while fetching resource %s: %v", resourceType, err)
 			return
 		}
+		jsonPayload = expandDLPWebSubRules(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
