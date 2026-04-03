@@ -655,6 +655,9 @@ func GenerateDataSourceFile(workingDir string, dataSourceIDs []CollectedDataSour
 			// For data sources that should be queried by name for readability.
 			// Look up the name from the ID-to-name registry.
 			if name, ok := LookupNameByID(dsID.ID); ok {
+				if dsID.DataSourceType == "zia_user_management" {
+					name = strings.TrimSpace(strings.Split(name, "(")[0])
+				}
 				if enumVal, needsEnum := queryWithEnumsDataSources[dsID.DataSourceType]; needsEnum {
 					dataSourceBlock = fmt.Sprintf(`data "%s" "%s" {
   name  = "%s"
