@@ -40,6 +40,18 @@ type DataSourceMapping struct {
 	DataSourceType string // e.g., "zia_location_groups", "zia_firewall_filtering_time_window"
 }
 
+// emailSuffixPattern matches an email address in parentheses at the end of a string.
+// This handles the ZIA API inconsistency where user names are returned as "Name(email@domain.com)"
+// but the API doesn't accept that format for lookups — only "Name" works.
+var emailSuffixPattern = regexp.MustCompile(`\s*\([^()]*@[^()]+\)\s*$`)
+
+// StripEmailSuffix removes an email suffix like "(user@domain.com)" from the end of a name.
+// This is a workaround for the ZIA API returning user names with email suffixes that
+// it then doesn't accept when searching by name.
+func StripEmailSuffix(name string) string {
+	return strings.TrimSpace(emailSuffixPattern.ReplaceAllString(name, ""))
+}
+
 // GetDataSourceMappings returns the mapping of attribute names to data source types.
 // This is where you can easily add new mappings as requested by the user.
 // NOTE: This function returns ZIA mappings by default for backwards compatibility.
@@ -655,6 +667,12 @@ func GenerateDataSourceFile(workingDir string, dataSourceIDs []CollectedDataSour
 			// For data sources that should be queried by name for readability.
 			// Look up the name from the ID-to-name registry.
 			if name, ok := LookupNameByID(dsID.ID); ok {
+				// Workaround for ZIA API inconsistency: user names are returned as
+				// "Name(email@domain.com)" but the API doesn't accept that format for lookups.
+				if dsID.DataSourceType == "zia_user_management" {
+					name = StripEmailSuffix(name)
+				}
+
 				if enumVal, needsEnum := queryWithEnumsDataSources[dsID.DataSourceType]; needsEnum {
 					dataSourceBlock = fmt.Sprintf(`data "%s" "%s" {
   name  = "%s"

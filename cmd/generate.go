@@ -2573,27 +2573,29 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 				}
 			}
 			ty := r.Block.Attributes[attrName].AttributeType
-			// If this attribute is "url_categories" and empty/missing, set to ANY
-			// EXCEPT for zia_sandbox_rules where we should not set it unless explicitly present
-			// if attrName == "url_categories" && resourceType != "zia_sandbox_rules" {
-			// 	raw := structData[apiAttrName]
-			// 	if raw == nil {
-			// 		// Not present? Force to ANY
-			// 		structData[apiAttrName] = []string{"ANY"}
-			// 	} else {
-			// 		// Convert raw to check emptiness
-			// 		switch val := raw.(type) {
-			// 		case []string:
-			// 			if len(val) == 0 {
-			// 				structData[apiAttrName] = []string{"ANY"}
-			// 			}
-			// 		case []interface{}:
-			// 			if len(val) == 0 {
-			// 				structData[apiAttrName] = []string{"ANY"}
-			// 			}
-			// 		}
-			// 	}
-			// }
+
+			// For zia_url_filtering_rules, when url_categories is empty or missing, set to ["ANY"]
+			// to match the Terraform provider's Read behavior which defaults empty url_categories to ["ANY"].
+			// This prevents state drift where the provider sets ["ANY"] in state but the HCL omits it.
+			// NOTE: This is specific to zia_url_filtering_rules only - other resources like zia_sandbox_rules,
+			// zia_ssl_inspection_rules, zia_file_type_control_rules do NOT have this provider-side default.
+			if attrName == "url_categories" && resourceType == "zia_url_filtering_rules" {
+				raw := structData[apiAttrName]
+				isEmpty := false
+				if raw == nil {
+					isEmpty = true
+				} else {
+					switch val := raw.(type) {
+					case []string:
+						isEmpty = len(val) == 0
+					case []interface{}:
+						isEmpty = len(val) == 0
+					}
+				}
+				if isEmpty {
+					structData[apiAttrName] = []interface{}{"ANY"}
+				}
+			}
 			// (A) ADD THIS BLOCK:
 			// If this attribute is a boolean in the schema, but structData doesn't have it at all,
 			// default it to false so WriteAttrLine will print "= false".

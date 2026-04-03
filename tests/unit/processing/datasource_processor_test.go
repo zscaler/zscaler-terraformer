@@ -4,6 +4,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/zscaler/zscaler-terraformer/v2/terraformutils/helpers"
 	"github.com/zscaler/zscaler-terraformer/v2/tests/testutils"
 )
 
@@ -188,6 +189,72 @@ func TestDataSourceFileGeneration(t *testing.T) {
 		if !strings.Contains(expectedFormat, ds.dataSourceType) {
 			t.Errorf("Data source should contain type: %s", ds.dataSourceType)
 		}
+	}
+}
+
+func TestStripEmailSuffix(t *testing.T) {
+	// Test the StripEmailSuffix function that handles ZIA API inconsistency
+	// where user names are returned as "Name(email@domain.com)" but the API
+	// doesn't accept that format for lookups.
+	testCases := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "Name with email suffix",
+			input:    "ZCC User(zcc@psaraswat.zscloud.net)",
+			expected: "ZCC User",
+		},
+		{
+			name:     "Name with email and spaces",
+			input:    "ZS2 ONEAPI(zs2oneapiuser@psaraswat.zslogin.net)",
+			expected: "ZS2 ONEAPI",
+		},
+		{
+			name:     "Name with trailing space before email",
+			input:    "Test User (test@example.com)",
+			expected: "Test User",
+		},
+		{
+			name:     "Name without email suffix",
+			input:    "Regular User",
+			expected: "Regular User",
+		},
+		{
+			name:     "Name with parentheses but no email",
+			input:    "John (Johnny) Doe",
+			expected: "John (Johnny) Doe",
+		},
+		{
+			name:     "Name with nested parentheses and email at end",
+			input:    "John (Johnny) Doe(john@example.com)",
+			expected: "John (Johnny) Doe",
+		},
+		{
+			name:     "Empty string",
+			input:    "",
+			expected: "",
+		},
+		{
+			name:     "Only email in parentheses",
+			input:    "(user@domain.com)",
+			expected: "",
+		},
+		{
+			name:     "Complex domain",
+			input:    "Admin User(admin@sub.domain.company.co.uk)",
+			expected: "Admin User",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			result := helpers.StripEmailSuffix(tc.input)
+			if result != tc.expected {
+				t.Errorf("StripEmailSuffix(%q) = %q, want %q", tc.input, result, tc.expected)
+			}
+		})
 	}
 }
 

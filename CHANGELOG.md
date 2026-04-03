@@ -1,5 +1,21 @@
 # Changelog
 
+## 2.1.15 (April, 3 2026)
+
+
+### Notes
+
+- Release date: (April, 3 2026)
+- Supported Terraform version: **v1.x.x**
+
+## **Enhancements**
+
+- [PR #394](https://github.com/zscaler/zscaler-terraformer/pull/394) - Improved data source generation: `zia_user_management` names now have email suffixes stripped (e.g., `"Name(email@domain.com)"` → `"Name"`), `zia_file_type_categories` uses `name` + `enums` instead of `id`, and `zia_virtual_service_edge_cluster` uses `name` instead of `id` for better readability and API compatibility
+
+## **🐛 Bug Fixes**
+
+- [PR #394](https://github.com/zscaler/zscaler-terraformer/pull/394) - `zia_url_filtering_rules`: When `url_categories` is empty or not returned by the API, the generated HCL now includes `url_categories = ["ANY"]` to match the Terraform provider's Read behavior, preventing state drift on certain tenants where the API returns `["ANY"]` as a default
+
 ## 2.1.14 (March, 23 2026)
 
 
