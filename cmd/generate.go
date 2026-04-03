@@ -2575,6 +2575,27 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 			ty := r.Block.Attributes[attrName].AttributeType
 			// If this attribute is "url_categories" and empty/missing, set to ANY
 			// EXCEPT for zia_sandbox_rules where we should not set it unless explicitly present
+			// Check if the attribute is "url_categories"
+			if attrName == "url_categories" && resourceType != "zia_sandbox_rules" {
+				raw := structData[apiAttrName]				
+				// Case 1: The key is missing entirely from the API
+				if raw == nil {
+					structData[apiAttrName] = []string{"ANY"}
+				} else {
+					// Case 2: The key exists but is an empty list
+					// We use a type switch to check the content of 'raw'
+					switch v := raw.(type) {
+					case []string:
+						if len(v) == 0 {
+							structData[apiAttrName] = []string{"ANY"}
+						}
+					case []interface{}:
+						if len(v) == 0 {
+							structData[apiAttrName] = []string{"ANY"}
+						}
+					}
+				}
+			}
 			// if attrName == "url_categories" && resourceType != "zia_sandbox_rules" {
 			// 	raw := structData[apiAttrName]
 			// 	if raw == nil {
