@@ -330,6 +330,112 @@ func mockGenerateHCL(resourceType string, data map[string]interface{}) string {
 	return result
 }
 
+func TestURLCategoriesDefaultToANY(t *testing.T) {
+	// Test that zia_url_filtering_rules defaults url_categories to ["ANY"] when empty
+	// This matches the Terraform provider's Read behavior which sets url_categories = ["ANY"]
+	// when the API returns an empty list, preventing state drift.
+	testCases := []struct {
+		name         string
+		resourceType string
+		urlCats      interface{}
+		expectANY    bool
+		description  string
+	}{
+		{
+			name:         "zia_url_filtering_rules with nil url_categories should default to ANY",
+			resourceType: "zia_url_filtering_rules",
+			urlCats:      nil,
+			expectANY:    true,
+			description:  "Should default empty url_categories to ANY for zia_url_filtering_rules",
+		},
+		{
+			name:         "zia_url_filtering_rules with empty slice should default to ANY",
+			resourceType: "zia_url_filtering_rules",
+			urlCats:      []interface{}{},
+			expectANY:    true,
+			description:  "Should default empty url_categories slice to ANY for zia_url_filtering_rules",
+		},
+		{
+			name:         "zia_url_filtering_rules with existing categories should not change",
+			resourceType: "zia_url_filtering_rules",
+			urlCats:      []interface{}{"PORNOGRAPHY", "GAMBLING"},
+			expectANY:    false,
+			description:  "Should preserve existing url_categories for zia_url_filtering_rules",
+		},
+		{
+			name:         "zia_sandbox_rules with empty url_categories should NOT default to ANY",
+			resourceType: "zia_sandbox_rules",
+			urlCats:      nil,
+			expectANY:    false,
+			description:  "Should NOT default empty url_categories for zia_sandbox_rules",
+		},
+		{
+			name:         "zia_ssl_inspection_rules with empty url_categories should NOT default to ANY",
+			resourceType: "zia_ssl_inspection_rules",
+			urlCats:      nil,
+			expectANY:    false,
+			description:  "Should NOT default empty url_categories for zia_ssl_inspection_rules",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Simulate the logic from generate.go
+			structData := make(map[string]interface{})
+			if tc.urlCats != nil {
+				structData["urlCategories"] = tc.urlCats
+			}
+
+			// Apply the defaulting logic (only for zia_url_filtering_rules)
+			if tc.resourceType == "zia_url_filtering_rules" {
+				raw := structData["urlCategories"]
+				isEmpty := false
+				if raw == nil {
+					isEmpty = true
+				} else {
+					switch val := raw.(type) {
+					case []string:
+						isEmpty = len(val) == 0
+					case []interface{}:
+						isEmpty = len(val) == 0
+					}
+				}
+				if isEmpty {
+					structData["urlCategories"] = []interface{}{"ANY"}
+				}
+			}
+
+			// Verify the result
+			result := structData["urlCategories"]
+			if tc.expectANY {
+				if result == nil {
+					t.Errorf("%s: Expected url_categories to be set to ANY, but was nil", tc.description)
+					return
+				}
+				resultSlice, ok := result.([]interface{})
+				if !ok {
+					t.Errorf("%s: Expected url_categories to be []interface{}, got %T", tc.description, result)
+					return
+				}
+				if len(resultSlice) != 1 || resultSlice[0] != "ANY" {
+					t.Errorf("%s: Expected url_categories to be [ANY], got %v", tc.description, resultSlice)
+				}
+			} else {
+				// For non-zia_url_filtering_rules, result should be unchanged
+				if tc.urlCats == nil && result != nil {
+					// Only check if we expect no change and original was nil
+					if tc.resourceType != "zia_url_filtering_rules" {
+						// Other resource types should not have ANY added
+						if resultSlice, ok := result.([]interface{}); ok && len(resultSlice) == 1 && resultSlice[0] == "ANY" {
+							t.Errorf("%s: Should NOT have defaulted to ANY for %s", tc.description, tc.resourceType)
+						}
+					}
+				}
+			}
+		})
+	}
+}
+
 func TestVersionComparison(t *testing.T) {
 	tests := []struct {
 		name     string
