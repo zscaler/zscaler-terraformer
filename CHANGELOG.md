@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.1.16 (April, 3 2026)
+
+
+### Notes
+
+- Release date: (April, 13 2026)
+- Supported Terraform version: **v1.x.x**
+
+## **🐛 Bug Fixes**
+
+- [PR #396](https://github.com/zscaler/zscaler-terraformer/pull/396) - Updated to Zscaler SDK GO v3.8.30 and GO v1.25.x
+
 ## 2.1.15 (April, 3 2026)
 
 
