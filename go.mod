@@ -1,10 +1,10 @@
 module github.com/zscaler/zscaler-terraformer/v2
 
-go 1.25.0
+go 1.25.8
 
 require (
 	github.com/google/uuid v1.6.0
-	github.com/hashicorp/terraform-exec v0.25.0
+	github.com/hashicorp/terraform-exec v0.25.1
 	github.com/hashicorp/terraform-json v0.27.2
 	github.com/iancoleman/strcase v0.3.0
 	github.com/sirupsen/logrus v1.9.4
@@ -31,7 +31,7 @@ require (
 	github.com/hashicorp/go-hclog v1.6.3 // indirect
 	github.com/hashicorp/go-retryablehttp v0.7.8 // indirect
 	github.com/hashicorp/go-uuid v1.0.3 // indirect
-	github.com/hashicorp/go-version v1.8.0 // indirect
+	github.com/hashicorp/go-version v1.9.0 // indirect
 	github.com/hashicorp/logutils v1.0.0 // indirect
 	github.com/hashicorp/terraform-plugin-log v0.10.0 // indirect
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.40.0 // indirect
