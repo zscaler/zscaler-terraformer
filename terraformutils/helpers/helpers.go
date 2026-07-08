@@ -79,6 +79,90 @@ func IsInList(item string, list []string) bool {
 	return false
 }
 
+// resourcesSkippingNonPositiveOrder lists rule-based resource types whose entries
+// with a non-positive "order" value (order <= 0) must be skipped during import
+// and generation. The Zscaler API returns predefined/system rules with negative
+// (or zero) order values that the Terraform provider does not support managing.
+//
+// To extend this behavior to additional rule-based resources in the future,
+// simply add the resource type to this set. All rule-based resources carry the
+// "order" attribute, so no other changes are required.
+var resourcesSkippingNonPositiveOrder = map[string]bool{
+	"zia_firewall_dns_rule": true,
+}
+
+// ShouldSkipNonPositiveOrderRules reports whether entries of the given resource
+// type with a non-positive "order" value (order <= 0) should be skipped.
+func ShouldSkipNonPositiveOrderRules(resourceType string) bool {
+	return resourcesSkippingNonPositiveOrder[resourceType]
+}
+
+// FilterNonPositiveOrderRules removes entries with a non-positive "order" value
+// (order <= 0) from the provided data when the resource type is configured to
+// skip such rules (see resourcesSkippingNonPositiveOrder). These correspond to
+// predefined/system rules that the provider cannot manage.
+//
+// Entries whose "order" field is absent or unparseable are retained so that
+// resources without a meaningful order are never dropped. When the resource type
+// is not configured for skipping, the input is returned unchanged.
+func FilterNonPositiveOrderRules(resourceType string, data []interface{}) []interface{} {
+	if !ShouldSkipNonPositiveOrderRules(resourceType) {
+		return data
+	}
+
+	filtered := make([]interface{}, 0, len(data))
+	for _, item := range data {
+		m, ok := item.(map[string]interface{})
+		if !ok {
+			filtered = append(filtered, item)
+			continue
+		}
+
+		orderVal, exists := m["order"]
+		if !exists {
+			filtered = append(filtered, item)
+			continue
+		}
+
+		order, ok := toFloat64(orderVal)
+		if ok && order <= 0 {
+			name, _ := m["name"].(string)
+			log.Printf("[INFO] Skipping predefined %s rule %q with non-positive order %v", resourceType, name, orderVal)
+			continue
+		}
+
+		filtered = append(filtered, item)
+	}
+
+	return filtered
+}
+
+// toFloat64 best-effort converts a value decoded from JSON (or a typed struct)
+// into a float64. It returns false when the value cannot be interpreted as a
+// number.
+func toFloat64(v interface{}) (float64, bool) {
+	switch n := v.(type) {
+	case float64:
+		return n, true
+	case float32:
+		return float64(n), true
+	case int:
+		return float64(n), true
+	case int32:
+		return float64(n), true
+	case int64:
+		return float64(n), true
+	case json.Number:
+		f, err := n.Float64()
+		if err != nil {
+			return 0, false
+		}
+		return f, true
+	default:
+		return 0, false
+	}
+}
+
 // TypeSetBlock generates HCL for TypeSet attributes like notification_template, auditor, icap_server.
 func TypeSetBlock(blockName string, blockData interface{}) string {
 	output := ""
