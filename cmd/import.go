@@ -2568,8 +2568,10 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 	// Skip predefined/system rules with a non-positive order (order <= 0) for
 	// configured rule-based resources (e.g. zia_firewall_dns_rule). These rules
 	// are not manageable by the Terraform provider and must not be imported.
-	jsonStructData = helpers.FilterNonPositiveOrderRules(resourceType, jsonStructData)
-	resourceCount = len(jsonStructData)
+	if helpers.ShouldSkipNonPositiveOrderRules(resourceType) {
+		jsonStructData = helpers.FilterNonPositiveOrderRules(resourceType, jsonStructData)
+		resourceCount = len(jsonStructData)
+	}
 
 	if resourceCount == 0 {
 		return

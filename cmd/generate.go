@@ -2522,8 +2522,10 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 	// Skip predefined/system rules with a non-positive order (order <= 0) for
 	// configured rule-based resources (e.g. zia_firewall_dns_rule). These rules
 	// are not manageable by the Terraform provider.
-	jsonStructData = helpers.FilterNonPositiveOrderRules(resourceType, jsonStructData)
-	resourceCount = len(jsonStructData)
+	if helpers.ShouldSkipNonPositiveOrderRules(resourceType) {
+		jsonStructData = helpers.FilterNonPositiveOrderRules(resourceType, jsonStructData)
+		resourceCount = len(jsonStructData)
+	}
 
 	if resourceCount == 0 {
 		_, _ = fmt.Fprintf(cmd.OutOrStdout(), "no resources found to generate.")
