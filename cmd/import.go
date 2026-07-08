@@ -47,7 +47,6 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/end_user_notification"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/filetypecontrol"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/firewalldnscontrolpolicies"
-	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/firewallipscontrolpolicies"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/firewallpolicies/filteringrules"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/firewallpolicies/ipdestinationgroups"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/firewallpolicies/ipsourcegroups"
@@ -58,6 +57,9 @@ import (
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/forwarding_control_policy/proxies"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/forwarding_control_policy/zpa_gateways"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/ftp_control_policy"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/http_header_control/http_header_action_profile"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/http_header_control/http_header_profile"
+	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/ips_control_policies/ips_policies"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/location/locationmanagement"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/malware_protection"
 	"github.com/zscaler/zscaler-sdk-go/v3/zscaler/zia/services/mobile_threat_settings"
@@ -1810,7 +1812,7 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		}
 		// EXACTLY like the TF pattern:
 		service := api.ZIAService
-		rules, err := firewallipscontrolpolicies.GetAll(ctx, service)
+		rules, err := ips_policies.GetAll(ctx, service)
 		if err != nil {
 			shouldSkip, message := helpers.HandleZIAAPIError(err, resourceType)
 			if shouldSkip {
@@ -1821,7 +1823,7 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 			log.Printf("[ERROR] error occurred while fetching resource %s: %v", resourceType, err)
 			return
 		}
-		rulesFiltered := []firewallipscontrolpolicies.FirewallIPSRules{}
+		rulesFiltered := []ips_policies.FirewallIPSRules{}
 		for _, rule := range rules {
 			if helpers.IsInList(rule.Name, []string{"Default Cloud IPS Rule"}) {
 				continue
@@ -2274,6 +2276,34 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
 
+	case "zia_http_header_action_profile":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		jsonPayload, err := http_header_action_profile.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+
+	case "zia_http_header_profile":
+		if api.ZIAService == nil {
+			log.Fatal("ZIA service is not initialized")
+		}
+		// EXACTLY like the TF pattern:
+		service := api.ZIAService
+		jsonPayload, err := http_header_profile.GetAll(ctx, service)
+		if err != nil {
+			log.Fatal(err)
+		}
+		resourceCount = len(jsonPayload)
+		m, _ := json.Marshal(jsonPayload)
+		_ = json.Unmarshal(m, &jsonStructData)
+
 	case "ztc_ip_destination_groups":
 		if api.ZTCService == nil {
 			log.Fatal("ZTC service is not initialized")
@@ -2533,6 +2563,14 @@ func importResource(ctx context.Context, cmd *cobra.Command, writer io.Writer, r
 	default:
 		log.Printf("%q is not yet supported for state import", resourceType)
 		return
+	}
+
+	// Skip predefined/system rules with a non-positive order (order <= 0) for
+	// configured rule-based resources (e.g. zia_firewall_dns_rule). These rules
+	// are not manageable by the Terraform provider and must not be imported.
+	if helpers.ShouldSkipNonPositiveOrderRules(resourceType) {
+		jsonStructData = helpers.FilterNonPositiveOrderRules(resourceType, jsonStructData)
+		resourceCount = len(jsonStructData)
 	}
 
 	if resourceCount == 0 {

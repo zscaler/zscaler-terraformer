@@ -12,9 +12,22 @@ Track all Zscaler Terraformer Tool releases. New resources, features, and bug fi
 
 ---
 
-``Last updated: v2.1.16``
+``Last updated: v2.1.17``
 
 ---
+
+## 2.1.17 (July, 8 2026)
+
+
+### Notes
+
+- Release date: (July, 8 2026)
+- Supported Terraform version: **v1.x.x**
+
+## **Enhancements**
+
+- [PR #405](https://github.com/zscaler/zscaler-terraformer/pull/405) - Added support for the ZIA resources `zia_http_header_action_profile` and `zia_http_header_profile`
+- [PR #405](https://github.com/zscaler/zscaler-terraformer/pull/405) - `zia_firewall_dns_rule`: predefined/system rules with a non-positive `order` (order <= 0) are now skipped during import and generation. The behavior is centrally configurable for other rule-based resources.
 
 ## 2.1.16 (April, 3 2026)
 
