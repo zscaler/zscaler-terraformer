@@ -57,6 +57,7 @@ jobs:
           }
 
       - name: Debug CHOCOLATEY_REPO_TOKEN (temporary)
+        if: ${{ always() }}
         shell: pwsh
         env:
           TOKEN: ${{ secrets.CHOCOLATEY_REPO_TOKEN }}
