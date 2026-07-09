@@ -3,7 +3,6 @@ name: Update Chocolatey Package
 on:
   release:
     types: [published]
-  workflow_dispatch:
 
 permissions:
   contents: read
@@ -55,34 +54,6 @@ jobs:
             Write-Error "Please ensure the SHA256SUMS file exists in the release assets."
             exit 1
           }
-
-      - name: Debug CHOCOLATEY_REPO_TOKEN (temporary)
-        if: ${{ always() }}
-        shell: pwsh
-        env:
-          TOKEN: ${{ secrets.CHOCOLATEY_REPO_TOKEN }}
-        run: |
-          $len = if ($env:TOKEN) { $env:TOKEN.Length } else { 0 }
-          Write-Host "secret present: $([bool]$env:TOKEN)"
-          Write-Host "token length: $len"
-          $kind = if ($env:TOKEN -like 'github_pat_*') { 'fine-grained' }
-                  elseif ($env:TOKEN -like 'ghp_*') { 'classic' }
-                  elseif ($len -eq 0) { 'EMPTY' }
-                  else { 'unknown-format' }
-          Write-Host "token kind: $kind"
-          $trimLen = if ($env:TOKEN) { $env:TOKEN.Trim().Length } else { 0 }
-          Write-Host "has surrounding whitespace: $($trimLen -ne $len)"
-          # repos.get is exactly what checkout's getDefaultBranch calls.
-          $code = & curl.exe -sS -o NUL -w "%{http_code}" `
-            -H "Authorization: Bearer $env:TOKEN" `
-            -H "Accept: application/vnd.github+json" `
-            https://api.github.com/repos/zscaler/chocolatey-packages
-          Write-Host "repos.get (Bearer) HTTP: $code"
-          # Also verify what an unauthenticated call returns for this public repo.
-          $anon = & curl.exe -sS -o NUL -w "%{http_code}" `
-            -H "Accept: application/vnd.github+json" `
-            https://api.github.com/repos/zscaler/chocolatey-packages
-          Write-Host "repos.get (anon) HTTP: $anon"
 
       - name: Checkout chocolatey-packages repository
         uses: actions/checkout@v6
