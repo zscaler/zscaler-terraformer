@@ -5,7 +5,7 @@ go 1.25.8
 require (
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/terraform-exec v0.25.1
-	github.com/hashicorp/terraform-json v0.27.2
+	github.com/hashicorp/terraform-json v0.28.0
 	github.com/iancoleman/strcase v0.3.0
 	github.com/sirupsen/logrus v1.9.4
 	github.com/spf13/cobra v1.10.2
