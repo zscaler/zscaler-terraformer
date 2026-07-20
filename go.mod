@@ -4,14 +4,14 @@ go 1.25.8
 
 require (
 	github.com/google/uuid v1.6.0
-	github.com/hashicorp/terraform-exec v0.25.1
-	github.com/hashicorp/terraform-json v0.27.2
+	github.com/hashicorp/terraform-exec v0.25.2
+	github.com/hashicorp/terraform-json v0.28.0
 	github.com/iancoleman/strcase v0.3.0
 	github.com/sirupsen/logrus v1.9.4
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
-	github.com/zclconf/go-cty v1.18.1
-	github.com/zscaler/zscaler-sdk-go/v3 v3.8.40
+	github.com/zclconf/go-cty v1.19.0
+	github.com/zscaler/zscaler-sdk-go/v3 v3.8.41
 )
 
 require (
@@ -22,6 +22,7 @@ require (
 require (
 	github.com/allegro/bigcache/v3 v3.1.0 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
+	github.com/apparentlymart/go-textseg/v17 v17.0.1 // indirect
 	github.com/fatih/color v1.18.0 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
@@ -48,7 +49,7 @@ require (
 	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	golang.org/x/sys v0.43.0 // indirect
-	golang.org/x/text v0.38.0 // indirect
+	golang.org/x/sys v0.45.0 // indirect
+	golang.org/x/text v0.40.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
