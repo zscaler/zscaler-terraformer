@@ -321,6 +321,9 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 		} else if helpers.IsInList(resourceType, []string{"zpa_pra_credential_pool"}) && block == "credentials" {
 			output += helpers.ListIdsStringBlock(block, structData["credentials"])
 			continue
+		} else if helpers.IsInList(resourceType, []string{"zpa_server_group"}) && block == "servers" {
+			output += helpers.ListIdsStringBlock(block, structData["servers"])
+			continue
 		} else if helpers.IsInList(resourceType, []string{"zpa_server_group", "zpa_policy_access_rule"}) && block == "app_connector_groups" {
 			output += helpers.ListIdsStringBlock(block, structData["appConnectorGroups"])
 			continue

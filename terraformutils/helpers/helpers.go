@@ -137,6 +137,40 @@ func FilterNonPositiveOrderRules(resourceType string, data []interface{}) []inte
 	return filtered
 }
 
+// policyStyleBoolResources lists the ZPA resource types whose "policy_style"
+// attribute is modeled as a bool in the Terraform provider even though the API
+// returns it as a string ("NONE" / "DUAL_POLICY_EVAL"). The provider performs
+// the string<->bool conversion at runtime, so the generated HCL must use a bool.
+var policyStyleBoolResources = map[string]bool{
+	"zpa_application_segment":            true,
+	"zpa_application_segment_inspection": true,
+}
+
+// NormalizePolicyStyle rewrites the API "policyStyle" string value into the bool
+// expected by the Terraform provider schema for the given resource type
+// ("DUAL_POLICY_EVAL" -> true, anything else -> false). Entries that already use
+// a bool, or that omit the attribute, are left untouched. When the resource type
+// does not model policy_style as a bool, the input is returned unchanged.
+func NormalizePolicyStyle(resourceType string, data []interface{}) []interface{} {
+	if !policyStyleBoolResources[resourceType] {
+		return data
+	}
+
+	for _, item := range data {
+		m, ok := item.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		if v, exists := m["policyStyle"]; exists {
+			if s, ok := v.(string); ok {
+				m["policyStyle"] = s == "DUAL_POLICY_EVAL"
+			}
+		}
+	}
+
+	return data
+}
+
 // toFloat64 best-effort converts a value decoded from JSON (or a typed struct)
 // into a float64. It returns false when the value cannot be interpreted as a
 // number.
@@ -563,6 +597,11 @@ func ListNestedBlock(fieldName string, obj interface{}) string {
 			for key, value := range m {
 				snakeKey := strcase.ToSnake(key)
 				if IsComputedAttribute(snakeKey) {
+					continue
+				}
+				// "enabled" is not configurable within common_apps_dto.apps_config;
+				// strip it to avoid unconfigurable/computed attribute errors.
+				if snakeKey == "enabled" {
 					continue
 				}
 				switch value := value.(type) {

@@ -49,8 +49,9 @@ TFPROVIDERLINT = tfproviderlint
 STATICCHECK = staticcheck
 BINARY_NAME = zscaler-terraformer
 
-# Fully qualified variable for use with ldflags
-LD_FLAGS=-ldflags="-X github.com/zscaler/zscaler-terraformer/cmd.versionString=$(VERSION)"
+# Fully qualified variable for use with ldflags.
+# Strip a leading "v" so the CLI (which prints "v%s") does not render "vv...".
+LD_FLAGS=-ldflags="-X github.com/zscaler/zscaler-terraformer/v2/terraformutils.version=$(VERSION:v%=%)"
 
 build:
 	@go build \

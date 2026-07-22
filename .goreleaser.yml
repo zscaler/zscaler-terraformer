@@ -11,7 +11,7 @@ before:
 builds:
   - main: ./main.go
     ldflags:
-      - -s -w -X "github.com/zscaler/zscaler-terraformer/cmd.versionString={{.Env.VERSION}}"
+      - -s -w -X "github.com/zscaler/zscaler-terraformer/v2/terraformutils.version={{.Version}}"
     goos:
       - windows
       - linux

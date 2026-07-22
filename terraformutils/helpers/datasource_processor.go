@@ -81,6 +81,7 @@ func GetDataSourceMappingsForProvider(providerPrefix string) []DataSourceMapping
 		{"applications", "zpa_application_segment"},
 		{"app_segments", "zpa_application_segment"},
 		{"appSegments", "zpa_application_segment"},
+		{"servers", "zpa_application_server"},
 
 		// ZPA Service Edge and Network Mappings
 		{"service_edges", "zpa_service_edge_controller"},
