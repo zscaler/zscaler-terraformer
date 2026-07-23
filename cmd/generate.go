@@ -900,6 +900,7 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		resourceCount = len(jsonPayload)
 		m, _ := json.Marshal(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
+		jsonStructData = helpers.NormalizePolicyStyle(resourceType, jsonStructData)
 	case "zpa_application_segment_browser_access":
 		if api.ZPAService == nil {
 			log.Fatal("ZPA service is not initialized")
@@ -926,6 +927,7 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		m, _ := json.Marshal(jsonPayload)
 		resourceCount = len(jsonPayload)
 		_ = json.Unmarshal(m, &jsonStructData)
+		jsonStructData = helpers.NormalizePolicyStyle(resourceType, jsonStructData)
 	case "zpa_application_segment_pra":
 		if api.ZPAService == nil {
 			log.Fatal("ZPA service is not initialized")
@@ -2574,7 +2576,7 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 		sort.Strings(sortedBlockAttributes)
 		for _, attrName := range sortedBlockAttributes {
 			apiAttrName := nesting.MapTfFieldNameToAPI(resourceType, attrName)
-			if attrName == "id" || attrName == "tcp_port_ranges" || attrName == "udp_port_ranges" || attrName == "rule_order" || (resourceType == "zia_url_categories" && attrName == "val") || (resourceType == "ztc_provisioning_url" && attrName == "prov_url") || (resourceType == "ztc_location_template" && attrName == "template_id") || (resourceType == "zia_cloud_app_control_rule" && (attrName == "id" || attrName == "rule_id")) || (resourceType == "zia_dlp_web_rules" && attrName == "file_types") {
+			if attrName == "id" || attrName == "tcp_port_ranges" || attrName == "udp_port_ranges" || attrName == "rule_order" || (resourceType == "zia_url_categories" && attrName == "val") || (resourceType == "ztc_provisioning_url" && attrName == "prov_url") || (resourceType == "ztc_location_template" && attrName == "template_id") || (resourceType == "zia_cloud_app_control_rule" && (attrName == "id" || attrName == "rule_id")) || (resourceType == "zia_dlp_web_rules" && attrName == "file_types") || (resourceType == "zpa_provisioning_key" && attrName == "provisioning_key") {
 				continue
 			}
 

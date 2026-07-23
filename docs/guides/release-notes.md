@@ -12,9 +12,25 @@ Track all Zscaler Terraformer Tool releases. New resources, features, and bug fi
 
 ---
 
-``Last updated: v2.1.18``
+``Last updated: v2.1.19``
 
 ---
+
+## 2.1.19 (July, 22 2026)
+
+
+### Notes
+
+- Release date: (July, 22 2026)
+- Supported Terraform version: **v1.x.x**
+
+## **🐛 Bug Fixes**
+
+- [PR #411](https://github.com/zscaler/zscaler-terraformer/pull/411) - `zpa_provisioning_key`: the computed `provisioning_key` attribute is no longer written to the generated HCL, preventing `Value for unconfigurable attribute` errors during `terraform plan`/`apply`.
+- [PR #411](https://github.com/zscaler/zscaler-terraformer/pull/411) - `zpa_server_group`: the `servers` attribute is now emitted as a single block with an `id` list (matching `app_connector_groups`) instead of a repeated `servers` block per entry.
+- [PR #411](https://github.com/zscaler/zscaler-terraformer/pull/411) - `zpa_application_segment_pra`/`zpa_application_segment_inspection`: the non-configurable `enabled` attribute is no longer written within the `common_apps_dto.apps_config` block.
+- [PR #411](https://github.com/zscaler/zscaler-terraformer/pull/411) - `zpa_application_segment`/`zpa_application_segment_inspection`: the `policy_style` attribute is now generated as a bool (`DUAL_POLICY_EVAL` -> `true`, `NONE` -> `false`) to match the provider schema, instead of the raw API string.
+- [PR #411](https://github.com/zscaler/zscaler-terraformer/pull/411) - Fixed CLI version reporting: release builds now stamp the correct version at link time via `ldflags`, so `zscaler-terraformer --version` and `zscaler-terraformer version` report the installed release instead of a stale hardcoded value.
 
 ## 2.1.18 (July, 20 2026)
 
