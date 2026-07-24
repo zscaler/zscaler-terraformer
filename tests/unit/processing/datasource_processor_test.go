@@ -1,12 +1,73 @@
 package processing
 
 import (
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/zscaler/zscaler-terraformer/v2/terraformutils/helpers"
 	"github.com/zscaler/zscaler-terraformer/v2/tests/testutils"
 )
+
+// TestCertificateIDDataSourceMapping verifies that the clientless_apps.certificate_id
+// single-value attribute is collected and rewritten to a zpa_ba_certificate data
+// source reference (instead of being left as a raw numeric ID).
+func TestCertificateIDDataSourceMapping(t *testing.T) {
+	dir := t.TempDir()
+	hcl := `resource "zpa_application_segment_browser_access" "x" {
+  name = "x"
+  clientless_apps {
+    name           = "app1.example.com"
+    domain         = "app1.example.com"
+    certificate_id = "72058304855085464"
+  }
+  clientless_apps {
+    name           = "app2.example.com"
+    domain         = "app2.example.com"
+    certificate_id = "72058304855085464"
+  }
+}
+`
+	tfPath := filepath.Join(dir, "zpa_application_segment_browser_access.tf")
+	if err := os.WriteFile(tfPath, []byte(hcl), 0644); err != nil {
+		t.Fatalf("failed to write fixture: %v", err)
+	}
+
+	// Collect data source IDs (certificate not imported -> no resource map entry).
+	dataSourceIDs, err := helpers.CollectDataSourceIDs(dir, map[string]string{}, false)
+	if err != nil {
+		t.Fatalf("CollectDataSourceIDs: %v", err)
+	}
+
+	foundCert := false
+	for _, ds := range dataSourceIDs {
+		if ds.DataSourceType == "zpa_ba_certificate" && ds.ID == "72058304855085464" {
+			foundCert = true
+		}
+	}
+	if !foundCert {
+		t.Fatalf("expected zpa_ba_certificate data source to be collected, got: %+v", dataSourceIDs)
+	}
+
+	if err := helpers.ReplaceAllReferences(dir, map[string]string{}, dataSourceIDs, false); err != nil {
+		t.Fatalf("ReplaceAllReferences: %v", err)
+	}
+
+	out, err := os.ReadFile(tfPath)
+	if err != nil {
+		t.Fatalf("failed to read output: %v", err)
+	}
+	got := string(out)
+
+	want := "certificate_id = data.zpa_ba_certificate.this_72058304855085464.id"
+	if !strings.Contains(got, want) {
+		t.Errorf("expected %q in output, got:\n%s", want, got)
+	}
+	if strings.Contains(got, `certificate_id = "72058304855085464"`) {
+		t.Errorf("raw certificate_id should have been replaced, got:\n%s", got)
+	}
+}
 
 func TestDataSourceMappingResolution(t *testing.T) {
 	// Test data source mapping logic for ZIA
@@ -306,5 +367,186 @@ func TestReferenceReplacement(t *testing.T) {
 			testutils.AssertContains(t, tc.expectedHCL, "data.", "Replaced HCL should contain data source reference")
 			testutils.AssertContains(t, tc.expectedHCL, tc.dataSourceType, "Replaced HCL should contain correct data source type")
 		})
+	}
+}
+
+// TestRegisterNestedIDNames verifies that the recursive payload walker registers
+// generic {id, name} objects, sibling field pairs (segmentGroupId/segmentGroupName),
+// and certificate pairs (certificateId/certificateName) at any nesting depth.
+func TestRegisterNestedIDNames(t *testing.T) {
+	helpers.ResetIDNameRegistry()
+	t.Cleanup(helpers.ResetIDNameRegistry)
+
+	payload := map[string]interface{}{
+		"id":               "72058304855181170",
+		"name":             "App01",
+		"segmentGroupId":   "72058304855181174",
+		"segmentGroupName": "Example200",
+		"serverGroups": []interface{}{
+			map[string]interface{}{
+				"id":   "72058304855181176",
+				"name": "Example200_SG",
+			},
+		},
+		"clientlessApps": []interface{}{
+			map[string]interface{}{
+				"id":              "72058304855181180",
+				"name":            "app01.example.com",
+				"certificateId":   "72058304855085464",
+				"certificateName": "wildcard.example.com",
+			},
+		},
+	}
+
+	helpers.RegisterNestedIDNames(payload)
+
+	expected := map[string]string{
+		"72058304855181170": "App01",                // top-level {id, name}
+		"72058304855181174": "Example200",           // sibling segmentGroupId/Name pair
+		"72058304855181176": "Example200_SG",        // nested server group object
+		"72058304855181180": "app01.example.com",    // nested clientless app object
+		"72058304855085464": "wildcard.example.com", // certificateId/Name pair
+	}
+	for id, wantName := range expected {
+		name, ok := helpers.LookupNameByID(id)
+		if !ok {
+			t.Errorf("expected ID %s to be registered", id)
+			continue
+		}
+		if name != wantName {
+			t.Errorf("ID %s: got name %q, want %q", id, name, wantName)
+		}
+	}
+
+	if !helpers.IsCertificateNameUnique("wildcard.example.com") {
+		t.Error("certificate name registered once should be unique")
+	}
+}
+
+// TestZPADataSourceGeneratedByName verifies that ZPA data sources in datasource.tf
+// are emitted with a name lookup when the ID-to-name registry has the name, and
+// fall back to an id lookup when it does not.
+func TestZPADataSourceGeneratedByName(t *testing.T) {
+	helpers.ResetIDNameRegistry()
+	t.Cleanup(helpers.ResetIDNameRegistry)
+
+	helpers.RegisterIDName("72058304855181176", "Example200_SG")
+	helpers.RegisterIDName("72058304855181174", "Example200")
+	// No name registered for 72058304855099999 -> id fallback expected.
+
+	dir := t.TempDir()
+	dataSourceIDs := []helpers.CollectedDataSourceID{
+		{DataSourceType: "zpa_server_group", ID: "72058304855181176", UniqueName: "this_72058304855181176"},
+		{DataSourceType: "zpa_segment_group", ID: "72058304855181174", UniqueName: "this_72058304855181174"},
+		{DataSourceType: "zpa_app_connector_group", ID: "72058304855099999", UniqueName: "this_72058304855099999"},
+	}
+
+	if err := helpers.GenerateDataSourceFile(dir, dataSourceIDs, false); err != nil {
+		t.Fatalf("GenerateDataSourceFile: %v", err)
+	}
+
+	out, err := os.ReadFile(filepath.Join(dir, "datasource.tf"))
+	if err != nil {
+		t.Fatalf("failed to read datasource.tf: %v", err)
+	}
+	got := string(out)
+
+	for _, want := range []string{
+		`data "zpa_server_group" "this_72058304855181176" {
+  name = "Example200_SG"
+}`,
+		`data "zpa_segment_group" "this_72058304855181174" {
+  name = "Example200"
+}`,
+		`data "zpa_app_connector_group" "this_72058304855099999" {
+  id = "72058304855099999"
+}`,
+	} {
+		if !strings.Contains(got, want) {
+			t.Errorf("expected datasource.tf to contain:\n%s\ngot:\n%s", want, got)
+		}
+	}
+
+	if strings.Contains(got, `id = "72058304855181176"`) {
+		t.Errorf("server group with a known name should not be queried by id, got:\n%s", got)
+	}
+}
+
+// TestBACertificateNameUniquenessGate verifies that zpa_ba_certificate data
+// sources are only queried by name when the certificate name is unambiguous;
+// duplicate names (e.g. reissued certs sharing a CN) fall back to id.
+func TestBACertificateNameUniquenessGate(t *testing.T) {
+	helpers.ResetIDNameRegistry()
+	t.Cleanup(helpers.ResetIDNameRegistry)
+
+	// Unique certificate name.
+	helpers.RegisterCertificateIDName("72058304855085464", "app01.example.com")
+	// Duplicate certificate name shared by two distinct IDs.
+	helpers.RegisterCertificateIDName("72058304855085466", "wildcard.example.com")
+	helpers.RegisterCertificateIDName("72058304855085467", "wildcard.example.com")
+
+	if helpers.IsCertificateNameUnique("wildcard.example.com") {
+		t.Fatal("duplicate certificate name should not be reported unique")
+	}
+
+	dir := t.TempDir()
+	dataSourceIDs := []helpers.CollectedDataSourceID{
+		{DataSourceType: "zpa_ba_certificate", ID: "72058304855085464", UniqueName: "this_72058304855085464"},
+		{DataSourceType: "zpa_ba_certificate", ID: "72058304855085466", UniqueName: "this_72058304855085466"},
+	}
+
+	if err := helpers.GenerateDataSourceFile(dir, dataSourceIDs, false); err != nil {
+		t.Fatalf("GenerateDataSourceFile: %v", err)
+	}
+
+	out, err := os.ReadFile(filepath.Join(dir, "datasource.tf"))
+	if err != nil {
+		t.Fatalf("failed to read datasource.tf: %v", err)
+	}
+	got := string(out)
+
+	uniqueWant := `data "zpa_ba_certificate" "this_72058304855085464" {
+  name = "app01.example.com"
+}`
+	if !strings.Contains(got, uniqueWant) {
+		t.Errorf("unique certificate name should be queried by name, got:\n%s", got)
+	}
+
+	dupWant := `data "zpa_ba_certificate" "this_72058304855085466" {
+  id = "72058304855085466"
+}`
+	if !strings.Contains(got, dupWant) {
+		t.Errorf("duplicate certificate name should fall back to id, got:\n%s", got)
+	}
+	if strings.Contains(got, `name = "wildcard.example.com"`) {
+		t.Errorf("ambiguous certificate name must not be used for lookup, got:\n%s", got)
+	}
+}
+
+// TestListIdsStringBlockRegistersNames verifies that ZPA-style string-ID blocks
+// (server_groups, app_connector_groups, ...) register their {id, name} pairs for
+// later datasource generation, mirroring ListIdsIntBlock.
+func TestListIdsStringBlockRegistersNames(t *testing.T) {
+	helpers.ResetIDNameRegistry()
+	t.Cleanup(helpers.ResetIDNameRegistry)
+
+	obj := []interface{}{
+		map[string]interface{}{"id": "72058304855181176", "name": "Example200_SG"},
+		map[string]interface{}{"id": "72058304855181177", "name": "Example201_SG"},
+	}
+
+	out := helpers.ListIdsStringBlock("server_groups", obj)
+	if !strings.Contains(out, `"72058304855181176"`) || !strings.Contains(out, `"72058304855181177"`) {
+		t.Fatalf("block output should contain both IDs, got: %s", out)
+	}
+
+	for id, wantName := range map[string]string{
+		"72058304855181176": "Example200_SG",
+		"72058304855181177": "Example201_SG",
+	} {
+		name, ok := helpers.LookupNameByID(id)
+		if !ok || name != wantName {
+			t.Errorf("ID %s: got (%q, %v), want (%q, true)", id, name, ok, wantName)
+		}
 	}
 }

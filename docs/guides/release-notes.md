@@ -12,9 +12,27 @@ Track all Zscaler Terraformer Tool releases. New resources, features, and bug fi
 
 ---
 
-``Last updated: v2.1.19``
+``Last updated: v2.1.20``
 
 ---
+
+## 2.1.20 (July, 24 2026)
+
+
+### Notes
+
+- Release date: (July, 24 2026)
+- Supported Terraform version: **v1.x.x**
+
+## **Enhancements**
+
+- [PR #412](https://github.com/zscaler/zscaler-terraformer/pull/412) - Upgraded to [Zscaler-SDK-GO v3.8.42](https://github.com/zscaler/zscaler-sdk-go/releases/tag/v3.8.42)
+
+## **🐛 Bug Fixes**
+
+- [PR #412](https://github.com/zscaler/zscaler-terraformer/pull/412) - `zpa_application_segment_browser_access`/`zpa_application_segment_inspection`: the `certificate_id` attribute (within `clientless_apps`/`apps_config`) is now mapped to a `zpa_ba_certificate` data source reference instead of the raw numeric ID. Single-value ID attributes (e.g. `certificate_id`, `segment_group_id`, `banner_id`) now resolve to their corresponding data source or imported resource references during generation.
+- [PR #412](https://github.com/zscaler/zscaler-terraformer/pull/412) - ZPA data sources in the generated `datasource.tf` (e.g. `zpa_server_group`, `zpa_segment_group`, `zpa_ba_certificate`) are now queried by `name` instead of the raw numeric `id`, with a fallback to `id` when the name is unavailable or ambiguous.
+- [PR #412](https://github.com/zscaler/zscaler-terraformer/pull/412) - Nested blocks no longer emit empty-string attributes (e.g. `zpa_application_segment_browser_access` `clientless_apps.ext_domain`/`ext_label`); optional attributes with empty values are omitted from the generated HCL instead of being written as `= ""`.
 
 ## 2.1.19 (July, 22 2026)
 

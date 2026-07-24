@@ -104,6 +104,11 @@ func GetDataSourceMappingsForProvider(providerPrefix string) []DataSourceMapping
 		// ZPA Cloud Browser Isolation Mappings
 		{"banner_id", "zpa_cloud_browser_isolation_banner"},
 		{"region_ids", "zpa_cloud_browser_isolation_region"},
+
+		// ZPA Certificate Mappings (e.g. clientless_apps.certificate_id in
+		// browser access, apps_config.certificate_id in inspection, PRA portals)
+		{"certificate_id", "zpa_ba_certificate"},
+		{"certificateId", "zpa_ba_certificate"},
 	}
 
 	// ZTC-specific mappings for attributes that overlap with ZIA
@@ -644,6 +649,21 @@ func GenerateDataSourceFile(workingDir string, dataSourceIDs []CollectedDataSour
 		"zia_file_type_categories":               true,
 		"zia_virtual_service_edge_cluster":       true,
 		"zia_virtual_service_edge_node":          true,
+
+		// ZPA data sources: names are unique per resource type, so they are the
+		// natural lookup key. zpa_ba_certificate is additionally gated on name
+		// uniqueness below because certificate names (CN) can be duplicated.
+		"zpa_app_connector_group":     true,
+		"zpa_server_group":            true,
+		"zpa_segment_group":           true,
+		"zpa_application_segment":     true,
+		"zpa_application_server":      true,
+		"zpa_service_edge_controller": true,
+		"zpa_pra_portal_controller":   true,
+		"zpa_trusted_network":         true,
+		"zpa_isolation_profile":       true,
+		"zpa_inspection_profile":      true,
+		"zpa_ba_certificate":          true,
 	}
 
 	// Data source types that require an additional enum filter parameter.
@@ -667,7 +687,15 @@ func GenerateDataSourceFile(workingDir string, dataSourceIDs []CollectedDataSour
 		} else if queryByNameDataSources[dsID.DataSourceType] {
 			// For data sources that should be queried by name for readability.
 			// Look up the name from the ID-to-name registry.
-			if name, ok := LookupNameByID(dsID.ID); ok {
+			name, ok := LookupNameByID(dsID.ID)
+
+			// BA certificate names come from the certificate CN and can be
+			// duplicated; only query by name when the name maps to a single ID.
+			if ok && dsID.DataSourceType == "zpa_ba_certificate" && !IsCertificateNameUnique(name) {
+				ok = false
+			}
+
+			if ok {
 				// Workaround for ZIA API inconsistency: user names are returned as
 				// "Name(email@domain.com)" but the API doesn't accept that format for lookups.
 				if dsID.DataSourceType == "zia_user_management" {
@@ -1187,6 +1215,86 @@ func ReplaceAllReferences(workingDir string, resourceMap map[string]string, data
 					processedContent = strings.Replace(processedContent, fullMatch, replacement, 1)
 					hasChanges = true
 				}
+			}
+		}
+
+		// Process single-value and array ID attributes (e.g. certificate_id = "123",
+		// segment_group_id = "123", region_ids = ["1", "2"]). These use "= value"
+		// syntax rather than a nested "{ id = [...] }" block, so the block loop above
+		// never touches them. Resource references take priority over data sources.
+		for attributeName, expectedDataSourceType := range attributeToDataSource {
+			if !strings.HasSuffix(attributeName, "_id") && !strings.HasSuffix(attributeName, "_ids") {
+				continue
+			}
+
+			if strings.HasSuffix(attributeName, "_ids") {
+				// Array form: attribute_name = ["123", "456"]
+				pattern := fmt.Sprintf(`(?m)(\b%s\s*=\s*\[)([^\]]+)(\])`, regexp.QuoteMeta(attributeName))
+				re := regexp.MustCompile(pattern)
+				processedContent = re.ReplaceAllStringFunc(processedContent, func(match string) string {
+					submatches := re.FindStringSubmatch(match)
+					if len(submatches) < 4 {
+						return match
+					}
+					prefix := submatches[1]
+					idsContent := submatches[2]
+					suffix := submatches[3]
+
+					ids := extractIDsFromContent(idsContent)
+					var processedIds []string
+					needsReplacement := false
+					for _, id := range ids {
+						if strings.Contains(id, ".") {
+							processedIds = append(processedIds, id)
+							continue
+						}
+						// Priority 1: resource reference
+						if resourceRef, exists := resourceMap[id]; exists && isResourceTypeCompatible(resourceRef, providerPrefix, expectedDataSourceType) {
+							processedIds = append(processedIds, resourceRef)
+							needsReplacement = true
+							continue
+						}
+						// Priority 2: data source reference
+						if dataSourceRef, exists := dataSourceLookup[id]; exists && strings.Contains(dataSourceRef, expectedDataSourceType) {
+							processedIds = append(processedIds, dataSourceRef)
+							needsReplacement = true
+							continue
+						}
+						processedIds = append(processedIds, `"`+id+`"`)
+					}
+					if needsReplacement {
+						hasChanges = true
+						return prefix + strings.Join(processedIds, ", ") + suffix
+					}
+					return match
+				})
+			} else {
+				// Single-value form: attribute_name = "123"
+				pattern := fmt.Sprintf(`(?m)(\b%s\s*=\s*)"([^"]+)"`, regexp.QuoteMeta(attributeName))
+				re := regexp.MustCompile(pattern)
+				processedContent = re.ReplaceAllStringFunc(processedContent, func(match string) string {
+					submatches := re.FindStringSubmatch(match)
+					if len(submatches) < 3 {
+						return match
+					}
+					prefix := submatches[1]
+					id := submatches[2]
+
+					if strings.Contains(id, ".") {
+						return match // Already a reference
+					}
+					// Priority 1: resource reference
+					if resourceRef, exists := resourceMap[id]; exists && isResourceTypeCompatible(resourceRef, providerPrefix, expectedDataSourceType) {
+						hasChanges = true
+						return prefix + resourceRef
+					}
+					// Priority 2: data source reference
+					if dataSourceRef, exists := dataSourceLookup[id]; exists && strings.Contains(dataSourceRef, expectedDataSourceType) {
+						hasChanges = true
+						return prefix + dataSourceRef
+					}
+					return match
+				})
 			}
 		}
 
