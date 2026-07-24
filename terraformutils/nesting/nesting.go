@@ -545,6 +545,12 @@ func WriteNestedBlock(resourceType string, attributes []string, schemaBlock *tfj
 		case ty.IsPrimitiveType():
 			switch ty {
 			case cty.String, cty.Bool, cty.Number:
+				// Skip empty string values inside nested blocks so optional
+				// attributes (e.g. clientless_apps.ext_domain / ext_label) are
+				// omitted entirely instead of being emitted as `= ""`.
+				if s, ok := attrStruct[apiFieldName].(string); ok && s == "" {
+					continue
+				}
 				nestedBlockOutput += WriteAttrLine(snakeCaseAttrName, attrStruct[apiFieldName], false)
 			default:
 				log.Debugf("unexpected primitive type %q", ty.FriendlyName())

@@ -142,8 +142,8 @@ github.com/xanzy/ssh-agent v0.3.3 h1:+/15pJfg/RsTxqYcX6fHqOXZwwMP+2VyYWJeWM2qQFM
 github.com/xanzy/ssh-agent v0.3.3/go.mod h1:6dzNDKs0J9rVPHPhaGCukekBHKqfl+L3KghI1Bc68Uw=
 github.com/zclconf/go-cty v1.19.0 h1:IV8WdqYZc2c5rLX9bEoLNXKojBAp0MZPBHMIrCoa/s4=
 github.com/zclconf/go-cty v1.19.0/go.mod h1:12W89jGn3JCOIQi7infWr9m80rOkb5RNYJqXMZcN4c8=
-github.com/zscaler/zscaler-sdk-go/v3 v3.8.41 h1:DqjCj2iksA2Y1f9NFHy47f9JoVPtxQdH0/+Mnds5HyU=
-github.com/zscaler/zscaler-sdk-go/v3 v3.8.41/go.mod h1:qvdAz1F94pppQMt82mplTqY1gbfs/DComi7qJIvr9S4=
+github.com/zscaler/zscaler-sdk-go/v3 v3.8.42 h1:75mQbdAE+3/bVncnSDv8CA+9pz/ZL6jIHVy5UAN/pkw=
+github.com/zscaler/zscaler-sdk-go/v3 v3.8.42/go.mod h1:qvdAz1F94pppQMt82mplTqY1gbfs/DComi7qJIvr9S4=
 go.yaml.in/yaml/v3 v3.0.4 h1:tfq32ie2Jv2UxXFdLJdh3jXuOzWiL1fo0bu/FbuKpbc=
 go.yaml.in/yaml/v3 v3.0.4/go.mod h1:DhzuOOF2ATzADvBadXxruRBLzYTpT36CKvDb3+aBEFg=
 golang.org/x/crypto v0.52.0 h1:RMs7fP2rXdep0CftQlK8Uf+kibLm7qkCcradZWYz988=

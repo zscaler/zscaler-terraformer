@@ -43,6 +43,11 @@ import (
 var (
 	idNameRegistryMu sync.RWMutex
 	idNameRegistry   = make(map[string]string) // "id" -> "name"
+	// certificateNameIDs tracks which distinct certificate IDs carry a given
+	// certificate name. BA certificate names come from the certificate CN and
+	// are not guaranteed unique, so datasource generation only queries a
+	// certificate by name when exactly one imported certificate ID has it.
+	certificateNameIDs = make(map[string]map[string]bool) // "name" -> set of ids
 )
 
 // RegisterIDName stores an ID-to-name mapping for later use in data source generation.
@@ -53,6 +58,29 @@ func RegisterIDName(id, name string) {
 	idNameRegistryMu.Lock()
 	defer idNameRegistryMu.Unlock()
 	idNameRegistry[id] = name
+}
+
+// RegisterCertificateIDName stores a certificate ID-to-name mapping and tracks
+// how many distinct certificate IDs share the same name (see IsCertificateNameUnique).
+func RegisterCertificateIDName(id, name string) {
+	if id == "" || name == "" {
+		return
+	}
+	idNameRegistryMu.Lock()
+	defer idNameRegistryMu.Unlock()
+	idNameRegistry[id] = name
+	if certificateNameIDs[name] == nil {
+		certificateNameIDs[name] = make(map[string]bool)
+	}
+	certificateNameIDs[name][id] = true
+}
+
+// IsCertificateNameUnique reports whether exactly one registered certificate ID
+// carries the given name, making it safe to look the certificate up by name.
+func IsCertificateNameUnique(name string) bool {
+	idNameRegistryMu.RLock()
+	defer idNameRegistryMu.RUnlock()
+	return len(certificateNameIDs[name]) == 1
 }
 
 // LookupNameByID returns the name for a given ID from the registry.
@@ -68,6 +96,73 @@ func ResetIDNameRegistry() {
 	idNameRegistryMu.Lock()
 	defer idNameRegistryMu.Unlock()
 	idNameRegistry = make(map[string]string)
+	certificateNameIDs = make(map[string]map[string]bool)
+}
+
+// siblingIDNameFields maps API ID fields to the companion name field the API
+// returns in the same payload (e.g. an application segment carries
+// segmentGroupId and segmentGroupName side by side). certificateId is handled
+// separately so duplicate certificate names can be detected.
+var siblingIDNameFields = map[string]string{
+	"segmentGroupId": "segmentGroupName",
+}
+
+// RegisterNestedIDNames recursively walks an API response payload and registers
+// every ID-to-name pair it can find: generic {id, name} objects (server groups,
+// connector groups, applications, ...) and sibling field pairs like
+// segmentGroupId/segmentGroupName. This lets datasource.tf generation emit
+// human-readable name lookups without any additional API calls.
+func RegisterNestedIDNames(data interface{}) {
+	switch v := data.(type) {
+	case map[string]interface{}:
+		if id := stringifyID(v["id"]); id != "" {
+			if name, ok := v["name"].(string); ok && name != "" {
+				RegisterIDName(id, name)
+			}
+		}
+		for idField, nameField := range siblingIDNameFields {
+			if id := stringifyID(v[idField]); id != "" {
+				if name, ok := v[nameField].(string); ok && name != "" {
+					RegisterIDName(id, name)
+				}
+			}
+		}
+		if id := stringifyID(v["certificateId"]); id != "" {
+			if name, ok := v["certificateName"].(string); ok && name != "" {
+				RegisterCertificateIDName(id, name)
+			}
+		}
+		for _, nested := range v {
+			RegisterNestedIDNames(nested)
+		}
+	case []interface{}:
+		for _, item := range v {
+			RegisterNestedIDNames(item)
+		}
+	}
+}
+
+// stringifyID normalizes an ID value from a JSON payload to its string form.
+// Terraform references (values containing dots) are not IDs and yield "".
+func stringifyID(v interface{}) string {
+	switch id := v.(type) {
+	case string:
+		if id == "" || strings.Contains(id, ".") {
+			return ""
+		}
+		return id
+	case float64:
+		if id == 0 {
+			return ""
+		}
+		return fmt.Sprintf("%d", int64(id))
+	case int:
+		if id == 0 {
+			return ""
+		}
+		return fmt.Sprintf("%d", id)
+	}
+	return ""
 }
 
 func IsInList(item string, list []string) bool {
@@ -514,6 +609,11 @@ func ListIdsStringBlock(fieldName string, obj interface{}) string {
 		} else {
 			// This is a regular ID, add quotes
 			validItems = append(validItems, "\""+id+"\"")
+
+			// Capture the name for data source generation if available.
+			if name, ok := m["name"].(string); ok && name != "" {
+				RegisterIDName(id, name)
+			}
 		}
 	}
 

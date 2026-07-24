@@ -2538,7 +2538,8 @@ func generate(ctx context.Context, cmd *cobra.Command, writer io.Writer, resourc
 
 	for i := 0; i < resourceCount; i++ {
 		structData := jsonStructData[i].(map[string]interface{})
-		helpers.ConvertAttributes(structData) // Ensure the attributes are converted
+		helpers.RegisterNestedIDNames(structData) // Capture ID-to-name pairs for datasource generation
+		helpers.ConvertAttributes(structData)     // Ensure the attributes are converted
 
 		resourceID := ""
 		if os.Getenv("USE_STATIC_RESOURCE_IDS") == "true" {
