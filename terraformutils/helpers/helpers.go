@@ -42,15 +42,27 @@ import (
 // (e.g., groups, departments) and consumed when generating datasource.tf.
 var (
 	idNameRegistryMu sync.RWMutex
-	idNameRegistry   = make(map[string]string) // "id" -> "name"
-	// certificateNameIDs tracks which distinct certificate IDs carry a given
-	// certificate name. BA certificate names come from the certificate CN and
-	// are not guaranteed unique, so datasource generation only queries a
-	// certificate by name when exactly one imported certificate ID has it.
-	certificateNameIDs = make(map[string]map[string]bool) // "name" -> set of ids
+	idNameRegistry   = make(map[string]string) // "id" -> "name" (type-agnostic fallback)
+	// typedIDNames maps "dataSourceType|id" to a name. IDs are only unique within
+	// a single object type — ZIA in particular reuses small integer IDs across
+	// types (a file type category and a rule label can both be id 56) — so names
+	// are scoped by data source type to avoid resolving an ID to another type's name.
+	typedIDNames = make(map[string]string) // "type|id" -> "name"
+	// typedNameIDs tracks which distinct IDs carry a given name within a data
+	// source type. Names are not guaranteed unique (BA certificate names come
+	// from the certificate CN, ZIA device and user names can repeat), so a data
+	// source is only queried by name when exactly one ID of that type has it.
+	typedNameIDs = make(map[string]map[string]bool) // "type|name" -> set of ids
 )
 
+// typedKey builds the composite registry key for a data source type and value.
+func typedKey(dataSourceType, value string) string {
+	return dataSourceType + "|" + value
+}
+
 // RegisterIDName stores an ID-to-name mapping for later use in data source generation.
+// Prefer RegisterTypedIDName when the data source type is known: this type-agnostic
+// registry is only consulted as a fallback and cannot detect cross-type ID reuse.
 func RegisterIDName(id, name string) {
 	if id == "" || name == "" {
 		return
@@ -60,30 +72,47 @@ func RegisterIDName(id, name string) {
 	idNameRegistry[id] = name
 }
 
-// RegisterCertificateIDName stores a certificate ID-to-name mapping and tracks
-// how many distinct certificate IDs share the same name (see IsCertificateNameUnique).
-func RegisterCertificateIDName(id, name string) {
-	if id == "" || name == "" {
+// RegisterTypedIDName stores an ID-to-name mapping scoped to a data source type
+// and tracks how many distinct IDs of that type share the name
+// (see IsNameUniqueForDataSource).
+func RegisterTypedIDName(dataSourceType, id, name string) {
+	if dataSourceType == "" || id == "" || name == "" {
 		return
 	}
 	idNameRegistryMu.Lock()
 	defer idNameRegistryMu.Unlock()
-	idNameRegistry[id] = name
-	if certificateNameIDs[name] == nil {
-		certificateNameIDs[name] = make(map[string]bool)
+	typedIDNames[typedKey(dataSourceType, id)] = name
+	nameKey := typedKey(dataSourceType, name)
+	if typedNameIDs[nameKey] == nil {
+		typedNameIDs[nameKey] = make(map[string]bool)
 	}
-	certificateNameIDs[name][id] = true
+	typedNameIDs[nameKey][id] = true
 }
 
-// IsCertificateNameUnique reports whether exactly one registered certificate ID
-// carries the given name, making it safe to look the certificate up by name.
-func IsCertificateNameUnique(name string) bool {
+// IsNameAmbiguousForDataSource reports whether more than one registered ID of the
+// given data source type carries the name, which makes a lookup by name unsafe.
+// A name with no type-scoped registration is not considered ambiguous: nothing
+// observed during import contradicts it.
+func IsNameAmbiguousForDataSource(dataSourceType, name string) bool {
 	idNameRegistryMu.RLock()
 	defer idNameRegistryMu.RUnlock()
-	return len(certificateNameIDs[name]) == 1
+	return len(typedNameIDs[typedKey(dataSourceType, name)]) > 1
 }
 
-// LookupNameByID returns the name for a given ID from the registry.
+// LookupNameForDataSource returns the name registered for an ID within a data
+// source type, falling back to the type-agnostic registry when the type-scoped
+// registry has no entry (e.g. names captured by the ListIds*Block helpers).
+func LookupNameForDataSource(dataSourceType, id string) (string, bool) {
+	idNameRegistryMu.RLock()
+	if name, ok := typedIDNames[typedKey(dataSourceType, id)]; ok {
+		idNameRegistryMu.RUnlock()
+		return name, true
+	}
+	idNameRegistryMu.RUnlock()
+	return LookupNameByID(id)
+}
+
+// LookupNameByID returns the name for a given ID from the type-agnostic registry.
 func LookupNameByID(id string) (string, bool) {
 	idNameRegistryMu.RLock()
 	defer idNameRegistryMu.RUnlock()
@@ -91,55 +120,92 @@ func LookupNameByID(id string) (string, bool) {
 	return name, ok
 }
 
-// ResetIDNameRegistry clears the ID-to-name registry (useful for testing).
+// ResetIDNameRegistry clears the ID-to-name registries (useful for testing).
 func ResetIDNameRegistry() {
 	idNameRegistryMu.Lock()
 	defer idNameRegistryMu.Unlock()
 	idNameRegistry = make(map[string]string)
-	certificateNameIDs = make(map[string]map[string]bool)
+	typedIDNames = make(map[string]string)
+	typedNameIDs = make(map[string]map[string]bool)
 }
 
-// siblingIDNameFields maps API ID fields to the companion name field the API
-// returns in the same payload (e.g. an application segment carries
-// segmentGroupId and segmentGroupName side by side). certificateId is handled
-// separately so duplicate certificate names can be detected.
-var siblingIDNameFields = map[string]string{
-	"segmentGroupId": "segmentGroupName",
+// siblingIDNameFields maps an API ID field to the companion name field the API
+// returns in the same payload, along with the data source type the pair resolves
+// to (e.g. an application segment carries segmentGroupId and segmentGroupName
+// side by side, both describing a zpa_segment_group).
+var siblingIDNameFields = map[string]struct {
+	nameField      string
+	dataSourceType string
+}{
+	"segmentGroupId": {"segmentGroupName", "zpa_segment_group"},
+	"certificateId":  {"certificateName", "zpa_ba_certificate"},
 }
 
 // RegisterNestedIDNames recursively walks an API response payload and registers
-// every ID-to-name pair it can find: generic {id, name} objects (server groups,
-// connector groups, applications, ...) and sibling field pairs like
-// segmentGroupId/segmentGroupName. This lets datasource.tf generation emit
-// human-readable name lookups without any additional API calls.
-func RegisterNestedIDNames(data interface{}) {
+// the ID-to-name pairs that datasource.tf generation needs, scoped by data source
+// type. Names are taken from the payload the tool already holds, so no additional
+// API calls are made.
+//
+// Objects are typed by the attribute that contains them: the same attribute-to-data
+// source mapping used when collecting IDs (e.g. "departments" -> zia_department_management,
+// "serverGroups" -> zpa_server_group) is applied here, which guarantees that every
+// collected ID can be resolved with the type it was collected under.
+func RegisterNestedIDNames(resourceType string, data interface{}) {
+	attributeToDataSource := make(map[string]string)
+	for _, mapping := range GetDataSourceMappingsForProvider(providerPrefixFromResourceType(resourceType)) {
+		attributeToDataSource[mapping.AttributeName] = mapping.DataSourceType
+	}
+	registerNestedIDNames(data, attributeToDataSource)
+}
+
+func registerNestedIDNames(data interface{}, attributeToDataSource map[string]string) {
 	switch v := data.(type) {
 	case map[string]interface{}:
-		if id := stringifyID(v["id"]); id != "" {
-			if name, ok := v["name"].(string); ok && name != "" {
-				RegisterIDName(id, name)
-			}
-		}
-		for idField, nameField := range siblingIDNameFields {
+		for idField, sibling := range siblingIDNameFields {
 			if id := stringifyID(v[idField]); id != "" {
-				if name, ok := v[nameField].(string); ok && name != "" {
-					RegisterIDName(id, name)
+				if name, ok := v[sibling.nameField].(string); ok && name != "" {
+					RegisterTypedIDName(sibling.dataSourceType, id, name)
 				}
 			}
 		}
-		if id := stringifyID(v["certificateId"]); id != "" {
-			if name, ok := v["certificateName"].(string); ok && name != "" {
-				RegisterCertificateIDName(id, name)
+		for key, nested := range v {
+			if dataSourceType, ok := attributeToDataSource[key]; ok {
+				registerObjectNames(dataSourceType, nested)
 			}
-		}
-		for _, nested := range v {
-			RegisterNestedIDNames(nested)
+			registerNestedIDNames(nested, attributeToDataSource)
 		}
 	case []interface{}:
 		for _, item := range v {
-			RegisterNestedIDNames(item)
+			registerNestedIDNames(item, attributeToDataSource)
 		}
 	}
+}
+
+// registerObjectNames registers the {id, name} pairs of an attribute value under
+// the data source type that attribute maps to. The value may be a single object
+// or a list of them.
+func registerObjectNames(dataSourceType string, value interface{}) {
+	switch v := value.(type) {
+	case map[string]interface{}:
+		if id := stringifyID(v["id"]); id != "" {
+			if name, ok := v["name"].(string); ok && name != "" {
+				RegisterTypedIDName(dataSourceType, id, name)
+			}
+		}
+	case []interface{}:
+		for _, item := range v {
+			registerObjectNames(dataSourceType, item)
+		}
+	}
+}
+
+// providerPrefixFromResourceType extracts the provider prefix (zia, zpa, ztc)
+// from a resource type such as "zia_dlp_web_rules".
+func providerPrefixFromResourceType(resourceType string) string {
+	if idx := strings.Index(resourceType, "_"); idx > 0 {
+		return resourceType[:idx]
+	}
+	return resourceType
 }
 
 // stringifyID normalizes an ID value from a JSON payload to its string form.

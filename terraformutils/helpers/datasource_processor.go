@@ -636,6 +636,7 @@ func GenerateDataSourceFile(workingDir string, dataSourceIDs []CollectedDataSour
 	}
 
 	// Data source types that should be queried by name instead of id for readability.
+	// Every entry must expose "name" as a settable argument on its data source schema.
 	queryByNameDataSources := map[string]bool{
 		"zia_group_management":                   true,
 		"zia_department_management":              true,
@@ -650,9 +651,18 @@ func GenerateDataSourceFile(workingDir string, dataSourceIDs []CollectedDataSour
 		"zia_virtual_service_edge_cluster":       true,
 		"zia_virtual_service_edge_node":          true,
 
-		// ZPA data sources: names are unique per resource type, so they are the
-		// natural lookup key. zpa_ba_certificate is additionally gated on name
-		// uniqueness below because certificate names (CN) can be duplicated.
+		// ZIA types that are also managed resources: an ID that was imported as a
+		// resource is replaced with the resource reference before reaching here, so
+		// these only apply to objects the user did not import.
+		"zia_location_management":                           true,
+		"zia_rule_labels":                                   true,
+		"zia_firewall_filtering_ip_source_groups":           true,
+		"zia_firewall_filtering_destination_groups":         true,
+		"zia_firewall_filtering_network_service_groups":     true,
+		"zia_firewall_filtering_network_application_groups": true,
+		"zia_forwarding_control_proxy_gateway":              true,
+
+		// ZPA data sources.
 		"zpa_app_connector_group":     true,
 		"zpa_server_group":            true,
 		"zpa_segment_group":           true,
@@ -686,12 +696,13 @@ func GenerateDataSourceFile(workingDir string, dataSourceIDs []CollectedDataSour
 `, dsID.DataSourceType, dsID.UniqueName, dsID.ID, dsID.Name)
 		} else if queryByNameDataSources[dsID.DataSourceType] {
 			// For data sources that should be queried by name for readability.
-			// Look up the name from the ID-to-name registry.
-			name, ok := LookupNameByID(dsID.ID)
+			// Look up the name registered for this ID under its data source type.
+			name, ok := LookupNameForDataSource(dsID.DataSourceType, dsID.ID)
 
-			// BA certificate names come from the certificate CN and can be
-			// duplicated; only query by name when the name maps to a single ID.
-			if ok && dsID.DataSourceType == "zpa_ba_certificate" && !IsCertificateNameUnique(name) {
+			// Names are not guaranteed unique (BA certificate CNs, ZIA device and
+			// user names can repeat). Query by name only when it is unambiguous,
+			// otherwise fall back to the ID so the lookup still resolves correctly.
+			if ok && IsNameAmbiguousForDataSource(dsID.DataSourceType, name) {
 				ok = false
 			}
 

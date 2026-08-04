@@ -254,6 +254,11 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 			"virtual_zen_clusters",
 			"virtual_zens",
 			"application_groups",
+			"excluded_groups",
+			"exclude_users",
+			"excluded_departments",
+			"included_domain_profiles",
+			"workload_groups",
 		}) {
 			output += helpers.ListIdsIntBlock(block, structData[MapTfFieldNameToAPI(resourceType, block)])
 			continue
