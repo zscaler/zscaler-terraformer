@@ -398,28 +398,30 @@ func TestRegisterNestedIDNames(t *testing.T) {
 		},
 	}
 
-	helpers.RegisterNestedIDNames(payload)
+	helpers.RegisterNestedIDNames("zpa_application_segment", payload)
 
-	expected := map[string]string{
-		"72058304855181170": "App01",                // top-level {id, name}
-		"72058304855181174": "Example200",           // sibling segmentGroupId/Name pair
-		"72058304855181176": "Example200_SG",        // nested server group object
-		"72058304855181180": "app01.example.com",    // nested clientless app object
-		"72058304855085464": "wildcard.example.com", // certificateId/Name pair
+	expected := []struct {
+		dataSourceType string
+		id             string
+		wantName       string
+	}{
+		{"zpa_segment_group", "72058304855181174", "Example200"},            // sibling segmentGroupId/Name pair
+		{"zpa_server_group", "72058304855181176", "Example200_SG"},          // nested server group object
+		{"zpa_ba_certificate", "72058304855085464", "wildcard.example.com"}, // certificateId/Name pair
 	}
-	for id, wantName := range expected {
-		name, ok := helpers.LookupNameByID(id)
+	for _, e := range expected {
+		name, ok := helpers.LookupNameForDataSource(e.dataSourceType, e.id)
 		if !ok {
-			t.Errorf("expected ID %s to be registered", id)
+			t.Errorf("expected %s ID %s to be registered", e.dataSourceType, e.id)
 			continue
 		}
-		if name != wantName {
-			t.Errorf("ID %s: got name %q, want %q", id, name, wantName)
+		if name != e.wantName {
+			t.Errorf("%s ID %s: got name %q, want %q", e.dataSourceType, e.id, name, e.wantName)
 		}
 	}
 
-	if !helpers.IsCertificateNameUnique("wildcard.example.com") {
-		t.Error("certificate name registered once should be unique")
+	if helpers.IsNameAmbiguousForDataSource("zpa_ba_certificate", "wildcard.example.com") {
+		t.Error("certificate name registered once should not be ambiguous")
 	}
 }
 
@@ -430,8 +432,8 @@ func TestZPADataSourceGeneratedByName(t *testing.T) {
 	helpers.ResetIDNameRegistry()
 	t.Cleanup(helpers.ResetIDNameRegistry)
 
-	helpers.RegisterIDName("72058304855181176", "Example200_SG")
-	helpers.RegisterIDName("72058304855181174", "Example200")
+	helpers.RegisterTypedIDName("zpa_server_group", "72058304855181176", "Example200_SG")
+	helpers.RegisterTypedIDName("zpa_segment_group", "72058304855181174", "Example200")
 	// No name registered for 72058304855099999 -> id fallback expected.
 
 	dir := t.TempDir()
@@ -480,13 +482,13 @@ func TestBACertificateNameUniquenessGate(t *testing.T) {
 	t.Cleanup(helpers.ResetIDNameRegistry)
 
 	// Unique certificate name.
-	helpers.RegisterCertificateIDName("72058304855085464", "app01.example.com")
+	helpers.RegisterTypedIDName("zpa_ba_certificate", "72058304855085464", "app01.example.com")
 	// Duplicate certificate name shared by two distinct IDs.
-	helpers.RegisterCertificateIDName("72058304855085466", "wildcard.example.com")
-	helpers.RegisterCertificateIDName("72058304855085467", "wildcard.example.com")
+	helpers.RegisterTypedIDName("zpa_ba_certificate", "72058304855085466", "wildcard.example.com")
+	helpers.RegisterTypedIDName("zpa_ba_certificate", "72058304855085467", "wildcard.example.com")
 
-	if helpers.IsCertificateNameUnique("wildcard.example.com") {
-		t.Fatal("duplicate certificate name should not be reported unique")
+	if !helpers.IsNameAmbiguousForDataSource("zpa_ba_certificate", "wildcard.example.com") {
+		t.Fatal("duplicate certificate name should be reported ambiguous")
 	}
 
 	dir := t.TempDir()
@@ -548,5 +550,178 @@ func TestListIdsStringBlockRegistersNames(t *testing.T) {
 		if !ok || name != wantName {
 			t.Errorf("ID %s: got (%q, %v), want (%q, true)", id, name, ok, wantName)
 		}
+	}
+}
+
+// TestZIADataSourceGeneratedByName covers the ZIA types reachable from a single
+// zia_dlp_web_rules import. Types that are also managed resources
+// (zia_location_management, zia_firewall_filtering_ip_source_groups) must be
+// queried by name just like the data-source-only types.
+func TestZIADataSourceGeneratedByName(t *testing.T) {
+	helpers.ResetIDNameRegistry()
+	t.Cleanup(helpers.ResetIDNameRegistry)
+
+	helpers.RegisterTypedIDName("zia_location_management", "166080180", "BD-Location-01")
+	helpers.RegisterTypedIDName("zia_firewall_filtering_ip_source_groups", "10495374", "BD_SRC_IP_GROUP01")
+	helpers.RegisterTypedIDName("zia_department_management", "68759309", "A001")
+	helpers.RegisterTypedIDName("zia_rule_labels", "3456", "BD_LABEL01")
+
+	dir := t.TempDir()
+	dataSourceIDs := []helpers.CollectedDataSourceID{
+		{DataSourceType: "zia_location_management", ID: "166080180", UniqueName: "this_166080180"},
+		{DataSourceType: "zia_firewall_filtering_ip_source_groups", ID: "10495374", UniqueName: "this_10495374"},
+		{DataSourceType: "zia_department_management", ID: "68759309", UniqueName: "this_68759309"},
+		{DataSourceType: "zia_rule_labels", ID: "3456", UniqueName: "this_3456"},
+		// No name registered -> must fall back to an id lookup.
+		{DataSourceType: "zia_location_management", ID: "166862881", UniqueName: "this_166862881"},
+	}
+
+	if err := helpers.GenerateDataSourceFile(dir, dataSourceIDs, false); err != nil {
+		t.Fatalf("GenerateDataSourceFile: %v", err)
+	}
+
+	out, err := os.ReadFile(filepath.Join(dir, "datasource.tf"))
+	if err != nil {
+		t.Fatalf("failed to read datasource.tf: %v", err)
+	}
+	got := string(out)
+
+	for _, want := range []string{
+		`data "zia_location_management" "this_166080180" {
+  name = "BD-Location-01"
+}`,
+		`data "zia_firewall_filtering_ip_source_groups" "this_10495374" {
+  name = "BD_SRC_IP_GROUP01"
+}`,
+		`data "zia_department_management" "this_68759309" {
+  name = "A001"
+}`,
+		`data "zia_rule_labels" "this_3456" {
+  name = "BD_LABEL01"
+}`,
+		`data "zia_location_management" "this_166862881" {
+  id = "166862881"
+}`,
+	} {
+		if !strings.Contains(got, want) {
+			t.Errorf("expected datasource.tf to contain:\n%s\ngot:\n%s", want, got)
+		}
+	}
+}
+
+// TestZIACrossTypeIDCollision guards the type-scoped registry. ZIA reuses small
+// integer IDs across object types, so a name registered for one type must never
+// leak into a data source of another type.
+func TestZIACrossTypeIDCollision(t *testing.T) {
+	helpers.ResetIDNameRegistry()
+	t.Cleanup(helpers.ResetIDNameRegistry)
+
+	// Same numeric ID 56 used by two unrelated ZIA object types.
+	helpers.RegisterTypedIDName("zia_file_type_categories", "56", "FTCATEGORY_SCZIP")
+	helpers.RegisterTypedIDName("zia_rule_labels", "56", "BD_LABEL_56")
+
+	dir := t.TempDir()
+	dataSourceIDs := []helpers.CollectedDataSourceID{
+		{DataSourceType: "zia_file_type_categories", ID: "56", UniqueName: "this_56"},
+	}
+	if err := helpers.GenerateDataSourceFile(dir, dataSourceIDs, false); err != nil {
+		t.Fatalf("GenerateDataSourceFile: %v", err)
+	}
+
+	out, err := os.ReadFile(filepath.Join(dir, "datasource.tf"))
+	if err != nil {
+		t.Fatalf("failed to read datasource.tf: %v", err)
+	}
+	got := string(out)
+
+	if !strings.Contains(got, `name  = "FTCATEGORY_SCZIP"`) {
+		t.Errorf("file type category should resolve to its own name, got:\n%s", got)
+	}
+	if strings.Contains(got, "BD_LABEL_56") {
+		t.Errorf("another type's name leaked into the data source, got:\n%s", got)
+	}
+}
+
+// TestZIAAmbiguousNameFallsBackToID verifies that when two IDs of the same ZIA
+// type share a name, the data source is emitted with an id lookup instead.
+func TestZIAAmbiguousNameFallsBackToID(t *testing.T) {
+	helpers.ResetIDNameRegistry()
+	t.Cleanup(helpers.ResetIDNameRegistry)
+
+	helpers.RegisterTypedIDName("zia_devices", "111", "Shared Device Name")
+	helpers.RegisterTypedIDName("zia_devices", "222", "Shared Device Name")
+
+	if !helpers.IsNameAmbiguousForDataSource("zia_devices", "Shared Device Name") {
+		t.Fatal("name shared by two IDs should be ambiguous")
+	}
+
+	dir := t.TempDir()
+	dataSourceIDs := []helpers.CollectedDataSourceID{
+		{DataSourceType: "zia_devices", ID: "111", UniqueName: "this_111"},
+	}
+	if err := helpers.GenerateDataSourceFile(dir, dataSourceIDs, false); err != nil {
+		t.Fatalf("GenerateDataSourceFile: %v", err)
+	}
+
+	out, err := os.ReadFile(filepath.Join(dir, "datasource.tf"))
+	if err != nil {
+		t.Fatalf("failed to read datasource.tf: %v", err)
+	}
+	if got := string(out); !strings.Contains(got, `id = "111"`) {
+		t.Errorf("ambiguous name should fall back to id lookup, got:\n%s", got)
+	}
+}
+
+// TestRegisterNestedIDNamesZIA verifies that a zia_dlp_web_rules payload registers
+// its referenced objects under the correct ZIA data source types, and that the
+// rule's own ID is not registered as if it were a referenced object.
+func TestRegisterNestedIDNamesZIA(t *testing.T) {
+	helpers.ResetIDNameRegistry()
+	t.Cleanup(helpers.ResetIDNameRegistry)
+
+	payload := map[string]interface{}{
+		"id":   float64(1836678),
+		"name": "DLP_Rule_1",
+		"departments": []interface{}{
+			map[string]interface{}{"id": float64(68759309), "name": "A001"},
+		},
+		"locations": []interface{}{
+			map[string]interface{}{"id": float64(166080180), "name": "BD-Location-01"},
+		},
+		"source_ip_groups": []interface{}{
+			map[string]interface{}{"id": float64(10495374), "name": "BD_SRC_IP_GROUP01"},
+		},
+		"file_type_categories": []interface{}{
+			map[string]interface{}{"id": float64(56), "name": "FTCATEGORY_SCZIP"},
+		},
+	}
+
+	helpers.RegisterNestedIDNames("zia_dlp_web_rules", payload)
+
+	expected := []struct {
+		dataSourceType string
+		id             string
+		wantName       string
+	}{
+		{"zia_department_management", "68759309", "A001"},
+		{"zia_location_management", "166080180", "BD-Location-01"},
+		{"zia_firewall_filtering_ip_source_groups", "10495374", "BD_SRC_IP_GROUP01"},
+		{"zia_file_type_categories", "56", "FTCATEGORY_SCZIP"},
+	}
+	for _, e := range expected {
+		name, ok := helpers.LookupNameForDataSource(e.dataSourceType, e.id)
+		if !ok {
+			t.Errorf("expected %s ID %s to be registered", e.dataSourceType, e.id)
+			continue
+		}
+		if name != e.wantName {
+			t.Errorf("%s ID %s: got name %q, want %q", e.dataSourceType, e.id, name, e.wantName)
+		}
+	}
+
+	// The rule's own ID must not pollute the type-agnostic registry, where it
+	// could later be mistaken for a referenced object of another type.
+	if name, ok := helpers.LookupNameByID("1836678"); ok {
+		t.Errorf("rule's own ID should not be registered type-agnostically, got %q", name)
 	}
 }
