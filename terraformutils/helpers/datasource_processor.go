@@ -154,7 +154,9 @@ func GetDataSourceMappingsForProvider(providerPrefix string) []DataSourceMapping
 
 		// ZIA User/Group Mappings
 		{"users", "zia_user_management"},
+		{"excluded_users", "zia_user_management"},
 		{"groups", "zia_group_management"},
+		{"excluded_groups", "zia_group_management"},
 		{"departments", "zia_department_management"},
 		{"file_type_categories", "zia_file_type_categories"},
 
