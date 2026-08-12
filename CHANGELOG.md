@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.1.22 (August, 12 2026)
+
+
+### Notes
+
+- Release date: (August, 12 2026)
+- Supported Terraform version: **v1.x.x**
+
+## **Enhancements**
+
+- [PR #416](https://github.com/zscaler/zscaler-terraformer/pull/416) - Fixed attribute `excluded_users` mispell on ZIA `zia_dlp_web_rules`
+
 ## 2.1.21 (August, 4 2026)
 
 

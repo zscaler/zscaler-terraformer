@@ -255,7 +255,7 @@ func NestBlocks(resourceType string, schemaBlock *tfjson.SchemaBlock, structData
 			"virtual_zens",
 			"application_groups",
 			"excluded_groups",
-			"exclude_users",
+			"excluded_users",
 			"excluded_departments",
 			"included_domain_profiles",
 			"workload_groups",
