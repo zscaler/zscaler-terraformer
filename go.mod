@@ -11,11 +11,11 @@ require (
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
 	github.com/zclconf/go-cty v1.19.0
-	github.com/zscaler/zscaler-sdk-go/v3 v3.8.55
+	github.com/zscaler/zscaler-sdk-go/v3 v3.8.57
 )
 
 require (
-	github.com/go-jose/go-jose/v4 v4.1.5 // indirect
+	github.com/go-jose/go-jose/v4 v4.1.6 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 )
 
@@ -50,6 +50,6 @@ require (
 	github.com/subosito/gotenv v1.6.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	golang.org/x/sys v0.45.0 // indirect
-	golang.org/x/text v0.42.0 // indirect
+	golang.org/x/text v0.43.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
